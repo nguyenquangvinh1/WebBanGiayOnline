@@ -10,7 +10,7 @@ using WebBanGiay.Data;
 
 namespace WebBanGiay.Areas.Admin.Controllers
 {
-    [Area("Admin")]
+    [Area("Admin")] /*sfsdfsd*/
     public class HoaDonController : Controller
     {
         private readonly AppDbContext _context;
