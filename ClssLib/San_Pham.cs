@@ -33,7 +33,7 @@ namespace ClssLib
         [JsonIgnore]
         public virtual Chat_Lieu Chat_Lieu { get; set; }
         [JsonIgnore]
-        public virtual ICollection<San_Pham_Chi_Tiet> San_Pham_Chi_Tiets { get; set; }
+        public virtual ICollection<San_Pham_Chi_Tiet>? San_Pham_Chi_Tiets { get; set; }
         [JsonIgnore]
         public virtual ICollection<Anh_San_Pham> Anh_San_Phams { get; set; }
     }
