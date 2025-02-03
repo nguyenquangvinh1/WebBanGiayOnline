@@ -15,25 +15,16 @@ namespace ClssLib
         public int so_luong { get; set; }
         public int trang_thai { get; set; }
         [JsonIgnore]
-        public virtual Kieu_Dang Kieu_Dang { get; set; }
+        public virtual Kich_Thuoc Kich_Thuoc { get; set; }
         [JsonIgnore]
         public virtual Mau_Sac Mau_Sac { get; set; }
         [JsonIgnore]
-        public virtual Danh_Muc Danh_Muc { get; set; }
-        [JsonIgnore]
-        public virtual Loai_Giay Loai_Giay { get; set; }
-        [JsonIgnore]
-        public virtual Mui_Giay Mui_Giay { get; set; }
-        [JsonIgnore]
-        public virtual Co_Giay Co_Giay { get; set; }
-        [JsonIgnore]
-        public virtual De_Giay De_Giay { get; set; }
-        [JsonIgnore]
-        public virtual Kich_Thuoc Kich_Thuoc { get; set; }
-        [JsonIgnore]
-        public virtual Chat_Lieu Chat_Lieu { get; set; }
+        public virtual San_Pham San_Pham { get; set; }
         [JsonIgnore]
         public virtual ICollection<Anh_San_Pham> Anh_San_Phams { get; set; }
+        [JsonIgnore]
+        public virtual ICollection<Hoa_Don_Chi_Tiet> Hoa_Don_Chi_Tiets { get; set; }
+
 
     }
 }

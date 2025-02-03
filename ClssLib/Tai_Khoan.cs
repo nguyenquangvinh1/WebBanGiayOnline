@@ -17,8 +17,8 @@ namespace ClssLib
         public DateTime ngay_tao { get; set; }
         public DateTime ngay_sua { get; set; }
 
-        public Nhan_Vien?Nhan_Vien { get; set; }
+        public Nhan_Vien? Nhan_Vien { get; set; }
 
-        public Khach_Hang?Khach_Hang { get; set; }
+        public Khach_Hang? Khach_Hang { get; set; }
     }
 }

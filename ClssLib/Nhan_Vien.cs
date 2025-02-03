@@ -23,6 +23,6 @@ namespace ClssLib
         public Tai_Khoan?Tai_Khoan { get; set; }
      
         [JsonIgnore]
-        public virtual ICollection<Hoa_Don> Hoa_Dons { get; set; }
+        public virtual ICollection<Hoa_Don>? Hoa_Dons { get; set; }
     }
 }

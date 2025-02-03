@@ -28,9 +28,9 @@ namespace ClssLib
         [JsonIgnore]
         public virtual Nhan_Vien Nhan_Vien { get; set; }
         [JsonIgnore]
-        public virtual Phieu_Giam_Gia Giam_Gia { get; set;}
+        public virtual Phieu_Giam_Gia? Giam_Gia { get; set;}
         [JsonIgnore]
-        public virtual ICollection<Thanh_Toan> Thanh_Toans { get; set; }
+        public virtual ICollection<Thanh_Toan>? Thanh_Toans { get; set; }
         [JsonIgnore]
         public virtual ICollection<Hoa_Don_Chi_Tiet> Hoa_Don_Chi_Tiets { get; set; }
 

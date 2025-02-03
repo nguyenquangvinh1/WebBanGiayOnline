@@ -21,6 +21,9 @@ namespace ClssLib
         public string nguoi_sua { get; set; }
         [JsonIgnore]
         public virtual Hoa_Don Hoa_Don { get; set; }
+        [JsonIgnore]
+        public virtual San_Pham_Chi_Tiet San_Pham_Chi_Tiet { get; set; }
+
 
     }
 }

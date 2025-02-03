@@ -17,6 +17,6 @@ namespace ClssLib
         [JsonIgnore]
         public virtual Hoa_Don Hoa_Don { get; set; }
         [JsonIgnore]
-        public virtual Phuong_Thuc_Thanh_Toan Phuong_Thuc_Thanh_Toan { get; set; }
+        public virtual Phuong_Thuc_Thanh_Toan? Phuong_Thuc_Thanh_Toan { get; set; }
     }
 }

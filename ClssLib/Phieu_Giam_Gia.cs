@@ -26,8 +26,8 @@ namespace ClssLib
         public string nguoi_tao { get; set; }
         public string nguoi_sua { get; set; }
         [JsonIgnore]
-        public virtual ICollection<Phieu_Giam_Gia_Khach_Hang> Phieu_Giam_Gia_Khach_Hang { get; set; }
+        public virtual ICollection<Phieu_Giam_Gia_Khach_Hang>? Phieu_Giam_Gia_Khach_Hang { get; set; }
         [JsonIgnore]
-        public virtual ICollection<Hoa_Don> Hoa_Dons { get; set; }
+        public virtual ICollection<Hoa_Don>? Hoa_Dons { get; set; }
     }
 }

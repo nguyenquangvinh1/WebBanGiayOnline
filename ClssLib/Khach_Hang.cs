@@ -21,12 +21,12 @@ namespace ClssLib
         public int trang_thai { get; set; }
         public DateTime ngay_tao { get; set; }
 
-        public Tai_Khoan?Tai_Khoan { get; set; }
+        public Tai_Khoan? Tai_Khoan { get; set; }
      
         [JsonIgnore]
-        public virtual ICollection<Dia_Chi> Dia_Chi { get; set; }
+        public virtual ICollection<Dia_Chi>? Dia_Chi { get; set; }
 
         [JsonIgnore]
-        public virtual ICollection<Hoa_Don> Hoa_Dons { get; set; }
+        public virtual ICollection<Hoa_Don>? Hoa_Dons { get; set; }
     }
 }
