@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -23,10 +24,14 @@ namespace ClssLib
         public DateTime ngay_sua { get; set; }
         public string nguoi_tao { get; set; }
         public string nguoi_sua { get; set; }
+        [ForeignKey("Khach_Hang")]
+        public Guid? Khach_HangID { get; set; }
+        [ForeignKey("Nhan_Vien")]
+        public Guid? Nhan_VienID { get; set; }
         [JsonIgnore]
-        public virtual Khach_Hang Khach_Hang { get; set; }
+        public virtual Khach_Hang? Khach_Hang { get; set; }
         [JsonIgnore]
-        public virtual Nhan_Vien Nhan_Vien { get; set; }
+        public virtual Nhan_Vien? Nhan_Vien { get; set; }
         [JsonIgnore]
         public virtual Phieu_Giam_Gia? Giam_Gia { get; set;}
         [JsonIgnore]

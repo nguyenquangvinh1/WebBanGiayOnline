@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -19,6 +20,8 @@ namespace ClssLib
         public DateTime ngay_sua { get; set; }
         public string nguoi_tao { get; set; }
         public string nguoi_sua { get; set; }
+        [ForeignKey("Hoa_Don")]
+        public Guid Hoa_DonID { get; set; }
         [JsonIgnore]
         public virtual Hoa_Don Hoa_Don { get; set; }
         [JsonIgnore]
