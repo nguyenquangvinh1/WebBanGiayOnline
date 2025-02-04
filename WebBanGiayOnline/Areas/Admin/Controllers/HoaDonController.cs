@@ -10,7 +10,7 @@ using WebBanGiay.Data;
 
 namespace WebBanGiay.Areas.Admin.Controllers
 {
-    [Area("Admin")] /*sfsdfsd*/
+    [Area("Admin")]
     public class HoaDonController : Controller
     {
         private readonly AppDbContext _context;
@@ -57,14 +57,13 @@ namespace WebBanGiay.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,tong_tien,ghi_chu,trang_thai,dia_chi,sdt_nguoi_nhan,email_nguoi_nhan,loai_hoa_don,ten_nguoi_nhan,thoi_gian_nhan_hang,ngay_tao,ngay_sua,nguoi_tao,nguoi_sua")] Hoa_Don hoa_Don)
         {
-            if (ModelState.IsValid)
-            {
-                hoa_Don.ID = Guid.NewGuid();
-                _context.Add(hoa_Don);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(hoa_Don);
+
+
+            hoa_Don.ID = Guid.NewGuid();
+
+            _context.Add(hoa_Don);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Admin/HoaDon/Edit/5
