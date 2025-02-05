@@ -1,83 +1,125 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using ClssLib;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WebBanGiay.Data;
 
 namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 {
+
+    [Area("Admin")] /*sfsdfsd*/
     public class DanhMucController : Controller
     {
-        // GET: DanhMucController
-        public ActionResult Index()
+        private readonly AppDbContext _context;
+
+        public DanhMucController(AppDbContext context)
         {
-            return View();
+            _context = context;
+        }
+        public async Task<IActionResult> Index()
+        {
+            return View(await _context.danh_Mucs.ToListAsync());
         }
 
-        // GET: DanhMucController/Details/5
-        public ActionResult Details(int id)
+        // GET: KieuDangController/Details/5
+        public async Task<IActionResult> Details(Guid? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var danh = await _context.danh_Mucs
+                .FirstOrDefaultAsync(m => m.ID == id);
+            if (danh == null)
+            {
+                return NotFound();
+            }
+
+            return View(danh);
         }
 
-        // GET: DanhMucController/Create
+        // GET: KieuDangController/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: DanhMucController/Create
+        // POST: KieuDangController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Create(Danh_Muc danh_Muc)
         {
-            try
+            if (ModelState.IsValid)
             {
+                danh_Muc.ID = Guid.NewGuid();
+                _context.danh_Mucs.Add(danh_Muc);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
+            return View(danh_Muc);
         }
 
-        // GET: DanhMucController/Edit/5
-        public ActionResult Edit(int id)
+        // GET: KieuDangController/Edit/5
+        public async Task<IActionResult> Edit(Guid? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var danh = await _context.danh_Mucs.FindAsync(id);
+            if (danh == null)
+            {
+                return NotFound();
+            }
+            return View(danh);
         }
 
-        // POST: DanhMucController/Edit/5
+        // POST: KieuDangController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<IActionResult> Edit(Danh_Muc danh_Muc)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            var danh = await _context.danh_Mucs.FindAsync(danh_Muc);
+            if (danh == null)
+                return NotFound();
+            _context.Entry(danh_Muc).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: DanhMucController/Delete/5
-        public ActionResult Delete(int id)
+        // GET: KieuDangController/Delete/5
+        public async Task<IActionResult> Delete(Guid? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var danh = await _context.danh_Mucs
+                .FirstOrDefaultAsync(m => m.ID == id);
+            if (danh == null)
+            {
+                return NotFound();
+            }
+
+            return View(danh);
         }
 
-        // POST: DanhMucController/Delete/5
+        // POST: KieuDangController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            try
+            var danh = await _context.danh_Mucs.FindAsync(id);
+            if (danh != null)
             {
-                return RedirectToAction(nameof(Index));
+                _context.danh_Mucs.Remove(danh);
             }
-            catch
-            {
-                return View();
-            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
     }
 }

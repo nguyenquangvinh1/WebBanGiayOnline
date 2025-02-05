@@ -1,83 +1,125 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using ClssLib;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WebBanGiay.Data;
 
 namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 {
+
+    [Area("Admin")] /*sfsdfsd*/
     public class LoaiGiayController : Controller
     {
-        // GET: LoaiGiayController
-        public ActionResult Index()
+        private readonly AppDbContext _context;
+
+        public LoaiGiayController(AppDbContext context)
         {
-            return View();
+            _context = context;
+        }
+        public async Task<IActionResult> Index()
+        {
+            return View(await _context.loai_Giays.ToListAsync());
         }
 
-        // GET: LoaiGiayController/Details/5
-        public ActionResult Details(int id)
+        // GET: KieuDangController/Details/5
+        public async Task<IActionResult> Details(Guid? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var loai = await _context.loai_Giays
+                .FirstOrDefaultAsync(m => m.ID == id);
+            if (loai == null)
+            {
+                return NotFound();
+            }
+
+            return View(loai);
         }
 
-        // GET: LoaiGiayController/Create
+        // GET: KieuDangController/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: LoaiGiayController/Create
+        // POST: KieuDangController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Create(Loai_Giay loai_Giay)
         {
-            try
+            if (ModelState.IsValid)
             {
+                loai_Giay.ID = Guid.NewGuid();
+                _context.loai_Giays.Add(loai_Giay);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
+            return View(loai_Giay);
         }
 
-        // GET: LoaiGiayController/Edit/5
-        public ActionResult Edit(int id)
+        // GET: KieuDangController/Edit/5
+        public async Task<IActionResult> Edit(Guid? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var loai = await _context.loai_Giays.FindAsync(id);
+            if (loai == null)
+            {
+                return NotFound();
+            }
+            return View(loai);
         }
 
-        // POST: LoaiGiayController/Edit/5
+        // POST: KieuDangController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<IActionResult> Edit(Loai_Giay loai_Giay)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            var loai = await _context.loai_Giays.FindAsync(loai_Giay.ID);
+            if (loai == null)
+                return NotFound();
+            _context.Entry(loai_Giay).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: LoaiGiayController/Delete/5
-        public ActionResult Delete(int id)
+        // GET: KieuDangController/Delete/5
+        public async Task<IActionResult> Delete(Guid? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var loai = await _context.loai_Giays
+                .FirstOrDefaultAsync(m => m.ID == id);
+            if (loai == null)
+            {
+                return NotFound();
+            }
+
+            return View(loai);
         }
 
-        // POST: LoaiGiayController/Delete/5
+        // POST: KieuDangController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            try
+            var loai = await _context.loai_Giays.FindAsync(id);
+            if (loai != null)
             {
-                return RedirectToAction(nameof(Index));
+                _context.loai_Giays.Remove(loai);
             }
-            catch
-            {
-                return View();
-            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
     }
 }

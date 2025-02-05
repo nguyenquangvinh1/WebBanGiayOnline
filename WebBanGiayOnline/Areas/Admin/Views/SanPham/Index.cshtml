@@ -1,0 +1,107 @@
+﻿@model IEnumerable<ClssLib.San_Pham>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ten_san_pham)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.mo_ta)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.trang_thai)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ngay_tao)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ngay_sua)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.nguoi_tao)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.nguoi_sua)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Kieu_Dang)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Danh_Muc)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Loai_Giay)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Mui_Giay)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Co_Giay)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.De_Giay)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Chat_Lieu)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ten_san_pham)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.mo_ta)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.trang_thai)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ngay_tao)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ngay_sua)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.nguoi_tao)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.nguoi_sua)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Kieu_Dang.ma)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Danh_Muc.ma)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Loai_Giay.ma)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Mui_Giay.ma)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Co_Giay.ma)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.De_Giay.ma)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Chat_Lieu.ma)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
