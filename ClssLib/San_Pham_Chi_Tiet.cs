@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -14,6 +15,12 @@ namespace ClssLib
         public decimal gia { get; set; }
         public int so_luong { get; set; }
         public int trang_thai { get; set; }
+        [ForeignKey("Kich_Thuoc")]
+        public Guid Kich_ThuocID { get; set; }
+        [ForeignKey("Mau_Sac")]
+        public Guid Mau_SacID { get; set; }
+        [ForeignKey("San_Pham")]
+        public Guid San_PhamID { get; set; }
         [JsonIgnore]
         public virtual Kich_Thuoc Kich_Thuoc { get; set; }
         [JsonIgnore]
@@ -21,9 +28,9 @@ namespace ClssLib
         [JsonIgnore]
         public virtual San_Pham San_Pham { get; set; }
         [JsonIgnore]
-        public virtual ICollection<Anh_San_Pham> Anh_San_Phams { get; set; }
+        public virtual ICollection<Anh_San_Pham>? Anh_San_Phams { get; set; }
         [JsonIgnore]
-        public virtual ICollection<Hoa_Don_Chi_Tiet> Hoa_Don_Chi_Tiets { get; set; }
+        public virtual ICollection<Hoa_Don_Chi_Tiet>? Hoa_Don_Chi_Tiets { get; set; }
 
 
     }

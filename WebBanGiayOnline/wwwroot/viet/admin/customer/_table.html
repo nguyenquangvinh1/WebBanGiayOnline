@@ -1,0 +1,110 @@
+<div class="row mx-0 bg-white" ng-if="items">
+	<div class="col-12 py-3">
+		<div class="col-12 py-3 d-flex justify-content-end">
+			<input type="text" id="searchInput" placeholder="Tìm kiếm..." class="form-control"
+				style="max-width: 200px;">
+		</div>
+		<table id="datatable-buttons" class="table table-collapse table-bordered dt-responsive">
+			<thead>
+				<tr>
+					<th>Id</th>
+					<th>Tên khách hàng</th>
+					<th>Email</th>
+					<th>SĐT</th>
+					<th>SĐT thay thế</th>
+					<th>Địa chỉ </th>
+					<th>Địa chỉ thay thế</th>
+					<th>Tùy Chỉnh</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td class="align-center">1</td>
+					<td class="align-center w-25">Nguyễn Đức Lương</td>
+					<td class="align-center">luong123@gmail.com</td>
+					<td class="align-center">0345783896</td>
+					<td class="align-center">0348726529</td>
+					<td class="align-center">Bắc Từ Liêm, Hà Nội</td>
+					<td class="align-center">Thanh Xuân, Hà Nội</td>
+					<td class="align-center">
+						<div class="btn-group btn-group-xs">
+							<button ng-click="edit(item)" class="btn btn-icon">
+								<i class="fa fa-xs fa-pen"></i>
+							</button>
+							<button ng-click="delete(item)" class="btn btn-danger">
+								<i class="fa fa-xs fa-times"></i>
+							</button>
+						</div>
+
+					</td>
+				</tr>
+				<tr>
+					<td class="align-center">2</td>
+					<td class="align-center w-25">Bùi Đức Việt</td>
+					<td class="align-center">viet123@gmail.com</td>
+					<td class="align-center">0967265925</td>
+					<td class="align-center"></td>
+					<td class="align-center">Nam Từ Liêm, Hà Nội</td>
+					<td class="align-center"></td>
+					<td class="align-center">
+						<div class="btn-group btn-group-xs">
+							<button ng-click="edit(item)" class="btn btn-icon">
+								<i class="fa fa-xs fa-pen"></i>
+							</button>
+							<button ng-click="delete(item)" class="btn btn-danger">
+								<i class="fa fa-xs fa-times"></i>
+							</button>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td class="align-center">3</td>
+					<td class="align-center w-25">Trần Huyền Trang</td>
+					<td class="align-center">trang123@gmail.com</td>
+					<td class="align-center">0894639565</td>
+					<td class="align-center">0967265925</td>
+					<td class="align-center">Bắc Từ Liêm, Hà Nội</td>
+					<td class="align-center"></td>
+					<td class="align-center">
+						<div class="btn-group btn-group-xs">
+							<button ng-click="edit(item)" class="btn btn-icon">
+								<i class="fa fa-xs fa-pen"></i>
+							</button>
+							<button ng-click="delete(item)" class="btn btn-danger">
+								<i class="fa fa-xs fa-times"></i>
+							</button>
+						</div>
+
+					</td>
+				</tr>
+				<tr>
+					<td class="align-center">4</td>
+					<td class="align-center w-25">Lỗ Quyết Định</td>
+					<td class="align-center">dinh123@gmail.com</td>
+					<td class="align-center">0896464620</td>
+					<td class="align-center"></td>
+					<td class="align-center">Nam Từ Liêm, Hà Nội</td>
+					<td class="align-center">Bắc Từ Liêm, Hà Nội</td>
+					<td class="align-center">
+						<div class="btn-group btn-group-xs">
+							<button ng-click="edit(item)" class="btn btn-icon">
+								<i class="fa fa-xs fa-pen"></i>
+							</button>
+							<button ng-click="delete(item)" class="btn btn-danger">
+								<i class="fa fa-xs fa-times"></i>
+							</button>
+						</div>
+
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<div id="pagination" class="d-flex justify-content-end mt-3">
+			<button id="prevBtn" class="btn btn-secondary me-2" onclick="changePage(-1)">Trước</button>
+			<div id="pageNumbers" style="margin: 0 10px;" class="d-flex align-items-center">1 2 3 ... 99</div>
+			<button id="nextBtn" class="btn btn-secondary ms-2" onclick="changePage(1)">Tiếp theo</button>
+		</div>
+	</div>
+</div>
+
+<!-- <script src="/assetss/js/init.js"></script> -->

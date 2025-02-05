@@ -4,9 +4,6 @@
     ViewData["Title"] = "Index";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 
 <div class="page-header">
     <h2 class="header-title">@ViewData["Title"] :</h2>
@@ -25,210 +22,126 @@
     </div>
 </div>
 
-<div class="card">
+<div class="card shadow-sm rounded">
     <div class="card-body">
-        <div class="row m-b-30">
-            <div class="col-lg-8">
-                <div class="d-md-flex">
-                    <div class="m-b-10">
-                        <select class="custom-select" style="min-width: 200px;" id="trangthaidonhang" name="trangthaidonhang" asp-items="ViewBag.TrangThai">
-                            <option selected>All</option>
-                        </select>
-                    </div>
-                </div>
+        <div class="row mb-3">
+            <div class="col-lg-8 d-flex align-items-center">
+                
+                <a asp-action="Create" class="btn btn-success ml-3">
+                    <i class="fa fa-plus"></i> Thêm mới
+                </a>
             </div>
         </div>
         <div class="table-responsive">
             <table class="table table-hover e-commerce-table">
-                <thead>
+                <thead class="bg-primary text-white">
                     <tr>
-                        <th>
-                            Người đặt
-                        </th>
+                        <th>Người đặt</th>
                         <th>Địa chỉ</th>
                         <th>Số điện thoại</th>
                         <th>Tổng tiền</th>
                         <th>Ngày xuất hóa đơn</th>
+                        <th>Nhân viên</th>
                         <th>Trạng thái đơn hàng</th>
-
-
-
+                        <th>Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @if (Model != null)
+                    @foreach (var item in Model)
                     {
-                        foreach (var item in Model)
-                        {
-                            <tr>
-                                <td>
-                                    @if (@item.Khach_Hang != null)
-                                    {
-                                        @item.Khach_Hang.ho_ten
-                                    }
-                                    else
-                                    {
-                                        <p>NULL</p>
-                                    }
-                                </td>
-                                <td>
-                                    @item.
-                                </td>
-                                <td>
-                                    @item.sdt_nguoi_nhan
-                                </td>
-
-                                <td>@string.Format("{0:0,0}", item.tong_tien) VND</td>
-                                <td>  @String.Format("{0:dd/MM/yyyy}", item.ngay_tao)</td>
-                                <td>
-                                    @if (item.trang_thai.ToString().Equals("Đã Giao", StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        <div class="d-flex align-items-center">
-                                            <div class="badge badge-success badge-dot m-r-10"></div>
-                                            <div>Đã Giao</div>
-                                        </div>
-                                    }
-                                    else if (item.trang_thai.ToString().Equals("Đang Giao", StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        <div class="d-flex align-items-center">
-                                            <div class="badge badge-warning badge-dot m-r-10"></div>
-                                            <div>Đang Giao</div>
-                                        </div>
-                                    }
-
-                                    else if (item.trang_thai.ToString().Equals("Đơn hàng thành công", StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        <div class="d-flex align-items-center">
-                                            <div class="badge badge-success badge-dot m-r-10"></div>
-                                            <div>Thành công</div>
-                                        </div>
-                                    }
-                                    else if (item.trang_thai.ToString().Equals("Đã đóng gói", StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        <div class="d-flex align-items-center">
-                                            <div class="badge badge-warning badge-dot m-r-10"></div>
-                                            <div>Đã đóng gói</div>
-                                        </div>
-                                    }
-                                    else if (item.trang_thai.ToString().Equals("Chưa xác nhận", StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        <div class="d-flex align-items-center">
-                                            <div class="badge badge-danger badge-dot m-r-10"></div>
-                                            <div>Chưa Xác Nhận</div>
-                                        </div>
-                                    }
-                                    else if (item.trang_thai.ToString().Equals("Đã xác nhận", StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        <div class="d-flex align-items-center">
-                                            <div class="badge badge-danger badge-dot m-r-10"></div>
-                                            <div>Đã xác nhận</div>
-                                        </div>
-                                    }
-                                </td>
-
-
-                                <td>
-                                    <div class="btn-group btn-group-sm ">
-                                        <a class="m-10" asp-action="Details" asp-controller="HoaDon" asp-route-id="@item.ID">
-                                            <i class="fas fa-pen btn btn-primary "></i>
-                                        </a>
-                                        <a class="m-10" data-toggle="modal" data-target="#deleteModal-@item.ID">
-                                            <i class="fas fa-trash-alt btn btn-danger "></i>
-                                        </a>
-                                    </div>
-                                </td>
-                                <td class="text-right">
-
-                                    <form asp-area="Admin" asp-controller="HoaDon" asp-action="Delete" asp-route-id="@item.ID">
-                                        @Html.AntiForgeryToken()
-                                        <div class="modal fade" id="deleteModal-@item.ID" role="dialog">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="exampleModalLabel">Xóa Đơn Hàng:</h5>
-                                                        <button type="button" class="close" data-dismiss="modal">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
-                                                    </div>
-                                                    <div class="modal-body text-center">
-                                                        <div class="warning">Bạn muốn xóa đơn hàng này?</div>
-                                                        <div class="text-danger ">Mã đơn hàng : @item.ID </div>
-                                                        <div class="text-danger ">
-                                                            Người nhận : @if (@item.Khach_Hang != null)
-                                                            {
-                                                                @item.Khach_Hang.ho_ten
-                                                            }
-                                                        </div>
-                                                        <div class="text-danger ">Địa chỉ : @item.dia_chi </div>
-                                                        <div class="text-danger ">Tổng tiền : @item.tong_tien </div>
-
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-default btn-tone" data-dismiss="modal">Đóng</button>
-                                                        <button type="submit" class="btn btn-danger btn-tone">Xóa</button>
-                                                    </div>
-                                                </div>
+                        <tr>
+                            <td>@(item.Khach_HangID != null ? item.ten_nguoi_nhan : "NULL")</td>
+                            <td>@item.dia_chi</td>
+                            <td>@item.sdt_nguoi_nhan</td>
+                            <td>@string.Format("{0:0,0} VND", item.tong_tien)</td>
+                            <td>@item.thoi_gian_nhan_hang.ToString("dd/MM/yyyy")</td>
+                            <td>@(item.Nhan_VienID != null ? item.nguoi_tao : "NULL")</td>
+                            <td>
+                                @if (item.trang_thai == 1)
+                                {
+                                    <span class="badge badge-primary p-2">Chờ xác nhận</span>
+                                }
+                                else if (item.trang_thai == 2)
+                                {
+                                    <span class="badge badge-warning p-2">Đang giao</span>
+                                }
+                                else if (item.trang_thai == 3)
+                                {
+                                    <span class="badge badge-success p-2">Hoàn thành</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-secondary p-2">Chưa xác định</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a asp-action="Details" asp-controller="HoaDon" asp-route-id="@item.ID" class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal-@item.ID">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <form asp-area="Admin" asp-controller="HoaDon" asp-action="Delete" asp-route-id="@item.ID">
+                                @Html.AntiForgeryToken()
+                                <div class="modal fade" id="deleteModal-@item.ID" role="dialog">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel">Xóa Đơn Hàng:</h5>
+                                                <button type="button" class="close" data-dismiss="modal">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
                                             </div>
+                                            <div class="modal-body text-center">
+                                                <div class="warning">Bạn muốn xóa đơn hàng này?</div>
+                                                <div class="text-danger ">Mã đơn hàng : @item.ID </div>
+                                                <div class="text-danger ">
+                                                    Người nhận : @if (@item.Khach_HangID != null)
+                                                    {
+                                                        @item.ten_nguoi_nhan
+                                                    }
+                                                </div>
+                                                <div class="text-danger ">Số điện thoại : @item.sdt_nguoi_nhan </div>
+                                                <div class="text-danger ">Địa chỉ : @item.dia_chi </div>
+                                                <div class="text-danger ">Tổng tiền : @item.tong_tien </div>
+
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default btn-tone" data-dismiss="modal">Đóng</button>
+                                                <button type="submit" class="btn btn-danger btn-tone">Xóa</button>
+                                            </div>
+                                           
                                         </div>
-                                    </form>
-                                </td>
-                            </tr>
-                        }
+                                    </div>
+                                </div>
+                            </form>
+                        </tr>
                     }
-
-
                 </tbody>
             </table>
         </div>
     </div>
 </div>
-<div aria-label="Page navigation example">
-    <ul class="pagination">
-        <pager class="pager-container" list="@Model" asp-area="Admin" asp-controller="AdminDonHangs" asp-route-TinhTrang="@ViewBag.CurrentTinhTrang" asp-action="Index" />
-    </ul>
-</div>
+
 @section Scripts {
     <script>
         $(document).ready(function () {
-            jQuery("#trangthaidonhang").change(function () {
-                var trangthaidonhang = jQuery(this).children(":selected").attr("value");
-
-                $('#trangthaidonhang option')
-                    .removeAttr('selected');
-                $("#trangthaidonhang > [value='" + trangthaidonhang + "']").attr("selected", "true");
+            $("#trangthaidonhang").change(function () {
+                var trangthaidonhang = $(this).val();
                 $.ajax({
                     url: '/Admin/AdminDonHangs/Filtter',
-                    datatype: "json",
                     type: "GET",
-                    data: {
-                        trangthai: trangthaidonhang
-                    },
-                    async: true,
+                    data: { trangthai: trangthaidonhang },
                     success: function (results) {
-                        if (results.status == "success") {
+                        if (results.status === "success") {
                             window.location.href = results.redirectUrl;
                         }
                     },
-                    error: function (xhr) {
-                        alert('error');
-                    }
-                });
-            });
-
-            $("#keyword").keyup(function () {
-                var strkeyword = $('#keyword').val();
-                $.ajax({
-                    url: '/Admin/Search/FindProduct/',
-                    datatype: "json",
-                    type: "POST",
-                    data: { keyword: strkeyword },
-                    async: true,
-                    success: function (results) {
-                        $("#records_table").html("");
-                        $("#records_table").html(results);
-                    },
-                    error: function (xhr) {
-                        alert('error');
+                    error: function () {
+                        alert('Lỗi tải dữ liệu');
                     }
                 });
             });

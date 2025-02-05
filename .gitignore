@@ -362,5 +362,13 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /WebBanGiayOnline/appsettings.json
+<<<<<<< HEAD
 /WebBanGiayOnline/Migrations/20250204033406_datn.cs
+=======
+/WebBanGiayOnline/Migrations/20250128030109_datn.cs
+/WebBanGiayOnline/Migrations/20250203115609_test1.cs
 /WebBanGiayOnline/Migrations/AppDbContextModelSnapshot.cs
+/WebBanGiayOnline/Migrations/20250204055601_test1.cs
+>>>>>>> 377f179670ed4674beb103ccf999f6f2834ba5ab
+/WebBanGiayOnline/Migrations/AppDbContextModelSnapshot.cs
+/WebBanGiayOnline/Migrations/20250204112725_datn.cs

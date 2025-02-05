@@ -1,0 +1,63 @@
+<div class="row mx-0 bg-white">
+	<div class="col-md-8">
+		<form class="form p-3">
+			<div class="row">
+				<div class="col-12 col-md-6 col-lg-6 mb-3">
+					<label class="form-label">Mã</label>
+					<input type="text" class="form-control" ng-model="form.name">
+				</div>
+				<div class="col-12 col-md-6 col-lg-6 mb-3">
+					<label class="form-label">Giảm giá</label>
+					<input type="text" class="form-control" ng-model="form.price">
+				</div>
+				<div class="col-12 col-md-6 col-lg-6 mb-3">
+					<label class="form-label">Tổng tiền tối thiểu</label>
+					<input type="text" class="form-control" ng-model="form.price_min">
+				</div>
+				<div class="col-12 col-md-6 col-lg-6 mb-3">
+					<label class="form-label">Ngày bắt đầu</label>
+					<input type="text" class="form-control" ng-model="form.date_start">
+				</div>
+				<div class="col-12 col-md-6 col-lg-6 mb-3">
+					<label class="form-label">Ngày kết thúc</label>
+					<input type="text" class="form-control" ng-model="form.date_end">
+				</div>
+				<div class="col-12 col-md-6 col-lg-6 mb-3">
+					<label class="form-label">Số lượng</label>
+					<input type="text" class="form-control" ng-model="form.quantity">
+				</div>
+				<div class="col-12 col-md-6 col-lg-6 mb-3">
+					<label class="form-label">Mô tả</label>
+					<input type="text" class="form-control" ng-model="form.description">
+				</div>
+				<div class="col-12 col-md-6 col-lg-6 mb-3">
+					<label>Trạng Thái</label>
+					<div class="col-md-10">
+						<div class="form-check-inline pr-3">
+							<div class="custom-control custom-radio">
+								<input type="radio" class="custom-control-input" id="yes" name="available"
+									ng-model="form.available" ng-value="true">
+								<label class="custom-control-label" for="yes">Hoạt động</label>
+							</div>
+						</div>
+						<div class="form-check-inline">
+							<div class="custom-control custom-radio">
+								<input type="radio" class="custom-control-input" id="no" name="available"
+									ng-model="form.available" ng-value="false">
+								<label class="custom-control-label" for="no">Không hoạt động</label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<div class="card-header text-center">
+	<button ng-click="create()" class="btn btn-primary">
+		<i class="fas fa-plus"></i> Thêm
+	</button>
+	<button ng-click="update()" class="btn btn-success">
+		<i class="far fa-save"></i> Cập nhật
+	</button>
+</div>

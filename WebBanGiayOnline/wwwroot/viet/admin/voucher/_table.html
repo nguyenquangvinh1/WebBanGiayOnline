@@ -1,0 +1,95 @@
+<div class="row mx-0 bg-white" ng-if="items">
+	<div class="col-12 py-3">
+		<div class="col-12 py-3 d-flex justify-content-end">
+			<input type="text" id="searchInput" placeholder="Tìm kiếm..." class="form-control"
+				style="max-width: 200px;">
+		</div>
+		<table id="datatable-buttons" class="table table-collapse table-bordered dt-responsive">
+			<thead>
+				<tr>
+					<th>Mã</th>
+					<th>Giảm giá</th>
+					<th>Tổng tiền tối thiểu</th>
+					<th>Ngày bắt đầu</th>
+					<th>Ngày kết thúc</th>
+					<th>Số lượng </th>
+					<th>Mô tả</th>
+					<th>Trạng thái</th>
+					<th>Tùy Chỉnh</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td class="align-center">GIAM2010</td>
+					<td class="align-center">500000</td>
+					<td class="align-center">2000000</td>
+					<td class="align-center">18/10/2024</td>
+					<td class="align-center">22/10/2024</td>
+					<td class="align-center">500</td>
+					<td class="align-center">Mã giảm giá ngày 20/10</td>
+					<td class="align-center">Không hoạt động</td>
+					<td class="align-center">
+						<div class="btn-group btn-group-xs">
+							<button ng-click="edit(item)" class="btn btn-icon">
+								<i class="fa fa-xs fa-pen"></i>
+							</button>
+							<button ng-click="delete(item)" class="btn btn-danger">
+								<i class="fa fa-xs fa-times"></i>
+							</button>
+						</div>
+
+					</td>
+				</tr>
+				<tr>
+					<td class="align-center">GIAM1111</td>
+					<td class="align-center">100000</td>
+					<td class="align-center">1000000</td>
+					<td class="align-center">10/11/2024</td>
+					<td class="align-center">12/11/2024</td>
+					<td class="align-center">111</td>
+					<td class="align-center">Mã giảm giá ngày 11/11</td>
+					<td class="align-center">Hoạt động</td>
+					<td class="align-center">
+						<div class="btn-group btn-group-xs">
+							<button ng-click="edit(item)" class="btn btn-icon">
+								<i class="fa fa-xs fa-pen"></i>
+							</button>
+							<button ng-click="delete(item)" class="btn btn-danger">
+								<i class="fa fa-xs fa-times"></i>
+							</button>
+						</div>
+
+					</td>
+				</tr>
+				<tr>
+					<td class="align-center">GIAM1212</td>
+					<td class="align-center">200000</td>
+					<td class="align-center">1500000</td>
+					<td class="align-center">10/12/2024</td>
+					<td class="align-center">13/12/2024</td>
+					<td class="align-center">100</td>
+					<td class="align-center">Mã giảm giá ngày 12/12</td>
+					<td class="align-center">Hoạt động</td>
+					<td class="align-center">
+						<div class="btn-group btn-group-xs">
+							<button ng-click="edit(item)" class="btn btn-icon">
+								<i class="fa fa-xs fa-pen"></i>
+							</button>
+							<button ng-click="delete(item)" class="btn btn-danger">
+								<i class="fa fa-xs fa-times"></i>
+							</button>
+						</div>
+
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<div id="pagination" class="d-flex justify-content-end mt-3">
+			<button id="prevBtn" class="btn btn-secondary me-2" onclick="changePage(-1)">Trước</button>
+			<div id="pageNumbers" style="margin: 0 10px;" class="d-flex align-items-center">1 2 3 ... 99</div>
+			<button id="nextBtn" class="btn btn-secondary ms-2" onclick="changePage(1)">Tiếp theo</button>
+		</div>
+	</div>
+</div>
+
+<!-- <script src="/assetss/js/init.js"></script> -->

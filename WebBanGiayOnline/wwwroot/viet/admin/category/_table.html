@@ -1,0 +1,96 @@
+<div class="row mx-0 bg-white" ng-if="items">
+	<div class="col-12 py-3">
+		<div class="col-12 py-3 d-flex justify-content-end">
+			<input type="text" id="searchInput" placeholder="Tìm kiếm..." class="form-control"
+				style="max-width: 200px;">
+		</div>
+		<table id="datatable-buttons" class="table table-collapse table-bordered dt-responsive">
+			<thead>
+				<tr>
+					<th>Mã DM</th>
+					<th>Tên Danh Mục</th>
+					<th>#</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="item in items">
+					<td class="align-center">1</td>
+					<td class="align-center">Áo sơ mi</td>
+					<td class="align-center">
+						<div class="btn-group btn-group-xs">
+							<button ng-click="edit(item)" class="btn btn-icon">
+								<i class="fa fa-xs fa-pen"></i>
+							</button>
+							<button ng-click="delete(item)" class="btn btn-danger">
+								<i class="fa fa-xs fa-times"></i>
+							</button>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td class="align-center">2</td>
+					<td class="align-center">Quần jean</td>
+					<td class="align-center">
+						<div class="btn-group btn-group-xs">
+							<button ng-click="edit(item)" class="btn btn-icon">
+								<i class="fa fa-xs fa-pen"></i>
+							</button>
+							<button ng-click="delete(item)" class="btn btn-danger">
+								<i class="fa fa-xs fa-times"></i>
+							</button>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td class="align-center">3</td>
+					<td class="align-center">Áo thun</td>
+					<td class="align-center">
+						<div class="btn-group btn-group-xs">
+							<button ng-click="edit(item)" class="btn btn-icon">
+								<i class="fa fa-xs fa-pen"></i>
+							</button>
+							<button ng-click="delete(item)" class="btn btn-danger">
+								<i class="fa fa-xs fa-times"></i>
+							</button>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td class="align-center">4</td>
+					<td class="align-center">Quần tây</td>
+					<td class="align-center">
+						<div class="btn-group btn-group-xs">
+							<button ng-click="edit(item)" class="btn btn-icon">
+								<i class="fa fa-xs fa-pen"></i>
+							</button>
+							<button ng-click="delete(item)" class="btn btn-danger">
+								<i class="fa fa-xs fa-times"></i>
+							</button>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td class="align-center">5</td>
+					<td class="align-center">Áo khoác</td>
+					<td class="align-center">
+						<div class="btn-group btn-group-xs">
+							<button ng-click="edit(item)" class="btn btn-icon">
+								<i class="fa fa-xs fa-pen"></i>
+							</button>
+							<button ng-click="delete(item)" class="btn btn-danger">
+								<i class="fa fa-xs fa-times"></i>
+							</button>
+						</div>
+					</td>
+				</tr>
+
+			</tbody>
+		</table>
+		<div id="pagination" class="d-flex justify-content-end mt-3">
+			<button id="prevBtn" class="btn btn-secondary me-2" onclick="changePage(-1)">Trước</button>
+			<div id="pageNumbers" style="margin: 0 10px;" class="d-flex align-items-center">1 2 3 ... 99</div>
+			<button id="nextBtn" class="btn btn-secondary ms-2" onclick="changePage(1)">Tiếp theo</button>
+		</div>
+	</div>
+</div>
+<!-- <script src="/assetss/js/init.js"></script> -->

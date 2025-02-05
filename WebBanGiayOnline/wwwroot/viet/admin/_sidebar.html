@@ -1,0 +1,78 @@
+<div class="left side-menu">
+	<button type="button" class="button-menu-mobile button-menu-mobile-topbar open-left waves-effect">
+		<i class="mdi mdi-close"></i>
+	</button>
+	<div class="topbar-left">
+		<div class="text-center bg-logo">
+			<a href="/" class="logo">
+				<img src="/assets/img/logo">
+			</a>
+		</div>
+	</div>
+	<div class="sidebar-inner slimscrollleft">
+		<div id="sidebar-menu">
+			<ul>
+				<li>
+					<a href="/admin" class="waves-effect">
+						<i class="dripicons-device-desktop"></i>
+						<span>Trang chính</span>
+					</a>
+				</li>
+				<li>
+					<a href="#!product" class="waves-effect">
+						<i class="dripicons-to-do"></i>
+						<span>Sản Phẩm</span>
+					</a>
+				</li>
+				<li>
+					<a href="#!category" class="waves-effect">
+						<i class="dripicons-to-do"></i>
+						<span>Danh mục</span>
+					</a>
+				</li>
+				<li>
+					<a href="#!order" class="waves-effect">
+						<i class="dripicons-to-do"></i>
+						<span>Đơn Hàng</span>
+					</a>
+				</li>
+				<li>
+					<a href="#!charts" class="waves-effect">
+						<i class="dripicons-to-do"></i>
+						<span>Thống Kê</span>
+					</a>
+				</li>
+				<li>
+					<a href="#!voucher" class="waves-effect">
+						<i class="dripicons-to-do"></i>
+						<span>Voucher</span>
+					</a>
+				</li>
+				<li class="nav-item dropdown">
+					<a href="" class="nav-link dropdown-toggle" id="accountDropdown" data-toggle="dropdown"
+						aria-haspopup="true" aria-expanded="false">
+						<i class="dripicons-to-do"></i>
+						<span>Tài khoản</span>
+					</a>
+					<div class="dropdown-menu keep-open" style="margin-left: 57px;" aria-labelledby="accountDropdown">
+						<div style="background-color: #ffffff; font-size: 13px;">
+							<a style="padding-bottom: 15px;" class="dropdown-item" href="#!customer">Khách hàng</a>
+							<a style="padding-bottom: 15px;" class="dropdown-item" href="#!account">Quản Lý</a>
+							<!-- <a style="padding-bottom: 15px;" class="dropdown-item" href="#">Đăng xuất</a> -->
+						</div>
+
+					</div>
+				</li>
+			</ul>
+		</div>
+		<div class="clearfix"></div>
+	</div>
+</div>
+
+<script>
+	document.querySelectorAll('.dropdown-menu.keep-open').forEach(dropdown => {
+		dropdown.addEventListener('click', function (event) {
+			event.stopPropagation();
+		});
+	});
+</script>
