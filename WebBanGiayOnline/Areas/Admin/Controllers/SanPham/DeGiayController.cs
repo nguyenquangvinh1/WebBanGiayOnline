@@ -1,83 +1,125 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using ClssLib;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WebBanGiay.Data;
 
 namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 {
+
+    [Area("Admin")] /*sfsdfsd*/
     public class DeGiayController : Controller
     {
-        // GET: DeGiayController
-        public ActionResult Index()
+        private readonly AppDbContext _context;
+
+        public DeGiayController(AppDbContext context)
         {
-            return View();
+            _context = context;
+        }
+        public async Task<IActionResult> Index()
+        {
+            return View(await _context.de_Giays.ToListAsync());
         }
 
-        // GET: DeGiayController/Details/5
-        public ActionResult Details(int id)
+        // GET: KieuDangController/Details/5
+        public async Task<IActionResult> Details(Guid? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var de = await _context.de_Giays
+                .FirstOrDefaultAsync(m => m.ID == id);
+            if (de == null)
+            {
+                return NotFound();
+            }
+
+            return View(de);
         }
 
-        // GET: DeGiayController/Create
+        // GET: KieuDangController/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: DeGiayController/Create
+        // POST: KieuDangController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Create(De_Giay de_Giay)
         {
-            try
+            if (ModelState.IsValid)
             {
+                de_Giay.ID = Guid.NewGuid();
+                _context.de_Giays.Add(de_Giay);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
+            return View(de_Giay);
         }
 
-        // GET: DeGiayController/Edit/5
-        public ActionResult Edit(int id)
+        // GET: KieuDangController/Edit/5
+        public async Task<IActionResult> Edit(Guid? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var de = await _context.de_Giays.FindAsync(id);
+            if (de == null)
+            {
+                return NotFound();
+            }
+            return View(de);
         }
 
-        // POST: DeGiayController/Edit/5
+        // POST: KieuDangController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<IActionResult> Edit(De_Giay de_Giay)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            var de = await _context.de_Giays.FindAsync(de_Giay.ID);
+            if (de == null)
+                return NotFound();
+            _context.Entry(de_Giay).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: DeGiayController/Delete/5
-        public ActionResult Delete(int id)
+        // GET: KieuDangController/Delete/5
+        public async Task<IActionResult> Delete(Guid? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var de = await _context.de_Giays
+                .FirstOrDefaultAsync(m => m.ID == id);
+            if (de == null)
+            {
+                return NotFound();
+            }
+
+            return View(de);
         }
 
-        // POST: DeGiayController/Delete/5
+        // POST: KieuDangController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            try
+            var de = await _context.de_Giays.FindAsync(id);
+            if (de != null)
             {
-                return RedirectToAction(nameof(Index));
+                _context.de_Giays.Remove(de);
             }
-            catch
-            {
-                return View();
-            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
     }
 }

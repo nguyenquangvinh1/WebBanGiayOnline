@@ -81,8 +81,8 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Kieu_Dang kieu_Dang)
         {
-            var kieu_dang = await _context.kieu_Dangs.FindAsync(kieu_Dang.ID);
-            if (kieu_Dang == null)
+            var kieu_dang1 = await _context.kieu_Dangs.FindAsync(kieu_Dang.ID);
+            if (kieu_dang1 == null)
                 return NotFound();
             _context.Entry(kieu_Dang).State = EntityState.Modified;
             await _context.SaveChangesAsync();

@@ -1,0 +1,65 @@
+﻿@model IEnumerable<ClssLib.San_Pham_Chi_Tiet>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ma)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.gia)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.so_luong)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.trang_thai)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Kich_Thuoc)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Mau_Sac)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.San_Pham)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ma)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.gia)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.so_luong)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.trang_thai)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Kich_Thuoc.ma)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Mau_Sac.ma)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.San_Pham.mo_ta)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

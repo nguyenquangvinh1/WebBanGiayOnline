@@ -1,83 +1,125 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using ClssLib;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WebBanGiay.Data;
 
 namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 {
+
+    [Area("Admin")] /*sfsdfsd*/
     public class MauSacController : Controller
     {
-        // GET: MauSacController
-        public ActionResult Index()
+        private readonly AppDbContext _context;
+
+        public MauSacController(AppDbContext context)
         {
-            return View();
+            _context = context;
+        }
+        public async Task<IActionResult> Index()
+        {
+            return View(await _context.mau_Sacs.ToListAsync());
         }
 
-        // GET: MauSacController/Details/5
-        public ActionResult Details(int id)
+        // GET: KieuDangController/Details/5
+        public async Task<IActionResult> Details(Guid? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var mau = await _context.mau_Sacs
+                .FirstOrDefaultAsync(m => m.ID == id);
+            if (mau == null)
+            {
+                return NotFound();
+            }
+
+            return View(mau);
         }
 
-        // GET: MauSacController/Create
+        // GET: KieuDangController/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: MauSacController/Create
+        // POST: KieuDangController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Create(Mau_Sac mau_Sac)
         {
-            try
+            if (ModelState.IsValid)
             {
+                mau_Sac.ID = Guid.NewGuid();
+                _context.mau_Sacs.Add(mau_Sac);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
+            return View(mau_Sac);
         }
 
-        // GET: MauSacController/Edit/5
-        public ActionResult Edit(int id)
+        // GET: KieuDangController/Edit/5
+        public async Task<IActionResult> Edit(Guid? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var mau = await _context.mau_Sacs.FindAsync(id);
+            if (mau == null)
+            {
+                return NotFound();
+            }
+            return View(mau);
         }
 
-        // POST: MauSacController/Edit/5
+        // POST: KieuDangController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<IActionResult> Edit(Mau_Sac mau_Sac)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            var mau = await _context.mau_Sacs.FindAsync(mau_Sac.ID);
+            if (mau == null)
+                return NotFound();
+            _context.Entry(mau_Sac).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: MauSacController/Delete/5
-        public ActionResult Delete(int id)
+        // GET: KieuDangController/Delete/5
+        public async Task<IActionResult> Delete(Guid? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var mau = await _context.mau_Sacs
+                .FirstOrDefaultAsync(m => m.ID == id);
+            if (mau == null)
+            {
+                return NotFound();
+            }
+
+            return View(mau);
         }
 
-        // POST: MauSacController/Delete/5
+        // POST: KieuDangController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            try
+            var mau = await _context.mau_Sacs.FindAsync(id);
+            if (mau != null)
             {
-                return RedirectToAction(nameof(Index));
+                _context.mau_Sacs.Remove(mau);
             }
-            catch
-            {
-                return View();
-            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
     }
 }
