@@ -372,3 +372,5 @@ FodyWeavers.xsd
 >>>>>>> 377f179670ed4674beb103ccf999f6f2834ba5ab
 /WebBanGiayOnline/Migrations/AppDbContextModelSnapshot.cs
 /WebBanGiayOnline/Migrations/20250204112725_datn.cs
+/WebBanGiayOnline/Migrations/20250204112725_datn.Designer.cs
+/WebBanGiayOnline/Migrations/20250204112725_datn.Designer.cs
