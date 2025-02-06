@@ -18,7 +18,7 @@ namespace ClssLib
         [ForeignKey("Hoa_Don")]
         public Guid Hoa_DonID { get; set; }
         [ForeignKey("Phuong_Thuc_Thanh_Toan")]
-        public Guid Phuong_Thuc_Thanh_ToanID { get; set; }
+        public Guid? Phuong_Thuc_Thanh_ToanID { get; set; }
         [JsonIgnore]
         public virtual Hoa_Don Hoa_Don { get; set; }
         [JsonIgnore]
