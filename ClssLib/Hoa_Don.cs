@@ -34,19 +34,13 @@ namespace ClssLib
         [Display(Name = "Ngày xuất hàng :")]
         public DateTime ngay_tao { get; set; }
         [Display(Name = "Ngày thay đổi :")]
-        public DateTime ngay_sua { get; set; }
+        public DateTime? ngay_sua { get; set; }
         [Display(Name = "Nhân viên :")]
         public string nguoi_tao { get; set; }
         [Display(Name = "Người sửa :")]
-        public string nguoi_sua { get; set; }
-        [ForeignKey("Khach_Hang")]
-        public Guid? Khach_HangID { get; set; }
-        [ForeignKey("Nhan_Vien")]
-        public Guid? Nhan_VienID { get; set; }
+        public string? nguoi_sua { get; set; }
         [JsonIgnore]
-        public virtual Khach_Hang? Khach_Hang { get; set; }
-        [JsonIgnore]
-        public virtual Nhan_Vien? Nhan_Vien { get; set; }
+        public virtual ICollection<Tai_Khoan_Hoa_Don> Tai_Khoan_Hoa_Dons { get; set; }
         [JsonIgnore]
         public virtual Phieu_Giam_Gia? Giam_Gia { get; set;}
         [JsonIgnore]

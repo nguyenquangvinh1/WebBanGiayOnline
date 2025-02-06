@@ -12,13 +12,8 @@ using WebBanGiay.Data;
 namespace WebBanGiay.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-<<<<<<<< HEAD:WebBanGiayOnline/Migrations/20250204112725_datn.Designer.cs
-    [Migration("20250204112725_datn")]
-    partial class datn
-========
-    [Migration("20250204055601_test1")]
-    partial class test1
->>>>>>>> 79bc728ae9fe71c87697ad77eb51295c6f55a27f:WebBanGiayOnline/Migrations/20250204055601_test1.Designer.cs
+    [Migration("20250205141112_DATN")]
+    partial class DATN
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

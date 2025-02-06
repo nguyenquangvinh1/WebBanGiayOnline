@@ -57,8 +57,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,tong_tien,ghi_chu,trang_thai,dia_chi,sdt_nguoi_nhan,email_nguoi_nhan,loai_hoa_don,ten_nguoi_nhan,thoi_gian_nhan_hang,ngay_tao,ngay_sua,nguoi_tao,nguoi_sua")] Hoa_Don hoa_Don)
         {
-                hoa_Don.Khach_HangID = Guid.Parse("48b28a27-db9a-4d1a-bc7e-d030841fe069");
-                hoa_Don.Nhan_VienID = Guid.Parse("31060743-f6ca-4ac5-8744-b0e3a847df1f");
+                
          
             _context.Add(hoa_Don);
                 await _context.SaveChangesAsync();
@@ -99,8 +98,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
            
                 try
                 {
-                    hoa_Don.Khach_HangID = Guid.Parse("48b28a27-db9a-4d1a-bc7e-d030841fe069");
-                    hoa_Don.Nhan_VienID = Guid.Parse("31060743-f6ca-4ac5-8744-b0e3a847df1f");
+                    
 
                     _context.Update(hoa_Don);
                     await _context.SaveChangesAsync();

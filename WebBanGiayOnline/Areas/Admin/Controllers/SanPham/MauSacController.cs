@@ -7,7 +7,7 @@ using WebBanGiay.Data;
 namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 {
 
-    [Area("Admin")] /*12344*/
+    [Area("Admin")] /*123344*/
     public class MauSacController : Controller
     {
         private readonly AppDbContext _context;

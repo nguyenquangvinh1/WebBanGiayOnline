@@ -1,83 +1,126 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using ClssLib;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WebBanGiay.Data;
 
 namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 {
+    [Area("Admin")] /*sfsdfsd*/
     public class ChatLieuController : Controller
     {
         // GET: ChatLieuController
-        public ActionResult Index()
+        // GET: CoGiayController
+        private readonly AppDbContext _context;
+
+        public ChatLieuController(AppDbContext context)
         {
-            return View();
+            _context = context;
+        }
+        public async Task<IActionResult> Index()
+        {
+            return View(await _context.chat_Lieus.ToListAsync());
         }
 
-        // GET: ChatLieuController/Details/5
-        public ActionResult Details(int id)
+        // GET: KieuDangController/Details/5
+        public async Task<IActionResult> Details(Guid? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var chat = await _context.chat_Lieus
+                .FirstOrDefaultAsync(m => m.ID == id);
+            if (chat == null)
+            {
+                return NotFound();
+            }
+
+            return View(chat);
         }
 
-        // GET: ChatLieuController/Create
+        // GET: KieuDangController/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: ChatLieuController/Create
+        // POST: KieuDangController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Create(Chat_Lieu chat_Lieu)
         {
-            try
+            if (ModelState.IsValid)
             {
+                chat_Lieu.ID = Guid.NewGuid();
+                _context.chat_Lieus.Add(chat_Lieu);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
+            return View(chat_Lieu);
         }
 
-        // GET: ChatLieuController/Edit/5
-        public ActionResult Edit(int id)
+        // GET: KieuDangController/Edit/5
+        public async Task<IActionResult> Edit(Guid? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var chat = await _context.chat_Lieus.FindAsync(id);
+            if (chat == null)
+            {
+                return NotFound();
+            }
+            return View(chat);
         }
 
-        // POST: ChatLieuController/Edit/5
+        // POST: KieuDangController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<IActionResult> Edit(Chat_Lieu chat_Lieu)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            var chat = await _context.chat_Lieus.FindAsync(chat_Lieu.ID);
+            if (chat == null)
+                return NotFound();
+            _context.Entry(chat_Lieu).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: ChatLieuController/Delete/5
-        public ActionResult Delete(int id)
+        // GET: KieuDangController/Delete/5
+        public async Task<IActionResult> Delete(Guid? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var chat = await _context.chat_Lieus
+                .FirstOrDefaultAsync(m => m.ID == id);
+            if (chat == null)
+            {
+                return NotFound();
+            }
+
+            return View(chat);
         }
 
-        // POST: ChatLieuController/Delete/5
+        // POST: KieuDangController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            try
+            var chat = await _context.chat_Lieus.FindAsync(id);
+            if (chat != null)
             {
-                return RedirectToAction(nameof(Index));
+                _context.chat_Lieus.Remove(chat);
             }
-            catch
-            {
-                return View();
-            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
     }
 }

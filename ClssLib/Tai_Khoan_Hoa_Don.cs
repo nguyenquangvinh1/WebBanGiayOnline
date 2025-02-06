@@ -8,18 +8,21 @@ using System.Threading.Tasks;
 
 namespace ClssLib
 {
-    public class Dia_Chi
+    public class Tai_Khoan_Hoa_Don
     {
         public Guid ID { get; set; }
-        public int loai_dia_chi { get; set; }
-        public string tinh { get; set; }
-        public string huyen { get; set; }
-        public string xa { get; set; }
+        public string Ten { get; set; }
+        public string vai_tro { get; set; }
         public DateTime ngay_tao { get; set; }
-        public DateTime ngay_sua { get; set; }
+        public DateTime? ngay_sua { get; set; }
         [ForeignKey("Tai_Khoan")]
         public Guid Tai_KhoanID { get; set; }
         [JsonIgnore]
         public virtual Tai_Khoan Tai_Khoan { get; set; }
+        [ForeignKey("Hoa_Don")]
+        public Guid Hoa_DonID { get; set; }
+        
+        [JsonIgnore]
+        public virtual Hoa_Don Hoa_Don { get; set; }
     }
 }
