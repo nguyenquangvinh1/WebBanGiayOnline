@@ -15,9 +15,9 @@ namespace ClssLib
         public string mo_ta { get; set; }
         public int trang_thai { get; set; }
         public DateTime ngay_tao { get; set; }
-        public DateTime ngay_sua { get; set; }
+        public DateTime? ngay_sua { get; set; }
         public string nguoi_tao { get; set; }
-        public string nguoi_sua { get; set; }
+        public string? nguoi_sua { get; set; }
         [ForeignKey("Kieu_Dang")]
         public Guid? Kieu_DangID { get; set; }
         [ForeignKey("Danh_Muc")]

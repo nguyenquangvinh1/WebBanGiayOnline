@@ -15,6 +15,8 @@ namespace ClssLib
         public decimal gia { get; set; }
         public int so_luong { get; set; }
         public int trang_thai { get; set; }
+        public DateTime ngay_tao { get; set; }
+        public DateTime? ngay_sua { get; set; }
         [ForeignKey("Kich_Thuoc")]
         public Guid Kich_ThuocID { get; set; }
         [ForeignKey("Mau_Sac")]
@@ -28,9 +30,12 @@ namespace ClssLib
         [JsonIgnore]
         public virtual San_Pham San_Pham { get; set; }
         [JsonIgnore]
-        public virtual ICollection<Anh_San_Pham>? Anh_San_Phams { get; set; }
+        public virtual ICollection<Anh_San_Pham_San_Pham_Chi_Tiet>? Anh_San_Pham_San_Pham_Chi_Tiets { get; set; }
         [JsonIgnore]
         public virtual ICollection<Hoa_Don_Chi_Tiet>? Hoa_Don_Chi_Tiets { get; set; }
+        
+        [JsonIgnore]
+        public virtual ICollection<Gio_Hang_Chi_Tiet>? Gio_Hang_Chi_Tiets { get; set; }
 
 
     }

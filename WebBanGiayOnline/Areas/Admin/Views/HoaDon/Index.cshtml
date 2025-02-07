@@ -50,12 +50,10 @@
                     @foreach (var item in Model)
                     {
                         <tr>
-                            <td>@(item.Khach_HangID != null ? item.ten_nguoi_nhan : "NULL")</td>
                             <td>@item.dia_chi</td>
                             <td>@item.sdt_nguoi_nhan</td>
                             <td>@string.Format("{0:0,0} VND", item.tong_tien)</td>
                             <td>@item.thoi_gian_nhan_hang.ToString("dd/MM/yyyy")</td>
-                            <td>@(item.Nhan_VienID != null ? item.nguoi_tao : "NULL")</td>
                             <td>
                                 @if (item.trang_thai == 1)
                                 {
@@ -99,10 +97,7 @@
                                                 <div class="warning">Bạn muốn xóa đơn hàng này?</div>
                                                 <div class="text-danger ">Mã đơn hàng : @item.ID </div>
                                                 <div class="text-danger ">
-                                                    Người nhận : @if (@item.Khach_HangID != null)
-                                                    {
-                                                        @item.ten_nguoi_nhan
-                                                    }
+                                                    
                                                 </div>
                                                 <div class="text-danger ">Số điện thoại : @item.sdt_nguoi_nhan </div>
                                                 <div class="text-danger ">Địa chỉ : @item.dia_chi </div>
