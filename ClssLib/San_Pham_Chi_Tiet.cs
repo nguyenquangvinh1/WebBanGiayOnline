@@ -11,7 +11,6 @@ namespace ClssLib
     public class San_Pham_Chi_Tiet
     {
         public Guid ID { get; set; }
-        public string ma { get; set; }
         public decimal gia { get; set; }
         public int so_luong { get; set; }
         public int trang_thai { get; set; }

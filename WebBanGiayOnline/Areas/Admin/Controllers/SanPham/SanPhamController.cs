@@ -2,7 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 using WebBanGiay.Data;
+using WebBanGiay.ViewModel;
 
 namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 {
@@ -18,7 +21,9 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         }
         public async Task<IActionResult> Index()
         {
-            return View(await _context.san_Phams.ToListAsync());
+            var list = await _context.san_Phams.ToListAsync();
+
+            return View(list);
         }
 
         // GET: KieuDangController/Details/5
@@ -49,22 +54,53 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             ViewData["Mui_GiayID"] = new SelectList( _context.mui_Giays.ToList(), "ID", "ten_mui_giay");
             ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.ToList(), "ID", "ten_kieu_dang");
             ViewData["Loai_GiayID"] = new SelectList( _context.loai_Giays.ToList(), "ID", "ten_loai_giay");
+            ViewData["Kich_ThuocID"] = new SelectList( _context.kich_Thuocs.ToList(), "ID", "ten_kich_thuoc");
+            ViewData["Mau_SacID"] = new SelectList( _context.mau_Sacs.ToList(), "ID", "ma_mau");
             return View();
         }
 
         // POST: KieuDangController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ten_san_pham,mo_ta,trang_thai,ngay_tao,ngay_sua,nguoi_tao,nguoi_sua,Chat_LieuID,Co_GiayID,Danh_MucID,De_GiayID,Mui_GiayID,Kieu_DangID,Loai_GiayID")]San_Pham san_Pham)
+        public async Task<IActionResult> Create(San_Pham san_Pham,string lstSPCT)
         {
-            if (ModelState.IsValid)
+            var listCT = JsonConvert.DeserializeObject<List<San_PhamCTView>>(lstSPCT);
+
+            var kich = await _context.kich_Thuocs.ToListAsync();
+            var mau = await _context.mau_Sacs.ToListAsync();
+            
+                var SP = new San_Pham();
+                SP.ID = Guid.NewGuid();
+                SP.ten_san_pham = san_Pham.ten_san_pham;
+                SP.mo_ta = san_Pham.mo_ta;
+                SP.trang_thai = 1;
+                SP.ngay_tao = DateTime.Now;
+                SP.Kieu_DangID = san_Pham.Kieu_DangID;
+                SP.Danh_MucID = san_Pham.Danh_MucID;
+                SP.Loai_GiayID = san_Pham.Loai_GiayID;
+                SP.Mui_GiayID = san_Pham.Mui_GiayID;
+                SP.Co_GiayID = san_Pham.Co_GiayID;
+                SP.De_GiayID = san_Pham.De_GiayID;
+                SP.Chat_LieuID = san_Pham.Chat_LieuID;
+                await _context.san_Phams.AddAsync(SP);
+            foreach (var item in listCT)
             {
-                san_Pham.ID = Guid.NewGuid();
-                await _context.san_Phams.AddAsync(san_Pham);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var sp = new San_Pham_Chi_Tiet()
+                {
+                    ID = Guid.NewGuid(),
+                    gia = item.gia,
+                    so_luong = item.so_luong,
+                    trang_thai = item.trang_thai,
+                    ngay_tao = item.ngay_tao,
+                    Kich_ThuocID = kich.Find(x => x.ten_kich_thuoc == item.Kich_Thuoc).ID,
+                    Mau_SacID = mau.Find(x => x.ma_mau == item.Mau_Sac).ID,
+                    San_PhamID = SP.ID
+                };
+                _context.san_Pham_Chi_Tiets.Add(sp);
             }
-            return View(san_Pham);
+            await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            
         }
 
         // GET: KieuDangController/Edit/5

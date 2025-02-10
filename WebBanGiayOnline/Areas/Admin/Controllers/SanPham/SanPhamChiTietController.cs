@@ -16,9 +16,12 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         {
             _context = context;
         }
-        public async Task<IActionResult> Index()
+        [HttpGet("id")]
+        public async Task<IActionResult> Index(Guid? id)
         {
-            return View(await _context.san_Pham_Chi_Tiets.ToListAsync());
+            var sp = await _context.san_Phams.FirstOrDefaultAsync(x => x.ID == id);
+            ViewData["San_Pham"] = sp;
+            return View(await _context.san_Pham_Chi_Tiets.Where(x => x.San_PhamID == id).ToListAsync());
         }
 
         // GET: KieuDangController/Details/5

@@ -7,9 +7,6 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.ma)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.gia)
             </th>
             <th>
@@ -19,13 +16,19 @@
                 @Html.DisplayNameFor(model => model.trang_thai)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Kich_Thuoc)
+                @Html.DisplayNameFor(model => model.ngay_tao)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Mau_Sac)
+                @Html.DisplayNameFor(model => model.ngay_sua)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.San_Pham)
+                @Html.DisplayNameFor(model => model.Kich_ThuocID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Mau_SacID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.San_PhamID)
             </th>
             <th></th>
         </tr>
@@ -33,9 +36,6 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ma)
-            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.gia)
             </td>
@@ -46,13 +46,19 @@
                 @Html.DisplayFor(modelItem => item.trang_thai)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Kich_Thuoc.ma)
+                @Html.DisplayFor(modelItem => item.ngay_tao)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Mau_Sac.ma)
+                @Html.DisplayFor(modelItem => item.ngay_sua)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.San_Pham.mo_ta)
+                    @Html.DisplayFor(modelItem => item.Kich_ThuocID)
+            </td>
+            <td>
+                    @Html.DisplayFor(modelItem => item.Mau_SacID)
+            </td>
+            <td>
+                    @Html.DisplayFor(modelItem => item.San_PhamID)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |

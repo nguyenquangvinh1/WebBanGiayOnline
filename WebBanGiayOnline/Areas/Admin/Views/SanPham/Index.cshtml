@@ -52,6 +52,7 @@
         </tr>
     </thead>
     <tbody>
+        
 @foreach (var item in Model) {
         <tr>
             <td>
@@ -76,30 +77,28 @@
                 @Html.DisplayFor(modelItem => item.nguoi_sua)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Kieu_Dang.ma)
+                @Html.DisplayFor(modelItem => item.Kieu_DangID)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Danh_Muc.ma)
+                @Html.DisplayFor(modelItem => item.Danh_MucID)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Loai_Giay.ma)
+                @Html.DisplayFor(modelItem => item.Loai_GiayID)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Mui_Giay.ma)
+                @Html.DisplayFor(modelItem => item.Mui_GiayID)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Co_Giay.ma)
+                @Html.DisplayFor(modelItem => item.Co_GiayID)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.De_Giay.ma)
+                @Html.DisplayFor(modelItem => item.De_GiayID)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Chat_Lieu.ma)
+                @Html.DisplayFor(modelItem => item.Chat_LieuID)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                    <a asp-area="Admin" asp-controller="SanPhamChiTiet" asp-action="Index" asp-route-id="@item.ID">Edit</a> 
             </td>
         </tr>
 }

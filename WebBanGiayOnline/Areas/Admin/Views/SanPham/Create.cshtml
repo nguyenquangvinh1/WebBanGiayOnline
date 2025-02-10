@@ -1,6 +1,6 @@
 ﻿@model ClssLib.San_Pham
 
-<h4>San_Pham</h4>
+@*  <h4>San_PhamViewModel</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -26,52 +26,35 @@
                 <input asp-for="ngay_tao" class="form-control" />
                 <span asp-validation-for="ngay_tao" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="ngay_sua" class="control-label"></label>
-                <input asp-for="ngay_sua" class="form-control" />
-                <span asp-validation-for="ngay_sua" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="nguoi_tao" class="control-label"></label>
-                <input asp-for="nguoi_tao" class="form-control" />
-                <span asp-validation-for="nguoi_tao" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="nguoi_sua" class="control-label"></label>
-                <input asp-for="nguoi_sua" class="form-control" />
-                <span asp-validation-for="nguoi_sua" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Kieu_DangID" class="control-label"></label>
-                <select asp-for="Kieu_DangID" class="form-control" asp-items="ViewBag.Kieu_DangID">
-                    
-                </select>
-                    
-            </div>
-            <div class="form-group">
-                <label asp-for="Danh_MucID" class="control-label"></label>
-                <select asp-for="Danh_MucID" class ="form-control" asp-items="ViewBag.Danh_MucID"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="Loai_GiayID" class="control-label"></label>
-                <select asp-for="Loai_GiayID" class ="form-control" asp-items="ViewBag.Loai_GiayID"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="Mui_GiayID" class="control-label"></label>
-                <select asp-for="Mui_GiayID" class ="form-control" asp-items="ViewBag.Mui_GiayID"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="Co_GiayID" class="control-label"></label>
-                <select asp-for="Co_GiayID" class ="form-control" asp-items="ViewBag.Co_GiayID"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="De_GiayID" class="control-label"></label>
-                <select asp-for="De_GiayID" class ="form-control" asp-items="ViewBag.De_GiayID"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="Chat_LieuID" class="control-label"></label>
-                <select asp-for="Chat_LieuID" class ="form-control" asp-items="ViewBag.Chat_LieuID"></select>
-            </div>
+
+            <div class="mb-3 row">
+                <div class="form-group col-md-4">
+                    <label asp-for="Chat_LieuID" class="control-label"></label>
+                    <select asp-for="Chat_LieuID" class="form-control" asp-items="ViewBag.Chat_LieuID"></select>
+                </div>
+            <div class="form-group col-md-4">
+            <label asp-for="Co_GiayID" class="control-label"></label>
+            <select asp-for="Co_GiayID" class="form-control" asp-items="ViewBag.Co_GiayID"></select>
+        </div>
+        <div class="form-group col-md-4">
+            <label asp-for="Danh_MucID" class="control-label"></label>
+            <select asp-for="Danh_MucID" class="form-control" asp-items="ViewBag.Danh_MucID"></select>
+        </div>
+        </div>
+        <div class="mb-3 row">
+
+        <div class="form-group col-md-4">
+            <label asp-for="De_GiayID" class="control-label"></label>
+            <select asp-for="De_GiayID" class="form-control" asp-items="ViewBag.De_GiayID"></select>
+        </div><div class="form-group col-md-4">
+            <label asp-for="Mui_GiayID" class="control-label"></label>
+            <select asp-for="Mui_GiayID" class="form-control" asp-items="ViewBag.Mui_GiayID"></select>
+        </div><div class="form-group col-md-4">
+            <label asp-for="Kieu_DangID" class="control-label"></label>
+            <select asp-for="Kieu_DangID" class="form-control" asp-items="ViewBag.Kieu_DangID"></select>
+        </div>
+
+        </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
@@ -85,4 +68,222 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+ *@
+
+<h2>Thêm Sản Phẩm</h2>
+<form asp-action="Create">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <input class="form-control" type="hidden" id="lstSPCT" required="" name="lstSPCT" />
+
+
+    <div class="form-group mb-3">
+
+        <label asp-for="ten_san_pham" class="control-label"></label>
+        <input asp-for="ten_san_pham" class="form-control" />
+        <span asp-validation-for="ten_san_pham" class="text-danger"></span>
+    </div>
+    <div class="mb-3 row">
+        <div class="form-group col-md-4">
+            <label asp-for="Chat_LieuID" class="control-label"></label>
+            <select asp-for="Chat_LieuID" class="form-control" asp-items="ViewBag.Chat_LieuID"></select>
+        </div>
+        <div class="form-group col-md-4">
+            <label asp-for="Co_GiayID" class="control-label"></label>
+            <select asp-for="Co_GiayID" class="form-control" asp-items="ViewBag.Co_GiayID"></select>
+        </div>
+        <div class="form-group col-md-4">
+            <label asp-for="Danh_MucID" class="control-label"></label>
+            <select asp-for="Danh_MucID" class="form-control" asp-items="ViewBag.Danh_MucID"></select>
+        </div>
+    </div>
+    <div class="mb-3 row">
+
+        <div class="form-group col-md-4">
+            <label asp-for="De_GiayID" class="control-label"></label>
+            <select asp-for="De_GiayID" class="form-control" asp-items="ViewBag.De_GiayID"></select>
+        </div><div class="form-group col-md-4">
+            <label asp-for="Mui_GiayID" class="control-label"></label>
+            <select asp-for="Mui_GiayID" class="form-control" asp-items="ViewBag.Mui_GiayID"></select>
+        </div><div class="form-group col-md-4">
+            <label asp-for="Kieu_DangID" class="control-label"></label>
+            <select asp-for="Kieu_DangID" class="form-control" asp-items="ViewBag.Kieu_DangID"></select>
+        </div>
+
+    </div>
+    <div class="form-group mb-3">
+        <label asp-for="mo_ta" class="control-label">Mô Tả Sản Phẩm</label>
+        <textarea asp-for="mo_ta" class="form-control"></textarea>
+        <span asp-validation-for="mo_ta" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Create" id="saveProduct" class="btn btn-primary" />
+    </div>
+
+</form>
+
+<!-- Thêm màu sắc -->
+<h2>Thêm Sản Phẩm</h2>
+<form>
+    <div class="mb-3">
+        <label class="form-label">Màu Sắc:</label>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                data-bs-target="#colorModal">
+            +
+        </button>
+    </div>
+    <div id="selectedColors" class="mb-3"></div>
+
+    <div class="mb-3">
+        <label class="form-label">Kích Cỡ:</label>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                data-bs-target="#sizeModal">
+            +
+        </button>
+    </div>
+
+    <div id="productTables"></div>
+</form>
+
+<!-- Modal chọn màu -->
+<div class="modal fade" id="colorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chọn Màu Sắc</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                @foreach (var item in (IEnumerable<SelectListItem>)ViewData["Mau_SacID"])
+                {
+                    <div class="form-check">
+                        <input class="form-check-input color-checkbox" type="checkbox"
+                               value="@item.Text">@item.Text
+                    </div>
+                }
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="addColor">Thêm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal chọn kích cỡ -->
+<div class="modal fade" id="sizeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chọn Kích Cỡ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                @foreach (var item in (IEnumerable<SelectListItem>)ViewData["Kich_ThuocID"])
+                {
+                    <div class="form-check">
+                        <input class="form-check-input size-checkbox" type="checkbox" value="@item.Text">
+                        @item.Text
+                    </div>
+                }
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="addSize">Thêm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div id="productTables"></div>
+<script>
+    $(document).ready(function () {
+        let selectedSizes = [];
+
+        $('#addColor').click(function () {
+            $('.color-checkbox:checked').each(function () {
+                let color = $(this).val();
+                if ($(`#color-${color}`).length === 0) {
+                    $('#selectedColors').append(`<span id="color-${color}" class="badge bg-secondary me-2">${color}</span>`);
+                    $('#productTables').append(`
+                        <div class="mt-4" id="table-${color}">
+                            <h4>Sản phẩm - ${color}</h4>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Kích Cỡ</th>
+                                        <th>Số Lượng</th>
+                                        <th>Giá</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    `);
+                }
+            });
+            $('#colorModal').modal('hide');
+        });
+
+        $('#addSize').click(function () {
+            $('.size-checkbox:checked').each(function () {
+                let size = $(this).val();
+                if (!selectedSizes.includes(size)) {
+                    selectedSizes.push(size);
+                    $("[id^='table-'] tbody").each(function () {
+                        $(this).append(`
+                            <tr>
+                                <td>${size}</td>
+                                <td><input type="number" class="form-control quantity" data-size="${size}"></td>
+                                <td><input type="number" class="form-control price" data-size="${size}"></td>
+                            </tr>
+                        `);
+                    });
+                }
+            });
+            $('#sizeModal').modal('hide');
+        });
+
+        $('#saveProduct').click(function () {
+            let sanPhamCTList = [];
+
+            $("[id^='table-']").each(function () {
+                let color = $(this).attr('id').replace('table-', '');
+                $(this).find("tbody tr").each(function () {
+                    let size = $(this).find("td:first").text();
+                    let quantity = $(this).find(".quantity").val();
+                    let price = $(this).find(".price").val();
+                    if (quantity > 0) {
+                        sanPhamCTList.push({
+                            Mau_Sac: color,
+                            Kich_Thuoc: size,
+                            so_luong: parseInt(quantity),
+                            gia: parseInt(price),
+                            trang_thai: 1,
+                            ngay_tao: new Date().toISOString()
+                        });
+                    }
+                });
+            });
+
+            // Chuyển dữ liệu thành JSON và gán vào input ẩn
+            $('#lstSPCT').val(JSON.stringify(sanPhamCTList));
+
+            // // Gửi form
+            // $('form').submit();
+        });
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

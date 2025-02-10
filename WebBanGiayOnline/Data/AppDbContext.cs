@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using System.Drawing;
+using WebBanGiay.ViewModel;
 
 namespace WebBanGiay.Data
 {

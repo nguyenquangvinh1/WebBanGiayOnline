@@ -7,16 +7,7 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.ma)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.ten_kich_thuoc)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.trang_thai)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.mo_ta)
             </th>
             <th></th>
         </tr>
@@ -25,16 +16,7 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.ma)
-            </td>
-            <td>
                 @Html.DisplayFor(modelItem => item.ten_kich_thuoc)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.trang_thai)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.mo_ta)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
