@@ -1,0 +1,221 @@
+<div class="row mx-0 bg-white">
+
+	<div class="col-md-4 text-center">
+		<span>
+			<img src="/assetss/img/aosomi1.jpg" style="max-width: 100%; margin-top: 5rem">
+		</span>
+	</div>
+	<div class="col-md-8">
+		<form class="form p-3">
+			<div class="form-group row" style="margin-left: -29px;">
+				<div class="col">
+					<label class="form-label">Tên Sản Phẩm</label>
+					<input type="text" class="form-control" ng-model="form.name" placeholder="Nhập Tên Sản Phẩm">
+				</div>
+				<div class="col">
+					<label class="form-label">Giá Nhập</label>
+					<div class="input-group">
+						<div class="input-group-prepend">
+							<span class="input-group-text">VND</span>
+						</div>
+						<input type="number" min="1" class="form-control" ng-model="form.price" placeholder="Nhập giá ">
+					</div>
+				</div>
+				<div class="col">
+					<label class="form-label">Giá Bán + VAT</label>
+					<div class="input-group">
+						<div class="input-group-prepend">
+							<span class="input-group-text">VND</span>
+						</div>
+						<input type="number" min="1" class="form-control" ng-model="form.price"
+							placeholder="Nhập giá bán">
+					</div>
+				</div>
+			</div>
+			<div class="form-group row">
+				<label class="form-label">Ảnh</label>
+				<div class="custom-file">
+					<input type="file" class="custom-file-input" id="Tải ảnh lên">
+					<label class="custom-file-label">Chọn file</label>
+				</div>
+			</div>
+			<div class="form-group row">
+				<label class="form-label">Danh mục</label>
+				<select ng-model="form.category.id" class="custom-select">
+					<option>Quần thể thao</option>
+					<option>Áo Sơ Mi</option>
+					<option>Quần âu</option>
+					<option>Áo Phông</option>
+				</select>
+			</div>
+			<div class="form-group row">
+				<label class="form-label">Hãng</label>
+				<input type="text" class="form-control" placeholder="Nhập hãng của Sản Phẩm">
+			</div>
+			<div id="productAttributesContainer" style="margin: 30px;">
+				<!-- Mẫu div thuộc tính sản phẩm đầu tiên -->
+				<div class="product-attributes" id="attribute-1">
+					<div class="form-group row" style="margin-left: -29px;">
+						<div class="col">
+							<label class="form-label">Màu sắc</label>
+							<input type="text" id="colorInput" class="form-control" placeholder="Nhập màu sắc">
+						</div>
+
+						<div class="col">
+							<label class="form-label">Size</label>
+							<input type="text" id="sizeInput" class="form-control" placeholder="Nhập size">
+						</div>
+					</div>
+					<div class="form-group row" style="margin-left: -29px;">
+						<div class="col">
+							<label class="form-label">Số lượng</label>
+							<input type="number" class="form-control" placeholder="Nhập số lượng" min="1"
+								onblur="validateQuantity(this)" onkeydown="return event.key !== '-'">
+						</div>
+					</div>
+					<div class="form-group row" style="margin-left: -29px;">
+						<div class="col">
+							<button class="btn btn-danger" onclick="removeAttribute(this)">Xóa</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+			<!-- Nút "Thêm" -->
+			<div class="form-group row" style="margin-left: -29px;">
+				<div class="col">
+					<button id="addAttributeButton" class="btn btn-primary" onclick="addAttribute()">Thêm thuộc
+						tính</button>
+				</div>
+			</div>
+
+			<div class="form-group row">
+				<label class="form-label">Mô tả</label>
+				<textarea name="description" rows="4" cols="50" class="form-control" ng-model="form.description"
+					placeholder="Nhập mô tả Sản Phẩm"></textarea>
+			</div>
+			<div class="form-group row">
+				<label class="col-md-2 px-0 control-label">Trạng Thái</label>
+				<div class="col-md-10">
+					<div class="form-check-inline pr-3">
+						<div class="custom-control custom-radio">
+							<input type="radio" class="custom-control-input" id="yes" name="available"
+								ng-model="form.available" ng-value="true">
+							<label class="custom-control-label" for="yes">Còn hàng</label>
+						</div>
+					</div>
+					<div class="form-check-inline">
+						<div class="custom-control custom-radio">
+							<input type="radio" class="custom-control-input" id="no" name="available"
+								ng-model="form.available" ng-value="false">
+							<label class="custom-control-label" for="no">Hết hàng</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<div class="card-header text-center">
+	<button ng-click="create()" class="btn btn-primary">
+		<i class="fas fa-plus"></i> Thêm
+	</button>
+	<button ng-click="update()" class="btn btn-success">
+		<i class="far fa-save"></i> Cập nhật
+	</button>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+<script>
+	// Thư viện màu sắc và kích thước
+	const colorLibrary = [
+		"Đỏ", "Xanh Lá", "Xanh Dương", "Vàng", "Trắng", "Đen", "Hồng", "Cam", "Tím", "Nâu",
+		"Xám", "Xanh Ngọc", "Xanh Biển", "Xanh Rêu", "Kem", "Be", "Xanh Lục", "Đỏ Đô", "Xanh Cốm", "Đỏ Tía",
+		"Xanh Dương Đậm", "Xanh Lá Đậm", "Vàng Chanh", "Nâu Đất", "Ghi", "Xanh Đá", "Xanh Lá Nhạt", "Tím Nhạt", "Đỏ Cam", "Xanh Lá Đậm",
+		"Vàng Nghệ", "Xanh Thủy", "Hồng Nhạt", "Nâu Nhạt", "Xanh Mòng Bẩy", "Cam Đậm", "Xanh Nước Biển", "Tím Đậm", "Đỏ Tươi", "Xanh Lơ",
+		"Vàng Đậm", "Nâu Sẫm", "Đen Nhánh", "Trắng Ngà", "Hồng Đậm", "Xanh Cốm Nhạt", "Xanh Dương Nhạt", "Ghi Đậm", "Ghi Nhạt", "Nâu Ghi",
+		"Cam Nhạt", "Xanh Bích", "Đỏ Thẫm", "Tím Đen", "Xanh Lục Nhạt", "Xanh Lê", "Đen Xì", "Xanh Bích Đậm", "Trắng Sữa", "Đỏ Sẫm",
+		"Xanh Lơ Nhạt", "Hồng Tươi", "Đỏ Hồng", "Vàng Chanh Nhạt", "Xanh Mòng Bẩy Nhạt", "Xanh Lá Chanh", "Xanh Rêu Nhạt", "Tím Nhạt Nhất",
+		"Đen Bạc", "Vàng Bạc", "Trắng Bạc", "Vàng Đồng", "Xanh Đen", "Xanh Xô Viết", "Cam Sáng", "Đỏ Cam Đậm", "Xanh Cốm Đậm", "Hồng Phấn",
+		"Nâu Cà Phê", "Tím Hoa Đào", "Xanh Mòng Bẩy Đậm", "Đỏ Mận", "Đen Nhạt", "Hồng Cam", "Xanh Thời Thượng", "Vàng Nhạt", "Tím Mận",
+		"Nâu Sôcôla", "Xanh Thạch Anh", "Xanh Lục Đậm", "Hồng Cánh Sen", "Xanh Ngọc Bích", "Xanh Cỏ", "Đỏ Bầm", "Xanh Chàm", "Vàng Đậm Nhất",
+		"Xanh Biển Sẫm", "Vàng Cam", "Xanh Lá Ngọc", "Trắng Mịn", "Hồng Tím", "Đen Huyền", "Nâu Thẫm", "Tím Sáng", "Đỏ Chói", "Xanh Xám"
+	];
+
+	const sizeLibrary = [
+		"XS", "S", "M", "L", "XL", "XXL", "XXXL", "Free Size",
+		"28", "29", "30", "31", "32", "33", "34", "35", "36",
+		"38", "40", "42", "44", "46", "48", "50"
+	];
+
+	// Hàm thêm autocomplete cho input
+	function addAutocomplete(inputId, suggestions) {
+		$("#" + inputId).autocomplete({
+			source: suggestions,
+			minLength: 1 // Hiển thị gợi ý khi người dùng nhập ít nhất 1 ký tự
+		});
+	}
+
+	// Gọi hàm addAutocomplete cho các input sử dụng thư viện màu sắc và size
+	$(function () {
+		addAutocomplete("colorInput", colorLibrary);
+		addAutocomplete("sizeInput", sizeLibrary);
+	});
+
+	let attributeCount = 1; // Biến đếm để tạo ID tự động
+	function addAttribute() {
+		// Lấy div chứa các thuộc tính để sao chép
+		const container = document.getElementById("productAttributesContainer");
+		const attributeTemplate = container.querySelector(".product-attributes");
+
+		// Sao chép div mẫu và tạo một bộ mới
+		const newAttributes = attributeTemplate.cloneNode(true);
+
+		// Tăng biến đếm và tạo ID mới
+		attributeCount++;
+		newAttributes.id = `attribute-${attributeCount}`;
+
+		// Đặt lại giá trị cho các trường trong bộ mới
+		const inputs = newAttributes.querySelectorAll("input, select");
+		inputs.forEach(input => {
+			if (input.type === "text") {
+				input.value = ""; // Đặt lại cho trường nhập hãng
+			} else if (input.type === "number") {
+				input.value = 1; // Đặt lại cho trường số lượng
+			} else {
+				input.selectedIndex = 0; // Đặt lại cho trường select
+			}
+		});
+
+		// Thêm sự kiện xóa cho nút "Xóa" mới
+		newAttributes.querySelector("button").onclick = function () {
+			removeAttribute(this);
+		};
+
+		// Thêm bộ mới vào container
+		container.appendChild(newAttributes);
+	}
+
+	function removeAttribute(button) {
+		// Lấy div chứa nút "Xóa" đang được nhấn
+		const attributeDiv = button.closest(".product-attributes");
+
+		// Kiểm tra và xóa nếu có nhiều hơn 1 bộ
+		if (document.querySelectorAll(".product-attributes").length > 1) {
+			attributeDiv.remove();
+		} else {
+			alert("Bạn cần ít nhất một bộ thuộc tính!");
+		}
+	}
+
+	function validateQuantity(input) {
+		// Đảm bảo số lượng luôn lớn hơn hoặc bằng 1
+		if (input.value === "" || input.value < 1) {
+			input.value = 1;
+		}
+	}
+
+
+</script>

@@ -1,0 +1,92 @@
+﻿@model ClssLib.Hoa_Don
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h1>Edit</h1>
+
+<h4>Hoa_Don</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ID" />
+            <div class="form-group">
+                <label asp-for="tong_tien" class="control-label"></label>
+                <input asp-for="tong_tien" class="form-control" />
+                <span asp-validation-for="tong_tien" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ghi_chu" class="control-label"></label>
+                <input asp-for="ghi_chu" class="form-control" />
+                <span asp-validation-for="ghi_chu" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="trang_thai" class="control-label"></label>
+                <input asp-for="trang_thai" class="form-control" />
+                <span asp-validation-for="trang_thai" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="dia_chi" class="control-label"></label>
+                <input asp-for="dia_chi" class="form-control" />
+                <span asp-validation-for="dia_chi" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="sdt_nguoi_nhan" class="control-label"></label>
+                <input asp-for="sdt_nguoi_nhan" class="form-control" />
+                <span asp-validation-for="sdt_nguoi_nhan" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="email_nguoi_nhan" class="control-label"></label>
+                <input asp-for="email_nguoi_nhan" class="form-control" />
+                <span asp-validation-for="email_nguoi_nhan" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="loai_hoa_don" class="control-label"></label>
+                <input asp-for="loai_hoa_don" class="form-control" />
+                <span asp-validation-for="loai_hoa_don" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ten_nguoi_nhan" class="control-label"></label>
+                <input asp-for="ten_nguoi_nhan" class="form-control" />
+                <span asp-validation-for="ten_nguoi_nhan" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="thoi_gian_nhan_hang" class="control-label"></label>
+                <input asp-for="thoi_gian_nhan_hang" class="form-control" />
+                <span asp-validation-for="thoi_gian_nhan_hang" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ngay_tao" class="control-label"></label>
+                <input asp-for="ngay_tao" class="form-control" />
+                <span asp-validation-for="ngay_tao" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ngay_sua" class="control-label"></label>
+                <input asp-for="ngay_sua" class="form-control" />
+                <span asp-validation-for="ngay_sua" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="nguoi_tao" class="control-label"></label>
+                <input asp-for="nguoi_tao" class="form-control" />
+                <span asp-validation-for="nguoi_tao" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="nguoi_sua" class="control-label"></label>
+                <input asp-for="nguoi_sua" class="form-control" />
+                <span asp-validation-for="nguoi_sua" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

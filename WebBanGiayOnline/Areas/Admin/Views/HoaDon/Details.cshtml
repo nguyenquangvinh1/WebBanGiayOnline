@@ -1,0 +1,101 @@
+﻿@model ClssLib.Hoa_Don
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Xem Hóa Đơn </h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-4">
+            @Html.DisplayNameFor(model => model.tong_tien)
+        </dt>
+        <dd class = "col-sm-8">
+            @Html.DisplayFor(model => model.tong_tien)
+        </dd>
+        <dt class = "col-sm-4">
+            @Html.DisplayNameFor(model => model.ghi_chu)
+        </dt>
+        <dd class = "col-sm-8">
+            @Html.DisplayFor(model => model.ghi_chu)
+        </dd>
+        <dt class = "col-sm-4">
+            @Html.DisplayNameFor(model => model.trang_thai)
+        </dt>
+        <dd class = "col-sm-8">
+            @Html.DisplayFor(model => model.trang_thai)
+        </dd>
+        <dt class = "col-sm-4">
+            @Html.DisplayNameFor(model => model.dia_chi)
+        </dt>
+        <dd class = "col-sm-8">
+            @Html.DisplayFor(model => model.dia_chi)
+        </dd>
+        <dt class = "col-sm-4">
+            @Html.DisplayNameFor(model => model.sdt_nguoi_nhan)
+        </dt>
+        <dd class = "col-sm-8">
+            @Html.DisplayFor(model => model.sdt_nguoi_nhan)
+        </dd>
+        <dt class = "col-sm-4">
+            @Html.DisplayNameFor(model => model.email_nguoi_nhan)
+        </dt>
+        <dd class = "col-sm-8">
+            @Html.DisplayFor(model => model.email_nguoi_nhan)
+        </dd>
+        <dt class = "col-sm-4">
+            @Html.DisplayNameFor(model => model.loai_hoa_don)
+        </dt>
+        <dd class = "col-sm-8">
+            @Html.DisplayFor(model => model.loai_hoa_don)
+        </dd>
+        <dt class = "col-sm-4">
+            @Html.DisplayNameFor(model => model.ten_nguoi_nhan)
+        </dt>
+        <dd class = "col-sm-8">
+            @Html.DisplayFor(model => model.ten_nguoi_nhan)
+        </dd>
+        <dt class = "col-sm-4">
+            @Html.DisplayNameFor(model => model.thoi_gian_nhan_hang)
+        </dt>
+        <dd class = "col-sm-8">
+            @Html.DisplayFor(model => model.thoi_gian_nhan_hang)
+        </dd>
+        <dt class = "col-sm-4">
+            @Html.DisplayNameFor(model => model.ngay_tao)
+        </dt>
+        <dd class = "col-sm-8">
+            @Html.DisplayFor(model => model.ngay_tao)
+        </dd>
+        <dt class = "col-sm-4">
+            @Html.DisplayNameFor(model => model.ngay_sua)
+        </dt>
+        <dd class = "col-sm-8">
+            @Html.DisplayFor(model => model.ngay_sua)
+        </dd>
+        <dt class = "col-sm-4">
+            @Html.DisplayNameFor(model => model.nguoi_tao)
+        </dt>
+        <dd class = "col-sm-8">
+            @Html.DisplayFor(model => model.nguoi_tao)
+        </dd>
+        <dt class = "col-sm-4">
+            @Html.DisplayNameFor(model => model.nguoi_sua)
+        </dt>
+        <dd class = "col-sm-8">
+            @Html.DisplayFor(model => model.nguoi_sua)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.ID" class="btn btn-warning">
+        <i class="fa fa-edit"></i> Sửa
+    </a>
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="fa fa-arrow-left"></i> Quay lại danh sách
+    </a>
+</div>

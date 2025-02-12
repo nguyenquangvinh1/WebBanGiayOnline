@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Autocomplete với gợi ý khi gõ</title>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <style>
+        .form-control {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        .col {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="col">
+        <label class="form-label">Màu sắc</label>
+        <input type="text" id="colorInput" class="form-control" placeholder="Nhập màu sắc">
+    </div>
+
+    <div class="col">
+        <label class="form-label">Size</label>
+        <input type="text" id="sizeInput" class="form-control" placeholder="Nhập size">
+    </div>
+
+    <!-- Bao gồm jQuery và jQuery UI -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+    <script>
+        // Thư viện màu sắc và kích thước
+        const colorLibrary = [
+            "Đỏ", "Xanh Lá", "Xanh Dương", "Vàng", "Trắng", "Đen", "Hồng", "Cam", "Tím", "Nâu",
+            "Xám", "Xanh Ngọc", "Xanh Biển", "Xanh Rêu", "Kem", "Be", "Xanh Lục", "Đỏ Đô", "Xanh Cốm", "Đỏ Tía",
+            "Xanh Dương Đậm", "Xanh Lá Đậm", "Vàng Chanh", "Nâu Đất", "Ghi", "Xanh Đá", "Xanh Lá Nhạt", "Tím Nhạt", "Đỏ Cam", "Xanh Lá Đậm"
+        ];
+
+        const sizeLibrary = [
+            "XS", "S", "M", "L", "XL", "XXL", "XXXL", "Free Size", "28", "30", "32", "34", "36",
+            "38", "40", "42", "44", "46", "48", "50"
+        ];
+
+        // Hàm thêm autocomplete cho input
+        function addAutocomplete(inputId, suggestions) {
+            $("#" + inputId).autocomplete({
+                source: suggestions,
+                minLength: 1, // Bắt đầu gợi ý khi người dùng nhập ít nhất 1 ký tự
+                select: function (event, ui) {
+                    console.log("Chọn: " + ui.item.value);
+                }
+            });
+        }
+
+        // Gọi hàm addAutocomplete cho các input sử dụng thư viện màu sắc và size
+        $(function () {
+            addAutocomplete("colorInput", colorLibrary);
+            addAutocomplete("sizeInput", sizeLibrary);
+        });
+    </script>
+</body>
+
+</html>

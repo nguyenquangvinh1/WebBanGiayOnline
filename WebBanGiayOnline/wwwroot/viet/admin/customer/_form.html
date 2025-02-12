@@ -1,0 +1,60 @@
+<div class="row mx-0 bg-white">
+	<div class="col-md-8">
+		<form class="form p-3">
+			<div class="row">
+				<div class="col-12 col-md-6 col-lg-6 mb-3">
+					<label class="form-label">Tên khách hàng</label>
+					<input type="text" class="form-control" ng-model="form.name">
+				</div>
+				<div class="col-12 col-md-6 col-lg-6 mb-3">
+					<label class="form-label">Email</label>
+					<input type="text" class="form-control" ng-model="form.email">
+				</div>
+				<div class="col-12 col-md-6 col-lg-6 mb-3">
+					<label class="form-label">Mật khẩu</label>
+					<input type="text" class="form-control" ng-model="form.pass">
+				</div>
+				<div class="col-12 col-md-6 col-lg-6 mb-3">
+					<label class="form-label">Nhập lại mật khẩu</label>
+					<input type="text" class="form-control" ng-model="form.pass2">
+				</div>
+				<div class="col-12 col-md-6 col-lg-6 mb-3">
+					<label class="form-label">SĐT</label>
+					<input type="text" class="form-control" ng-model="form.telephone">
+				</div>
+				<div class="col-12 col-md-6 col-lg-6 mb-3">
+					<label class="form-label">SĐT thay thế</label>
+					<input type="text" class="form-control" ng-model="form.alt_telephone">
+				</div>
+				<div class="col-12 col-md-6 col-lg-6 mb-3">
+					<label class="form-label">Tỉnh/Thành phố</label>
+					<input type="text" class="form-control" ng-model="form.province">
+				</div>
+				<div class="col-12 col-md-6 col-lg-6 mb-3">
+					<label class="form-label">Huyện/Quận</label>
+					<input type="text" class="form-control" ng-model="form.district">
+				</div>
+				<div class="col-12 col-md-6 col-lg-6 mb-3">
+					<label class="form-label">Xã/Phường</label>
+					<input type="text" class="form-control" ng-model="form.district">
+				</div>
+				<div class="col-12 col-md-6 col-lg-6 mb-3">
+					<label class="form-label">Địa chỉ cụ thể</label>
+					<input type="text" class="form-control" ng-model="form.address">
+				</div>
+				<div class="col-12 col-md-6 col-lg-6 mb-3">
+					<label class="form-label">Địa chỉ thay thế</label>
+					<input type="text" class="form-control" ng-model="form.alt_address">
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<div class="card-header text-center">
+	<button ng-click="create()" class="btn btn-primary">
+		<i class="fas fa-plus"></i> Thêm
+	</button>
+	<button ng-click="update()" class="btn btn-success">
+		<i class="far fa-save"></i> Cập nhật
+	</button>
+</div>
