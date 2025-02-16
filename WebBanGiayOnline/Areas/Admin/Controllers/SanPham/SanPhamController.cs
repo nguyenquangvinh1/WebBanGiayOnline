@@ -31,9 +31,80 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 .Include(x => x.Mui_Giay)
                 .AsNoTracking()
                 .ToListAsync();
-
+            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu");
+            ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.ToList(), "ID", "ten_loai_co_giay");
+            ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.ToList(), "ID", "ten_danh_muc");
+            ViewData["De_GiayID"] = new SelectList(_context.de_Giays.ToList(), "ID", "ten_de_giay");
+            ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.ToList(), "ID", "ten_mui_giay");
+            ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.ToList(), "ID", "ten_kieu_dang");
+            ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.ToList(), "ID", "ten_loai_giay");
             return View(list);
         }
+        [HttpGet]
+        public IActionResult Filter(string chatLieu, string coGiay, string danhMuc, string deGiay, string muiGiay, string kieuDang, string loaiGiay)
+        {
+            var query = _context.san_Phams.AsQueryable();
+
+            if (!string.IsNullOrEmpty(chatLieu))
+                query = query.Where(sp => sp.Chat_LieuID.ToString() == chatLieu);
+
+            if (!string.IsNullOrEmpty(coGiay))
+                query = query.Where(sp => sp.Co_GiayID.ToString() == coGiay);
+
+            if (!string.IsNullOrEmpty(danhMuc))
+                query = query.Where(sp => sp.Danh_MucID.ToString() == danhMuc);
+
+            if (!string.IsNullOrEmpty(deGiay))
+                query = query.Where(sp => sp.De_GiayID.ToString() == deGiay);
+
+            if (!string.IsNullOrEmpty(muiGiay))
+                query = query.Where(sp => sp.Mui_GiayID.ToString() == muiGiay);
+
+            if (!string.IsNullOrEmpty(kieuDang))
+                query = query.Where(sp => sp.Kieu_DangID.ToString() == kieuDang);
+
+            if (!string.IsNullOrEmpty(loaiGiay))
+                query = query.Where(sp => sp.Loai_GiayID.ToString() == loaiGiay);
+
+            var result = query
+                .Include(x => x.Chat_Lieu)
+                .Include(x => x.Co_Giay)
+                .Include(x => x.Danh_Muc)
+                .Include(x => x.De_Giay)
+                .Include(x => x.Kieu_Dang)
+                .Include(x => x.Loai_Giay)
+                .Include(x => x.Mui_Giay)
+                .AsNoTracking()
+                .ToList();
+            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu");
+            ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.ToList(), "ID", "ten_loai_co_giay");
+            ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.ToList(), "ID", "ten_danh_muc");
+            ViewData["De_GiayID"] = new SelectList(_context.de_Giays.ToList(), "ID", "ten_de_giay");
+            ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.ToList(), "ID", "ten_mui_giay");
+            ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.ToList(), "ID", "ten_kieu_dang");
+            ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.ToList(), "ID", "ten_loai_giay");
+
+            return View("Index", result); // Trả về danh sách San_Pham và render lại view Index
+        }
+
+
+        [HttpPost]
+        public IActionResult ChangeStatus(Guid id, int trang_thai)
+        {
+            var sanPham = _context.san_Phams.FirstOrDefault(sp => sp.ID == id);
+            if (sanPham == null)
+            {
+                return NotFound();
+            }
+
+            // Cập nhật trạng thái
+            sanPham.trang_thai = trang_thai;
+            _context.san_Phams.Update(sanPham);
+            _context.SaveChanges();
+
+            return Json(new { success = true });
+        }
+
 
         // GET: KieuDangController/Details/5
         public async Task<IActionResult> Details(Guid? id)
@@ -134,14 +205,10 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 return NotFound();
             }
             var lstSPCT = _context.san_Pham_Chi_Tiets
-                .Include(x => x.Mau_Sac)
-                .Include(x => x.Kich_Thuoc)
                 .Where(x => x.San_PhamID == id).ToList();
-            var sp = new SpEditView()
-            {
-                spct = lstSPCT,
-                san_Pham = san
-            };
+            ViewData["lstSPCT"] = JsonConvert.SerializeObject(lstSPCT);
+
+
 
             ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu",san.Chat_LieuID);
             ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.ToList(), "ID", "ten_loai_co_giay", san.Co_GiayID);
@@ -150,36 +217,48 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.ToList(), "ID", "ten_mui_giay", san.Mui_GiayID);
             ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.ToList(), "ID", "ten_kieu_dang", san.Kieu_DangID);
             ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.ToList(), "ID", "ten_loai_giay", san.Loai_GiayID);
-            return View(sp);
+            ViewData["Kich_ThuocID"] = new SelectList(_context.kich_Thuocs.ToList(), "ID", "ten_kich_thuoc");
+            ViewData["Mau_SacID"] = new SelectList(_context.mau_Sacs.ToList(), "ID", "ma_mau");
+            return View(san);
         }
 
         // POST: KieuDangController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit( San_Pham san_Pham, string lstSPCT)
+        public async Task<IActionResult> Edit(San_Pham san_Pham, string lstSPCT)
         {
+            // Kiểm tra xem san_Pham và danh sách spct có null không
+            if (san_Pham == null)
+            {
+                ModelState.AddModelError("", "Dữ liệu sản phẩm không hợp lệ.");
+                return View(san_Pham); // Hiển thị lại trang với thông báo lỗi
+            }
             var listCT = JsonConvert.DeserializeObject<List<San_Pham_Chi_Tiet>>(lstSPCT);
-
-            var kich = await _context.kich_Thuocs.ToListAsync();
-            var mau = await _context.mau_Sacs.ToListAsync();
 
             foreach (var item in listCT)
             {
-                var SPCT = _context.san_Pham_Chi_Tiets.FirstOrDefault(x => x.ID == item.ID);
-                SPCT.gia = item.gia;
-                SPCT.so_luong = item.so_luong;
-                SPCT.trang_thai = item.trang_thai;
-                _context.san_Pham_Chi_Tiets.Update(SPCT);
-            }
+                var sp = _context.san_Pham_Chi_Tiets.Find(item.ID);
 
+
+
+                sp.gia = item.gia;
+                sp.so_luong = item.so_luong;
+                sp.trang_thai = item.trang_thai;
+                
+                _context.san_Pham_Chi_Tiets.Update(sp);
+            }
 
             var san = await _context.san_Phams.FindAsync(san_Pham.ID);
             if (san == null)
+            {
                 return NotFound();
+            }
+
             _context.Entry(san_Pham).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
 
         // GET: KieuDangController/Delete/5
         public async Task<IActionResult> Delete(Guid? id)

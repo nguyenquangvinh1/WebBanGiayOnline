@@ -1,103 +1,187 @@
-﻿@model WebBanGiay.ViewModel.SpEditView
+﻿@model ClssLib.San_Pham
 
-<form asp-action="Edit">
+<form asp-action="Edit" method="post">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" id="lstSPCT" name="lstSPCT" />
     <div class="form-group mb-3">
-
-        <label asp-for="san_Pham.ten_san_pham" class="control-label"></label>
-        <input asp-for="san_Pham.ten_san_pham" class="form-control" />
-        <span asp-validation-for="san_Pham.ten_san_pham" class="text-danger"></span>
+        <label asp-for="ten_san_pham" class="control-label"></label>
+        <input asp-for="ten_san_pham" class="form-control" />
+        <span asp-validation-for="ten_san_pham" class="text-danger"></span>
     </div>
+
+
+    <div class="form-group col-md-4">
+        <label asp-for="Co_GiayID" class="control-label"></label>
+        <select asp-for="Co_GiayID" class="form-control" asp-items="ViewBag.Co_GiayID"></select>
+        <span asp-validation-for="Co_GiayID" class="text-danger"></span>
+    </div>
+
     <div class="mb-3 row">
         <div class="form-group col-md-4">
-            <label asp-for="san_Pham.Chat_LieuID" class="control-label"></label>
-            <select asp-for="san_Pham.Chat_LieuID" class="form-control" asp-items="ViewBag.Chat_LieuID"></select>
-            <span asp-validation-for="san_Pham.Chat_LieuID" class="text-danger"></span>
-
+            <label asp-for="Chat_LieuID" class="control-label"></label>
+            <select asp-for="Chat_LieuID" class="form-control" asp-items="ViewBag.Chat_LieuID"></select>
+            <span asp-validation-for="Chat_LieuID" class="text-danger"></span>
         </div>
         <div class="form-group col-md-4">
-            <label asp-for="san_Pham.Co_GiayID" class="control-label"></label>
-            <select asp-for="san_Pham.Co_GiayID" class="form-control" asp-items="ViewBag.Co_GiayID"></select>
-            <span asp-validation-for="san_Pham.Co_GiayID" class="text-danger"></span>
-
+            <label asp-for="Co_GiayID" class="control-label"></label>
+            <select asp-for="Co_GiayID" class="form-control" asp-items="ViewBag.Co_GiayID"></select>
+            <span asp-validation-for="Co_GiayID" class="text-danger"></span>
         </div>
         <div class="form-group col-md-4">
-            <label asp-for="san_Pham.Danh_MucID" class="control-label"></label>
-            <select asp-for="san_Pham.Danh_MucID" class="form-control" asp-items="ViewBag.Danh_MucID"></select>
-            <span asp-validation-for="san_Pham.Danh_MucID" class="text-danger"></span>
-
+            <label asp-for="Danh_MucID" class="control-label"></label>
+            <select asp-for="Danh_MucID" class="form-control" asp-items="ViewBag.Danh_MucID"></select>
+            <span asp-validation-for="Danh_MucID" class="text-danger"></span>
         </div>
     </div>
+
     <div class="mb-3 row">
-
         <div class="form-group col-md-4">
-            <label asp-for="san_Pham.De_GiayID" class="control-label"></label>
-            <select asp-for="san_Pham.De_GiayID" class="form-control" asp-items="ViewBag.De_GiayID"></select>
-            <span asp-validation-for="san_Pham.De_GiayID" class="text-danger"></span>
-
-        </div><div class="form-group col-md-4">
-            <label asp-for="san_Pham.Mui_GiayID" class="control-label"></label>
-            <select asp-for="san_Pham.Mui_GiayID" class="form-control" asp-items="ViewBag.Mui_GiayID"></select>
-            <span asp-validation-for="san_Pham.Mui_GiayID" class="text-danger"></span>
-
-        </div><div class="form-group col-md-4">
-            <label asp-for="san_Pham.Kieu_DangID" class="control-label"></label>
-            <select asp-for="san_Pham.Kieu_DangID" class="form-control" asp-items="ViewBag.Kieu_DangID"></select>
-            <span asp-validation-for="san_Pham.Kieu_DangID" class="text-danger"></span>
-
+            <label asp-for="De_GiayID" class="control-label"></label>
+            <select asp-for="De_GiayID" class="form-control" asp-items="ViewBag.De_GiayID"></select>
+            <span asp-validation-for="De_GiayID" class="text-danger"></span>
         </div>
+        <div class="form-group col-md-4">
+            <label asp-for="Mui_GiayID" class="control-label"></label>
+            <select asp-for="Mui_GiayID" class="form-control" asp-items="ViewBag.Mui_GiayID"></select>
+            <span asp-validation-for="Mui_GiayID" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-4">
+            <label asp-for="Kieu_DangID" class="control-label"></label>
+            <select asp-for="Kieu_DangID" class="form-control" asp-items="ViewBag.Kieu_DangID"></select>
+            <span asp-validation-for="Kieu_DangID" class="text-danger"></span>
+        </div>
+    </div>
 
-    </div>
     <div class="form-group mb-3">
-        <label asp-for="san_Pham.mo_ta" class="control-label">Mô Tả Sản Phẩm</label>
-        <textarea asp-for="san_Pham.mo_ta" class="form-control"></textarea>
-        <span asp-validation-for="san_Pham.mo_ta" class="text-danger"></span>
+        <label asp-for="mo_ta" class="control-label">Mô Tả Sản Phẩm</label>
+        <textarea asp-for="mo_ta" class="form-control"></textarea>
+        <span asp-validation-for="mo_ta" class="text-danger"></span>
     </div>
+
     <div class="form-group">
         <input type="submit" value="Save" id="saveProduct" class="btn btn-primary" />
     </div>
-
 </form>
 
-<div id="productTables">
-    <div class="mt-4" id="table-SPCT">
-        <h4>Sản phẩm Chi Tiết</h4>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Màu Sắc</th>
-                    <th>Kích Cỡ</th>
-                    <th>Số Lượng</th>
-                    <th>Giá</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.spct)
-                {
-                    <tr>
-                        <td>@item.Mau_Sac.ma_mau</td>
-                        <td>@item.Kich_Thuoc.ten_kich_thuoc</td>
-                        <td><input type="number" class="form-control quantity" value="@item.so_luong"></td>
-                        <td><input type="number" class="form-control price" value="@item.gia"></td>
-                        @item.trang_thai == 1 ? "
-                        <td><button class='btn btn-success'>đang bán</button></td>" : "
-                        <td><button class='btn btn-danger'>Ngừng bán</button></td>"
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+<div class="mt-4" id="table-SPCT">
+    <h4>Sản phẩm Chi Tiết</h4>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Màu Sắc</th>
+                <th>Kích Cỡ</th>
+                <th>Số Lượng</th>
+                <th>Giá</th>
+                <th>Trạng Thái</th>
+                <th class="d-none">ID</th> <!-- Ô ẩn cho ID -->
+            </tr>
+        </thead>
+        <tbody>
+            
+        </tbody>
+    </table>
 </div>
+<input type="hidden" id="lstSPCTData" value='@Html.Raw(ViewData["lstSPCT"] as string)' />
 
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+   $(document).ready(function () {
+    // Lấy JSON từ thẻ input hidden để tránh lỗi encoding
+    let jsonData = $('#lstSPCTData').val().trim();
+    console.log("Chuỗi JSON từ ViewData:", jsonData);
+    console.log("Kiểu dữ liệu jsonData:", typeof jsonData);
+    
+    let lstSPCT = [];
+    try {
+        if (jsonData.startsWith('{') || jsonData.startsWith('[')) {
+            lstSPCT = JSON.parse(jsonData);
+        } else {
+            console.warn("Dữ liệu không hợp lệ hoặc đã được parse trước đó.");
+        }
+    } catch (error) {
+        console.error("Lỗi khi parse JSON:", error);
+    }
+    
+    console.log("Dữ liệu lstSPCT:", lstSPCT);
+    console.log("Kiểu dữ liệu lstSPCT:", typeof lstSPCT);
+    
+    let kichThuocList = @Html.Raw(Json.Serialize(ViewData["Kich_ThuocID"]));
+    let mauSacList = @Html.Raw(Json.Serialize(ViewData["Mau_SacID"]));
+    
+    function loadTable() {
+        let tbody = $('#table-SPCT tbody');
+        tbody.empty(); // Xóa các dòng cũ
+
+        lstSPCT.forEach(item => {
+            let kichThuoc = kichThuocList.find(k => k.value === item.Kich_ThuocID)?.text || 'Không xác định';
+            let mauSac = mauSacList.find(m => m.value === item.Mau_SacID)?.text || 'Không xác định';
+            
+            let row = `<tr>
+                <td data-id="${item.Mau_SacID}">${mauSac}</td>
+                <td data-id="${item.Kich_ThuocID}">${kichThuoc}</td>
+                <td><input type='number' class='quantity form-control' value='${item.so_luong}' /></td>
+                <td><input type='number' class='price form-control' value='${item.gia}' /></td>
+                <td><button class='toggle-status btn btn-sm ${item.trang_thai === 1 ? 'btn-success' : 'btn-danger'}' data-status="${item.trang_thai}" style='width: 150px; height: 30px; line-height: 18px; white-space: nowrap;'>${item.trang_thai === 1 ? 'Hoạt động' : 'Không hoạt động'}</button></td>
+                <td class='d-none'>${item.ID}</td>
+                </tr>`;
+            tbody.append(row);
+        });
+    }
+    
+    if (Array.isArray(lstSPCT)) {
+        loadTable();
+    } else {
+        console.error("lstSPCT không phải là một mảng");
+    }
+
+    // Lưu dữ liệu từ bảng vào input ẩn khi nhấn nút lưu
+    $('#saveProduct').click(function () {
+        let sanPhamCTList = [];
+
+        // Duyệt qua các dòng của bảng
+        $('#table-SPCT tbody tr').each(function () {
+            let color = $(this).find("td:first").data("id");
+            let size = $(this).find("td:nth-child(2)").data("id");
+            let quantity = $(this).find(".quantity").val();
+            let price = $(this).find(".price").val();
+            let id = $(this).find("td:nth-child(6)").text(); // Lấy ID từ ô ẩn
+            let status = $(this).find(".toggle-status").data("status");
+
+            // Kiểm tra số lượng trước khi thêm vào danh sách
+            if (quantity > 0) {
+                sanPhamCTList.push({
+                    Mau_SacID: color,
+                    Kich_ThuocID: size,
+                    so_luong: parseInt(quantity),
+                    gia: parseInt(price),
+                    trang_thai: status,
+                    id: id, // Thêm ID vào danh sách
+                    ngay_tao: new Date().toISOString()
+                });
+            }
+        });
+
+        // Chuyển dữ liệu thành JSON và gán vào input ẩn
+        $('#lstSPCT').val(JSON.stringify(sanPhamCTList));
+    });
+
+    // Sự kiện thay đổi trạng thái mà không đẩy dòng trong bảng
+    $(document).on('click', '.toggle-status', function () {
+        let button = $(this);
+        let currentStatus = button.data("status");
+        let newStatus = currentStatus === 1 ? 0 : 1;
+        button.data("status", newStatus);
+        button.toggleClass('btn-success btn-danger').text(newStatus === 1 ? 'Hoạt động' : 'Không hoạt động');
+    });
+});
 
 
-
-
-
+</script>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
+

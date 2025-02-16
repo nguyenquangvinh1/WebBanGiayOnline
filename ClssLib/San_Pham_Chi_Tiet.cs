@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -17,17 +18,19 @@ namespace ClssLib
         public DateTime ngay_tao { get; set; }
         public DateTime? ngay_sua { get; set; }
         [ForeignKey("Kich_Thuoc")]
-        public Guid Kich_ThuocID { get; set; }
+        public Guid? Kich_ThuocID { get; set; }
         [ForeignKey("Mau_Sac")]
-        public Guid Mau_SacID { get; set; }
+        public Guid? Mau_SacID { get; set; }
         [ForeignKey("San_Pham")]
         public Guid San_PhamID { get; set; }
         [JsonIgnore]
-        public virtual Kich_Thuoc Kich_Thuoc { get; set; }
+        [IgnoreDataMember]
+        public virtual Kich_Thuoc? Kich_Thuoc { get; set; }
         [JsonIgnore]
-        public virtual Mau_Sac Mau_Sac { get; set; }
+        [IgnoreDataMember]
+        public virtual Mau_Sac? Mau_Sac { get; set; }
         [JsonIgnore]
-        public virtual San_Pham San_Pham { get; set; }
+        public virtual San_Pham? San_Pham { get; set; }
         [JsonIgnore]
         public virtual ICollection<Anh_San_Pham_San_Pham_Chi_Tiet>? Anh_San_Pham_San_Pham_Chi_Tiets { get; set; }
         [JsonIgnore]

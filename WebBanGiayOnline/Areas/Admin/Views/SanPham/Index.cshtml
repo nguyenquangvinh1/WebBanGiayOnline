@@ -3,57 +3,110 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
+
+<!-- Nút mở modal lọc -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+    Lọc sản phẩm
+</button>
+
+<!-- Modal lọc -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterModalLabel">Lọc sản phẩm</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label for="filterChatLieu">Chất liệu:</label>
+                <select id="filterChatLieu" class="form-control">
+                    <option value="">Tất cả</option>
+                    @foreach (var item in (SelectList)ViewData["Chat_LieuID"])
+                    {
+                        <option value="@item.Text">@item.Text</option>
+                    }
+                </select>
+                
+                <label for="filterCoGiay">Cổ giày:</label>
+                <select id="filterCoGiay" class="form-control">
+                    <option value="">Tất cả</option>
+                    @foreach (var item in (SelectList)ViewData["Co_GiayID"])
+                    {
+                        <option value="@item.Text">@item.Text</option>
+                    }
+                </select>
+                
+                <label for="filterDanhMuc">Danh mục:</label>
+                <select id="filterDanhMuc" class="form-control">
+                    <option value="">Tất cả</option>
+                    @foreach (var item in (SelectList)ViewData["Danh_MucID"])
+                    {
+                        <option value="@item.Text">@item.Text</option>
+                    }
+                </select>
+                
+                <label for="filterDeGiay">Đế giày:</label>
+                <select id="filterDeGiay" class="form-control">
+                    <option value="">Tất cả</option>
+                    @foreach (var item in (SelectList)ViewData["De_GiayID"])
+                    {
+                        <option value="@item.Text">@item.Text</option>
+                    }
+                </select>
+                
+                <label for="filterMuiGiay">Mũi giày:</label>
+                <select id="filterMuiGiay" class="form-control">
+                    <option value="">Tất cả</option>
+                    @foreach (var item in (SelectList)ViewData["Mui_GiayID"])
+                    {
+                        <option value="@item.Text">@item.Text</option>
+                    }
+                </select>
+                
+                <label for="filterKieuDang">Kiểu dáng:</label>
+                <select id="filterKieuDang" class="form-control">
+                    <option value="">Tất cả</option>
+                    @foreach (var item in (SelectList)ViewData["Kieu_DangID"])
+                    {
+                        <option value="@item.Text">@item.Text</option>
+                    }
+                </select>
+                
+                <label for="filterLoaiGiay">Loại giày:</label>
+                <select id="filterLoaiGiay" class="form-control">
+                    <option value="">Tất cả</option>
+                    @foreach (var item in (SelectList)ViewData["Loai_GiayID"])
+                    {
+                        <option value="@item.Text">@item.Text</option>
+                    }
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="applyFilter">Lọc</button>
+            </div>
+        </div>
+    </div>
+</div>
+<table class="table" id="sanPhamTable">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ten_san_pham)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.mo_ta)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.trang_thai)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ngay_tao)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ngay_sua)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.nguoi_tao)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.nguoi_sua)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Kieu_Dang)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Danh_Muc)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Loai_Giay)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Mui_Giay)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Co_Giay)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.De_Giay)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Chat_Lieu)
-            </th>
+            <th>@Html.DisplayNameFor(model => model.ten_san_pham)</th>
+            <th>@Html.DisplayNameFor(model => model.mo_ta)</th>
+            <th>@Html.DisplayNameFor(model => model.trang_thai)</th>
+            <th>@Html.DisplayNameFor(model => model.ngay_tao)</th>
+            <th class="filterable">Tên kiểu dáng</th>
+            <th class="filterable">Tên danh mục</th>
+            <th class="filterable">Tên loại giày</th>
+            <th class="filterable">Tên mũi giày</th>
+            <th class="filterable">Tên cổ giày</th>
+            <th class="filterable">Tên đế giày</th>
+            <th class="filterable">Tên chất liệu</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model ?? Enumerable.Empty<ClssLib.San_Pham>())
-        {
+@foreach (var item in Model) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.ten_san_pham)
@@ -62,19 +115,10 @@
                 @Html.DisplayFor(modelItem => item.mo_ta)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.trang_thai)
+                <button class='toggle-status btn btn-sm @(item.trang_thai == 1 ? "btn-success" : "btn-danger")' data-id='@item.ID' data-status='@item.trang_thai' style='width: 150px; height: 30px; line-height: 18px; white-space: nowrap;'>@(item.trang_thai == 1 ? "Hoạt động" : "Không hoạt động")</button>
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.ngay_tao)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ngay_sua)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.nguoi_tao)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.nguoi_sua)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Kieu_Dang.ten_kieu_dang)
@@ -97,10 +141,55 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Chat_Lieu.ten_chat_lieu)
             </td>
-            <td>
-                    <a asp-action="Edit" asp-route-id="@item.ID">Edit</a>
-            </td>
+            <td><a asp-action="Edit" asp-route-id="@item.ID">Edit</a></td>
         </tr>
 }
     </tbody>
 </table>
+
+<script>
+    $(document).ready(function () {
+       
+            $('#applyFilter').click(function () {
+                let filters = {};
+                $('select').each(function () {
+                    let id = $(this).attr('id');
+                    let value = $(this).val(); // Lấy value thay vì text
+                    if (value && value !== '') {
+                        filters[id] = value;
+                    }
+                });
+
+                let queryString = $.param(filters);
+                window.location.href = '/Admin/SanPham/Filter?' + queryString;
+            });
+
+
+        $(document).on('click', '.toggle-status', function () {
+            let button = $(this);
+            let id = button.data("id");
+            let currentStatus = button.data("status");
+            let newStatus = currentStatus === 1 ? 0 : 1;
+
+            $.ajax({
+                url: '/Admin/SanPham/ChangeStatus',
+                type: 'POST',
+                data: { id: id, trang_thai: newStatus },
+                async: false,  // Đảm bảo request hoàn tất trước khi tiếp tục
+                success: function () {
+                    button.data("status", newStatus);
+                    button.toggleClass('btn-success btn-danger')
+                        .text(newStatus === 1 ? 'Hoạt động' : 'Không hoạt động');
+                },
+                error: function (xhr, status, error) {
+                    console.error("Lỗi AJAX:", status, error);
+                    alert("Có lỗi xảy ra, vui lòng thử lại!");
+                },
+                complete: function () {
+                    console.log("Request đổi trạng thái hoàn tất.");
+                }
+            });
+        });
+
+    });
+</script>
