@@ -1,75 +1,5 @@
 ﻿@model ClssLib.San_Pham
 
-@*  <h4>San_PhamViewModel</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="ten_san_pham" class="control-label"></label>
-                <input asp-for="ten_san_pham" class="form-control" />
-                <span asp-validation-for="ten_san_pham" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="mo_ta" class="control-label"></label>
-                <input asp-for="mo_ta" class="form-control" />
-                <span asp-validation-for="mo_ta" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="trang_thai" class="control-label"></label>
-                <input asp-for="trang_thai" class="form-control" />
-                <span asp-validation-for="trang_thai" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ngay_tao" class="control-label"></label>
-                <input asp-for="ngay_tao" class="form-control" />
-                <span asp-validation-for="ngay_tao" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3 row">
-                <div class="form-group col-md-4">
-                    <label asp-for="Chat_LieuID" class="control-label"></label>
-                    <select asp-for="Chat_LieuID" class="form-control" asp-items="ViewBag.Chat_LieuID"></select>
-                </div>
-            <div class="form-group col-md-4">
-            <label asp-for="Co_GiayID" class="control-label"></label>
-            <select asp-for="Co_GiayID" class="form-control" asp-items="ViewBag.Co_GiayID"></select>
-        </div>
-        <div class="form-group col-md-4">
-            <label asp-for="Danh_MucID" class="control-label"></label>
-            <select asp-for="Danh_MucID" class="form-control" asp-items="ViewBag.Danh_MucID"></select>
-        </div>
-        </div>
-        <div class="mb-3 row">
-
-        <div class="form-group col-md-4">
-            <label asp-for="De_GiayID" class="control-label"></label>
-            <select asp-for="De_GiayID" class="form-control" asp-items="ViewBag.De_GiayID"></select>
-        </div><div class="form-group col-md-4">
-            <label asp-for="Mui_GiayID" class="control-label"></label>
-            <select asp-for="Mui_GiayID" class="form-control" asp-items="ViewBag.Mui_GiayID"></select>
-        </div><div class="form-group col-md-4">
-            <label asp-for="Kieu_DangID" class="control-label"></label>
-            <select asp-for="Kieu_DangID" class="form-control" asp-items="ViewBag.Kieu_DangID"></select>
-        </div>
-
-        </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
- *@
 
 <h2>Thêm Sản Phẩm</h2>
 <form asp-action="Create">
@@ -84,10 +14,19 @@
         <input asp-for="ten_san_pham" class="form-control" />
         <span asp-validation-for="ten_san_pham" class="text-danger"></span>
     </div>
+    <select id="Loai_GiayID" name="Loai_GiayID" class="form-control select2">
+        <option value="">-- Nhập hoặc chọn Loại Giày --</option>
+        @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Loai_GiayID)
+        {
+            <option value="@item.Value">@item.Text</option>
+        }
+    </select>
+
+
     <div class="mb-3 row">
         <div class="form-group col-md-4">
             <label asp-for="Chat_LieuID" class="control-label"></label>
-            <select asp-for="Chat_LieuID" class="form-control" asp-items="ViewBag.Chat_LieuID"></select>
+            <select asp-for="Chat_LieuID" class="form-control select2" asp-items="ViewBag.Chat_LieuID"></select>
                 <span asp-validation-for="Chat_LieuID" class="text-danger"></span>
 
         </div>
@@ -216,6 +155,46 @@
     $(document).ready(function () {
         let selectedSizes = [];
 
+        setTimeout(() => {
+            console.log("Check Select2 again:", typeof $.fn.select2 !== "undefined");
+        }, 3000);
+
+        console.log("jQuery hiện tại:", $.fn.jquery);
+
+        $.getScript("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js")
+            .done(function () {
+                console.log("✅ Select2 tải lại thành công!");
+                $(".select2").select2();
+            })
+            .fail(function () {
+                console.error("⚠️ Không thể tải lại Select2!");
+            });
+
+        console.log("🔍 jQuery version:", $.fn.jquery);
+        console.log("🔍 Select2 exists:", typeof $.fn.select2 !== "undefined");
+
+        // Kiểm tra nếu Select2 đã tải
+        if ($.fn.select2) {
+            $(".select2").select2({
+                placeholder: "Nhập hoặc chọn một tùy chọn",
+                allowClear: true,
+                tags: true, // Cho phép nhập giá trị mới
+                tokenSeparators: [',', ' '], // Cho phép nhập nhiều giá trị
+                createTag: function (params) {
+                    let term = $.trim(params.term);
+                    if (term === '') return null;
+                    return {
+                        id: term,
+                        text: term,
+                        newTag: true // Đánh dấu là giá trị mới
+                    };
+                }
+            });
+            console.log("✅ Select2 đã được khởi tạo thành công!");
+        } else {
+            console.error("⚠️ Select2 chưa được tải đúng cách!");
+        }
+
         $('#addColor').click(function () {
             $('.color-checkbox:checked').each(function () {
                 let color = $(this).val();
@@ -239,6 +218,12 @@
                 }
             });
             $('#colorModal').modal('hide');
+            setTimeout(() => {
+                $('.modal-backdrop').fadeOut(300, function () {
+                    $(this).remove();
+                });
+                $('body').removeClass('modal-open'); // Loại bỏ lớp giữ nền bị tối
+            }, 300); // Đợi 300ms để hiệu ứng fade chạy
         });
 
         $('#addSize').click(function () {
@@ -258,6 +243,12 @@
                 }
             });
             $('#sizeModal').modal('hide');
+            setTimeout(() => {
+                $('.modal-backdrop').fadeOut(300, function () {
+                    $(this).remove();
+                });
+                $('body').removeClass('modal-open'); // Loại bỏ lớp giữ nền bị tối
+            }, 300); // Đợi 300ms để hiệu ứng fade chạy
         });
 
         $('#saveProduct').click(function () {

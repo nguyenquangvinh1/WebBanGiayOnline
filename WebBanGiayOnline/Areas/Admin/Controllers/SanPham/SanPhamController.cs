@@ -87,6 +87,28 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             return View("Index", result); // Trả về danh sách San_Pham và render lại view Index
         }
 
+        [HttpPost("add-loai-giay")]
+        public async Task<IActionResult> AddLoaiGiay([FromBody] string tenLoaiGiay)
+        {
+            if (string.IsNullOrWhiteSpace(tenLoaiGiay))
+            {
+                return BadRequest(new { success = false, message = "Tên không hợp lệ" });
+            }
+
+            // Kiểm tra xem giá trị đã tồn tại chưa
+            var existing = await _context.loai_Giays.FirstOrDefaultAsync(l => l.ten_loai_giay == tenLoaiGiay);
+            if (existing != null)
+            {
+                return Ok(new { success = true, id = existing.ID, text = existing.ten_loai_giay });
+            }
+
+            // Thêm giá trị mới vào database
+            var newLoaiGiay = new Loai_Giay { ten_loai_giay = tenLoaiGiay };
+            _context.loai_Giays.Add(newLoaiGiay);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, id = newLoaiGiay.ID, text = newLoaiGiay.ten_loai_giay });
+        }
 
         [HttpPost]
         public IActionResult ChangeStatus(Guid id, int trang_thai)
