@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -19,18 +21,25 @@ namespace ClssLib
         public string? nguoi_tao { get; set; }
         public string? nguoi_sua { get; set; }
         [ForeignKey("Kieu_Dang")]
+        [Display(Name = "Kiểu Dáng :")]
         public Guid? Kieu_DangID { get; set; }
         [ForeignKey("Danh_Muc")]
+        [Display(Name = "Danh mục :")]
         public Guid? Danh_MucID { get; set; }
         [ForeignKey("Loai_Giay")]
+        [Display(Name = "Loại Giày :")]
         public Guid? Loai_GiayID { get; set; }
         [ForeignKey("Mui_Giay")]
+        [Display(Name = "Mũi Giày :")]
         public Guid? Mui_GiayID { get; set; }
         [ForeignKey("Co_Giay")]
+        [Display(Name = "Cổ Giày :")]
         public Guid? Co_GiayID { get; set; }
         [ForeignKey("De_Giay")]
+        [Display(Name = "Đế Giày :")]
         public Guid? De_GiayID { get; set; }
         [ForeignKey("Chat_Lieu")]
+        [Display(Name = "Chất Liệu :")]
         public Guid? Chat_LieuID { get; set; }
         [JsonIgnore]
         public virtual Kieu_Dang? Kieu_Dang { get; set; }

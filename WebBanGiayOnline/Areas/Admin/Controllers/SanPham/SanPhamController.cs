@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using WebBanGiay.Data;
 using WebBanGiay.ViewModel;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 {
@@ -87,7 +89,192 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             return View("Index", result); // Trả về danh sách San_Pham và render lại view Index
         }
 
-        [HttpPost("add-loai-giay")]
+        [HttpPost]
+        public async Task<IActionResult> AddCoGiay([FromBody] string tenCoGiay)
+        {
+            if (string.IsNullOrWhiteSpace(tenCoGiay))
+            {
+                return BadRequest(new { success = false, message = "Tên không hợp lệ" });
+            }
+
+            // Kiểm tra xem giá trị đã tồn tại chưa
+            var existing = await _context.co_Giays.FirstOrDefaultAsync(l => l.ten_loai_co_giay == tenCoGiay);
+            if (existing != null)
+            {
+                return Ok(new { success = true, id = existing.ID, text = existing.ten_loai_co_giay });
+            }
+
+            // Thêm giá trị mới vào database
+            var newCoGiay = new Co_Giay { ten_loai_co_giay = tenCoGiay };
+            _context.co_Giays.Add(newCoGiay);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, id = newCoGiay.ID, text = newCoGiay.ten_loai_co_giay });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddDeGiay([FromBody] string tenDeGiay)
+        {
+            if (string.IsNullOrWhiteSpace(tenDeGiay))
+            {
+                return BadRequest(new { success = false, message = "Tên không hợp lệ" });
+            }
+
+            // Kiểm tra xem giá trị đã tồn tại chưa
+            var existing = await _context.de_Giays.FirstOrDefaultAsync(l => l.ten_de_giay == tenDeGiay);
+            if (existing != null)
+            {
+                return Ok(new { success = true, id = existing.ID, text = existing.ten_de_giay });
+            }
+
+            // Thêm giá trị mới vào database
+            var newDeGiay = new De_Giay { ten_de_giay = tenDeGiay };
+            _context.de_Giays.Add(newDeGiay);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, id = newDeGiay.ID, text = newDeGiay.ten_de_giay });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddMuiGiay([FromBody] string tenMuiGiay)
+        {
+            if (string.IsNullOrWhiteSpace(tenMuiGiay))
+            {
+                return BadRequest(new { success = false, message = "Tên không hợp lệ" });
+            }
+
+            // Kiểm tra xem giá trị đã tồn tại chưa
+            var existing = await _context.mui_Giays.FirstOrDefaultAsync(l => l.ten_mui_giay == tenMuiGiay);
+            if (existing != null)
+            {
+                return Ok(new { success = true, id = existing.ID, text = existing.ten_mui_giay });
+            }
+
+            // Thêm giá trị mới vào database
+            var newMuiGiay = new Mui_Giay { ten_mui_giay = tenMuiGiay };
+            _context.mui_Giays.Add(newMuiGiay);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, id = newMuiGiay.ID, text = newMuiGiay.ten_mui_giay });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddMauSac([FromBody] string tenMauSac)
+        {
+            if (string.IsNullOrWhiteSpace(tenMauSac))
+            {
+                return BadRequest(new { success = false, message = "Tên không hợp lệ" });
+            }
+
+            // Kiểm tra xem giá trị đã tồn tại chưa
+            var existing = await _context.mau_Sacs.FirstOrDefaultAsync(l => l.ma_mau == tenMauSac);
+            if (existing != null)
+            {
+                return Ok(new { success = true, id = existing.ID, text = existing.ma_mau });
+            }
+
+            // Thêm giá trị mới vào database
+            var newMauSac = new Mau_Sac { ma_mau = tenMauSac };
+            _context.mau_Sacs.Add(newMauSac);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, id = newMauSac.ID, text = newMauSac.ma_mau });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddKieuDang([FromBody] string tenKieuDang)
+        {
+            if (string.IsNullOrWhiteSpace(tenKieuDang))
+            {
+                return BadRequest(new { success = false, message = "Tên không hợp lệ" });
+            }
+
+            // Kiểm tra xem giá trị đã tồn tại chưa
+            var existing = await _context.kieu_Dangs.FirstOrDefaultAsync(l => l.ten_kieu_dang == tenKieuDang);
+            if (existing != null)
+            {
+                return Ok(new { success = true, id = existing.ID, text = existing.ten_kieu_dang });
+            }
+
+            // Thêm giá trị mới vào database
+            var newKieuDang = new Kieu_Dang { ten_kieu_dang = tenKieuDang };
+            _context.kieu_Dangs.Add(newKieuDang);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, id = newKieuDang.ID, text = newKieuDang.ten_kieu_dang });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddKichThuoc([FromBody] string tenKichThuoc)
+        {
+            if (string.IsNullOrWhiteSpace(tenKichThuoc))
+            {
+                return BadRequest(new { success = false, message = "Tên không hợp lệ" });
+            }
+
+            // Kiểm tra xem giá trị đã tồn tại chưa
+            var existing = await _context.kich_Thuocs.FirstOrDefaultAsync(l => l.ten_kich_thuoc == tenKichThuoc);
+            if (existing != null)
+            {
+                return Ok(new { success = true, id = existing.ID, text = existing.ten_kich_thuoc });
+            }
+
+            // Thêm giá trị mới vào database
+            var newKichThuoc = new Kich_Thuoc { ten_kich_thuoc = tenKichThuoc };
+            _context.kich_Thuocs.Add(newKichThuoc);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, id = newKichThuoc.ID, text = newKichThuoc.ten_kich_thuoc });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddDanhMuc([FromBody] string tenDanhMuc)
+        {
+            if (string.IsNullOrWhiteSpace(tenDanhMuc))
+            {
+                return BadRequest(new { success = false, message = "Tên không hợp lệ" });
+            }
+
+            // Kiểm tra xem giá trị đã tồn tại chưa
+            var existing = await _context.danh_Mucs.FirstOrDefaultAsync(l => l.ten_danh_muc == tenDanhMuc);
+            if (existing != null)
+            {
+                return Ok(new { success = true, id = existing.ID, text = existing.ten_danh_muc });
+            }
+
+            // Thêm giá trị mới vào database
+            var newDanhMuc = new Danh_Muc { ten_danh_muc = tenDanhMuc };
+            _context.danh_Mucs.Add(newDanhMuc);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, id = newDanhMuc.ID, text = newDanhMuc.ten_danh_muc });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddChatLieu([FromBody] string tenChatLieu)
+        {
+            if (string.IsNullOrWhiteSpace(tenChatLieu))
+            {
+                return BadRequest(new { success = false, message = "Tên không hợp lệ" });
+            }
+
+            // Kiểm tra xem giá trị đã tồn tại chưa
+            var existing = await _context.chat_Lieus.FirstOrDefaultAsync(l => l.ten_chat_lieu == tenChatLieu);
+            if (existing != null)
+            {
+                return Ok(new { success = true, id = existing.ID, text = existing.ten_chat_lieu });
+            }
+
+            // Thêm giá trị mới vào database
+            var newChatLieu = new Chat_Lieu { ten_chat_lieu = tenChatLieu };
+            _context.chat_Lieus.Add(newChatLieu);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, id = newChatLieu.ID, text = newChatLieu.ten_chat_lieu });
+        }
+        
+
+        [HttpPost]
         public async Task<IActionResult> AddLoaiGiay([FromBody] string tenLoaiGiay)
         {
             if (string.IsNullOrWhiteSpace(tenLoaiGiay))
@@ -149,7 +336,14 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         // GET: KieuDangController/Create
         public  IActionResult Create()
         {
-             ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu");
+            var query = _context.san_Phams.AsQueryable();
+            var tenDaDangKy = new List<string>();
+            foreach (var item in query)
+            {
+                tenDaDangKy.Add(item.ten_san_pham);
+            }
+            ViewData["TenGiay"] = tenDaDangKy;
+            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu");
             ViewData["Co_GiayID"] = new SelectList( _context.co_Giays.ToList(), "ID", "ten_loai_co_giay");
             ViewData["Danh_MucID"] = new SelectList( _context.danh_Mucs.ToList(), "ID", "ten_danh_muc");
             ViewData["De_GiayID"] = new SelectList(  _context.de_Giays.ToList(), "ID", "ten_de_giay");
@@ -166,7 +360,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(San_Pham san_Pham,string lstSPCT)
         {
-            var listCT = JsonConvert.DeserializeObject<List<San_PhamCTView>>(lstSPCT);
+            
 
             var kich = await _context.kich_Thuocs.ToListAsync();
             var mau = await _context.mau_Sacs.ToListAsync();
@@ -185,21 +379,27 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 SP.De_GiayID = san_Pham.De_GiayID;
                 SP.Chat_LieuID = san_Pham.Chat_LieuID;
                 await _context.san_Phams.AddAsync(SP);
-            foreach (var item in listCT)
+            if (!lstSPCT.IsNullOrEmpty())
             {
-                var sp = new San_Pham_Chi_Tiet()
+
+                var listCT = JsonConvert.DeserializeObject<List<San_PhamCTView>>(lstSPCT);
+                foreach (var item in listCT)
                 {
-                    ID = Guid.NewGuid(),
-                    gia = item.gia,
-                    so_luong = item.so_luong,
-                    trang_thai = item.trang_thai,
-                    ngay_tao = item.ngay_tao,
-                    Kich_ThuocID = kich.Find(x => x.ten_kich_thuoc == item.Kich_Thuoc).ID,
-                    Mau_SacID = mau.Find(x => x.ma_mau == item.Mau_Sac).ID,
-                    San_PhamID = SP.ID
-                };
-                _context.san_Pham_Chi_Tiets.Add(sp);
+                    var sp = new San_Pham_Chi_Tiet()
+                    {
+                        ID = Guid.NewGuid(),
+                        gia = item.gia,
+                        so_luong = item.so_luong,
+                        trang_thai = item.trang_thai,
+                        ngay_tao = item.ngay_tao,
+                        Kich_ThuocID = kich.Find(x => x.ten_kich_thuoc == item.Kich_Thuoc).ID,
+                        Mau_SacID = mau.Find(x => x.ma_mau == item.Mau_Sac).ID,
+                        San_PhamID = SP.ID
+                    };
+                    _context.san_Pham_Chi_Tiets.Add(sp);
+                }
             }
+            
             await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             

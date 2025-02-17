@@ -4,62 +4,102 @@
 <h2>Thêm Sản Phẩm</h2>
 <form asp-action="Create">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <button class="btn btn-success" id="saveProduct">Luwu</button>
     <input class="form-control" type="hidden" id="lstSPCT" required="" name="lstSPCT" />
 
 
     <div class="form-group mb-3">
-
-        <label asp-for="ten_san_pham" class="control-label"></label>
-        <input asp-for="ten_san_pham" class="form-control" />
-        <span asp-validation-for="ten_san_pham" class="text-danger"></span>
+        <label for="ten_san_pham" class="control-label">Tên Sản Phẩm</label>
+        <select id="ten_san_pham" name="ten_san_pham" class="form-control select2">
+            <option value="">-- Nhập hoặc chọn tên sản phẩm --</option>
+            @foreach (var item in ViewBag.TenGiay as List<string>)
+            {
+                <option value="@item">@item</option>
+            }
+        </select>
+        <span id="ten_san_pham_warning" class="text-danger" style="display: none;">⚠️ Tên sản phẩm đã tồn tại!</span>
     </div>
-    <select id="Loai_GiayID" name="Loai_GiayID" class="form-control select2">
+
+
+    <div class="form-group mb-3">
+    <label asp-for="Loai_GiayID" class="control-label"></label>
+    <select id="Loai_GiayID" name="Loai_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddLoaiGiay">
         <option value="">-- Nhập hoặc chọn Loại Giày --</option>
         @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Loai_GiayID)
         {
             <option value="@item.Value">@item.Text</option>
         }
     </select>
-
+    </div>
 
     <div class="mb-3 row">
         <div class="form-group col-md-4">
             <label asp-for="Chat_LieuID" class="control-label"></label>
-            <select asp-for="Chat_LieuID" class="form-control select2" asp-items="ViewBag.Chat_LieuID"></select>
-                <span asp-validation-for="Chat_LieuID" class="text-danger"></span>
-
+            <select id="Chat_LieuID" name="Chat_LieuID" class="form-control select2" data-api="/Admin/SanPham/AddChatLieu">
+        <option value="">-- Nhập hoặc chọn Chất Liệu --</option>
+        @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Chat_LieuID)
+        {
+            <option value="@item.Value">@item.Text</option>
+                }
+            </select>
         </div>
         <div class="form-group col-md-4">
             <label asp-for="Co_GiayID" class="control-label"></label>
-            <select asp-for="Co_GiayID" class="form-control" asp-items="ViewBag.Co_GiayID"></select>
-                <span asp-validation-for="Co_GiayID" class="text-danger"></span>
 
+            <select id="Co_GiayID" name="Co_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddCoGiay">
+        <option value="">-- Nhập hoặc chọn Cổ Giày --</option>
+        @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Co_GiayID)
+        {
+            <option value="@item.Value">@item.Text</option>
+        }
+            </select>
         </div>
         <div class="form-group col-md-4">
             <label asp-for="Danh_MucID" class="control-label"></label>
-            <select asp-for="Danh_MucID" class="form-control" asp-items="ViewBag.Danh_MucID"></select>
-                <span asp-validation-for="Danh_MucID" class="text-danger"></span>
 
+
+            <select id="Danh_MucID" name="Danh_MucID" class="form-control select2" data-api="/Admin/SanPham/AddDanhMuc">
+        <option value="">-- Nhập hoặc chọn Danh Mục --</option>
+        @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Danh_MucID)
+        {
+            <option value="@item.Value">@item.Text</option>
+        }
+        </select>
         </div>
     </div>
     <div class="mb-3 row">
 
         <div class="form-group col-md-4">
             <label asp-for="De_GiayID" class="control-label"></label>
-            <select asp-for="De_GiayID" class="form-control" asp-items="ViewBag.De_GiayID"></select>
-                <span asp-validation-for="De_GiayID" class="text-danger"></span>
 
-        </div><div class="form-group col-md-4">
+            <select id="De_GiayID" name="De_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddDeGiay">
+        <option value="">-- Nhập hoặc chọn Đế Giày --</option>
+        @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.De_GiayID)
+        {
+            <option value="@item.Value">@item.Text</option>
+        }
+            </select>
+        </div>
+        <div class="form-group col-md-4">
             <label asp-for="Mui_GiayID" class="control-label"></label>
-            <select asp-for="Mui_GiayID" class="form-control" asp-items="ViewBag.Mui_GiayID"></select>
-            <span asp-validation-for="Mui_GiayID" class="text-danger"></span>
-
-        </div><div class="form-group col-md-4">
+            
+            <select id="Mui_GiayID" name="Mui_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddMuiGiay">
+        <option value="">-- Nhập hoặc chọn Mũi Giày --</option>
+        @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Mui_GiayID)
+        {
+            <option value="@item.Value">@item.Text</option>
+        }
+            </select>
+        </div>
+        <div class="form-group col-md-4">
             <label asp-for="Kieu_DangID" class="control-label"></label>
-            <select asp-for="Kieu_DangID" class="form-control" asp-items="ViewBag.Kieu_DangID"></select>
-                <span asp-validation-for="Kieu_DangID" class="text-danger"></span>
 
+            <select id="Kieu_DangID" name="Kieu_DangID" class="form-control select2" data-api="/Admin/SanPham/AddKieuDang">
+        <option value="">-- Nhập hoặc chọn Kiểu Dáng --</option>
+        @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Kieu_DangID)
+        {
+            <option value="@item.Value">@item.Text</option>
+        }
+            </select>
         </div>
 
     </div>
@@ -155,45 +195,172 @@
     $(document).ready(function () {
         let selectedSizes = [];
 
-        setTimeout(() => {
-            console.log("Check Select2 again:", typeof $.fn.select2 !== "undefined");
-        }, 3000);
 
-        console.log("jQuery hiện tại:", $.fn.jquery);
+        let danhSachTenGiay = @Html.Raw(Json.Serialize(ViewBag.TenGiay));
+        console.log("✅ Danh sách tên giày:", danhSachTenGiay);
 
-        $.getScript("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js")
-            .done(function () {
-                console.log("✅ Select2 tải lại thành công!");
-                $(".select2").select2();
-            })
-            .fail(function () {
-                console.error("⚠️ Không thể tải lại Select2!");
+        // Khởi tạo Select2
+        $("#ten_san_pham").select2({
+            placeholder: "Nhập hoặc chọn tên sản phẩm",
+            allowClear: true,
+            tags: true,
+            tokenSeparators: [',', ' ']
+        });
+
+        function kiemTraTrungLap(tenSanPham) {
+            return danhSachTenGiay.some(item => item.toLowerCase() === tenSanPham.trim().toLowerCase());
+        }
+
+        // Bắt sự kiện khi chọn hoặc nhập mới
+        $("#ten_san_pham").on("select2:selecting", function (e) {
+            let tenSanPham = e.params.args.data.text;
+            let warningElement = $("#ten_san_pham_warning");
+
+            if (kiemTraTrungLap(tenSanPham)) {
+                warningElement.show();
+                alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
+                e.preventDefault(); // Ngăn không cho chọn giá trị trùng lặp
+            } else {
+                warningElement.hide();
+            }
+        });
+
+        // Ngăn gửi form nếu tên sản phẩm bị trùng
+        $("#saveProduct").click(function (e) {
+            let tenSanPham = $("#ten_san_pham").val();
+
+            if (kiemTraTrungLap(tenSanPham)) {
+                alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
+                e.preventDefault(); // Ngăn form gửi đi nếu trùng tên
+            }
+        });
+
+        console.log("✅ Sự kiện kiểm tra tên sản phẩm đã được kích hoạt.");
+
+
+
+        console.log("✅ jQuery Version:", $.fn.jquery);
+
+        if (typeof $.fn.select2 === "undefined") {
+            console.warn("⚠️ Select2 chưa được tải! Đang tải lại...");
+            $.getScript("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js", function () {
+                console.log("✅ Select2 đã tải lại!");
+                khoiTaoSelect2(); // Khởi tạo lại Select2
             });
-
+        } else {
+            khoiTaoSelect2();
+        }
         console.log("🔍 jQuery version:", $.fn.jquery);
         console.log("🔍 Select2 exists:", typeof $.fn.select2 !== "undefined");
 
-        // Kiểm tra nếu Select2 đã tải
-        if ($.fn.select2) {
-            $(".select2").select2({
-                placeholder: "Nhập hoặc chọn một tùy chọn",
+        function khoiTaoSelect2() {
+            $(".select2").each(function () {
+                let apiUrl = $(this).data("api"); // Lấy API từ data-attribute nếu có
+
+                $(this).select2({
+                    placeholder: "Nhập hoặc chọn một tùy chọn",
+                    allowClear: true,
+                    tags: true,
+                    tokenSeparators: [',', ' '],
+                    createTag: function (params) {
+                        let term = $.trim(params.term);
+                        if (term === '') return null;
+
+                        let exists = false;
+                        $(this).find('option').each(function () {
+                            if ($(this).text().toLowerCase() === term.toLowerCase()) {
+                                exists = true;
+                                return false;
+                            }
+                        });
+
+                        if (exists) {
+                            return null;
+                        }
+
+                        return {
+                            id: term,
+                            text: `Nhấn Enter để thêm mới "${term}"`,
+                            newTag: true
+                        };
+                    }
+                }).on('select2:select', function (e) {
+                    let data = e.params.data;
+                    let selectElement = $(this);
+
+                    if (data.newTag) {
+                        let realValue = data.text.replace(/Nhấn Enter để thêm mới\s*"(.+)"$/, '$1');
+
+                        $.ajax({
+                            url: apiUrl,
+                            type: "POST",
+                            contentType: "application/json",
+                            data: JSON.stringify(realValue),
+                            success: function (response) {
+                                if (response.success) {
+                                    let newOption = new Option(response.text, response.id, true, true);
+                                    selectElement.append(newOption).trigger('change');
+                                } else {
+                                    alert("❌ Không thể thêm giá trị mới.");
+                                }
+                            },
+                            error: function () {
+                                alert("⚠️ Lỗi khi gửi dữ liệu.");
+                            }
+                        });
+                    }
+                });
+            });
+
+            console.log("✅ Select2 đã khởi tạo thành công!");
+        }
+
+        // 🔹 Xử lý sự kiện kiểm tra tên sản phẩm
+        function kiemTraTenSanPham() {
+            let danhSachTenGiay = @Html.Raw(Json.Serialize(ViewBag.TenGiay));
+            console.log("✅ Danh sách tên giày:", danhSachTenGiay);
+
+            $("#ten_san_pham").select2({
+                placeholder: "Nhập hoặc chọn tên sản phẩm",
                 allowClear: true,
-                tags: true, // Cho phép nhập giá trị mới
-                tokenSeparators: [',', ' '], // Cho phép nhập nhiều giá trị
-                createTag: function (params) {
-                    let term = $.trim(params.term);
-                    if (term === '') return null;
-                    return {
-                        id: term,
-                        text: term,
-                        newTag: true // Đánh dấu là giá trị mới
-                    };
+                tags: true,
+                tokenSeparators: [',', ' ']
+            });
+
+            function kiemTraTrungLap(tenSanPham) {
+                return danhSachTenGiay.some(item => item.toLowerCase() === tenSanPham.trim().toLowerCase());
+            }
+
+            // Kiểm tra khi chọn hoặc nhập mới
+            $("#ten_san_pham").on("select2:selecting", function (e) {
+                let tenSanPham = e.params.args.data.text;
+                let warningElement = $("#ten_san_pham_warning");
+
+                if (kiemTraTrungLap(tenSanPham)) {
+                    warningElement.show();
+                    alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
+                    e.preventDefault(); // Ngăn không cho chọn giá trị trùng lặp
+                } else {
+                    warningElement.hide();
                 }
             });
-            console.log("✅ Select2 đã được khởi tạo thành công!");
-        } else {
-            console.error("⚠️ Select2 chưa được tải đúng cách!");
+
+            // Ngăn gửi form nếu tên sản phẩm bị trùng
+            $("#saveProduct").click(function (e) {
+                let tenSanPham = $("#ten_san_pham").val();
+
+                if (kiemTraTrungLap(tenSanPham)) {
+                    alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
+                    e.preventDefault();
+                }
+            });
+
+            console.log("✅ Sự kiện kiểm tra tên sản phẩm đã được kích hoạt.");
         }
+
+        // Gọi kiểm tra tên sản phẩm sau khi Select2 đã tải
+        kiemTraTenSanPham();
+
 
         $('#addColor').click(function () {
             $('.color-checkbox:checked').each(function () {
@@ -276,10 +443,17 @@
             // Chuyển dữ liệu thành JSON và gán vào input ẩn
             $('#lstSPCT').val(JSON.stringify(sanPhamCTList));
 
+            let tenSanPham = $("#ten_san_pham").val();
+            if (kiemTraTrungLap(tenSanPham)) {
+                alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
+                e.preventDefault();
+            }
             // // Gửi form
             // $('form').submit();
         });
     });
+
+    
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
