@@ -1,11 +1,43 @@
 ﻿@model ClssLib.San_Pham
 
 
+
+<!-- Modal Hiển Thị Ảnh -->
+<div class="modal fade" id="productImageModal" tabindex="-1" aria-labelledby="productImageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ảnh Sản Phẩm</h5>
+                <button type="button" class="btn-close clsbtn" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="file" id="uploadProductImage" class="form-control">
+                <div class="row" id="imagePreviewContainer">
+                    <!-- Ảnh sẽ hiển thị tại đây -->
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" id="selectImages" class="btn btn-success">Chọn Ảnh</button>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+
+
 <h2>Thêm Sản Phẩm</h2>
 <form asp-action="Create">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <input class="form-control" type="hidden" id="lstSPCT" required="" name="lstSPCT" />
 
+    <input class="form-control" type="hidden" id="productImages" name="productImages" />
+
+
+    <button type="button" class="btn btn-secondary ms-2 anh_form" data-bs-toggle="modal" data-bs-target="#productImageModal">
+        Thêm Ảnh
+    </button>
 
     <div class="form-group mb-3">
         <label for="ten_san_pham" class="control-label">Tên Sản Phẩm</label>
@@ -194,6 +226,167 @@
 <script>
     $(document).ready(function () {
         let selectedSizes = [];
+        let uploadedImages = []; // Mảng lưu đường dẫn ảnh
+
+
+        $(document).on("click", ".anh_form", function () {
+
+            console.log(`🔹 Chọn ảnh `);
+            $("#selectImages").hide(); // Ẩn nút "Chọn Ảnh" khi mở modal
+            $("#imagePreviewContainer").html("");
+            uploadedImages.forEach(url => {
+                $("#imagePreviewContainer").append(`
+                        <div class="col-md-3 mt-2">
+                            <img src="${url}" class="img-thumbnail" width="100">
+                        </div>
+                    `);
+            });
+        });
+        $(document).on("click", ".anh_form", function () {
+
+            console.log(`🔹 Chọn ảnh `);
+            $("#selectImages").hide(); // Ẩn nút "Chọn Ảnh" khi mở modal
+            $("#imagePreviewContainer").html("");
+            uploadedImages.forEach(url => {
+                $("#imagePreviewContainer").append(`
+                        <div class="col-md-3 mt-2">
+                            <img src="${url}" class="img-thumbnail" width="100">
+                        </div>
+                    `);
+            });
+        });
+
+
+
+        // // Khi mở modal, hiển thị ảnh đã có
+        // $("#productImageModal").on("show.bs.modal", function () {
+        //     $("#imagePreviewContainer").html("");
+        //     uploadedImages.forEach(url => {
+        //         $("#imagePreviewContainer").append(`
+        //             <div class="col-md-3 mt-2">
+        //                 <img src="${url}" class="img-thumbnail" width="100">
+        //             </div>
+        //         `);
+        //     });
+        // });
+
+        // Khi chọn ảnh, tải lên server ngay lập tức
+        $("#uploadProductImage").change(function () {
+            let fileInput = this;
+            let formData = new FormData();
+            let file = fileInput.files[0];
+
+            if (!file) return;
+
+            formData.append("file", file);
+
+            $.ajax({
+                url: "/Admin/SanPham/UploadImage",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success) {
+                        uploadedImages.push(response.filePath);
+                        $("#imagePreviewContainer").append(`
+                            <div class="col-md-3 mt-2">
+                                <img src="${response.filePath}" class="img-thumbnail" width="100">
+                            </div>
+                        `);
+                        $("#productImages").val(JSON.stringify(uploadedImages)); // Lưu vào input ẩn
+                    } else {
+                        alert("❌ Lỗi khi tải ảnh!");
+                    }
+                },
+                error: function () {
+                    alert("⚠️ Có lỗi xảy ra khi tải ảnh!");
+                }
+            });
+        });
+        // Khi bấm nút "Chọn ảnh"
+        $(document).on("click", ".choose-image-btn", function () {
+
+            let color = $(this).data("color"); // Lấy màu từ data attribute
+            console.log(`🔹 Chọn ảnh cho màu: ${color}`);
+
+            $("#selectImages").data("color", color); // Lưu màu vào nút "Select Images"
+
+            let storedImages = JSON.parse($("#productImages").val() || "[]");
+
+            console.log(uploadedImages);
+            $("#selectImages").show();
+            $("#imagePreviewContainer").empty();
+
+            console.log(uploadedImages);
+            // Hiển thị danh sách ảnh đã lưu
+            uploadedImages.forEach(url => {
+                $("#imagePreviewContainer").append(`
+                                        <div class="col-md-3 mt-2 d-inline-block">
+                            <input type="checkbox" class="image-checkbox" value="${url}">
+                            <img src="${url}" class="img-thumbnail" width="100">
+                    </div>
+                        `);
+            });
+
+
+            // storedImages.forEach(img => {
+            //     $("#uploadedImages").append(`
+            //         <div class="m-2 d-inline-block text-center">
+            //         <input type="checkbox" class="image-checkbox" value="${img}">
+            //         <img src="${img}" class="img-thumbnail" width="100">
+            //     </div>
+            // `);
+            // });
+
+            $('#productImageModal').modal('show');
+        });
+
+        // Khi bấm nút "Select Images"
+        $(document).on("click", "#selectImages", function () {
+            let selectedImages = [];
+
+            // Lấy danh sách ảnh đã chọn
+            $(".image-checkbox:checked").each(function () {
+                selectedImages.push($(this).val());
+            });
+
+            console.log("✅ Ảnh đã chọn:", selectedImages);
+
+            if (selectedImages.length > 0) {
+                let color = $("#selectImages").data("color"); // Lấy màu đã lưu từ nút chọn ảnhconsole.log(`🎨 Màu sản phẩm: ${color}`);
+                console.log(`🎨 Màu sản phẩm: ${color}`);
+
+                let firstImage = selectedImages[0]; // Ảnh đầu tiên làm ảnh đại diện
+
+                // ✅ Kiểm tra nếu tồn tại ảnh đại diện thì cập nhật
+                let imgElement = $(`#img-${color}`);
+                if (imgElement.length > 0) {
+                    imgElement.attr("src", firstImage);
+                } else {
+                    console.warn(`⚠️ Không tìm thấy ảnh đại diện: #img-${color}`);
+                }
+
+                // ✅ Kiểm tra nếu bảng sản phẩm tồn tại thì lưu ảnh vào từng hàng chi tiết
+                let table = $(`#table-${color}`);
+                if (table.length > 0) {
+                    table.find("tbody tr").each(function () {
+                        let lstImgInput = $(this).find(".lst_img");
+                        if (lstImgInput.length > 0) {
+                            lstImgInput.val(JSON.stringify(selectedImages));
+                        } else {
+                            console.warn("⚠️ Không tìm thấy input .lst_img trong hàng.");
+                        }
+                    });
+                } else {
+                    console.warn(`⚠️ Không tìm thấy bảng sản phẩm: #table-${color}`);
+                }
+            }
+
+            // Đóng modal sau khi chọn ảnh
+            $('#productImageModal').modal('hide');
+        });
+
 
 
         let danhSachTenGiay = @Html.Raw(Json.Serialize(ViewBag.TenGiay));
@@ -360,28 +553,40 @@
 
         // Gọi kiểm tra tên sản phẩm sau khi Select2 đã tải
         kiemTraTenSanPham();
-
-
+        
         $('#addColor').click(function () {
+            console.log("đã nhấn thêm");
             $('.color-checkbox:checked').each(function () {
                 let color = $(this).val();
                 if ($(`#color-${color}`).length === 0) {
                     $('#selectedColors').append(`<span id="color-${color}" class="badge bg-secondary me-2">${color}</span>`);
                     $('#productTables').append(`
-                        <div class="mt-4" id="table-${color}">
-                            <h4>Sản phẩm - ${color}</h4>
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Kích Cỡ</th>
-                                        <th>Số Lượng</th>
-                                        <th>Giá</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
+                    <div class="mt-4" id="table-${color}">
+                        <h4>Sản phẩm - ${color}</h4>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Tên Sản Phẩm</th>
+                                    <th>Kích Cỡ</th>
+                                    <th>Số Lượng</th>
+                                    <th>Giá</th>
+                                    <th >Ảnh</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
                             </table>
+                            <!-- Khu vực chọn ảnh thay vì tải ảnh -->
+                        <div class="mt-2">
+                            <label class="form-label">Ảnh Sản Phẩm ${color}</label>
+                            <button type="button" class="btn btn-primary choose-image-btn" data-color="${color}">
+                                Chọn ảnh
+                            </button>
+                            <div class="mt-2">
+                                <img src="/img/default.png" class="img-thumbnail product-img" width="100" id="img-${color}">
+                            </div>
                         </div>
-                    `);
+                    </div>
+                `);
                 }
             });
             $('#colorModal').modal('hide');
@@ -390,56 +595,103 @@
                     $(this).remove();
                 });
                 $('body').removeClass('modal-open'); // Loại bỏ lớp giữ nền bị tối
+                initPerfectScrollbar();
             }, 300); // Đợi 300ms để hiệu ứng fade chạy
         });
 
         $('#addSize').click(function () {
+            let tenSanPham = $("#ten_san_pham").val(); // Lấy tên sản phẩm đang chọn
+
             $('.size-checkbox:checked').each(function () {
                 let size = $(this).val();
-                if (!selectedSizes.includes(size)) {
-                    selectedSizes.push(size);
-                    $("[id^='table-'] tbody").each(function () {
-                        $(this).append(`
-                            <tr>
-                                <td>${size}</td>
-                                <td><input type="number" class="form-control quantity" data-size="${size}"></td>
-                                <td><input type="number" class="form-control price" data-size="${size}"></td>
-                            </tr>
-                        `);
-                    });
-                }
+
+                $("[id^='table-']").each(function () {
+                    let color = $(this).attr("id").replace("table-", ""); // Lấy màu từ ID của bảng
+                    let tenSPCT = `${tenSanPham} [${color} - ${size}]`; // Định dạng tên sản phẩm
+
+                    $(this).find("tbody").append(`
+                    <tr>
+                        <td>${tenSPCT}</td>
+                        <td>${size}</td>
+                        <td><input type="number" class="form-control quantity" data-size="${size}"></td>
+                        <td><input type="number" class="form-control price" data-size="${size}"></td>
+                        <td ><input type="text" class="form-control lst_img" data-size="${size}"></td>
+                    </tr>
+                `);
+                });
             });
+
             $('#sizeModal').modal('hide');
             setTimeout(() => {
                 $('.modal-backdrop').fadeOut(300, function () {
                     $(this).remove();
                 });
                 $('body').removeClass('modal-open'); // Loại bỏ lớp giữ nền bị tối
+                initPerfectScrollbar();
             }, 300); // Đợi 300ms để hiệu ứng fade chạy
         });
+
+
+
+        function initPerfectScrollbar() {
+            if (typeof PerfectScrollbar !== "undefined") {
+                document.querySelectorAll('.scrollable').forEach(el => {
+                    if (!el._ps) { // Chỉ khởi tạo nếu chưa có
+                        el._ps = new PerfectScrollbar(el, {
+                            wheelSpeed: 1,
+                            wheelPropagation: true,
+                            minScrollbarLength: 20
+                        });
+                    } else {
+                        el._ps.update(); // Cập nhật nếu đã tồn tại
+                    }
+                });
+            } else {
+                console.warn("⚠️ Perfect Scrollbar chưa được tải!");
+            }
+        }
 
         $('#saveProduct').click(function () {
             let sanPhamCTList = [];
 
             $("[id^='table-']").each(function () {
-                let color = $(this).attr('id').replace('table-', '');
+                let color = $(this).attr('id').replace('table-', ''); // Lấy màu
+
+                console.log(`🟢 Đang kiểm tra bảng: #table-${color}`);
+
+                let table = $(this);
+                let rows = table.find("tbody tr");
+
+                if (rows.length === 0) {
+                    console.warn(`⚠️ Không có hàng sản phẩm nào trong #table-${color}`);
+                }
+
+
                 $(this).find("tbody tr").each(function () {
-                    let size = $(this).find("td:first").text();
-                    let quantity = $(this).find(".quantity").val();
-                    let price = $(this).find(".price").val();
+                    let size = $(this).find("td:nth-child(2)").text(); // Lấy kích cỡ
+                    let quantity = $(this).find(".quantity").val(); // Lấy số lượng
+                    let price = $(this).find(".price").val(); // Lấy giá
+
+                    let imgUrl = $(this).find(".lst_img").val(); // Lấy danh sách ảnh từ ô ẩn
+
+                    if (!tenSPCT) {
+                console.warn(`⚠️ ten_SPCT bị null hoặc rỗng trong bảng #table-${color}`);
+            }
+                    
+
                     if (quantity > 0) {
                         sanPhamCTList.push({
                             Mau_Sac: color,
                             Kich_Thuoc: size,
                             so_luong: parseInt(quantity),
                             gia: parseInt(price),
+                            imgUrl: imgUrl, // Lưu link ảnh vào object
                             trang_thai: 1,
                             ngay_tao: new Date().toISOString()
                         });
                     }
                 });
             });
-
             // Chuyển dữ liệu thành JSON và gán vào input ẩn
             $('#lstSPCT').val(JSON.stringify(sanPhamCTList));
 
@@ -448,9 +700,11 @@
                 alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
                 e.preventDefault();
             }
-            // // Gửi form
-            // $('form').submit();
+
+            // Gửi form
+            $('form').submit();
         });
+
     });
 
     

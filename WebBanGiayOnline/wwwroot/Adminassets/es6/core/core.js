@@ -1,12 +1,30 @@
-
+﻿
 export default class Core {
 
-    constructor() {
+	constructor() {
+		this.loadPerfectScrollbar(() => {
+			this.pfScrollBar();
+		});
 		this.sideNav();
-		this.pfScrollBar();
 		this.tooltipInit();
 		this.popOverInit();
 		this.toastInit();
+	}
+
+	loadPerfectScrollbar(callback) {
+		if (typeof PerfectScrollbar === "undefined") {
+			console.warn("⚠️ Perfect Scrollbar chưa được tải! Đang tải từ CDN...");
+			let script = document.createElement("script");
+			script.src = "https://cdnjs.cloudflare.com/ajax/libs/jquery.perfect-scrollbar/1.5.5/perfect-scrollbar.min.js";
+			script.onload = function () {
+				console.log("✅ Perfect Scrollbar đã tải xong!");
+				if (typeof callback === "function") callback();
+			};
+			document.head.appendChild(script);
+		} else {
+			console.log("✅ Perfect Scrollbar đã có sẵn!");
+			if (typeof callback === "function") callback();
+		}
 	}
 	
     sideNav() {
@@ -50,8 +68,16 @@ export default class Core {
 	} 
 
 	pfScrollBar() {
-		$('.scrollable').perfectScrollbar();
+		document.querySelectorAll('.scrollable').forEach(el => {
+			new PerfectScrollbar(el, {
+				wheelSpeed: 1,
+				wheelPropagation: true,
+				minScrollbarLength: 20
+			});
+		});
+		console.log("✅ Perfect Scrollbar đã khởi tạo thành công!");
 	}
+
 	
 	tooltipInit() {
 		$('[data-toggle="tooltip"]').tooltip()
@@ -66,4 +92,7 @@ export default class Core {
 	toastInit() {
 		$('.toast').toast();
 	}
+	console.log("✅ jQuery Version:", $.fn.jquery);
+	console.log("✅ Perfect Scrollbar exists:", typeof PerfectScrollbar !== "undefined");
+
 }    

@@ -28,12 +28,17 @@
     <!-- Core css -->
     <link href="~/Adminassets/css/app.min.css" rel="stylesheet">
 
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.perfect-scrollbar/1.5.5/perfect-scrollbar.min.js"></script>
+
+
     <!-- JS Select2 (Tải sau jQuery) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
     <!-- Fix lỗi AdminLTE ghi đè Select2 -->
     <script>
         $(document).ready(function () {
+            let selectedSizes = [];
             console.log("✅ jQuery Version:", $.fn.jquery);
 
             // Kiểm tra nếu Select2 bị ghi đè bởi AdminLTE
@@ -177,6 +182,177 @@
 
                 console.log("✅ Sự kiện kiểm tra tên sản phẩm đã được kích hoạt.");
             }
+
+
+            // // Khi bấm nút "Select Images"
+            // $(document).on("click", "#selectImages", function () {
+            //     let selectedImages = [];
+
+            //     // Lấy danh sách ảnh đã chọn
+            //     $(".image-checkbox:checked").each(function () {
+            //         selectedImages.push($(this).val());
+            //     });
+
+            //     console.log("✅ Ảnh đã chọn:", selectedImages);
+
+            //     if (selectedImages.length > 0) {
+            //         let color = $(this).data("color"); // Lấy màu đã lưu
+            //         let firstImage = selectedImages[0]; // Ảnh đầu tiên làm ảnh đại diện
+
+            //         // Cập nhật ảnh đại diện sản phẩm
+            //         $(`#img-${color}`).attr("src", firstImage);
+
+            //         // Lưu danh sách ảnh vào từng hàng của bảng sản phẩm chi tiết
+            //         $(`#table-${color} tbody tr`).each(function () {
+            //             $(this).find(".lst_img").val(JSON.stringify(selectedImages));
+            //         });
+            //     }
+
+            //     // Đóng modal sau khi chọn ảnh
+            //     $('#productImageModal').modal('hide');
+            // });
+
+
+
+            $('#addColor').click(function () {
+                console.log("đã nhấn thêm");
+                $('.color-checkbox:checked').each(function () {
+                    let color = $(this).val();
+                    if ($(`#color-${color}`).length === 0) {
+                        $('#selectedColors').append(`<span id="color-${color}" class="badge bg-secondary me-2">${color}</span>`);
+                        $('#productTables').append(`
+                            <div class="mt-4" id="table-${color}">
+                                <h4>Sản phẩm - ${color}</h4>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Tên Sản Phẩm</th>
+                                            <th>Kích Cỡ</th>
+                                            <th>Số Lượng</th>
+                                            <th>Giá</th>
+                                            <th >Ảnh</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                    </table>
+                                    <!-- Khu vực chọn ảnh thay vì tải ảnh -->
+                                <div class="mt-2">
+                                    <label class="form-label">Ảnh Sản Phẩm ${color}</label>
+                                    <button type="button" class="btn btn-primary choose-image-btn" data-color="${color}">
+                                        Chọn ảnh
+                                    </button>
+                                    <div class="mt-2">
+                                        <img src="/img/default.png" class="img-thumbnail product-img" width="100" id="img-${color}">
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+                    }
+                });
+                $('#colorModal').modal('hide');
+                setTimeout(() => {
+                    $('.modal-backdrop').fadeOut(300, function () {
+                        $(this).remove();
+                    });
+                    $('body').removeClass('modal-open'); // Loại bỏ lớp giữ nền bị tối
+                    initPerfectScrollbar();
+                }, 300); // Đợi 300ms để hiệu ứng fade chạy
+            });
+
+            $('#addSize').click(function () {
+                let tenSanPham = $("#ten_san_pham").val(); // Lấy tên sản phẩm đang chọn
+
+                $('.size-checkbox:checked').each(function () {
+                    let size = $(this).val();
+
+                    $("[id^='table-']").each(function () {
+                        let color = $(this).attr("id").replace("table-", ""); // Lấy màu từ ID của bảng
+                        let tenSPCT = `${tenSanPham} [${color} - ${size}]`; // Định dạng tên sản phẩm
+
+                        $(this).find("tbody").append(`
+                            <tr>
+                                <td>${tenSPCT}</td>
+                                <td>${size}</td>
+                                <td><input type="number" class="form-control quantity" data-size="${size}"></td>
+                                <td><input type="number" class="form-control price" data-size="${size}"></td>
+                                <td ><input type="text" class="form-control lst_img" data-size="${size}"></td>
+                            </tr>
+                        `);
+                    });
+                });
+
+                $('#sizeModal').modal('hide');
+                setTimeout(() => {
+                    $('.modal-backdrop').fadeOut(300, function () {
+                        $(this).remove();
+                    });
+                    $('body').removeClass('modal-open'); // Loại bỏ lớp giữ nền bị tối
+                    initPerfectScrollbar();
+                }, 300); // Đợi 300ms để hiệu ứng fade chạy
+            });
+
+
+
+
+            function initPerfectScrollbar() {
+                if (typeof PerfectScrollbar !== "undefined") {
+                    document.querySelectorAll('.scrollable').forEach(el => {
+                        if (!el._ps) { // Chỉ khởi tạo nếu chưa có
+                            el._ps = new PerfectScrollbar(el, {
+                                wheelSpeed: 1,
+                                wheelPropagation: true,
+                                minScrollbarLength: 20
+                            });
+                        } else {
+                            el._ps.update(); // Cập nhật nếu đã tồn tại
+                        }
+                    });
+                } else {
+                    console.warn("⚠️ Perfect Scrollbar chưa được tải!");
+                }
+            }
+
+            $('#saveProduct').click(function () {
+                let sanPhamCTList = [];
+
+                $("[id^='table-']").each(function () {
+                    let color = $(this).attr('id').replace('table-', ''); // Lấy màu
+
+                    $(this).find("tbody tr").each(function () {
+                        let tenSPCT = $(this).find("td:first").text(); // Lấy tên sản phẩm chi tiết
+                        let size = $(this).find("td:nth-child(2)").text(); // Lấy kích cỡ
+                        let quantity = $(this).find(".quantity").val(); // Lấy số lượng
+                        let price = $(this).find(".price").val(); // Lấy giá
+
+                        let imgUrl = $(this).find(".lst_img").val(); // Lấy danh sách ảnh từ ô ẩn
+
+                        if (quantity > 0) {
+                            sanPhamCTList.push({
+                                ten_SPCT: tenSPCT,
+                                Mau_Sac: color,
+                                Kich_Thuoc: size,
+                                so_luong: parseInt(quantity),
+                                gia: parseInt(price),
+                                imgUrl: imgUrl, // Lưu link ảnh vào object
+                                trang_thai: 1,
+                                ngay_tao: new Date().toISOString()
+                            });
+                        }
+                    });
+                });
+
+                // Chuyển dữ liệu thành JSON và gán vào input ẩn
+                $('#lstSPCT').val(JSON.stringify(sanPhamCTList));
+
+                let tenSanPham = $("#ten_san_pham").val();
+                if (kiemTraTrungLap(tenSanPham)) {
+                    alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
+                    e.preventDefault();
+                }
+
+                // Gửi form
+                $('form').submit();
+            });
 
         });
     </script>

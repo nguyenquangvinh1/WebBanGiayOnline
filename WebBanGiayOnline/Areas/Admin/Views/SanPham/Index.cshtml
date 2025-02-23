@@ -19,65 +19,65 @@
             </div>
             <div class="modal-body">
                 <label for="filterChatLieu">Chất liệu:</label>
-                <select id="filterChatLieu" class="form-control">
+                <select id="filterChatLieu" class="form-control filter-select">
                     <option value="">Tất cả</option>
                     @foreach (var item in (SelectList)ViewData["Chat_LieuID"])
                     {
-                        <option value="@item.Text">@item.Text</option>
+                        <option value="@item.Value">@item.Text</option>
                     }
                 </select>
                 
                 <label for="filterCoGiay">Cổ giày:</label>
-                <select id="filterCoGiay" class="form-control">
+                <select id="filterCoGiay" class="form-control filter-select">
                     <option value="">Tất cả</option>
                     @foreach (var item in (SelectList)ViewData["Co_GiayID"])
                     {
-                        <option value="@item.Text">@item.Text</option>
+                        <option value="@item.Value">@item.Text</option>
                     }
                 </select>
                 
                 <label for="filterDanhMuc">Danh mục:</label>
-                <select id="filterDanhMuc" class="form-control">
+                <select id="filterDanhMuc" class="form-control filter-select">
                     <option value="">Tất cả</option>
                     @foreach (var item in (SelectList)ViewData["Danh_MucID"])
                     {
-                        <option value="@item.Text">@item.Text</option>
+                        <option value="@item.Value">@item.Text</option>
                     }
                 </select>
                 
                 <label for="filterDeGiay">Đế giày:</label>
-                <select id="filterDeGiay" class="form-control">
+                <select id="filterDeGiay" class="form-control filter-select">
                     <option value="">Tất cả</option>
                     @foreach (var item in (SelectList)ViewData["De_GiayID"])
                     {
-                        <option value="@item.Text">@item.Text</option>
+                        <option value="@item.Value">@item.Text</option>
                     }
                 </select>
                 
                 <label for="filterMuiGiay">Mũi giày:</label>
-                <select id="filterMuiGiay" class="form-control">
+                <select id="filterMuiGiay" class="form-control filter-select">
                     <option value="">Tất cả</option>
                     @foreach (var item in (SelectList)ViewData["Mui_GiayID"])
                     {
-                        <option value="@item.Text">@item.Text</option>
+                        <option value="@item.Value">@item.Text</option>
                     }
                 </select>
                 
                 <label for="filterKieuDang">Kiểu dáng:</label>
-                <select id="filterKieuDang" class="form-control">
+                <select id="filterKieuDang" class="form-control filter-select">
                     <option value="">Tất cả</option>
                     @foreach (var item in (SelectList)ViewData["Kieu_DangID"])
                     {
-                        <option value="@item.Text">@item.Text</option>
+                        <option value="@item.Value">@item.Text</option>
                     }
                 </select>
                 
                 <label for="filterLoaiGiay">Loại giày:</label>
-                <select id="filterLoaiGiay" class="form-control">
+                <select id="filterLoaiGiay" class="form-control filter-select">
                     <option value="">Tất cả</option>
                     @foreach (var item in (SelectList)ViewData["Loai_GiayID"])
                     {
-                        <option value="@item.Text">@item.Text</option>
+                        <option value="@item.Value">@item.Text</option>
                     }
                 </select>
             </div>
@@ -149,20 +149,35 @@
 
 <script>
     $(document).ready(function () {
-       
-            $('#applyFilter').click(function () {
-                let filters = {};
-                $('select').each(function () {
-                    let id = $(this).attr('id');
-                    let value = $(this).val(); // Lấy value thay vì text
-                    if (value && value !== '') {
-                        filters[id] = value;
-                    }
-                });
 
-                let queryString = $.param(filters);
-                window.location.href = '/Admin/SanPham/Filter?' + queryString;
+        $(document).on('click', '#applyFilter', function () {
+            console.log("📌 Nút lọc đã được nhấn!"); // Kiểm tra sự kiện click có chạy không
+            applyFilter();
+        });
+        window.applyFilter = function () {
+            console.log("📌 Hàm applyFilter đã chạy!");
+
+            let filters = {};
+
+            $('select.filter-select').each(function () {
+                let id = $(this).attr('id');
+                let value = $(this).val();
+                console.log(`🎯 Lọc ID: ${id}, Giá trị: ${value}`);
+
+                if (value && value !== '') {
+                    let paramName = id.replace("filter", "").charAt(0).toLowerCase() + id.replace("filter", "").slice(1);
+                    filters[paramName] = value;
+                }
             });
+
+            console.log("📌 Dữ liệu lọc gửi đi:", filters);
+
+            let queryString = $.param(filters);
+            console.log("🔗 URL lọc: /Admin/SanPham/Filter?" + queryString);
+
+
+            window.location.href = '/Admin/SanPham/Filter?' + queryString;
+        };
 
 
         $(document).on('click', '.toggle-status', function () {

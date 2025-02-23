@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using WebBanGiay.Data;
 using WebBanGiay.ViewModel;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 {
@@ -42,9 +43,52 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.ToList(), "ID", "ten_loai_giay");
             return View(list);
         }
+        [HttpPost]
+        public async Task<IActionResult> UploadImage(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return Json(new { success = false, message = "⚠️ Không có file nào được tải lên!" });
+
+            // Danh sách định dạng ảnh hợp lệ
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+            var fileExtension = Path.GetExtension(file.FileName).ToLower();
+
+            if (!allowedExtensions.Contains(fileExtension))
+                return Json(new { success = false, message = "❌ Định dạng ảnh không hợp lệ! Chỉ chấp nhận JPG, PNG, GIF." });
+
+            try
+            {
+                string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/img");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                string uniqueFileName = Guid.NewGuid().ToString() + fileExtension;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(fileStream);
+                }
+
+                string relativePath = $"/img/{uniqueFileName}"; // Đường dẫn ảnh
+
+                return Json(new { success = true, filePath = relativePath });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "❌ Lỗi khi tải ảnh!", error = ex.Message });
+            }
+        }
+
+
+
         [HttpGet]
         public IActionResult Filter(string chatLieu, string coGiay, string danhMuc, string deGiay, string muiGiay, string kieuDang, string loaiGiay)
         {
+            Console.WriteLine($"📌 Nhận giá trị lọc: chatLieu={chatLieu}, coGiay={coGiay}, danhMuc={danhMuc}, deGiay={deGiay}, muiGiay={muiGiay}, kieuDang={kieuDang}, loaiGiay={loaiGiay}");
+
             var query = _context.san_Phams.AsQueryable();
 
             if (!string.IsNullOrEmpty(chatLieu))
@@ -78,6 +122,9 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 .Include(x => x.Mui_Giay)
                 .AsNoTracking()
                 .ToList();
+
+            Console.WriteLine($"🔍 Tổng sản phẩm tìm thấy: {result.Count}");
+
             ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu");
             ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.ToList(), "ID", "ten_loai_co_giay");
             ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.ToList(), "ID", "ten_danh_muc");
@@ -86,8 +133,9 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.ToList(), "ID", "ten_kieu_dang");
             ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.ToList(), "ID", "ten_loai_giay");
 
-            return View("Index", result); // Trả về danh sách San_Pham và render lại view Index
+            return View("Index", result); // Trả về danh sách đã lọc
         }
+
 
         [HttpPost]
         public async Task<IActionResult> AddCoGiay([FromBody] string tenCoGiay)
@@ -358,7 +406,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         // POST: KieuDangController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(San_Pham san_Pham,string lstSPCT)
+        public async Task<IActionResult> Create(San_Pham san_Pham,string lstSPCT, string productImages)
         {
             
 
@@ -379,6 +427,23 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 SP.De_GiayID = san_Pham.De_GiayID;
                 SP.Chat_LieuID = san_Pham.Chat_LieuID;
                 await _context.san_Phams.AddAsync(SP);
+            // ✅ Xử lý ảnh sản phẩm nếu có
+            List<Anh_San_Pham> anhSP = new List<Anh_San_Pham>();
+            if (!string.IsNullOrEmpty(productImages))
+            {
+                var imgUrls = JsonConvert.DeserializeObject<List<string>>(productImages);
+                foreach (var url in imgUrls)
+                {
+                    var anh = new Anh_San_Pham
+                    {
+                        ID = Guid.NewGuid(),
+                        anh_url = url,
+                        San_PhamID = SP.ID
+                    };
+                    await _context.anh_San_Phams.AddAsync(anh);
+                    anhSP.Add(anh);
+                }
+            }
             if (!lstSPCT.IsNullOrEmpty())
             {
 
@@ -388,6 +453,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                     var sp = new San_Pham_Chi_Tiet()
                     {
                         ID = Guid.NewGuid(),
+                        ten_SPCT = SP.ten_san_pham + " ["+ item.Mau_Sac +"-"+ item.Kich_Thuoc +"]",
                         gia = item.gia,
                         so_luong = item.so_luong,
                         trang_thai = item.trang_thai,
@@ -397,6 +463,22 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                         San_PhamID = SP.ID
                     };
                     _context.san_Pham_Chi_Tiets.Add(sp);
+
+                    if (!string.IsNullOrEmpty(item.imgUrl))
+                    {
+                        var imgUrls = JsonConvert.DeserializeObject<List<string>>(productImages);
+                        for (int i = 0;i< imgUrls.Count; i++)
+                        {
+                            var anh_sp = new Anh_San_Pham_San_Pham_Chi_Tiet()
+                            {
+                                ID = Guid.NewGuid(),
+                                San_Pham_Chi_TietID = sp.ID,
+                                Anh_San_PhamID = anhSP.Find(x => x.anh_url == imgUrls[i]).ID
+                            };
+                            await _context.anh_San_Pham_San_Pham_Chi_Tiets.AddAsync(anh_sp);
+                        }
+                    }
+                    
                 }
             }
             
@@ -431,6 +513,13 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             ViewData["lstSPCT"] = JsonConvert.SerializeObject(lstSPCT);
 
 
+            var query = _context.san_Phams.AsQueryable();
+            var tenDaDangKy = new List<string>();
+            foreach (var item in query)
+            {
+                tenDaDangKy.Add(item.ten_san_pham);
+            }
+            ViewData["TenGiay"] = tenDaDangKy;
 
             ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu",san.Chat_LieuID);
             ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.ToList(), "ID", "ten_loai_co_giay", san.Co_GiayID);

@@ -8,6 +8,7 @@ namespace WebBanGiay.ViewModel
         public Guid? ID { get; set; }
         public int gia { get; set; }
         public int so_luong { get; set; }
+        public string imgUrl { get; set; }
         public int trang_thai { get; set; }
         public DateTime ngay_tao { get; set; }
         public string? Kich_Thuoc { get; set; }

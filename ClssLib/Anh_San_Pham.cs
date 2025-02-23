@@ -11,10 +11,7 @@ namespace ClssLib
     public class Anh_San_Pham
     {
         public Guid ID { get; set; }
-        public string ma { get; set; }
         public string anh_url { get; set; }
-        public int trang_thai { get; set; }
-        public string mo_ta { get; set; }
         [ForeignKey("San_Pham")]
         public Guid? San_PhamID { get; set; }
         [JsonIgnore]
