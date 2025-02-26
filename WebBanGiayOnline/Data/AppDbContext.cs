@@ -34,6 +34,7 @@ namespace WebBanGiay.Data
         public DbSet<Tai_Khoan> tai_Khoans { get; set; }
         public DbSet<Tai_Khoan_Hoa_Don> tai_Khoan_Hoa_Dons { get; set; }
         public DbSet<Thanh_Toan> thanh_Toans { get; set; }
+        public DbSet<ThongKe> thongKes { get; set; }
         public DbSet<Vai_Tro> vai_Tros { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

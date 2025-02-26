@@ -1,5 +1,12 @@
 ﻿@model ClssLib.San_Pham
 
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h1>Edit</h1>
+
 <h4>San_Pham</h4>
 <hr />
 <div class="row">
@@ -88,6 +95,3 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}

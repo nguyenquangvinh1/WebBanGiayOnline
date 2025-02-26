@@ -1,10 +1,106 @@
-﻿@model IEnumerable<ClssLib.Hoa_Don>
+﻿
+
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Quản lý hóa đơn ";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
+  @using X.PagedList.Mvc.Core
+   @model X.PagedList.IPagedList<ClssLib.Hoa_Don>
 
+<style>
+    .pagination-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .pagination-info {
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    .pagination {
+        display: flex;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .page-item {
+        margin: 0 3px;
+    }
+
+    .page-link {
+        border: none;
+        padding: 8px 12px;
+        border-radius: 50%;
+        color: #495057;
+        background-color: transparent;
+        transition: all 0.3s ease-in-out;
+        font-weight: bold;
+    }
+
+        .page-link:hover {
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+        }
+
+    .page-item.active .page-link {
+        background-color: #007bff;
+        color: #fff;
+        border-color: #007bff;
+    }
+
+    .table-responsive {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .table thead {
+            background-color: #ffffff; /* Màu trắng cho tiêu đề */
+            color: #000000; /* Chữ màu đen */
+            font-weight: bold;
+        }
+
+        .table th, .table td {
+            border: 1px solid #ddd; /* Viền cho từng ô */
+            padding: 10px;
+            text-align: center;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa; /* Hiệu ứng hover */
+        }
+
+    .btn-action {
+        background-color: #17a2b8;
+        color: #fff;
+        border-radius: 5px;
+        padding: 5px 10px;
+        border: none;
+    }
+
+        .btn-action:hover {
+            background-color: #138496;
+        }
+
+
+    
+
+
+</style>
 <div class="page-header">
     <h2 class="header-title">@ViewData["Title"] :</h2>
     <div class="header-sub-title">
@@ -24,122 +120,206 @@
 
 <div class="card shadow-sm rounded">
     <div class="card-body">
-        <div class="row mb-3">
-            <div class="col-lg-8 d-flex align-items-center">
-                
-                <a asp-action="Create" class="btn btn-success ml-3">
-                    <i class="fa fa-plus"></i> Thêm mới
-                </a>
+
+        <div class="container mt-4">
+            <h2 class="text-center text-primary fw-bold">Quản lý hóa đơn</h2>
+
+            <div class="border p-4 rounded shadow-sm bg-light">
+                <!-- Bộ lọc -->
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fa fa-filter text-primary fs-4 me-2"></i>
+                    <h4 class="mb-0">Bộ lọc</h4>
+                </div>
+
+                <div class="row">
+                    <!-- Ô tìm kiếm -->
+                    <div class="col-md-12">
+                        <form action="@Url.Action("Index", "HoaDon")" method="get" class="d-flex">
+                            <input type="text" name="searchString" class="form-control me-2" placeholder="Nhập mã hóa đơn..." />
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa fa-search"></i> Tìm kiếm
+                            </button>
+                        </form>
+                        @if(!string.IsNullOrEmpty(ViewBag.KhaiBao))
+                        {
+                            <p style="color: red;">@ViewBag.KhaiBao</p>
+                        }
+                    </div>
+                </div>
+
+                <!-- Bộ lọc theo ngày -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <form method="get" action="@Url.Action("Index")" class="row g-3 d-flex align-items-end">
+                            <div class="col-md-4">
+                                <label for="fromDate" class="form-label fw-bold">Từ ngày:</label>
+                                <input type="date" id="fromDate" name="fromDate" class="form-control" value="Request.Query[fromDate]">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="toDate" class="form-label fw-bold">Đến ngày:</label>
+                                <input type="date" id="toDate" name="toDate" class="form-control" value="Request.Query[toDate]">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-filter"></i> Lọc
+                                </button>
+                            </div>
+                           <asp:Label ID="lblMessage" runat="server" ForeColor="Red"></asp:Label>
+
+                        </form>
+                        @if (!string.IsNullOrEmpty(ViewBag.ThongBao))
+                        {
+                            <p style="color: red;">@ViewBag.ThongBao</p>
+                        }
+
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- Bộ lọc danh mục -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <form id="filterForm" action="@Url.Action("Index", "HoaDon")" method="get">
+                            <label for="Category" class="fw-bold">Trạng thái:</label>
+                            <select name="Category" id="Category" class="form-select" onchange="document.getElementById('filterForm').submit()">
+                                <option value="">-- Chọn trạng thái --</option>
+                                @foreach (var item in ViewBag.TrangThaiList)
+                                {
+                                    <option value="@item.Value" selected="@(item.Value == Context.Request.Query["Category"] ? "selected" : null)">
+                                        @item.Text
+                                    </option>
+                                }
+                            </select>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <br>
+
+            <!-- Hành động -->
+            <div class="row mb-3">
+                <div class="col-lg-8 d-flex align-items-center">
+                    <a asp-action="Create" class="btn btn-success me-3">
+                        <i class="fa fa-plus"></i> Tạo hóa đơn
+                    </a>
+                    <a asp-action="ExportExcel" class="btn btn-outline-success">
+                        <i class="fa fa-file-excel"></i> Xuất Excel
+                    </a>
+                </div>
             </div>
         </div>
-        <div class="table-responsive">
-            <table class="table table-hover e-commerce-table">
-                <thead class="bg-primary text-white">
+
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover e-commerce-table">
+            <thead class=" text-white">
+                <tr>
+                    <th>STT</th>
+                    <th>Mã Hóa Đơn</th>
+                    <th>Người đặt</th>
+                    
+                    <th>Số điện thoại</th>
+                   
+                    <th>Ngày xuất hóa đơn</th>
+                    <th>Loại hóa đơn</th>
+                    <th>Trạng thái đơn hàng</th>
+                    <th>Tổng tiền</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody id="record_table">
+                @{
+                    
+                    int stt = (Model.PageNumber - 1) * Model.PageSize+1 ;
+                    
+                }
+                
+                @foreach (var item in Model)
+                {
                     <tr>
-                        <th>Người đặt</th>
-                        <th>Địa chỉ</th>
-                        <th>Số điện thoại</th>
-                        <th>Tổng tiền</th>
-                        <th>Ngày xuất hóa đơn</th>
-                        <th>Nhân viên</th>
-                        <th>Trạng thái đơn hàng</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>@item.dia_chi</td>
+                        <td>@(stt++)</td>
+                     
+                            <td>@item.MaHoaDon</td>
+                            <td>@item.ten_nguoi_nhan</td>
+                        
                             <td>@item.sdt_nguoi_nhan</td>
-                            <td>@string.Format("{0:0,0} VND", item.tong_tien)</td>
-                            <td>@item.thoi_gian_nhan_hang.ToString("dd/MM/yyyy")</td>
-                            <td>
-                                @if (item.trang_thai == 1)
+                           
+                            <td>@item.ngay_tao.ToString("dd/MM/yyyy")</td>
+                            <td>@if(item.loai_hoa_don ==1 )
                                 {
-                                    <span class="badge badge-primary p-2">Chờ xác nhận</span>
-                                }
-                                else if (item.trang_thai == 2)
-                                {
-                                    <span class="badge badge-warning p-2">Đang giao</span>
-                                }
-                                else if (item.trang_thai == 3)
-                                {
-                                    <span class="badge badge-success p-2">Hoàn thành</span>
-                                }
-                                else
-                                {
-                                    <span class="badge badge-secondary p-2">Chưa xác định</span>
+                                    @: Tại quầy
+                                }else{
+                                    @: Online
                                 }
                             </td>
+                        
+
+
+                            <td >
+                                @{
+                                    string trangThaiText = item.trang_thai switch
+                                    {
+                                        0 => "Chờ xử lý",
+                                        1 => "Đã xác nhận",
+                                        2 => "Đang giao hàng",
+                                        3 => "Hoàn thành",
+                                        4 => "Đã hủy",
+                                        _ => "Không xác định"
+                                    };
+                                }
+                                @trangThaiText
+                            </td>
+                        <td>@string.Format("{0:0,0} VND", item.tong_tien)</td>
                             <td>
                                 <div class="btn-group">
                                     <a asp-action="Details" asp-controller="HoaDon" asp-route-id="@item.ID" class="btn btn-info btn-sm">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal-@item.ID">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
+                                   
                                 </div>
-                            </td>
-                            <form asp-area="Admin" asp-controller="HoaDon" asp-action="Delete" asp-route-id="@item.ID">
-                                @Html.AntiForgeryToken()
-                                <div class="modal fade" id="deleteModal-@item.ID" role="dialog">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="exampleModalLabel">Xóa Đơn Hàng:</h5>
-                                                <button type="button" class="close" data-dismiss="modal">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body text-center">
-                                                <div class="warning">Bạn muốn xóa đơn hàng này?</div>
-                                                <div class="text-danger ">Mã đơn hàng : @item.ID </div>
-                                                <div class="text-danger ">
-                                                    
-                                                </div>
-                                                <div class="text-danger ">Số điện thoại : @item.sdt_nguoi_nhan </div>
-                                                <div class="text-danger ">Địa chỉ : @item.dia_chi </div>
-                                                <div class="text-danger ">Tổng tiền : @item.tong_tien </div>
-
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-default btn-tone" data-dismiss="modal">Đóng</button>
-                                                <button type="submit" class="btn btn-danger btn-tone">Xóa</button>
-                                            </div>
-                                           
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </tr>
-                    }
+                            </td> 
+                    </tr>
+                }
                 </tbody>
             </table>
+            
+
         </div>
     </div>
+
+<div class="pagination-container">
+    <span class="pagination-info">
+        Tổng số hóa đơn: <strong>@Model.TotalItemCount</strong> |
+        Hiển thị: <strong>@Model.PageSize</strong> mục/trang
+    </span>
+
+    @Html.PagedListPager(Model, page => Url.Action("Index", new
+        {
+            page,
+            searchString = Context.Request.Query["searchString"],
+            Category = Context.Request.Query["Category"]
+        }),
+            new PagedListRenderOptions
+    {
+        LiElementClasses = new[] { "page-item" },
+        PageClasses = new[] { "page-link" },
+        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+        DisplayLinkToLastPage = PagedListDisplayMode.Always,
+        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+        DisplayLinkToNextPage = PagedListDisplayMode.Always,
+        MaximumPageNumbersToDisplay = 5
+    })
 </div>
 
-@section Scripts {
-    <script>
-        $(document).ready(function () {
-            $("#trangthaidonhang").change(function () {
-                var trangthaidonhang = $(this).val();
-                $.ajax({
-                    url: '/Admin/AdminDonHangs/Filtter',
-                    type: "GET",
-                    data: { trangthai: trangthaidonhang },
-                    success: function (results) {
-                        if (results.status === "success") {
-                            window.location.href = results.redirectUrl;
-                        }
-                    },
-                    error: function () {
-                        alert('Lỗi tải dữ liệu');
-                    }
-                });
-            });
-        });
-    </script>
+
+
+
+@section Scripts
+{
+    
 }
+
+
