@@ -12,11 +12,15 @@ namespace ClssLib
     public class Hoa_Don
     {
         public Guid ID { get; set; }
+        [Display(Name = "Mã Hóa Đơn :")]
+        public string MaHoaDon { get; set; }
 
         [Display(Name = "Tổng tiền đơn hàng :")]
         public decimal tong_tien { get; set; }
         [Display(Name = "Ghi chú :")]
         public string ghi_chu { get; set; }
+        [Display(Name = "Sô lượng:")]
+        public int SoLuongSP { get; set; }
         [Display(Name = "Trạng thái :")]
         public int trang_thai { get; set; }
         [Display(Name = "Địa chỉ :")]

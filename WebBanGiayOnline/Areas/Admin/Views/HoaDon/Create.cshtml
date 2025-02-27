@@ -5,7 +5,7 @@
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h1>Create</h1>
+<h1>Create</h1> 
 
 <h4>Hóa đơn</h4>
 <hr />
@@ -13,6 +13,11 @@
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"> </div>
+            <div class="form-group">
+                <label asp-for="MaHoaDon" class="control-label">Mã hóa đơn</label>
+                <input asp-for="MaHoaDon" class="form-control" />
+                <span asp-validation-for="tong_tien" class="text-danger"></span>
+            </div>
             <div class="form-group">
                 <label asp-for="tong_tien" class="control-label">Tổng tiền</label>
                 <input asp-for="tong_tien" class="form-control" />
@@ -23,10 +28,16 @@
                 <input asp-for="ghi_chu" class="form-control" />
                 <span asp-validation-for="ghi_chu" class="text-danger"></span>
             </div>
+          
             <div class="form-group">
                 <label asp-for="trang_thai" class="control-label">trạng thái</label>
                 <input asp-for="trang_thai" class="form-control" />
                 <span asp-validation-for="trang_thai" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SoLuongSP" class="control-label">Số lượng sản phẩm</label>
+                <input asp-for="SoLuongSP" class="form-control" />
+                <span asp-validation-for="SoLuongSP" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="dia_chi" class="control-label">Địa chỉ</label>

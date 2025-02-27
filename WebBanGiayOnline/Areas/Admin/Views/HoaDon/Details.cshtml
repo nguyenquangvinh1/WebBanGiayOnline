@@ -1,101 +1,484 @@
 ﻿@model ClssLib.Hoa_Don
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Chi Tiết mã hóa đơn ";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
+<style>
+    .payment-summary {
+        background: #ffffff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        font-size: 16px;
+    }
 
-<h1>Details</h1>
+        .payment-summary p {
+            margin: 5px 0;
+            font-weight: 500;
+            color: #333;
+        }
 
-<div>
-    <h4>Xem Hóa Đơn </h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-4">
-            @Html.DisplayNameFor(model => model.tong_tien)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.tong_tien)
-        </dd>
-        <dt class = "col-sm-4">
-            @Html.DisplayNameFor(model => model.ghi_chu)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.ghi_chu)
-        </dd>
-        <dt class = "col-sm-4">
-            @Html.DisplayNameFor(model => model.trang_thai)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.trang_thai)
-        </dd>
-        <dt class = "col-sm-4">
-            @Html.DisplayNameFor(model => model.dia_chi)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.dia_chi)
-        </dd>
-        <dt class = "col-sm-4">
-            @Html.DisplayNameFor(model => model.sdt_nguoi_nhan)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.sdt_nguoi_nhan)
-        </dd>
-        <dt class = "col-sm-4">
-            @Html.DisplayNameFor(model => model.email_nguoi_nhan)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.email_nguoi_nhan)
-        </dd>
-        <dt class = "col-sm-4">
-            @Html.DisplayNameFor(model => model.loai_hoa_don)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.loai_hoa_don)
-        </dd>
-        <dt class = "col-sm-4">
-            @Html.DisplayNameFor(model => model.ten_nguoi_nhan)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.ten_nguoi_nhan)
-        </dd>
-        <dt class = "col-sm-4">
-            @Html.DisplayNameFor(model => model.thoi_gian_nhan_hang)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.thoi_gian_nhan_hang)
-        </dd>
-        <dt class = "col-sm-4">
-            @Html.DisplayNameFor(model => model.ngay_tao)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.ngay_tao)
-        </dd>
-        <dt class = "col-sm-4">
-            @Html.DisplayNameFor(model => model.ngay_sua)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.ngay_sua)
-        </dd>
-        <dt class = "col-sm-4">
-            @Html.DisplayNameFor(model => model.nguoi_tao)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.nguoi_tao)
-        </dd>
-        <dt class = "col-sm-4">
-            @Html.DisplayNameFor(model => model.nguoi_sua)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.nguoi_sua)
-        </dd>
-    </dl>
+        .payment-summary strong {
+            color: #d9534f;
+        }
+
+    .total-price {
+        border-top: 2px solid #ddd;
+        padding-top: 10px;
+        margin-top: 10px;
+        text-align: left;
+    }
+    .total-price h4 {
+        color: #d9534f;
+        font-weight: bold;
+        font-size: 22px;
+        text-align: right;
+    }
+
+    .progress-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        margin: 20px 0;
+        padding: 10px;
+    }
+
+    .progress-bar {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 0%;
+        height: 5px;
+        background-color: #007bff;
+        transition: width 0.4s ease-in-out;
+    }
+
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .step {
+        position: relative;
+        padding: 10px 15px;
+        background-color: #ccc;
+        border-radius: 20px;
+        font-size: 14px;
+        color: white;
+        transition: background-color 0.3s ease;
+    }
+
+        .step.active {
+            background-color: #28a745; /* Màu xanh cho bước hoàn thành */
+        }
+
+</style>
+
+
+<div class="container mt-4">
+    <h2>Quản lý đơn hàng / Chi tiết hóa đơn @Model.MaHoaDon</h2>
+    <!-- Thanh tiến trình -->
+    @if (ViewBag.TrangThaiList == null)
+    {
+        <p class="text-danger">Lỗi: Danh sách trạng thái không tồn tại.</p>
+    }
+   
+    @{
+        var trangThaiText = "";
+        switch (Model.trang_thai)
+        {
+            case 0: trangThaiText = "Chờ xử lý"; break;
+            case 1: trangThaiText = "Đã xác nhận"; break;
+            case 2: trangThaiText = "Đang giao hàng"; break;
+            case 3: trangThaiText = "Hoàn thành"; break;
+            case 4: trangThaiText = "Đã hủy"; break;
+            default: trangThaiText = "Không xác định"; break;
+        }
+    }
+    @{
+        var loaiHoadon = "";
+        switch (Model.loai_hoa_don)
+        {
+
+            case 1: loaiHoadon = "Tại quầy"; break;
+            case 2: loaiHoadon = "Online"; break;
+
+            default: loaiHoadon = "Không xác định"; break;
+        }
+    }
+
+
+
+    <div class="progress-container">
+        <div id="progressBar" class="progress-bar"></div>
+        <div class="progress-steps">
+            @foreach (var item in ViewBag.TrangThaiList)
+            {
+                <div class="step @(Model.trang_thai >= int.Parse(item.Value) ? "active" : "")">
+                    @item.Text
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center mt-3">
+        <button id="prevBtn" class="btn btn-primary me-2">⬅ PREVIOUS</button>
+        <button id="nextBtn" class="btn btn-primary me-2">NEXT ➡</button>
+        <button class="btn btn-danger btnCancelOrder" data-id="@Model.ID">❌ Hủy Đơn</button>
+        
+
+    </div>
+    <div class="container mt-4">
+        <h3 class="text-center">Lịch sử thay đổi trạng thái</h3>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Trạng thái</th>
+                    <th>Lý do</th>
+                    <th>Thời gian</th>
+                </tr>
+            </thead>
+            <tbody id="historyTable">
+                <tr>
+                    <td colspan="4" class="text-center text-muted">Chưa có thay đổi nào</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="cancelReasonContainer" style="display: none; margin-top: 10px;">
+        <input type="text" id="txtCancelReason" class="form-control" placeholder="Nhập lý do hủy đơn..." />
+        <button id="btnConfirmCancel" class="btn btn-warning" style="margin-top: 5px;">Xác nhận hủy</button>
+    </div>
+        <br />
+    <div class="row">
+        <!-- Cột trái: Thông tin hóa đơn -->
+        <div class="col-md-6">
+            <div class="card p-3 h-100">
+                <h5 class="text-primary">Thông tin hóa đơn @Model.MaHoaDon</h5>
+                <p><strong>Trạng thái:</strong> <span id="statusText" class="badge bg-warning">@(Model.trang_thai == 4 ? "0" : Model.tong_tien.ToString("N0") + " VNĐ")</span></p>
+
+                <p><strong>Loại hóa đơn:</strong> <span class="badge bg-info">@loaiHoadon</span></p>
+                <p><strong>Ghi chú:</strong> @Model.ghi_chu</p>
+            </div>
+        </div>
+
+        <!-- Cột phải: Thông tin khách hàng -->
+        <div class="col-md-6">
+            <div class="card p-3 h-100">
+                <h5 class="text-danger">Thông tin nhận hàng</h5>
+                <p><strong>Tên người nhận:</strong> @Model.ten_nguoi_nhan</p>
+                <p><strong>SDT người nhận:</strong> @Model.sdt_nguoi_nhan</p>
+                <p><strong>Email người nhận:</strong> @Model.email_nguoi_nhan</p>
+                <p><strong>Địa chỉ người nhận:</strong> @Model.dia_chi</p>
+            </div>
+        </div>
+    </div>
+
+   
+    @* <p>@Model.Tai_Khoan_Hoa_Dons.FirstOrDefault()?.ID - @Model.Tai_Khoan_Hoa_Dons.FirstOrDefault()?.Ten </p> *@
+  @*   @foreach (var tk in Model.Tai_Khoan_Hoa_Dons.Select(tkh => tkh.Tai_Khoan))
+    {
+        <div class="card p-3 mb-4">
+            <h5 class="text-danger">Thông tin nhận hàng</h5>
+            <p><strong>Tên người nhận:</strong> @tk.ho_ten</p>
+            <p><strong>SDT người nhận:</strong> @tk.sdt</p>
+            <p><strong>Email người nhận:</strong> @tk.email</p>
+            <p><strong>Địa chỉ người nhận:</strong> @tk.Dia_Chi</p>
+        </div> *@
+
+       
+    
+ 
+  <br />
+
+<div class="container">
+    <h3 class="text-center">Lịch sử thanh toán</h3>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Phương Thức</th>
+                <th>Số Tiền</th>
+                <th>Thời Gian</th>
+                <th>Nhân Viên Xác Nhận</th>
+                <th>Ghi Chú</th>
+            </tr>
+        </thead>
+        <tbody>
+                <tr>
+                    <td colspan="6" class="text-center text-muted">Không có dữ liệu</td>
+                </tr>
+        </tbody>
+      @*   <tbody>
+            @if (Model.LichSuThanhToan != null && Model.LichSuThanhToan.Any())
+            {
+                int index = 1;
+                foreach (var item in Model.LichSuThanhToan)
+                {
+                    <tr>
+                        <td>@index</td>
+                        <td>@item.PhuongThuc</td>
+                        <td>@item.SoTien.ToString("N0") đ</td>
+                        <td>@item.ThoiGian.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@item.NhanVienXacNhan</td>
+                        <td>@item.GhiChu</td>
+                    </tr>
+                    index++;
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-center text-muted">Không có lịch sử thanh toán nào.</td>
+                </tr>
+            }
+        </tbody> *@
+    </table>
+    <br />
+
+    <h3 class="text-center">Danh sách sản phẩm</h3>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Hình ảnh</th>
+                <th>Sản phẩm</th>
+                <th>Đơn giá</th>
+                <th>Số lượng</th>
+                <th>Số tiền</th>
+            </tr>
+        </thead>
+            <tbody>
+                <tr>
+                    <td colspan="6" class="text-center text-muted">Không có dữ liệu</td>
+                </tr>
+            </tbody>
+     @*    <tbody>
+            @if (Model.SanPhamTrongDonHang != null && Model.SanPhamTrongDonHang.Any())
+            {
+                int index = 1;
+                foreach (var item in Model.SanPhamTrongDonHang)
+                {
+                    <tr>
+                        <td>@index</td>
+                        <td><img src="@item.HinhAnhUrl" alt="Ảnh sản phẩm" width="50"></td>
+                        <td>@item.TenSanPham</td>
+                        <td>@item.DonGia.ToString("N0") đ</td>
+                        <td>@item.SoLuong</td>
+                        <td>@(item.DonGia * item.SoLuong).ToString("N0") đ</td>
+                    </tr>
+                    index++;
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-center text-muted">Không có dữ liệu</td>
+                </tr>
+            }
+        </tbody> *@
+    </table>
+
+ @*    <div class="row">
+        <div class="col-md-6">
+            <p><strong>Tổng tiền hàng:</strong> @Model.TongTienHang.ToString("N0") đ</p>
+            <p><strong>Phí vận chuyển:</strong> @Model.PhiVanChuyen.ToString("N0") đ</p>
+            <p><strong>Mã giảm giá:</strong> @Model.MaGiamGia</p>
+        </div>
+        <div class="col-md-6 text-right">
+            <h4 class="text-danger"><strong>Tổng thanh toán: @Model.TongThanhToan.ToString("N0") đ</strong></h4>
+        </div>
+    </div> *@
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.ID" class="btn btn-warning">
-        <i class="fa fa-edit"></i> Sửa
-    </a>
-    <a asp-action="Index" class="btn btn-secondary">
-        <i class="fa fa-arrow-left"></i> Quay lại danh sách
-    </a>
+
+<br />
+    <div class="row payment-summary">
+        <div class="col-md-6">
+            <p><strong>Tổng tiền hàng:</strong> @Model.tong_tien.ToString("N0") đ</p>
+            <p><strong>Phí vận chuyển:</strong> 40.000 đ</p>
+            <p><strong>Mã giảm giá:</strong> Không có</p>
+        </div>
+        <div class="col-md-6 text-right total-price">
+            <h4>
+                <strong>Tổng thanh toán: @((Model.tong_tien + 40000).ToString("N0")) đ</strong>
+            </h4>
+        </div>
+    </div>
+
+
+
+    <!-- Bảng hiển thị lịch sử thanh toán sẽ thêm vào đây -->
 </div>
+@section Scripts
+{
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+        <script>
+            
+            let currentStep = @Model.trang_thai ;
+        const steps = document.querySelectorAll(".step");
+        const progressBar = document.getElementById("progressBar");
+        const statusTextElement = document.getElementById("statusText");
+        const nextBtn = document.getElementById("nextBtn");
+        const prevBtn = document.getElementById("prevBtn");
+
+        let historyLog = [];
+                const statusText = [
+            "Chờ xử lý",
+            "Đã xác nhận",
+            "Đang giao hàng",
+            "Hoàn thành",
+            "Đã hủy"
+        ];
+
+            function updateProgress() {
+                steps.forEach((step, index) => {
+                    step.classList.toggle("active", index <= currentStep);
+                });
+                progressBar.style.width = `${(currentStep / (steps.length - 1)) * 100}%`;
+
+                 statusTextElement.innerText = statusText[currentStep];
+
+                      statusTextElement.className = "badge";
+        const colors = ["bg-secondary", "bg-primary", "bg-warning", "bg-success", "bg-danger"];
+        statusTextElement.classList.add(colors[currentStep]);
+         if (currentStep === 4) {
+            nextBtn.style.display = "none";
+            prevBtn.style.display = "none";
+        } else {
+            nextBtn.style.display = "inline-block";
+            prevBtn.style.display = "inline-block";
+        }
+            }
+
+                    function promptReason(callback) {
+            Swal.fire({
+                title: "Nhập lý do thay đổi trạng thái",
+                input: "text",
+                inputPlaceholder: "Nhập lý do...",
+                showCancelButton: true,
+                confirmButtonText: "Xác nhận",
+                cancelButtonText: "Hủy"
+            }).then((result) => {
+                if (result.isConfirmed && result.value.trim() !== "") {
+                    callback(result.value);
+                } else if (result.isConfirmed) {
+                    Swal.fire("Lỗi", "Vui lòng nhập lý do!", "error");
+                }
+            });
+        }
+
+
+        
+            function updateStatus(newStatus , reason) {
+
+                $.ajax({
+                    url: '@Url.Action("UpdateStatus", "HoaDon")',
+                    type: 'POST',
+                    data: { id: '@Model.ID', newStatus: newStatus , reason: reason },
+                    success: function (response) {
+                        if (response.success) {
+                            currentStep = response.status;
+                            historyLog.push({ step: currentStep, reason: reason, time: new Date().toLocaleString() });
+                renderHistory();
+                            updateProgress();
+                        } else {
+                            alert("Cập nhật trạng thái thất bại!");
+                        }
+                    },
+                    error: function () {
+                        alert("Có lỗi xảy ra khi cập nhật trạng thái!");
+                    }
+                });
+            }
+                    function renderHistory() {
+            let historyHTML = historyLog.map((log, index) =>
+                `<tr>
+                    <td>${index + 1}</td>
+                    <td>${statusText[log.step]}</td>
+                    <td>${log.reason}</td>
+                    <td>${log.time}</td>
+                </tr>`
+            ).join("");
+            document.getElementById("historyTable").innerHTML = historyHTML;
+        }
+                    nextBtn.addEventListener("click", () => {
+            if (currentStep < steps.length - 1) {
+                promptReason((reason) => {
+                    currentStep++;
+                    updateStatus(currentStep, reason);
+                });
+            }
+        });
+
+        prevBtn.addEventListener("click", () => {
+            if (currentStep > 0) {
+                promptReason((reason) => {
+                    currentStep--;
+                    updateStatus(currentStep, reason);
+                });
+            }
+        });
+   
+
+
+            updateProgress();
+
+             $(document).ready(function () {
+            $(".btnCancelOrder").click(function () {
+                var orderId = $(this).data("id");
+
+           
+
+
+                Swal.fire({
+                    title: "Bạn có chắc chắn muốn hủy đơn hàng?",
+                    text: "Sau khi hủy, không thể hoàn tác!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Có, hủy ngay!",
+                    cancelButtonText: "Không"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '@Url.Action("HuyDonHang", "HoaDon")',
+                            type: "POST",
+                            data: { id: orderId },
+                            success: function (response) {
+                                if (response.success) {
+
+                                    Swal.fire("Đã hủy!", "Đơn hàng đã được hủy.", "success")
+                                        .then(() => location.reload());
+                                } else {
+                                    Swal.fire("Lỗi!", response.message, "error");
+                                }
+                            },
+                            error: function () {
+                                Swal.fire("Lỗi!", "Không thể hủy đơn hàng.", "error");
+                            }
+                        });
+                    }
+                });
+            });
+
+         
+           
+  
+    
+
+
+        });
+
+        
+            
+        </script>
+   }

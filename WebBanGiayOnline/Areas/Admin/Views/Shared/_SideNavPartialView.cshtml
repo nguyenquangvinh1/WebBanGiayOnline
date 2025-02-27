@@ -2,7 +2,7 @@
     <div class="side-nav-inner">
         <ul class="side-nav-menu scrollable">
             <li class="nav-item ">
-                <a class="dropdown-toggle" asp-area="Admin" asp-controller="Home" asp-action="Index">
+                <a class="dropdown-toggle" asp-area="Admin" asp-controller="ThongKes" asp-action="Index">
                     <span class="icon-holder">
                         <i class="anticon anticon-dashboard"></i>
                     </span>
@@ -10,7 +10,7 @@
                 </a>
             </li>
             <li class="nav-item ">
-                <a class="dropdown-toggle" asp-area="Admin" asp-controller="AdminDonHangs" asp-action="Index">
+                <a class="dropdown-toggle" asp-area="Admin" asp-controller="SanPhamChiTiet" asp-action="Index">
                     <span class="icon-holder">
                         <i class="anticon anticon-appstore"></i>
                     </span>
@@ -37,9 +37,13 @@
                     <span class="arrow">
                         <i class="arrow-icon"></i>
                     </span>
+
+
                 </a>
              
+
                     </a>
+
                     <ul class="dropdown-menu">
                         <li>
                             <a asp-area="Admin" asp-controller="SanPham" asp-action="Index">Sản phẩm</a>
@@ -63,6 +67,7 @@
                             <a asp-area="Admin" asp-controller="MauSac" asp-action="Index">Màu Sắc</a>
 
 
+
                     </li>
                     <li>
                         <a asp-area="Admin" asp-controller="DanhMuc" asp-action="Index">Danh Mục</a>
@@ -79,7 +84,7 @@
                     <li>
                         <a asp-area="Admin" asp-controller="MuiGiay" asp-action="Index">Mũi Giày</a>
                     </li>
-                   
+
                 </ul>
 
             </li>
@@ -106,19 +111,12 @@
 
             </li>
             <li class="nav-item ">
-                <a class="dropdown-toggle" >
+                <a class="dropdown-toggle" asp-area="Admin" asp-controller="AdminShippers" asp-action="okiiIndex">
                     <span class="icon-holder">
                         <i class="fas fa-shipping-fast"></i>
                     </span>
                     <span class="title">Quản lý Tài Khoản</span>
                 </a>
-                <ul class="dropdown-menu">
-                    <li>
-                        <a asp-area="Admin" asp-controller="Khachhang" asp-action="Index">Khách Hàng</a>
-                    </li>
-                    
-
-                </ul>
             </li>
 
         </ul>
