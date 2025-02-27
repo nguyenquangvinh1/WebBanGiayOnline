@@ -41,8 +41,8 @@
         align-items: center;
         justify-content: space-between;
         position: relative;
-        margin: 20px 0;
-        padding: 10px;
+        margin: 22px 0;
+        
     }
 
     .progress-bar {
@@ -72,7 +72,7 @@
     }
 
         .step.active {
-            background-color: #28a745; /* Màu xanh cho bước hoàn thành */
+            background-color: #28a745;
         }
 
 </style>
@@ -80,11 +80,8 @@
 
 <div class="container mt-4">
     <h2>Quản lý đơn hàng / Chi tiết hóa đơn @Model.MaHoaDon</h2>
-    <!-- Thanh tiến trình -->
-    @if (ViewBag.TrangThaiList == null)
-    {
-        <p class="text-danger">Lỗi: Danh sách trạng thái không tồn tại.</p>
-    }
+  
+
    
     @{
         var trangThaiText = "";
@@ -127,7 +124,7 @@
     <div class="d-flex justify-content-center mt-3">
         <button id="prevBtn" class="btn btn-primary me-2">⬅ PREVIOUS</button>
         <button id="nextBtn" class="btn btn-primary me-2">NEXT ➡</button>
-        <button class="btn btn-danger btnCancelOrder" data-id="@Model.ID">❌ Hủy Đơn</button>
+        <button class="btn btn-danger btnCancelOrder" data-id="@Model.ID" id="huy">❌ Hủy Đơn</button>
         
 
     </div>
@@ -352,6 +349,21 @@
          if (currentStep === 4) {
             nextBtn.style.display = "none";
             prevBtn.style.display = "none";
+            huy.style.display="none";
+            
+
+        }else if(currentStep === 3){
+            nextBtn.style.display = "none";
+            prevBtn.style.display = "none";
+            huy.style.display="none";
+            statusText = [
+            "Chờ xử lý",
+            "Đã xác nhận",
+            "Đang giao hàng",
+            "Hoàn thành",
+
+        ];
+        
         } else {
             nextBtn.style.display = "inline-block";
             prevBtn.style.display = "inline-block";

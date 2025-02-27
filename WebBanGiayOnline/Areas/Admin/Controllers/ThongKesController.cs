@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using ClssLib;
 using WebBanGiay.Data;
 using Humanizer;
+using Newtonsoft.Json;
+using DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace WebBanGiay.Areas.Admin.Controllers
 {
@@ -22,54 +24,64 @@ namespace WebBanGiay.Areas.Admin.Controllers
         }
 
         // GET: Admin/ThongKes
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(Guid? id)
         {
+            var thongke = _context.thongKes
+                .Include(x => x.San_Pham_Chi_Tiet)
+                .AsQueryable()
+                .ToList();
+            
             var today = DateTime.Today;
             var startOfWeek = today.AddDays(-(int)today.DayOfWeek + (today.DayOfWeek == DayOfWeek.Sunday ? -6 : 1));
-            var endOfWeek = startOfWeek.AddDays(6); 
+            var endOfWeek = startOfWeek.AddDays(6);
 
             var homNay = _context.hoa_Dons
-                .Where(hd => hd.ngay_tao >= today)
-                .Select(hd => new ThongKe
+                .Where(hd => hd.ngay_tao >= today && (hd.trang_thai == 3 || hd.trang_thai == 4))
+                .GroupBy(_ => 1)
+                .Select(x => new ThongKe()
                 {
-                    TongTien = _context.hoa_Dons.Where(hd => hd.trang_thai == 3).Sum(hd => hd.tong_tien),
-
-                    DonThanhCong = hd.trang_thai == 3 ? 1 : 0,
-                    DonHuy = hd.trang_thai == 4 ? 1 : 0
+                    TongTien = x.Sum(x => x.tong_tien),
+                    DonThanhCong = x.Count(x => x.trang_thai == 3),
+                    DonHuy = x.Count(x => x.trang_thai == 4),
                 }).ToList();
+
+
 
             var tuanNay = _context.hoa_Dons
-                .Where(hd => hd.ngay_tao >= startOfWeek && hd.ngay_tao <= endOfWeek)
-                .Select(hd => new ThongKe
-                {
-                    TongTien = _context.hoa_Dons.Where(hd => hd.trang_thai == 3).Sum(hd => hd.tong_tien),
-
-                    DonThanhCong = hd.trang_thai == 3 ? 1 : 0,
-                    DonHuy = hd.trang_thai == 4 ? 1 : 0
-                }).ToList();
+                .Where(hd => hd.ngay_tao >= startOfWeek && hd.ngay_tao <= endOfWeek && (hd.trang_thai == 3 || hd.trang_thai == 4))
+                .GroupBy(_ => 1)
+                .Select(x =>
+                       new ThongKe()
+                       {
+                           TongTien = x.Sum(x => x.tong_tien),
+                           DonThanhCong = x.Count(x => x.trang_thai == 3),
+                           DonHuy = x.Count(x => x.trang_thai == 4),
+                       }).ToList();
 
             var thangNay = _context.hoa_Dons
-                .Where(hd => hd.ngay_tao.Month == today.Month && hd.ngay_tao.Year == today.Year)
-                .Select(hd => new ThongKe
-                {
-                    TongTien = _context.hoa_Dons.Where(hd => hd.trang_thai == 3).Sum(hd => hd.tong_tien),
-
-
-                    DonThanhCong = hd.trang_thai == 3 ? 1 : 0,
-                    DonHuy = hd.trang_thai == 4 ? 1 : 0
-                }).ToList();
+                .Where(hd => hd.ngay_tao.Month == today.Month && hd.ngay_tao.Year == today.Year && (hd.trang_thai == 3 || hd.trang_thai == 4))
+                .GroupBy(_ => 1)
+                .Select(x =>
+                       new ThongKe()
+                       {
+                           TongTien = x.Sum(x => x.tong_tien),
+                           DonThanhCong = x.Count(x => x.trang_thai == 3),
+                           DonHuy = x.Count(x => x.trang_thai == 4),
+                       }).ToList();
 
             var namNay = _context.hoa_Dons
-                .Where(hd => hd.ngay_tao.Year == today.Year)
-                .Select(hd => new ThongKe
-                {
-                    TongTien = _context.hoa_Dons.Where(hd => hd.trang_thai == 3).Sum(hd => hd.tong_tien),
-
-                    DonThanhCong = hd.trang_thai == 3 ? 1 : 0,
-                    DonHuy = hd.trang_thai == 4 ? 1 : 0
-                }).ToList();
+                .Where(hd => hd.ngay_tao.Year == today.Year && (hd.trang_thai == 3 || hd.trang_thai == 4))
+                .GroupBy(_ => 1)
+                .Select(x =>
+                       new ThongKe()
+                       {
+                           TongTien = x.Sum(x => x.tong_tien),
+                           DonThanhCong = x.Count(x => x.trang_thai == 3),
+                           DonHuy = x.Count(x => x.trang_thai == 4),
+                       }).ToList();
 
             var thongKeList = new List<ThongKe>
+           
     {
         new ThongKe
         {
@@ -103,11 +115,12 @@ namespace WebBanGiay.Areas.Admin.Controllers
             DonThanhCong = namNay.Sum(hd => hd.DonThanhCong),
             DonHuy = namNay.Sum(hd => hd.DonHuy),
         }
-    };
 
+
+    };
             return View(thongKeList);
         }
 
 
     }
-    }
+}
