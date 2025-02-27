@@ -12,8 +12,8 @@ using WebBanGiay.Data;
 namespace WebBanGiay.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250208161821_ThangDB")]
-    partial class ThangDB
+    [Migration("20250223134448_thangdb")]
+    partial class thangdb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -189,6 +189,10 @@ namespace WebBanGiay.Migrations
 
                     b.Property<Guid>("Tai_KhoanID")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("dia_chi")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("huyen")
                         .IsRequired()
@@ -777,9 +781,8 @@ namespace WebBanGiay.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ngay_sinh")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("ngay_sinh")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("ngay_sua")
                         .HasColumnType("datetime2");
@@ -788,7 +791,6 @@ namespace WebBanGiay.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("pass_word")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("sdt")
@@ -904,22 +906,22 @@ namespace WebBanGiay.Migrations
                     b.HasData(
                         new
                         {
-                            ID = new Guid("54240321-fe05-4338-8574-41e0538bf019"),
-                            ngay_tao = new DateTime(2025, 2, 8, 23, 18, 20, 214, DateTimeKind.Local).AddTicks(569),
+                            ID = new Guid("022d9ad0-ef4e-4b59-b07d-e3731ec41fc2"),
+                            ngay_tao = new DateTime(2025, 2, 23, 20, 44, 43, 851, DateTimeKind.Local).AddTicks(6083),
                             ten_vai_tro = "Admin",
                             trang_thai = 1
                         },
                         new
                         {
-                            ID = new Guid("9930d89d-543d-415c-acbf-4359eabd799d"),
-                            ngay_tao = new DateTime(2025, 2, 8, 23, 18, 20, 214, DateTimeKind.Local).AddTicks(584),
+                            ID = new Guid("27df0c84-5c01-4d12-9200-d3964d23ad7f"),
+                            ngay_tao = new DateTime(2025, 2, 23, 20, 44, 43, 851, DateTimeKind.Local).AddTicks(6101),
                             ten_vai_tro = "Nhân Viên",
                             trang_thai = 1
                         },
                         new
                         {
-                            ID = new Guid("18f18f2c-9870-41ae-be1e-f26700c6274b"),
-                            ngay_tao = new DateTime(2025, 2, 8, 23, 18, 20, 214, DateTimeKind.Local).AddTicks(586),
+                            ID = new Guid("f2d24dda-138b-400b-be75-1ca28173f507"),
+                            ngay_tao = new DateTime(2025, 2, 23, 20, 44, 43, 851, DateTimeKind.Local).AddTicks(6103),
                             ten_vai_tro = "Khách Hàng",
                             trang_thai = 1
                         });

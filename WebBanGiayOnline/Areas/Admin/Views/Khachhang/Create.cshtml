@@ -1,0 +1,237 @@
+﻿@model WebBanGiay.Areas.Admin.Models.ViewModel.CreateCustomerViewModel
+@{
+    ViewData["Title"] = "Khách Hàng";
+}
+<style>
+    /* Tạo hiệu ứng nổi cho form */
+    .row {
+        background: white; /* Màu nền sáng */
+        border-radius: 12px; /* Bo tròn góc */
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2); /* Hiệu ứng nổi */
+
+        margin: 40px auto; /* Căn giữa form */
+    }
+
+    /* Nền trang web */
+    body {
+   
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    /* Viền đen cho input */
+    .form-control {
+        border: 2px solid #CCCCCC !important;
+        border-radius: 8px;
+        padding: 10px;
+    }
+
+    /* Nút lưu */
+/*     .btn-primary {
+        width: 100%;
+        padding: 12px;
+        font-size: 18px;
+        border-radius: 8px;
+        transition: 0.3s;
+    }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        } */
+</style>
+
+
+<h2>Thêm Khách Hàng</h2>
+
+<form method="post" asp-action="Create">
+    <div class="row">
+        <!-- Dòng 1: User Name & Họ tên -->
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="UserName">User Name</label>
+                <input type="text" class="form-control custom-input" id="UserName" name="UserName" value="@Model.UserName" required />
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="Ho_ten">Họ tên</label>
+                <input type="text" class="form-control custom-input" id="Ho_ten" name="Ho_ten" value="@Model.Ho_ten" required />
+            </div>
+        </div>
+
+@*         <div class="col-md-12">
+            <div class="form-group">
+                <label for="PhoneNumber">Mật khẩu</label>
+                <input type="text" class="form-control custom-input" id="Password" name="Password" value="@Model.PassWord" required />
+            </div>
+        </div> *@
+        <!-- Dòng 2: Số điện thoại -->
+@*         <div class="col-md-12">
+            <div class="form-group">
+                <label for="PhoneNumber">Phone Number</label>
+                <input type="text" class="form-control custom-input" id="PhoneNumber" name="PhoneNumber" value="@Model.PhoneNumber" required />
+            </div>
+        </div> *@
+        <input type="text" class="form-control custom-input" id="Makh" name="Makh" value="@Model.Makh" hidden />
+
+        <!-- Dòng 3: Email -->
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="Email">Email</label>
+                <input type="email" class="form-control custom-input" id="Email" name="Email" value="@Model.Email" required />
+            </div>
+        </div>
+
+        <!-- Dòng 4: Căn cước & Số điện thoại -->
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="CCCD">Căn Cước</label>
+                <input type="text" class="form-control custom-input" id="CCCD" name="CCCD" value="@Model.CCCD" required />
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="PhoneNumber">Phone Number</label>
+                <input type="text" class="form-control custom-input" id="PhoneNumber" name="PhoneNumber" value="@Model.PhoneNumber" required />
+            </div>
+        </div>
+
+        <!-- Dòng 5: Ngày sinh & Giới tính -->
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="DateOfBirth">Date of Birth</label>
+                <input type="date" class="form-control custom-input" id="DateOfBirth" name="DateOfBirth" value="@Model.DateOfBirth.ToString("yyyy-MM-dd")" required />
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Gender</label>
+                <div class="gender-group">
+                    <input type="radio" id="Male" name="Gender" value="1" @(Model.Gender == 1 ? "checked" : "") />
+                    <label for="Male">Nam</label>
+                    <input type="radio" id="Female" name="Gender" value="0" @(Model.Gender == 0 ? "checked" : "") />
+                    <label for="Female">Nữ</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dòng 6: Thành phố - Huyện - Xã -->
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="tinh">Thành phố</label>
+                <select class="form-control custom-input" id="tinh" name="tinh">
+                    <option value="">Chọn thành phố</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="huyen">Huyện</label>
+                <select class="form-control custom-input" id="huyen" name="huyen">
+                    <option value="">Chọn huyện</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="xa">Xã</label>
+                <select class="form-control custom-input" id="xa" name="xa">
+                    <option value="">Chọn xã</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Dòng 7: Địa chỉ -->
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="dia_chi">Address</label>
+                <input type="text" class="form-control custom-input" id="dia_chi" name="dia_chi" value="@Model.dia_chi" required />
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group text-center mt-3">
+        <input type="submit" value="Save" class="btn btn-primary" />
+    </div>
+
+</form>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+ 
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Load danh sách tỉnh
+            $.ajax({
+                url: "https://provinces.open-api.vn/api/p/",
+                method: "GET",
+                success: function (data) {
+                    data.forEach(function (province) {
+                        $("#tinh").append('<option value="' + province.name + '">' + province.name + '</option>');
+                    });
+                }
+            });
+
+            // Khi chọn tỉnh -> Load danh sách huyện
+            $("#tinh").change(function () {
+                var provinceName = $(this).val();
+                $("#huyen").empty().append('<option value="">Chọn huyện</option>');
+                $("#xa").empty().append('<option value="">Chọn xã</option>');
+
+                if (provinceName) {
+                    $.ajax({
+                        url: "https://provinces.open-api.vn/api/p/",
+                        method: "GET",
+                        success: function (data) {
+                            var province = data.find(p => p.name === provinceName);
+                            if (province) {
+                                $.ajax({
+                                    url: "https://provinces.open-api.vn/api/p/" + province.code + "?depth=2",
+                                    method: "GET",
+                                    success: function (districtData) {
+                                        districtData.districts.forEach(function (district) {
+                                            $("#huyen").append('<option value="' + district.name + '">' + district.name + '</option>');
+                                        });
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+
+            // Khi chọn huyện -> Load danh sách xã
+            $("#huyen").change(function () {
+                var districtName = $(this).val();
+                $("#xa").empty().append('<option value="">Chọn xã</option>');
+
+                if (districtName) {
+                    $.ajax({
+                        url: "https://provinces.open-api.vn/api/d/",
+                        method: "GET",
+                        success: function (data) {
+                            var district = data.find(d => d.name === districtName);
+                            if (district) {
+                                $.ajax({
+                                    url: "https://provinces.open-api.vn/api/d/" + district.code + "?depth=2",
+                                    method: "GET",
+                                    success: function (wardData) {
+                                        wardData.wards.forEach(function (ward) {
+                                            $("#xa").append('<option value="' + ward.name + '">' + ward.name + '</option>');
+                                        });
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+    </script>
+}

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WebBanGiay.Migrations
 {
     /// <inheritdoc />
-    public partial class ThangDB : Migration
+    public partial class thangdb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -298,10 +298,10 @@ namespace WebBanGiay.Migrations
                 {
                     ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     user_name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    pass_word = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    pass_word = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ho_ten = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ma = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ngay_sinh = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ngay_sinh = table.Column<DateTime>(type: "datetime2", nullable: false),
                     gioi_tinh = table.Column<int>(type: "int", nullable: false),
                     sdt = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     email = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -418,6 +418,7 @@ namespace WebBanGiay.Migrations
                     tinh = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     huyen = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     xa = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    dia_chi = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ngay_tao = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ngay_sua = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Tai_KhoanID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
@@ -612,9 +613,9 @@ namespace WebBanGiay.Migrations
                 columns: new[] { "ID", "ngay_sua", "ngay_tao", "ten_vai_tro", "trang_thai" },
                 values: new object[,]
                 {
-                    { new Guid("18f18f2c-9870-41ae-be1e-f26700c6274b"), null, new DateTime(2025, 2, 8, 23, 18, 20, 214, DateTimeKind.Local).AddTicks(586), "Khách Hàng", 1 },
-                    { new Guid("54240321-fe05-4338-8574-41e0538bf019"), null, new DateTime(2025, 2, 8, 23, 18, 20, 214, DateTimeKind.Local).AddTicks(569), "Admin", 1 },
-                    { new Guid("9930d89d-543d-415c-acbf-4359eabd799d"), null, new DateTime(2025, 2, 8, 23, 18, 20, 214, DateTimeKind.Local).AddTicks(584), "Nhân Viên", 1 }
+                    { new Guid("022d9ad0-ef4e-4b59-b07d-e3731ec41fc2"), null, new DateTime(2025, 2, 23, 20, 44, 43, 851, DateTimeKind.Local).AddTicks(6083), "Admin", 1 },
+                    { new Guid("27df0c84-5c01-4d12-9200-d3964d23ad7f"), null, new DateTime(2025, 2, 23, 20, 44, 43, 851, DateTimeKind.Local).AddTicks(6101), "Nhân Viên", 1 },
+                    { new Guid("f2d24dda-138b-400b-be75-1ca28173f507"), null, new DateTime(2025, 2, 23, 20, 44, 43, 851, DateTimeKind.Local).AddTicks(6103), "Khách Hàng", 1 }
                 });
 
             migrationBuilder.CreateIndex(

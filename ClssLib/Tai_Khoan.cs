@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -10,12 +12,14 @@ namespace ClssLib
 {
     public class Tai_Khoan
     {
+
         public Guid ID { get; set; }
         public string user_name { get; set; }
-        public string pass_word { get; set; }
+        public string? pass_word { get; set; }
         public string ho_ten { get; set; }
+       
         public string ma { get; set; }
-        public string ngay_sinh { get; set; }
+        public DateTime ngay_sinh { get; set; }
         public int gioi_tinh { get; set; }
         public string sdt { get; set; }
         public string email { get; set; }
@@ -33,5 +37,8 @@ namespace ClssLib
         public virtual ICollection<Tai_Khoan_Hoa_Don>? Tai_Khoan_Hoa_Don { get; set; }
         [JsonIgnore]
         public virtual ICollection<Phieu_Giam_Gia_Tai_Khoan>? Phieu_Giam_Gia_Tai_Khoans { get; set; }
+
+
+
     }
 }
