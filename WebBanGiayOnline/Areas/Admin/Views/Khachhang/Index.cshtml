@@ -1,0 +1,173 @@
+﻿@model IEnumerable<WebBanGiay.Areas.Admin.Models.ViewModel.CreateCustomerViewModel>
+
+@{
+	ViewData["Title"] = "Người dùng";
+
+	Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="page-content-wrapper">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="page-title-box">
+					<div class="btn-group float-right">
+					
+					</div>
+					<h4 class="page-title">Khách Hàng</h4>
+				</div>
+			</div>
+		</div>
+		<nav>
+			<div class="nav nav-tabs" id="nav-tab" role="tablist">
+				<!-- <a href="javascript:(0);" class="nav-link" data-toggle="tab" data-target="#edit" type="button"
+					role="tab" aria-selected="false">Thêm Khách hàng</a>
+				<a href="javascript:(0);" class="nav-link active" data-toggle="tab" data-target="#list" type="button"
+					role="tab" aria-selected="true">Danh Sách Khách hàng</a> -->
+			</div>
+		</nav>
+		<div class="row mx-0 bg-white" ng-if="items">
+			<div class="col-12 py-3">
+				<div class="container-fluid py-3">
+					<div class="row align-items-center">
+						<!-- Ô tìm kiếm bên trái -->
+						<div class="col-md-4 d-flex align-items-center">
+							<div class="input-group" style="max-width: 300px;">
+								<span class="input-group-text">
+									<i class="fas fa-search text-orange"></i>
+								</span>
+								<input type="text" class="form-control" placeholder="Tên hoặc SĐT hoặc Email">
+							</div>
+						</div>
+
+						<!-- bộ lọc bên trái -->
+						<div class="col-md-6 d-flex align-items-center gap-3">
+
+@* 							<!-- nút quét cccd -->
+							<button class="btn btn-outline-primary">
+								<i class="fas fa-id-card"></i>
+							</button>
+
+							<!-- nút xuất excel -->
+							<button class="btn btn-outline-success">
+								<i class="fas fa-file-excel"></i>
+							</button>
+
+							<!-- nút tải template excel -->
+							<button class="btn btn-outline-warning">
+								<i class="fas fa-download"></i>
+							</button>
+
+							<!-- nút nhập excel -->
+							<button class="btn btn-outline-info">
+								<i class="fas fa-upload"></i>
+							</button> *@
+						</div>
+
+						<!-- Nút tạo nhân viên bên phải -->
+						<div class="col-md-2 text-end">
+							<a asp-action="Create" class="btn btn-outline-orange"
+							   style="border: 1px solid #e0e0e0;">
+								<i class="fas fa-plus"></i> Thêm 
+							</a>
+						</div>
+
+					</div>
+				</div>
+
+				<table id="datatable-buttons" class="table table-collapse table-bordered dt-responsive">
+					<thead>
+						<tr>
+							<td>STT</td>
+							<th class="d-none">ID</th> <!-- Ô ẩn cho ID -->
+							<td>Mã Khách Hàng</td>
+							<th>Tên Khách hàng</th>
+							<th>Email</th>
+							<th>SĐT</th>
+							<th>Địa chỉ </th>						
+							<th>Tùy Chỉnh</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var (item, index) in Model.Select((value, i) => (value, i + 1)))
+
+						{
+							<tr>
+								<td>@index</td> <!-- STT tự động -->
+								<td class='d-none'>@item.Id</td>
+								<td class="align-center">@item.Makh</td>
+								<td class="align-center">@item.Ho_ten</td>
+								<td class="align-center">@item.Email</td>
+								<td class="align-center">@item.PhoneNumber</td>
+								<td class="align-center">@item.FullAddress</td>
+
+								<td class="align-center">
+									<div class="btn-group btn-group-xs">
+										<a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">
+											<i class="fa fa-xs fa-pen"></i>
+										</a>
+									</div>
+								</td>
+							</tr>
+						}
+					</tbody>
+
+
+				</table>
+				<div id="pagination" class="d-flex justify-content-end mt-3">
+					<button id="prevBtn" class="btn btn-secondary me-2" onclick="changePage(-1) " style="border: 2px solid black; color: black; background-color: transparent; font-weight: bold;">Trước</button>
+					<span id="pageNumbers" class="d-flex align-items-center">1</span>
+					<button id="nextBtn" class="btn btn-secondary ms-2" onclick="changePage(1)" style="border: 2px solid black; color: black; background-color: transparent; font-weight: bold;">Sau</button>
+				</div>
+			</div>
+		</div>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+		<!-- <script src="/assetss/js/init.js"></script> -->
+		<div class="tab-content" id="nav-tabcontent">
+			<div class="tab-pane fade" id="edit" role="tabpanel">
+				<div ng-include="'/admin/account/_form.html'"></div>
+			</div>
+			<div class="tab-pane fade show active" id="list" role="tabpanel">
+				<div ng-include="'/admin/account/_table.html'"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			let rowsPerPage = 5; // Số khách hàng trên mỗi trang
+		let table = document.getElementById("datatable-buttons").getElementsByTagName("tbody")[0];
+			let rows = table.getElementsByTagName("tr");
+			let currentPage = 1;
+			let totalPages = Math.ceil(rows.length / rowsPerPage);
+
+			function showPage(page) {
+				for (let i = 0; i < rows.length; i++) {
+					rows[i].style.display = (i >= (page - 1) * rowsPerPage && i < page * rowsPerPage) ? "" : "none";
+				}
+				document.getElementById("pageNumbers").innerText = `${page} / ${totalPages}`;
+			}
+
+			function changePage(step) {
+				let newPage = currentPage + step;
+				if (newPage >= 1 && newPage <= totalPages) {
+					currentPage = newPage;
+					showPage(currentPage);
+				}
+			}
+
+			// Gán sự kiện cho các nút bấm
+			document.getElementById("prevBtn").addEventListener("click", function () {
+				changePage(-1);
+			});
+
+			document.getElementById("nextBtn").addEventListener("click", function () {
+				changePage(1);
+			});
+
+			// Hiển thị trang đầu tiên
+			showPage(currentPage);
+		});
+	</script>

@@ -15,11 +15,13 @@ namespace ClssLib
         public string tinh { get; set; }
         public string huyen { get; set; }
         public string xa { get; set; }
-        public DateTime ngay_tao { get; set; }
+        public string dia_chi { get; set; }
+
+		public DateTime ngay_tao { get; set; }
         public DateTime ngay_sua { get; set; }
         [ForeignKey("Tai_Khoan")]
         public Guid Tai_KhoanID { get; set; }
         [JsonIgnore]
-        public virtual Tai_Khoan Tai_Khoan { get; set; }
+        public virtual Tai_Khoan? Tai_Khoan { get; set; }
     }
 }

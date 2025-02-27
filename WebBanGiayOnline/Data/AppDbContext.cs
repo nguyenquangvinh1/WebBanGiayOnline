@@ -46,7 +46,6 @@ namespace WebBanGiay.Data
         {
             modelBuilder.Seed();
             base.OnModelCreating(modelBuilder);
-            
 
         }
        

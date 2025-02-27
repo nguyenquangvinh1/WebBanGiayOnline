@@ -37,7 +37,8 @@
                     <span class="arrow">
                         <i class="arrow-icon"></i>
                     </span>
-
+                </a>
+             
                     </a>
                     <ul class="dropdown-menu">
                         <li>
@@ -56,6 +57,9 @@
                             <a asp-area="Admin" asp-controller="CoGiay" asp-action="Index">Cổ Giày</a>
                         </li>
                         <li>
+
+                            <a asp-area="Admin" asp-controller="AdminNguoiDungs" asp-action="Index">Màu Sắc</a>
+
                             <a asp-area="Admin" asp-controller="MauSac" asp-action="Index">Màu Sắc</a>
 
 
@@ -75,7 +79,7 @@
                     <li>
                         <a asp-area="Admin" asp-controller="MuiGiay" asp-action="Index">Mũi Giày</a>
                     </li>
-
+                   
                 </ul>
 
             </li>
@@ -102,12 +106,19 @@
 
             </li>
             <li class="nav-item ">
-                <a class="dropdown-toggle" asp-area="Admin" asp-controller="AdminShippers" asp-action="okiiIndex">
+                <a class="dropdown-toggle" >
                     <span class="icon-holder">
                         <i class="fas fa-shipping-fast"></i>
                     </span>
                     <span class="title">Quản lý Tài Khoản</span>
                 </a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a asp-area="Admin" asp-controller="Khachhang" asp-action="Index">Khách Hàng</a>
+                    </li>
+                    
+
+                </ul>
             </li>
 
         </ul>
