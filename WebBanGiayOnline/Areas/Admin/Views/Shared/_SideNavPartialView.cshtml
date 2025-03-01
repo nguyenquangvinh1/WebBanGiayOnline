@@ -1,133 +1,152 @@
-﻿﻿<div class="side-nav">
-    <div class="side-nav-inner">
-        <ul class="side-nav-menu scrollable">
-            <li class="nav-item ">
-                <a class="dropdown-toggle" asp-area="Admin" asp-controller="ThongKes" asp-action="Index">
-                    <span class="icon-holder">
-                        <i class="anticon anticon-dashboard"></i>
-                    </span>
-                    <span class="title">Thống kê</span>
-                </a>
-            </li>
-            <li class="nav-item ">
-                <a class="dropdown-toggle" asp-area="Admin" asp-controller="SanPhamChiTiet" asp-action="Index">
-                    <span class="icon-holder">
-                        <i class="anticon anticon-appstore"></i>
-                    </span>
-                    <span class="title">Bán Hàng Tại Quầy</span>
+﻿<!-- Main Sidebar Container -->
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a href="index3.html" class="brand-link">
+        <img src="/AdminLTE-master/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+        <span class="brand-text font-weight-light">AdminLTE 3</span>
+    </a>
 
-                </a>
-            </li>
-            <li class="nav-item ">
-                <a class="dropdown-toggle" asp-area="Admin" asp-controller="HoaDon" asp-action="Index">
-                    <span class="icon-holder">
-                        <i class="anticon anticon-appstore"></i>
-                    </span>
-                    <span class="title">Quản lý đơn hàng</span>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+                <img src="/AdminLTE-master/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+            </div>
+            <div class="info">
+                <a href="#" class="d-block">Alexander Pierce</a>
+            </div>
+        </div>
 
-                </a>
-            </li>
-            <li class="nav-item dropdown ">
-                <a class="dropdown-toggle" href="javascript:void(0);">
+        <!-- SidebarSearch Form -->
+        <div class="form-inline">
+            <div class="input-group" data-widget="sidebar-search">
+                <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
+                <div class="input-group-append">
+                    <button class="btn btn-sidebar">
+                        <i class="fas fa-search fa-fw"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
 
-                    <span class="icon-holder">
-                        <i class="fas fa-cubes"></i>
-                    </span>
-                    <span class="title">Quản lý sản phẩm</span>
-                    <span class="arrow">
-                        <i class="arrow-icon"></i>
-                    </span>
-
-
-                </a>
-             
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <!-- Add icons to the links using the .nav-icon class
+                     with font-awesome or any other icon font library -->
+                
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="Admin" asp-controller="ThongKes" asp-action="Index">
+                        <span class="icon-holder">
+                            <i class="anticon anticon-dashboard"></i>
+                        </span>
+                        <span class="title">Thống kê</span>
+                    </a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link" asp-area="Admin" asp-controller="SanPhamChiTiet" asp-action="Index">
+                        <span class="icon-holder">
+                            <i class="anticon anticon-appstore"></i>
+                        </span>
+                        <span class="title">Bán Hàng Tại Quầy</span>
 
                     </a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link" asp-area="Admin" asp-controller="HoaDon" asp-action="Index">
+                        <span class="icon-holder">
+                            <i class="anticon anticon-appstore"></i>
+                        </span>
+                        <span class="title">Quản lý đơn hàng</span>
 
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a asp-area="Admin" asp-controller="SanPham" asp-action="Index">Sản phẩm</a>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:void(0);">
+
+                        <span class="icon-holder">
+                            <i class="fas fa-cubes"></i>
+                        </span>
+                        <span class="title">Quản lý sản phẩm</span>
+                        <span class="arrow">
+                            <i class="arrow-icon"></i>
+                        </span>
+
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="SanPham" asp-action="Index">Sản phẩm</a>
                         </li>
-                        @* <li>
-                            <a asp-area="Admin" asp-controller="SanPhamChiTiet" asp-action="Index">Sản phẩm Chi Tiết</a>
-                        </li> *@
-                        <li>
-                            <a asp-area="Admin" asp-controller="DeGiay" asp-action="Index">Đế Giày</a>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="DeGiay" asp-action="Index">Đế Giày</a>
                         </li>
-                        <li>
-                            <a asp-area="Admin" asp-controller="KieuDang" asp-action="Index">Kiểu dáng</a>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="KieuDang" asp-action="Index">Kiểu dáng</a>
                         </li>
-                        <li>
-                            <a asp-area="Admin" asp-controller="CoGiay" asp-action="Index">Cổ Giày</a>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="CoGiay" asp-action="Index">Cổ Giày</a>
                         </li>
-                        <li>
-
-                            <a asp-area="Admin" asp-controller="AdminNguoiDungs" asp-action="Index">Màu Sắc</a>
-
-                            <a asp-area="Admin" asp-controller="MauSac" asp-action="Index">Màu Sắc</a>
-
-
-
-                    </li>
-                    <li>
-                        <a asp-area="Admin" asp-controller="DanhMuc" asp-action="Index">Danh Mục</a>
-                    </li>
-                    <li>
-                        <a asp-area="Admin" asp-controller="ChatLieu" asp-action="Index">Chất liệu</a>
-                    </li>
-                    <li>
-                        <a asp-area="Admin" asp-controller="KichThuoc" asp-action="Index">Kích Thước</a>
-                    </li>
-                    <li>
-                        <a asp-area="Admin" asp-controller="LoaiGiay" asp-action="Index">Loại Giày</a>
-                    </li>
-                    <li>
-                        <a asp-area="Admin" asp-controller="MuiGiay" asp-action="Index">Mũi Giày</a>
-                    </li>
-
-                </ul>
-
-            </li>
-            <li class="nav-item dropdown">
-                <a class="dropdown-toggle" href="javascript:void(0);">
-                    <span class="icon-holder">
-                        <i class="anticon anticon-form"></i>
-                    </span>
-                    <span class="title">
-                        Giảm giá<span>
-                            <span class="arrow">
-                                <i class="arrow-icon"></i>
-                            </span>
-                </a>
-                <ul class="dropdown-menu">
-                    <li>
-                        <a asp-area="Admin" asp-controller="PhieuGiamGia" asp-action="Index">Phiếu giảm giá</a>
-                    </li>
-                    <li>
-                        <a asp-area="Admin" asp-controller="AdminNguoiDungs" asp-action="Index">Đợt giảm giá</a>
-                    </li>
-
-                </ul>
-
-            </li>
-            <li class="nav-item ">
-                <a class="dropdown-toggle">
-                    <span class="icon-holder">
-                        <i class="fas fa-shipping-fast"></i>
-                    </span>
-                    <span class="title">Quản lý Tài Khoản</span>
-                </a>
-                <ul class="dropdown-menu">
-                    <li>
-                        <a asp-area="Admin" asp-controller="Khachhang" asp-action="Index">Khách Hàng</a>
-                    </li>
-                    <li>
-                        <a asp-area="Admin" asp-controller="NhanVien" asp-action="Index">Nhân viên</a>
-                    </li>
-
-                </ul>
-            </li>
-
-        </ul>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="MauSac" asp-action="Index">Màu Sắc</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="DanhMuc" asp-action="Index">Danh Mục</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="ChatLieu" asp-action="Index">Chất liệu</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="KichThuoc" asp-action="Index">Kích Thước</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="LoaiGiay" asp-action="Index">Loại Giày</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="MuiGiay" asp-action="Index">Mũi Giày</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:void(0);">
+                        <span class="icon-holder">
+                            <i class="anticon anticon-form"></i>
+                        </span>
+                        <span class="title">
+                            Giảm giá<span>
+                                <span class="arrow">
+                                    <i class="arrow-icon"></i>
+                                </span>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="PhieuGiamGia" asp-action="Index">Phiếu giảm giá</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="AdminNguoiDungs" asp-action="Index">Đợt giảm giá</a>
+                        </li>
+                        
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="icon-holder">
+                            <i class="fas fa-shipping-fast"></i>
+                        </span>
+                        <span class="title">Quản lý Tài Khoản</span>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="NhanVien" asp-action="Index">Nhân viên</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="Khachhang" asp-action="Index">Khách hàng</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
     </div>
-</div>
+    <!-- /.sidebar -->
+</aside>
