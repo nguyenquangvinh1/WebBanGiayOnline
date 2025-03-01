@@ -1,0 +1,245 @@
+﻿ @model WebBanGiay.view_mode.NhanVien_Model
+
+
+<div class="container mt-4">
+    <h4 class="mb-3">Thông Tin Nhân Viên</h4>
+    <!-- Card để bố cục gọn gàng -->
+    <div class="card">
+        <div class="card-body">
+            <!-- Toàn bộ nội dung nằm trong form -->
+            <form asp-action="Edit" asp-controller="NhanVien" method="post" id="addEmployeeForm" enctype="multipart/form-data">
+                @Html.HiddenFor(m => m.Id)
+
+                @Html.HiddenFor(m => m.user_name)
+                <div class="row">
+                    <!-- Cột bên trái: Ảnh và thông tin cơ bản -->
+                    <div class="col-md-3 text-center">
+                        <div class="image-upload">
+                            <label for="file-input" style="cursor: pointer;">
+                                <!-- Input file ẩn, click vào ảnh để chọn file -->
+                                <input id="file-input" type="file" name="HinhAnh" accept="image/*" onchange="previewImage(event)" hidden>
+                                <!-- Ảnh preview, nếu Model.hinh_anh có giá trị thì hiển thị ảnh từ folder, ngược lại hiển thị default-avatar.png -->
+                                <img id="preview"
+                                     src="@(Model.hinh_anh != null ? "/images/nhanvien/" + Model.hinh_anh : "default-avatar.png")"
+                                     alt="Ảnh nhân viên"
+                                     class="rounded-circle"
+                                     style="width: 150px; height: 150px; object-fit: cover;">
+                            </label>
+                        </div>
+
+                        <!-- Hiển thị thông tin cơ bản (nếu cần) -->
+                        <h5 class="mt-3">@Model.ho_ten</h5>
+                        @* <div class="mb-3"> *@
+                        @*     <label class="form-label">Mã nhân viên</label> *@
+                        @*     <input type="text" class="form-control" asp-for="ma" readonly /> *@
+                        @*     @Html.HiddenFor(m => m.ma) *@
+                        @* </div> *@
+                        <p>Mã nhân viên  : @Model.ma</p>
+                        <p>Ngày tạo : @Model.ngay_tao</p>
+                    </div>
+
+                    <!-- Cột bên phải: Các trường nhập liệux` chi tiết -->
+                    <div class="col-md-9">
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <label>* Tên nhân viên</label>
+                                <input type="text" class="form-control" asp-for="ho_ten" placeholder="Nhập họ và tên">
+                                <span asp-validation-for="ho_ten" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label>* Email</label>
+                                <input type="email" class="form-control" asp-for="email" placeholder="Nhập email">
+                                <span asp-validation-for="email" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Bỏ trường mật khẩu -->
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <label>* Mã định danh cá nhân</label>
+                                <input type="text" class="form-control" asp-for="cccd" placeholder="Nhập CCCD">
+                                <span asp-validation-for="cccd" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label>* Số Điện Thoại</label>
+                                <input type="text" class="form-control" asp-for="sdt" placeholder="Nhập số điện thoại">
+                                <span asp-validation-for="sdt" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <label>* Ngày sinh</label>
+                                <input type="date" class="form-control" asp-for="ngay_sinh">
+                                <span asp-validation-for="ngay_sinh" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Giới tính</label>
+                                <span asp-validation-for="gioi_tinh" class="text-danger"></span>
+                                <div class="d-flex align-items-center">
+                                    <div class="form-check me-3">
+                                        <input type="radio" id="Male" asp-for="gioi_tinh" value="1" />
+                                        <label class="form-check-label" for="Male">Nam</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="radio" id="Female" asp-for="gioi_tinh" value="0" />
+                                        <label class="form-check-label" for="Female">Nữ</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Khu vực chọn Tỉnh/Huyện/Xã -->
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <label>* Tỉnh/Thành phố</label>
+                                <select class="form-control" id="tinh" asp-for="tinh">
+                                    <option value="">Chọn tỉnh/thành phố</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label>* Quận/Huyện</label>
+                                <select class="form-control" id="huyen" asp-for="huyen">
+                                    <option value="">Chọn quận/huyện</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label>* Xã/Phường</label>
+                                <select class="form-control" id="xa" asp-for="xa">
+                                    <option value="">Chọn xã/phường</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-12 mb-3">
+                                <label>* Địa chỉ chi tiết</label>
+                                <input type="text" class="form-control" asp-for="dia_chi_chi_tiet" placeholder="Nhập địa chỉ chi tiết (số nhà, đường phố,...)" />
+                                <span asp-validation-for="dia_chi_chi_tiet" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Nút submit -->
+                        <button type="submit" class="btn btn-primary mt-3" id="saveProduct">Cập nhật</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- CSS custom (bạn có thể bỏ vào file nhanvien.css hoặc custom thêm) -->
+<link rel="stylesheet" href="/assetss/css/nhanvien.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+
+<!-- Các script logic giữ nguyên -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+@section Scripts {
+
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Hiển thị preview ảnh sau khi chọn file
+        function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function () {
+                var output = document.getElementById('preview');
+                output.src = reader.result;
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        // Hiển thị hộp thoại xác nhận trước khi submit form
+        document.getElementById("addEmployeeForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+            Swal.fire({
+                title: "Xác nhận",
+                text: "Bạn có chắc chắn muốn cập nhật thông tin nhân viên?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Có, cập nhật!",
+                cancelButtonText: "Hủy"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    event.target.submit();
+                }
+            });
+        });
+
+        // Các script load tỉnh, huyện, xã (nếu cần) ...
+
+                        $(document).ready(function () {
+                    // Load danh sách tỉnh
+                    $.ajax({
+                        url: "https://provinces.open-api.vn/api/p/",
+                        method: "GET",
+                        success: function (data) {
+                            data.forEach(function (province) {
+                                $("#tinh").append('<option value="' + province.name + '">' + province.name + '</option>');
+                            });
+                        }
+                    });
+
+                    // Khi chọn tỉnh -> Load danh sách huyện
+                    $("#tinh").change(function () {
+                        var provinceName = $(this).val();
+                        $("#huyen").empty().append('<option value="">Chọn huyện</option>');
+                        $("#xa").empty().append('<option value="">Chọn xã</option>');
+
+                        if (provinceName) {
+                            $.ajax({
+                                url: "https://provinces.open-api.vn/api/p/",
+                                method: "GET",
+                                success: function (data) {
+                                    var province = data.find(p => p.name === provinceName);
+                                    if (province) {
+                                        $.ajax({
+                                            url: "https://provinces.open-api.vn/api/p/" + province.code + "?depth=2",
+                                            method: "GET",
+                                            success: function (districtData) {
+                                                districtData.districts.forEach(function (district) {
+                                                    $("#huyen").append('<option value="' + district.name + '">' + district.name + '</option>');
+                                                });
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    });
+
+                    // Khi chọn huyện -> Load danh sách xã
+                    $("#huyen").change(function () {
+                        var districtName = $(this).val();
+                        $("#xa").empty().append('<option value="">Chọn xã</option>');
+
+                        if (districtName) {
+                            $.ajax({
+                                url: "https://provinces.open-api.vn/api/d/",
+                                method: "GET",
+                                success: function (data) {
+                                    var district = data.find(d => d.name === districtName);
+                                    if (district) {
+                                        $.ajax({
+                                            url: "https://provinces.open-api.vn/api/d/" + district.code + "?depth=2",
+                                            method: "GET",
+                                            success: function (wardData) {
+                                                wardData.wards.forEach(function (ward) {
+                            $("#xa").append('<option value="' + ward.name + '">' + ward.name + '</option>');
+                                                });
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+    </script>
+}
+

@@ -1,0 +1,389 @@
+﻿@model IEnumerable<ClssLib.Phieu_Giam_Gia>
+
+
+<h1>Phiếu Giảm Giá</h1>
+
+
+@{
+    ViewData["Title"] = "Index";
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phiếu Giảm Giá</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: black;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+            .search-bar input {
+                padding: 10px;
+                flex-grow: 1;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                margin-right: 10px;
+            }
+
+        .btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+            .btn:hover {
+                background-color: #0056b3;
+            }
+
+        .filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+            .filter input[type="date"], .filter select {
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+            .status.active {
+                background-color: #28a745;
+                color: white;
+            }
+
+            .status.inactive {
+                background-color: #dc3545;
+                color: white;
+            }
+
+        .action-icon {
+            cursor: pointer;
+            color: #ff8c00; /* Màu cam */
+            font-size: 20px;
+        }
+
+            .action-icon:hover {
+                color: #ff5722; /* Màu đỏ cam khi hover */
+            }
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            z-index: 1;
+        }
+.dropdown button {
+                display: block;
+                padding: 10px;
+                width: 100%;
+                text-align: left;
+                border: none;
+                background: none;
+                cursor: pointer;
+            }
+
+                .dropdown button:hover {
+                    background-color: #f1f1f1;
+                }
+                
+        .icon-container1 {
+            position: relative;
+        }
+
+        .eye-icon1 {
+            cursor: pointer;
+            color: #000; /* Màu của biểu tượng con mắt */
+        }
+
+        .action-icons1{
+            display: none; /* Ẩn các biểu tượng hành động */
+            margin-top: 5px;
+        }
+
+            .action-icons1 a {
+                margin-right: 5px; /* Khoảng cách giữa các biểu tượng */
+                color: #000; /* Màu của các biểu tượng hành động */
+                text-decoration: none; /* Hủy bỏ gạch chân */
+            }
+
+                .action-icons1 a:hover {
+                    color: #007bff; /* Thay đổi màu khi di chuột vào */
+                }
+        .pagination {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .pagination button, .pagination select {
+                margin: 0 5px;
+                padding: 10px 15px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                background-color: #fff;
+                cursor: pointer;
+            }
+
+                .pagination button:hover {
+                    background-color: #007bff;
+                    color: white;
+                }
+    </style>
+    <script>
+        
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.eye-icon').on('click', function (e) {
+                e.preventDefault(); // Ngăn chặn hành động mặc định
+                $(this).siblings('.action-icons').toggle(); // Hiển thị hoặc ẩn các biểu tượng hành động
+            });
+        });
+    </script>
+</head>
+<body>
+
+    <div class="container">      
+        <div class="search-bar">
+            <input type="text" placeholder="Tìm phiếu giảm giá theo mã học viên...">
+            
+            <a asp-action="Create" class="btn">
+                <i class="fa fa-plus"></i> Thêm mới
+            </a>
+        </div>
+
+        <div class="filter">
+            <div class="date-input">
+                <input type="date" placeholder="Từ ngày">
+            </div>
+            <div class="date-input">
+                <input type="date" placeholder="Đến ngày">
+            </div>
+            <div class="input-group me-2">
+                <select class="form-select" name="type">
+                    <option value="">Chọn kiểu</option>
+
+                    @if (ViewData["CurrentType"]?.ToString() == "Công khai")
+                    {
+                        <option value="Công khai" selected>Công khai</option>
+                    }
+                    else
+                    {
+                        <option value="Công khai">Công khai</option>
+                    }
+
+                    @if (ViewData["CurrentType"]?.ToString() == "Cá nhân")
+                    {
+                        <option value="Cá nhân" selected>Cá nhân</option>
+                    }
+                    else
+                    {
+                        <option value="Cá nhân">Cá nhân</option>
+                    }
+                </select>
+
+            </div>
+            <select>
+                <option value="">Loại</option>
+                <option value="giam_gia">Giảm giá</option>
+                <option value="khuyen_mai">Khuyến mãi</option>
+            </select>
+            
+            <div class="input-group me-2">
+                        <select class="form-select" name="status">
+                            <option value="">Chọn trạng thái</option>
+
+                            @if (ViewData["CurrentStatus"]?.ToString() == "true")
+                            {
+                                <option value="true" selected>Active</option>
+                            }
+                            else
+                            {
+                                <option value="true">Active</option>
+                            }
+
+                            @if (ViewData["CurrentStatus"]?.ToString() == "false")
+                            {
+                                <option value="false" selected>Inactive</option>
+                            }
+                            else
+                            {
+                                <option value="false">Inactive</option>
+                            }
+                        </select>
+                    </div>
+            <!-- Xuất Excel -->
+            <form asp-action="ExportExcel" method="get" class="d-inline">
+                <button type="submit" class="btn btn-outline-success">
+                    <i class="fas fa-file-excel"></i>
+                </button>
+            </form>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Mã</th>
+                    <th>Tên</th>
+                    <th>Kiểu</th>
+                    
+                    <th>Số lượng</th>
+                    <th>Ngày bắt đầu</th>
+                    <th>Ngày kết thúc</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int stt = 1; // Khởi tạo biến STT
+                }
+                @foreach (var item in Model)
+                {
+                   
+                    <tr>
+                        <td>
+                            @stt <!-- Hiển thị số thứ tự và tăng biến STT -->
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ma)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ten_phieu_giam_gia)
+                        </td>
+                        <td>
+                            @if (item.kieu_giam_gia == 1)
+                            {
+                                @:Công khai
+                            }
+                            else if (item.kieu_giam_gia == 0)
+                            {
+                                @:Cá nhân
+                            }
+                        </td>
+                                               
+                        <td>
+                            @Html.DisplayFor(modelItem => item.so_luong)
+                        </td>
+                       
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ngay_bat_dau)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ngay_ket_thuc)
+                        </td>
+                        <td>
+                            @if (item.trang_thai == 1)
+                            {
+                                @:Còn hiệu lực
+                            }
+                            else
+                            {
+                                @:Hết hạn
+                            }
+                        </td>
+
+
+                        <td>
+                            <i class="fas fa-eye" title="Xem chi tiết"></i>
+                            
+                        
+                        </td>
+                        
+                    </tr>
+                    stt++; // Tăng biến STT sau mỗi lần lặp
+                }
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            <div>
+                <label for="itemsPerPage">Hiển thị:</label>
+                <select id="itemsPerPage">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                </select>
+                <span>sản phẩm trên trang</span>
+            </div>
+            <div>
+                <button>&laquo; Trước</button>
+                <button>1</button>
+                <button>2</button>
+                <button>3</button>
+                <button>Tiếp &raquo;</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
+
+
