@@ -12,79 +12,97 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thống kê doanh thu</title>
     <style>
+
+
+        .filter-buttons .btn {
+        margin-right: 5px;
+        }
+
+        .active-filter {
+        background-color: #ff6600;
+        color: white;
+        }
+
+        .table thead {
+        background-color: #ff6600;
+        color: white;
+        text-align: center;
+        }
+
+
         .card-body p {
-            color: black !important; /* Màu đen để dễ nhìn hơn */
-            font-weight: bold; /* Làm đậm chữ */
-            font-size: 16px; /* Tăng kích thước chữ để rõ ràng hơn */
+        color: black !important; 
+        font-weight: bold; /* Làm đậm chữ */
+        font-size: 16px; /* Tăng kích thước chữ để rõ ràng hơn */
         }
 
         .card-header {
-            color: white; /* Màu trắng giúp nổi bật trên nền màu */
-            font-weight: bold;
-            font-size: 20px;
+        color: white; /* Màu trắng giúp nổi bật trên nền màu */
+        font-weight: bold;
+        font-size: 20px;
         }
 
         .card-body {
-            color: #f8f9fa; /* Màu chữ xám nhạt giúp dễ nhìn hơn */
-            font-size: 18px;
+        color: #f8f9fa; /* Màu chữ xám nhạt giúp dễ nhìn hơn */
+        font-size: 18px;
         }
 
-            .card-body span {
-                font-weight: bold;
-            }
+        .card-body span {
+        font-weight: bold;
+        }
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            padding: 20px;
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        padding: 20px;
         }
 
         .container {
-            max-width: 1200px;
-            margin: auto;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: space-between;
+        max-width: 1200px;
+        margin: auto;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: space-between;
         }
 
         .card {
-            width: 48%; /* Cân chỉnh lại width để đảm bảo đúng layout */
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            position: relative;
+        width: 48%; 
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        position: relative;
         }
 
-            .card h3 {
-                margin: 10px 0;
-                font-size: 18px;
-            }
+        .card h3 {
+        margin: 10px 0;
+        font-size: 18px;
+        }
 
-            .card .amount {
-                font-size: 24px;
-                font-weight: bold;
-            }
+        .card .amount {
+        font-size: 24px;
+        font-weight: bold;
+        }
 
         .blue {
-            background-color: #007bff;
-            color: white;
+        background-color: #007bff;
+        color: white;
         }
 
         .green {
-            background-color: #009688;
-            color: white;
+        background-color: #009688;
+        color: white;
         }
 
         .orange {
-            background-color: #ff9800;
-            color: white;
+        background-color: #ff9800;
+        color: white;
         }
 
         .darkblue {
-            background-color: #3f51b5;
-            color: white;
+        background-color: #3f51b5;
+        color: white;
         }
     </style>
 </head>
@@ -98,11 +116,11 @@
 
 
 
-            var endOfWeek = startOfWeek.AddDays(6); 
+            var endOfWeek = startOfWeek.AddDays(6);
 
 
-            var startOfMonth = new DateTime(today.Year, today.Month, 1); 
-            var startOfYear = new DateTime(today.Year, 1, 1); 
+            var startOfMonth = new DateTime(today.Year, today.Month, 1);
+            var startOfYear = new DateTime(today.Year, 1, 1);
             var doanhThuDate = item.DoanhThu.Date;
             string cardColor = doanhThuDate == today ? "green" :
             (doanhThuDate >= startOfWeek && doanhThuDate <= endOfWeek) ? "orange" :
@@ -128,11 +146,86 @@
                         <span>Năm nay</span>
                     }
                 </div>
+
+
+
                 <h4 class="amount">@item.TongTien.ToString("N0") đ</h4>
                 <p style="color: black; font-weight: bold;">Đơn thành công: @item.DonThanhCong</p>
                 <p style="color: black; font-weight: bold;">Đơn hủy: @item.DonHuy</p>
             </div>
         }
+
+
+        <div class="container mt-4">
+            <h5>Bộ lọc</h5>
+            <div class="filter-buttons mb-3">
+                <button class="btn btn-outline-dark" id="today">NGÀY</button>
+                <button class="btn btn-outline-dark"id="weeks">TUẦN</button>
+                <button class="btn btn-outline-dark" id="month">THÁNG</button>
+                <button class="btn btn-outline-dark" id="years">NĂM</button>
+
+                <input type="date" class="form-control d-inline-block w-auto" placeholder="Từ ngày">
+            </div>
+
+
+            <table class="table table-bordered">
+
+                <thead>
+
+                    <tr>
+                        <th>Ảnh</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Giá tiền</th>
+                        <th>Kích cỡ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+              @*     @foreach(var item in Model )
+                              {
+                        <tr>
+                            <td>@item.San_Pham_Chi_Tiet.ma</td>
+                            <td>@item.San_Pham_Chi_Tiet.so_luong</td>
+                            <td>@item.San_Pham_Chi_Tiet.gia</td>
+                            <td>@item.San_Pham_Chi_Tiet.Kich_ThuocID</td>
+                        </tr>
+                    } *@
+
+               
+                  
+
+
+                </tbody>
+            </table>
+        </div>
+@*         
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+       
+        <title>Biểu đồ trạng thái</title>
+            <canvas id="statusChart" width="100" height="100"></canvas>
+            <script>
+                var ctx = document.getElementById('statusChart').getContext('2d');
+                var statusChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                    labels: ['Chờ Xử lý', 'Đã xác nhận', 'Đang giao hàng', 'Hoàn thành', 'Đã hủy'],
+                        datasets: [{
+                      data: [7.14, 14.29, 14.29, 42.86, 14.29],
+            backgroundColor: ['#9E9E9E', '#FF5722', '#FF9800','#4CAF50 ', '#D32F2F' ],
+             }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            </script> *@
+         
     </div>
 </body>
 </html>
