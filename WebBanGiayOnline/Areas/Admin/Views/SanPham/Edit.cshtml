@@ -1,12 +1,18 @@
 ﻿@model ClssLib.San_Pham
 
-<form asp-action="Edit" method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input type="hidden" id="lstSPCT" name="lstSPCT" />
+<div class="card card-primary">
+    <div class="card-header">
+        <h3 class="card-title">Thêm Sản Phẩm</h3>
+    </div>
+    <div class="card-body">
 
-    <div class="form-group mb-3">
-        <label for="ten_san_pham" class="control-label">Tên Sản Phẩm</label>
-        <select id="ten_san_pham" name="ten_san_pham" class="form-control select2" >
+    <form asp-action="Edit" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" id="lstSPCT" name="lstSPCT" />
+
+        <div class="form-group mb-3">
+            <label for="ten_san_pham" class="control-label">Tên Sản Phẩm</label>
+            <select id="ten_san_pham" name="ten_san_pham" class="form-control select2" >
             <option value="">-- Nhập hoặc chọn tên sản phẩm --</option>
             @foreach (var item in ViewBag.TenGiay as List<string>)
             {
@@ -19,64 +25,100 @@
                     <option value="@item">@item</option>
                 }
             }
-        </select>
-        <span id="ten_san_pham_warning" class="text-danger" style="display: none;">⚠️ Tên sản phẩm đã tồn tại!</span>
-    </div>
+            </select>
+            <span id="ten_san_pham_warning" class="text-danger" style="display: none;">⚠️ Tên sản phẩm đã tồn tại!</span>
+        </div>
 
 
-    <div class="form-group mb-3">
-        <label asp-for="Loai_GiayID" class="control-label"></label>
-        <select id="Loai_GiayID" name="Loai_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddLoaiGiay" asp-items="ViewBag.Loai_GiayID"></select>
-    </div>
+        <div class="form-group mb-3">
+            <label asp-for="Loai_GiayID" class="control-label"></label>
+            <select id="Loai_GiayID" name="Loai_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddLoaiGiay" asp-items="ViewBag.Loai_GiayID"></select>
+        </div>
 
-    <div class="mb-3 row">
-        <div class="form-group col-md-4">
+        <div class="mb-3 row">
+            <div class="form-group col-md-4">
             <label asp-for="Chat_LieuID" class="control-label"></label>
             <select id="Chat_LieuID" name="Chat_LieuID" class="form-control select2" asp-items="ViewBag.Chat_LieuID" data-api="/Admin/SanPham/AddChatLieu"></select>
-        </div>
-        <div class="form-group col-md-4">
+            </div>
+            <div class="form-group col-md-4">
             <label asp-for="Co_GiayID" class="control-label"></label>
 
             <select id="Co_GiayID" name="Co_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddCoGiay" asp-items="ViewBag.Co_GiayID"></select>
-        </div>
-        <div class="form-group col-md-4">
+            </div>
+            <div class="form-group col-md-4">
             <label asp-for="Danh_MucID" class="control-label"></label>
 
 
             <select id="Danh_MucID" name="Danh_MucID" class="form-control select2" data-api="/Admin/SanPham/AddDanhMuc" asp-items="ViewBag.Danh_MucID"></select>
+            </div>
         </div>
-    </div>
-    <div class="mb-3 row">
+        <div class="mb-3 row">
 
-        <div class="form-group col-md-4">
+            <div class="form-group col-md-4">
             <label asp-for="De_GiayID" class="control-label"></label>
 
             <select id="De_GiayID" name="De_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddDeGiay" asp-items="ViewBag.De_GiayID"></select>
-        </div>
-        <div class="form-group col-md-4">
+            </div>
+            <div class="form-group col-md-4">
             <label asp-for="Mui_GiayID" class="control-label"></label>
 
             <select id="Mui_GiayID" name="Mui_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddMuiGiay" asp-items="ViewBag.Mui_GiayID"></select>
-        </div>
-        <div class="form-group col-md-4">
+            </div>
+            <div class="form-group col-md-4">
             <label asp-for="Kieu_DangID" class="control-label"></label>
 
             <select id="Kieu_DangID" name="Kieu_DangID" class="form-control select2" data-api="/Admin/SanPham/AddKieuDang" asp-items="ViewBag.Kieu_DangID"></select>
+            </div>
+
         </div>
 
-    </div>
-
-    <div class="form-group mb-3">
+        <div class="form-group mb-3">
         <label asp-for="mo_ta" class="control-label">Mô Tả Sản Phẩm</label>
         <textarea asp-for="mo_ta" class="form-control"></textarea>
         <span asp-validation-for="mo_ta" class="text-danger"></span>
-    </div>
+        </div>
 
-    <div class="form-group">
+        <div class="form-group">
         <input type="submit" value="Save" id="saveProduct1" class="btn btn-primary" />
-    </div>
-</form>
+        </div>
+    </form>
 
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div id="productTables" class="card">
+            <div class="card-header" id="table-${color}">
+                <h3 class="card-title">
+                    Sản phẩm Chi Tiết</h4>
+                    <div class="card-tools">
+                    </div>
+            </div>
+            <div class="card-body table-responsive p-0" id="table-SPCT">
+                <table class="table table-hover text-nowrap">
+                    <thead>
+                        <tr>
+                            <th>Tên Sản Phẩm</th>
+                            <th>Màu Sắc</th>
+                            <th>Kích Cỡ</th>
+                            <th>Số Lượng</th>
+                            <th>Giá</th>
+                            <th>Trạng Thái</th>
+                            <th class="d-none">ID</th> <!-- Ô ẩn cho ID -->
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+               
+            </div>
+        </div>
+    </div>
+</div>
+
+@* 
 <div class="mt-4" id="table-SPCT">
     <h4>Sản phẩm Chi Tiết</h4>
     <table class="table table-bordered">
@@ -94,7 +136,7 @@
             
         </tbody>
     </table>
-</div>
+</div> *@
 <input type="hidden" id="lstSPCTData" value='@Html.Raw(ViewData["lstSPCT"] as string)' />
 
 
