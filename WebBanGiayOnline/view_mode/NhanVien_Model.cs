@@ -6,22 +6,17 @@ namespace WebBanGiay.view_mode
     public class NhanVien_Model
     {
         public Guid Id { get; set; }
+        public DateTime? ngay_sua { get; set; }
 
-        public string ? ma { get; set; }
-
+        public string? ma { get; set; }
         [Required(ErrorMessage = "Username không được để trống")]
         [StringLength(50, MinimumLength = 5, ErrorMessage = "Username phải có từ 5 đến 50 ký tự")]
         [RegularExpression("^[a-zA-Z0-9_]+$", ErrorMessage = "Username chỉ được chứa chữ cái, số và dấu gạch dưới (_)")]
         public string user_name { get; set; }
-     
-
-        [Required(ErrorMessage = "Vui lòng nhập địa chỉ chi tiết")]
 
         public string dia_chi_chi_tiet { get; set; }
 
-        ///
-
-        public string ? pass_word { get; set; }
+        public string? pass_word { get; set; }
 
         [Required(ErrorMessage = "Họ và tên không được để trống")]
         [StringLength(100, ErrorMessage = "Họ và tên tối đa 100 ký tự")]
@@ -62,6 +57,9 @@ namespace WebBanGiay.view_mode
 
         public string? hinh_anh { get; set; }
 
+        public DateTime ngay_tao { get; set; }
+
+
         public string fulldiachi
         {
             get
@@ -87,8 +85,8 @@ namespace WebBanGiay.view_mode
             }
         }
 
-        public DateTime ngay_tao { get; set; }
-        public DateTime? ngay_sua { get; set; }
+        //public DateTime ngay_tao { get; set; }
+        //public DateTime? ngay_sua { get; set; }
         public Guid Vai_TroID { get; set; }
 
         // Hàm kiểm tra ngày sinh

@@ -1,257 +1,4 @@
-﻿
-@* @model WebBanGiay.view_mode.NhanVien_Model *@
-
-@* <div class="container mt-4"> *@
-@*     <h4 class="mb-3">Thông Tin Nhân Viên</h4> *@
-@*     <!-- Form bao gồm cả ảnh upload và các trường nhập liệu --> *@
-@*     <form asp-action="Create" asp-controller="NhanVien" method="post" id="addEmployeeForm" enctype="multipart/form-data"> *@
-@*         <div class="row"> *@
-@*             <!-- Cột trái: Ảnh đại diện --> *@
-@*             <div class="col-md-3 text-center"> *@
-@*                 <div class="image-upload"> *@
-@*                     <label for="file-input" style="cursor: pointer;"> *@
-@*                         <!-- Input file ẩn, khi click vào ảnh sẽ mở file chooser --> *@
-@*                         <input id="file-input" type="file" name="HinhAnh" accept="image/*" onchange="previewImage(event)" hidden /> *@
-@*                         <!-- Ảnh preview: hình vuông, bo góc 10px --> *@
-@*                         <img id="preview" *@
-@*                              src="~/images/nhanvien/default-avatar.jpg" *@
-@*                              alt="Chọn ảnh" *@
-@*                              style="width: 200px; height: 200px; object-fit: cover; border-radius: 10px;" /> *@
-@*                     </label> *@
-@*                 </div> *@
-@*             </div> *@
-
-@*             <!-- Cột phải: Các trường nhập liệu --> *@
-@*             <div class="col-md-9"> *@
-@*                 <!-- Row 1: Tên nhân viên - Username --> *@
-@*                 <div class="row"> *@
-@*                     <div class="col-md-6 mb-3"> *@
-@*                         <label>* Tên nhân viên</label> *@
-@*                         <input type="text" class="form-control" asp-for="ho_ten" placeholder="Nhập tên nhân viên" /> *@
-@*                         <span asp-validation-for="ho_ten" class="text-danger"></span> *@
-@*                     </div> *@
-@*                     <div class="col-md-6 mb-3"> *@
-@*                         <label>* Username</label> *@
-@*                         <input type="text" class="form-control" asp-for="user_name" placeholder="Nhập username" /> *@
-@*                         <span asp-validation-for="user_name" class="text-danger"></span> *@
-@*                     </div> *@
-@*                 </div> *@
-
-@*                 <!-- Row 2: Số CCCD - Ngày sinh --> *@
-@*                 <div class="row"> *@
-@*                     <div class="col-md-6 mb-3"> *@
-@*                         <label>* Số CCCD</label> *@
-@*                         <input type="text" class="form-control" asp-for="cccd" placeholder="Nhập số CCCD" /> *@
-@*                         <span asp-validation-for="cccd" class="text-danger"></span> *@
-@*                     </div> *@
-@*                     <div class="col-md-6 mb-3"> *@
-@*                         <label>* Ngày sinh</label> *@
-@*                         <input type="date" class="form-control" asp-for="ngay_sinh" /> *@
-@*                         <span asp-validation-for="ngay_sinh" class="text-danger"></span> *@
-@*                     </div> *@
-@*                 </div> *@
-
-@*                 <!-- Row 3: Email - Số điện thoại --> *@
-@*                 <div class="row"> *@
-@*                     <div class="col-md-6 mb-3"> *@
-@*                         <label>* Email</label> *@
-@*                         <input type="email" class="form-control" asp-for="email" placeholder="Nhập email" /> *@
-                        
-@*                         <span asp-validation-for="email" class="text-danger"></span> *@
-@*                     </div> *@
-@*                     <div class="col-md-6 mb-3"> *@
-@*                         <label>* Số điện thoại</label> *@
-@*                         <input type="text" class="form-control" asp-for="sdt" placeholder="Nhập số điện thoại" /> *@
-@*                         <span asp-validation-for="sdt" class="text-danger"></span> *@
-@*                     </div> *@
-@*                 </div> *@
-
-@*                 <!-- Row 4: Tỉnh/Thành phố - Quận/Huyện - Xã/Phường --> *@
-@*                 <div class="row"> *@
-@*                     <div class="col-md-4 mb-3"> *@
-@*                         <label>* Tỉnh/Thành phố</label> *@
-@*                         <select class="form-control" id="tinh" name="tinh"> *@
-@*                             <option value="">Chọn tỉnh/thành phố</option> *@
-@*                         </select> *@
-@*                         <span asp-validation-for="tinh" class="text-danger"></span> *@
-@*                     </div> *@
-@*                     <div class="col-md-4 mb-3"> *@
-@*                         <label>* Quận/Huyện</label> *@
-@*                         <select class="form-control" id="huyen" name="huyen"> *@
-@*                             <option value="">Chọn quận/huyện</option> *@
-@*                         </select> *@
-@*                         <span asp-validation-for="huyen" class="text-danger"></span> *@
-@*                     </div> *@
-@*                     <div class="col-md-4 mb-3"> *@
-@*                         <label>* Xã/Phường</label> *@
-@*                         <select class="form-control" id="xa" name="xa"> *@
-@*                             <option value="">Chọn xã/phường</option> *@
-@*                         </select> *@
-@*                         <span asp-validation-for="xa" class="text-danger"></span> *@
-@*                     </div> *@
-@*                 </div> *@
-
-@*                 <!-- Row 5: Giới tính --> *@
-@*                 <div class="row"> *@
-@*                     <div class="col-md-6 mb-3"> *@
-@*                         <label>* Giới tính</label> *@
-@*                         <div class="d-flex align-items-center"> *@
-@*                             <div class="form-check me-3"> *@
-@*                                 <input class="form-check-input" type="radio" id="Male" asp-for="gioi_tinh" value="1" /> *@
-@*                                 <label class="form-check-label" for="Male">Nam</label> *@
-@*                             </div> *@
-@*                             <div class="form-check"> *@
-@*                                 <input class="form-check-input" type="radio" id="Female" asp-for="gioi_tinh" value="0" /> *@
-@*                                 <label class="form-check-label" for="Female">Nữ</label> *@
-@*                             </div> *@
-@*                         </div> *@
-@*                         <span asp-validation-for="gioi_tinh" class="text-danger"></span> *@
-@*                     </div> *@
-@*                     <div class="col-md-6 mb-3"> *@
-@*                         <label>* Địa chỉ chi tiết</label> *@
-@*                         <input type="text" class="form-control" asp-for="dia_chi_chi_tiet" placeholder="Nhập địa chỉ chi tiết (số nhà, đường phố,...)" /> *@
-@*                         <span asp-validation-for="dia_chi_chi_tiet" class="text-danger"></span> *@
-
-
-@*                     </div> *@
-@*                 </div> *@
-
-@*                 <!-- Nút Thêm Mới --> *@
-@*                 <button type="submit" class="btn btn-primary  mt-3" id="saveProduct">Thêm Mới</button> *@
-@*             </div> *@
-@*         </div> *@
-@*     </form> *@
-@* </div> *@
-
-@*     @section Scripts { *@
-@*         @{ *@
-@*             await Html.RenderPartialAsync("_ValidationScriptsPartial"); *@
-@*         } *@
-@*         <link rel="stylesheet" href="/assets/css/nhanvien.css"> *@
-@*         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"> *@
-@*         <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script> *@
-@*         <script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@3.2.11/dist/jquery.validate.unobtrusive.min.js"></script> *@
-@*         <!-- Thư viện jQuery --> *@
-@*         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script> *@
-@*         <!-- Thư viện SweetAlert2 --> *@
-@*         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> *@
-
-@*         <!-- 1. Xác nhận trước khi submit form --> *@
-@*         <script type="text/javascript"> *@
-@*         $(document).ready(function(){ *@
-@*             $("#addEmployeeForm").on("submit", function(event) { *@
-@*                 event.preventDefault(); *@
-@*                 Swal.fire({ *@
-@*                     title: "Xác nhận", *@
-@*                     text: "Bạn có chắc chắn muốn thêm nhân viên này?", *@
-@*                     icon: "warning", *@
-@*                     showCancelButton: true, *@
-@*                     confirmButtonColor: "#3085d6", *@
-@*                     cancelButtonColor: "#d33", *@
-@*                     confirmButtonText: "Có, thêm nhân viên!", *@
-@*                     cancelButtonText: "Hủy" *@
-@*                 }).then(function(result) { *@
-@*                     if (result.isConfirmed) { *@
-@*                         event.target.submit(); *@
-@*                     } *@
-@*                 }); *@
-@*             }); *@
-@*         }); *@
-
-@*         </script> *@
-
-@*         <!-- 2. Xử lý load danh sách tỉnh/huyện/xã và preview ảnh --> *@
-@*         <script type="text/javascript"> *@
-@*             $(document).ready(function () { *@
-@*                 // Load danh sách tỉnh *@
-@*                 $.ajax({ *@
-@*                     url: "https://provinces.open-api.vn/api/p/", *@
-@*                     method: "GET", *@
-@*                     success: function (data) { *@
-@*                         data.forEach(function (province) { *@
-@*                             $("#tinh").append('<option value="' + province.name + '">' + province.name + '</option>'); *@
-@*                         }); *@
-@*                     } *@
-@*                 }); *@
-
-@*                 // Khi chọn tỉnh -> Load danh sách huyện *@
-@*                 $("#tinh").change(function () { *@
-@*                     var provinceName = $(this).val(); *@
-@*                     $("#huyen").empty().append('<option value="">Chọn huyện</option>'); *@
-@*                     $("#xa").empty().append('<option value="">Chọn xã</option>'); *@
-
-@*                     if (provinceName) { *@
-@*                         $.ajax({ *@
-@*                             url: "https://provinces.open-api.vn/api/p/", *@
-@*                             method: "GET", *@
-@*                             success: function (data) { *@
-@*                                 var province = data.find(function(p) { return p.name === provinceName; }); *@
-@*                                 if (province) { *@
-@*                                     $.ajax({ *@
-@*                                         url: "https://provinces.open-api.vn/api/p/" + province.code + "?depth=2", *@
-@*                                         method: "GET", *@
-@*                                         success: function (districtData) { *@
-@*                                             districtData.districts.forEach(function (district) { *@
-@*                                                 $("#huyen").append('<option value="' + district.name + '">' + district.name + '</option>'); *@
-@*                                             }); *@
-@*                                         } *@
-@*                                     }); *@
-@*                                 } *@
-@*                             } *@
-@*                         }); *@
-@*                     } *@
-@*                 }); *@
-
-@*                 // Khi chọn huyện -> Load danh sách xã *@
-@*                 $("#huyen").change(function () { *@
-@*                     var districtName = $(this).val(); *@
-@*                     $("#xa").empty().append('<option value="">Chọn xã</option>'); *@
-
-@*                     if (districtName) { *@
-@*                         $.ajax({ *@
-@*                             url: "https://provinces.open-api.vn/api/d/", *@
-@*                             method: "GET", *@
-@*                             success: function (data) { *@
-@*                                 var district = data.find(function(d) { return d.name === districtName; }); *@
-@*                                 if (district) { *@
-@*                                     $.ajax({ *@
-@*                                         url: "https://provinces.open-api.vn/api/d/" + district.code + "?depth=2", *@
-@*                                         method: "GET", *@
-@*                                         success: function (wardData) { *@
-@*                                             wardData.wards.forEach(function (ward) { *@
-@*                                                 $("#xa").append('<option value="' + ward.name + '">' + ward.name + '</option>'); *@
-@*                                             }); *@
-@*                                         } *@
-@*                                     }); *@
-@*                                 } *@
-@*                             } *@
-@*                         }); *@
-@*                     } *@
-@*                 }); *@
-@*             }); *@
-
-@*             function previewImage(event) { *@
-@*                 var reader = new FileReader(); *@
-@*                 reader.onload = function() { *@
-@*                     var output = document.getElementById('preview'); *@
-@*                     output.src = reader.result; *@
-@*                 }; *@
-@*                 reader.readAsDataURL(event.target.files[0]); *@
-@*             } *@
-@*         </script> *@
-
-@*         <!-- 3. Validate form trước khi submit --> *@
-
-@*     } *@
-
-
-
-
-
-@*     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> *@
-
-@using WebBanGiay.view_mode
-@model WebBanGiay.view_mode.NhanVien_Model
+﻿@model WebBanGiay.view_mode.NhanVien_Model
 
 <div class="container mt-4">
     <h4 class="mb-3">Thông Tin Nhân Viên</h4>
@@ -262,7 +9,9 @@
             <div class="col-md-3 text-center">
                 <div class="image-upload">
                     <label for="file-input" style="cursor: pointer;">
+                        <!-- Input file ẩn, khi click vào ảnh sẽ mở file chooser -->
                         <input id="file-input" type="file" name="HinhAnh" accept="image/*" onchange="previewImage(event)" hidden />
+                        <!-- Ảnh preview: hình vuông, bo góc 10px -->
                         <img id="preview"
                              src="~/images/nhanvien/default-avatar.jpg"
                              alt="Chọn ảnh"
@@ -273,20 +22,11 @@
 
             <!-- Cột phải: Các trường nhập liệu -->
             <div class="col-md-9">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label>Upload ảnh CCCD</label>
-                        <input type="file" id="cccdImage" name="cccdImage" class="form-control" />
-                    </div>
-                    <div class="col-md-6 d-flex align-items-end">
-                        <button type="button" id="btnScanCccd" class="btn btn-primary">Quét CCCD</button>
-                    </div>
-                </div>
                 <!-- Row 1: Tên nhân viên - Username -->
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label>* Tên nhân viên</label>
-                        <input type="text" id="hoTen" class="form-control" asp-for="ho_ten" placeholder="Nhập tên nhân viên" />
+                        <input type="text" class="form-control" asp-for="ho_ten" placeholder="Nhập tên nhân viên" />
                         <span asp-validation-for="ho_ten" class="text-danger"></span>
                     </div>
                     <div class="col-md-6 mb-3">
@@ -300,29 +40,27 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label>* Số CCCD</label>
-                        <input type="text" id="cccd" class="form-control" asp-for="cccd" placeholder="Nhập số CCCD" />
+                        <input type="text" class="form-control" asp-for="cccd" placeholder="Nhập số CCCD" />
                         <span asp-validation-for="cccd" class="text-danger"></span>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label>* Ngày sinh</label>
-                        <input type="date" id="ngaySinh" class="form-control" asp-for="ngay_sinh" />
+                        <input type="date" class="form-control" asp-for="ngay_sinh" />
                         <span asp-validation-for="ngay_sinh" class="text-danger"></span>
                     </div>
                 </div>
-
-                <!-- Thêm phần upload ảnh CCCD và nút Quét CCCD -->
-                
 
                 <!-- Row 3: Email - Số điện thoại -->
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label>* Email</label>
                         <input type="email" class="form-control" asp-for="email" placeholder="Nhập email" />
+
                         <span asp-validation-for="email" class="text-danger"></span>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label>* Số điện thoại</label>
-                        <input id="sdt" type="text" class="form-control" asp-for="sdt" placeholder="Nhập số điện thoại" />
+                        <input type="text" class="form-control" asp-for="sdt" placeholder="Nhập số điện thoại" />
                         <span asp-validation-for="sdt" class="text-danger"></span>
                     </div>
                 </div>
@@ -352,7 +90,7 @@
                     </div>
                 </div>
 
-                <!-- Row 5: Giới tính & Địa chỉ chi tiết -->
+                <!-- Row 5: Giới tính -->
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label>* Giới tính</label>
@@ -372,28 +110,32 @@
                         <label>* Địa chỉ chi tiết</label>
                         <input type="text" class="form-control" asp-for="dia_chi_chi_tiet" placeholder="Nhập địa chỉ chi tiết (số nhà, đường phố,...)" />
                         <span asp-validation-for="dia_chi_chi_tiet" class="text-danger"></span>
+
+
                     </div>
                 </div>
 
                 <!-- Nút Thêm Mới -->
-                <button type="submit" class="btn btn-primary mt-3" id="saveProduct">Thêm Mới</button>
+                <button type="submit" class="btn btn-primary  mt-3" id="saveProduct">Thêm Mới</button>
             </div>
         </div>
     </form>
 </div>
 
 @section Scripts {
-  @{ 
-             await Html.RenderPartialAsync("_ValidationScriptsPartial"); 
-         } 
-    <link rel="stylesheet" href="/assets/css/nhanvien.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <link rel="stylesheet" href="/assets/css/nhanvien.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@3.2.11/dist/jquery.validate.unobtrusive.min.js"></script>
+    <!-- Thư viện jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- Thư viện SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Script xác nhận trước khi submit form -->
+    <!-- 1. Xác nhận trước khi submit form -->
     <script type="text/javascript">
         $(document).ready(function () {
             $("#addEmployeeForm").on("submit", function (event) {
@@ -414,9 +156,10 @@
                 });
             });
         });
+
     </script>
 
-    <!-- Script load danh sách tỉnh/huyện/xã và preview ảnh -->
+    <!-- 2. Xử lý load danh sách tỉnh/huyện/xã và preview ảnh -->
     <script type="text/javascript">
         $(document).ready(function () {
             // Load danh sách tỉnh
@@ -435,6 +178,7 @@
                 var provinceName = $(this).val();
                 $("#huyen").empty().append('<option value="">Chọn huyện</option>');
                 $("#xa").empty().append('<option value="">Chọn xã</option>');
+
                 if (provinceName) {
                     $.ajax({
                         url: "https://provinces.open-api.vn/api/p/",
@@ -461,6 +205,7 @@
             $("#huyen").change(function () {
                 var districtName = $(this).val();
                 $("#xa").empty().append('<option value="">Chọn xã</option>');
+
                 if (districtName) {
                     $.ajax({
                         url: "https://provinces.open-api.vn/api/d/",
@@ -482,61 +227,24 @@
                     });
                 }
             });
-
-            function previewImage(event) {
-                var reader = new FileReader();
-                reader.onload = function () {
-                    var output = document.getElementById('preview');
-                    output.src = reader.result;
-                };
-                reader.readAsDataURL(event.target.files[0]);
-            }
         });
+
+        function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function () {
+                var output = document.getElementById('preview');
+                output.src = reader.result;
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
     </script>
 
-    <!-- Script xử lý quét CCCD -->
-    <script>
-        $(document).ready(function () {
-            $("#btnScanCccd").click(function () {
-                var formData = new FormData();
-                var fileInput = $("#cccdImage")[0];
-                if (fileInput.files.length == 0) {
-                    alert("Vui lòng chọn file CCCD!");
-                    return;
-                }
-                formData.append("cccdImage", fileInput.files[0]);
-                $.ajax({
-                    url: "/Admin/NhanVien/ScanCccd",
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (data) {
-                        console.log(data);
-                        if (data.success) {
-                            if (data.fullName) {
-                                $("#hoTen").val(data.fullName);
-                            }
-                            if (data.birthDate) {
-                                var dateObj = new Date(data.birthDate);
-                                var month = ("0" + (dateObj.getMonth() + 1)).slice(-2);
-                                var day = ("0" + dateObj.getDate()).slice(-2);
-                                var formattedDate = dateObj.getFullYear() + "-" + month + "-" + day;
-                                $("#ngaySinh").val(formattedDate);
-                            }
-                            if (data.cccdNumber) {
-                                $("#cccd").val(data.cccdNumber);
-                            }
-                        } else {
-                            alert("Quét CCCD thất bại!");
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        alert("Có lỗi xảy ra: " + error);
-                    }
-                });
-            });
-        });
-    </script>
+    <!-- 3. Validate form trước khi submit -->
 }
+
+
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+

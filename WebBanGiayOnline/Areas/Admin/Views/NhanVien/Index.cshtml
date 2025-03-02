@@ -1,8 +1,4 @@
-﻿
-
-
-
-@using WebBanGiay.view_mode
+﻿@using WebBanGiay.view_mode
 @model EmployeeListViewModel
 
 @{
@@ -118,9 +114,14 @@
                                 <td class="align-center">@item.fulldiachi</td>
 
                                 <td class="align-center">
-                                    <span id="status-text-@item.Id" class="badge @(item.trang_thai == 0 ? "bg-success" : "bg-danger")">
-                                        @(item.trang_thai == 0 ? "Hoạt động" : "Không hoạt động")
-                                    </span>
+                                    @if (item.trang_thai == 0)
+                                    {
+                                        <span class="badge bg-success">Hoạt động</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Không hoạt động</span>
+                                    }
                                 </td>
                                 <td class="align-center">
                                     <div class="btn-group btn-group-xs">
@@ -128,7 +129,7 @@
                                             <i class="fa fa-xs fa-pen"></i>
                                         </a>
                                         <button type="button" class="btn btn-sm btn-secondary"
-                                                onclick="changeStatus('@item.Id')">
+                                                onclick="changeStatus('@item.Id', '@(item.trang_thai == 0 ? 1 : 0)')">
                                             <i class="fa fa-sync"></i>
                                         </button>
                                     </div>
@@ -240,30 +241,30 @@
                     tableBody.empty();
                     data.forEach((item, index) => {
                         let row = `
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td>${item.ho_ten}</td>
-                                <td>${item.email}</td>
-                                <td>${item.sdt}</td>
-                                <td>${item.cccd}</td>
-                                <td>${item.gioi_tinh == 1 ? "Nam" : "Nữ"}</td>
-                                <td>${item.tinh}</td>
-                                <td>
-                                    <select class="form-select status-dropdown" data-id="${item.Id}" name="trang_thai">
-                                        <option value="0" ${item.trang_thai == 0 ? "selected" : ""}>Hoạt động</option>
-                                        <option value="1" ${item.trang_thai == 1 ? "selected" : ""}>Ngừng hoạt động</option>
-                                        <option value="2" ${item.trang_thai == 2 ? "selected" : ""}>Chờ duyệt</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <div class="btn-group btn-group-xs">
-                                        <a href="/Admin/NhanVien/Edit/${item.Id}" class="btn btn-warning">
-                                            <i class="fa fa-xs fa-pen"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
+                                    <tr>
+                                        <td>${index + 1}</td>
+                                        <td>${item.ho_ten}</td>
+                                        <td>${item.email}</td>
+                                        <td>${item.sdt}</td>
+                                        <td>${item.cccd}</td>
+                                        <td>${item.gioi_tinh == 1 ? "Nam" : "Nữ"}</td>
+                                        <td>${item.tinh}</td>
+                                        <td>
+                                            <select class="form-select status-dropdown" data-id="${item.Id}" name="trang_thai">
+                                                <option value="0" ${item.trang_thai == 0 ? "selected" : ""}>Hoạt động</option>
+                                                <option value="1" ${item.trang_thai == 1 ? "selected" : ""}>Ngừng hoạt động</option>
+                                                <option value="2" ${item.trang_thai == 2 ? "selected" : ""}>Chờ duyệt</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-xs">
+                                                <a href="/Admin/NhanVien/Edit/${item.Id}" class="btn btn-warning">
+                                                    <i class="fa fa-xs fa-pen"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `;
                         tableBody.append(row);
                     });
                 })
@@ -285,30 +286,30 @@
                     tableBody.empty();
                     data.forEach((item, index) => {
                         let row = `
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td>${item.ho_ten}</td>
-                                <td>${item.email}</td>
-                                <td>${item.sdt}</td>
-                                <td>${item.cccd}</td>
-                                <td>${item.gioi_tinh == 1 ? "Nam" : "Nữ"}</td>
-                                <td>${item.dia_chi}</td>
-                                <td>
-                                    <select class="form-select status-dropdown" data-id="${item.Id}" name="trang_thai">
-                                        <option value="0" ${item.trang_thai == 0 ? "selected" : ""}>Hoạt động</option>
-                                        <option value="1" ${item.trang_thai == 1 ? "selected" : ""}>Ngừng hoạt động</option>
-                                        <option value="2" ${item.trang_thai == 2 ? "selected" : ""}>Chờ duyệt</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <div class="btn-group btn-group-xs">
-                                        <a href="/Admin/NhanVien/Edit/${item.Id}" class="btn btn-warning">
-                                            <i class="fa fa-xs fa-pen"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
+                                    <tr>
+                                        <td>${index + 1}</td>
+                                        <td>${item.ho_ten}</td>
+                                        <td>${item.email}</td>
+                                        <td>${item.sdt}</td>
+                                        <td>${item.cccd}</td>
+                                        <td>${item.gioi_tinh == 1 ? "Nam" : "Nữ"}</td>
+                                        <td>${item.dia_chi}</td>
+                                        <td>
+                                            <select class="form-select status-dropdown" data-id="${item.Id}" name="trang_thai">
+                                                <option value="0" ${item.trang_thai == 0 ? "selected" : ""}>Hoạt động</option>
+                                                <option value="1" ${item.trang_thai == 1 ? "selected" : ""}>Ngừng hoạt động</option>
+                                                <option value="2" ${item.trang_thai == 2 ? "selected" : ""}>Chờ duyệt</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-xs">
+                                                <a href="/Admin/NhanVien/Edit/${item.Id}" class="btn btn-warning">
+                                                    <i class="fa fa-xs fa-pen"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `;
                         tableBody.append(row);
                     });
                 })
@@ -316,27 +317,20 @@
         });
 
         // 3. Đổi trạng thái (giữ nguyên logic AJAX)
-               function changeStatus(id) {
+        function changeStatus(id, newStatus) {
             $.ajax({
-                url: "/Admin/NhanVien/ChangeStatus",
                 type: "POST",
-                data: { id: id },
+                url: "/Admin/NhanVien/ChangeStatus",
+                data: { id: id, trang_thai: newStatus },
                 success: function (response) {
                     if (response.success) {
-                        var statusText = $("#status-text-" + id);
-
-                        // Cập nhật trạng thái mới
-                        if (response.newStatus == 0) {
-                            statusText.text("Hoạt động").removeClass("bg-danger").addClass("bg-success");
-                        } else {
-                            statusText.text("Không hoạt động").removeClass("bg-success").addClass("bg-danger");
-                        }
+                        location.reload();
                     } else {
-                        alert(response.message);
+                        alert("Lỗi: " + response.message);
                     }
                 },
                 error: function () {
-                    alert("Lỗi khi gửi yêu cầu!");
+                    alert("Đã xảy ra lỗi khi cập nhật trạng thái.");
                 }
             });
         }

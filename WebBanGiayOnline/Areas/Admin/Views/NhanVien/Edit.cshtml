@@ -29,12 +29,7 @@
 
                         <!-- Hiển thị thông tin cơ bản (nếu cần) -->
                         <h5 class="mt-3">@Model.ho_ten</h5>
-                        @* <div class="mb-3"> *@
-                        @*     <label class="form-label">Mã nhân viên</label> *@
-                        @*     <input type="text" class="form-control" asp-for="ma" readonly /> *@
-                        @*     @Html.HiddenFor(m => m.ma) *@
-                        @* </div> *@
-                        <p>Mã nhân viên  : @Model.ma</p>
+                        <p>Mã nhân viên: @Model.ma</p>
                         <p>Ngày tạo : @Model.ngay_tao</p>
                     </div>
 
@@ -173,73 +168,73 @@
 
         // Các script load tỉnh, huyện, xã (nếu cần) ...
 
-                        $(document).ready(function () {
-                    // Load danh sách tỉnh
+        $(document).ready(function () {
+            // Load danh sách tỉnh
+            $.ajax({
+                url: "https://provinces.open-api.vn/api/p/",
+                method: "GET",
+                success: function (data) {
+                    data.forEach(function (province) {
+                        $("#tinh").append('<option value="' + province.name + '">' + province.name + '</option>');
+                    });
+                }
+            });
+
+            // Khi chọn tỉnh -> Load danh sách huyện
+            $("#tinh").change(function () {
+                var provinceName = $(this).val();
+                $("#huyen").empty().append('<option value="">Chọn huyện</option>');
+                $("#xa").empty().append('<option value="">Chọn xã</option>');
+
+                if (provinceName) {
                     $.ajax({
                         url: "https://provinces.open-api.vn/api/p/",
                         method: "GET",
                         success: function (data) {
-                            data.forEach(function (province) {
-                                $("#tinh").append('<option value="' + province.name + '">' + province.name + '</option>');
-                            });
-                        }
-                    });
-
-                    // Khi chọn tỉnh -> Load danh sách huyện
-                    $("#tinh").change(function () {
-                        var provinceName = $(this).val();
-                        $("#huyen").empty().append('<option value="">Chọn huyện</option>');
-                        $("#xa").empty().append('<option value="">Chọn xã</option>');
-
-                        if (provinceName) {
-                            $.ajax({
-                                url: "https://provinces.open-api.vn/api/p/",
-                                method: "GET",
-                                success: function (data) {
-                                    var province = data.find(p => p.name === provinceName);
-                                    if (province) {
-                                        $.ajax({
-                                            url: "https://provinces.open-api.vn/api/p/" + province.code + "?depth=2",
-                                            method: "GET",
-                                            success: function (districtData) {
-                                                districtData.districts.forEach(function (district) {
-                                                    $("#huyen").append('<option value="' + district.name + '">' + district.name + '</option>');
-                                                });
-                                            }
+                            var province = data.find(p => p.name === provinceName);
+                            if (province) {
+                                $.ajax({
+                                    url: "https://provinces.open-api.vn/api/p/" + province.code + "?depth=2",
+                                    method: "GET",
+                                    success: function (districtData) {
+                                        districtData.districts.forEach(function (district) {
+                                            $("#huyen").append('<option value="' + district.name + '">' + district.name + '</option>');
                                         });
                                     }
-                                }
-                            });
+                                });
+                            }
                         }
                     });
+                }
+            });
 
-                    // Khi chọn huyện -> Load danh sách xã
-                    $("#huyen").change(function () {
-                        var districtName = $(this).val();
-                        $("#xa").empty().append('<option value="">Chọn xã</option>');
+            // Khi chọn huyện -> Load danh sách xã
+            $("#huyen").change(function () {
+                var districtName = $(this).val();
+                $("#xa").empty().append('<option value="">Chọn xã</option>');
 
-                        if (districtName) {
-                            $.ajax({
-                                url: "https://provinces.open-api.vn/api/d/",
-                                method: "GET",
-                                success: function (data) {
-                                    var district = data.find(d => d.name === districtName);
-                                    if (district) {
-                                        $.ajax({
-                                            url: "https://provinces.open-api.vn/api/d/" + district.code + "?depth=2",
-                                            method: "GET",
-                                            success: function (wardData) {
-                                                wardData.wards.forEach(function (ward) {
-                            $("#xa").append('<option value="' + ward.name + '">' + ward.name + '</option>');
-                                                });
-                                            }
+                if (districtName) {
+                    $.ajax({
+                        url: "https://provinces.open-api.vn/api/d/",
+                        method: "GET",
+                        success: function (data) {
+                            var district = data.find(d => d.name === districtName);
+                            if (district) {
+                                $.ajax({
+                                    url: "https://provinces.open-api.vn/api/d/" + district.code + "?depth=2",
+                                    method: "GET",
+                                    success: function (wardData) {
+                                        wardData.wards.forEach(function (ward) {
+                                            $("#xa").append('<option value="' + ward.name + '">' + ward.name + '</option>');
                                         });
                                     }
-                                }
-                            });
+                                });
+                            }
                         }
                     });
-                });
+                }
+            });
+        });
     </script>
 }
 
