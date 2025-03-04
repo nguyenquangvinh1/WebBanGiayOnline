@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>@ViewData["Title"]</title>
+<<<<<<< HEAD
     <!-- jQuery (Chỉ giữ lại jQuery 3.4.1) -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
@@ -370,13 +371,41 @@
             margin-right: 10px;
         }
     </style>
+=======
+    <!-- Giữ lại phiên bản jQuery từ CDN -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+>>>>>>> b97c7d0c0d2a21730de94ec5a503c65f406f23c6
 
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/AdminLTE-master/plugins/fontawesome-free/css/all.min.css">
+    <!-- daterange picker -->
+    <link rel="stylesheet" href="/AdminLTE-master/plugins/daterangepicker/daterangepicker.css">
+    <!-- iCheck for checkboxes and radio inputs -->
+    <link rel="stylesheet" href="/AdminLTE-master/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Bootstrap Color Picker -->
+    <link rel="stylesheet" href="/AdminLTE-master/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
+    <!-- Tempusdominus Bootstrap 4 -->
+    <link rel="stylesheet" href="/AdminLTE-master/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="/AdminLTE-master/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/AdminLTE-master/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <!-- Bootstrap4 Duallistbox -->
+    <link rel="stylesheet" href="/AdminLTE-master/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
+    <!-- BS Stepper -->
+    <link rel="stylesheet" href="/AdminLTE-master/plugins/bs-stepper/css/bs-stepper.min.css">
+    <!-- dropzonejs -->
+    <link rel="stylesheet" href="/AdminLTE-master/plugins/dropzone/min/dropzone.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="/AdminLTE-master/dist/css/adminlte.min.css">
     @await RenderSectionAsync("Styles", required: false)
 </head>
 
-<body>
+<body class="hold-transition sidebar-mini">
     <div class="app">
-        <div class="layout">
+        <div class="wrapper">
             <!-- Header START -->
             @await Html.PartialAsync("Header.cshtml")
 
@@ -385,29 +414,78 @@
             @await Html.PartialAsync("_SideNavPartialView.cshtml")
             <!-- Side Nav END -->
             <!-- Page Container START -->
-            <div class="page-container">
-
-                <!-- Content Wrapper START -->
-                <div class="main-content">
-                    @RenderBody()
-
+            <div class="content-wrapper">
+                <!-- Content Header (Page header) -->
+                <div class="content-header">
+                    <div class="container-fluid">
+                        <div class="row mb-2">
+                            <div class="col-sm-6">
+                                <h1 class="m-0">Dashboard v3</h1>
+                            </div><!-- /.col -->
+                            <div class="col-sm-6">
+                                <ol class="breadcrumb float-sm-right">
+                                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                                    <li class="breadcrumb-item active">Dashboard v3</li>
+                                </ol>
+                            </div><!-- /.col -->
+                        </div><!-- /.row -->
+                    </div><!-- /.container-fluid -->
                 </div>
-                <!-- Content Wrapper END -->
-                <!-- Footer START -->
-                @await Html.PartialAsync("Footer.cshtml")
-                <!-- Footer END -->
+                <!-- /.content-header -->
+                <!-- Main content -->
+                <!-- Content Wrapper START -->
+                <div class="content">
+                    <div class="container-fluid">
+                        @RenderBody()
 
-
-
+                    </div>
+                </div>
             </div>
-            <!-- Page Container END -->
-            <!-- Search Start-->
-            <!-- Search End-->
-            <!-- Quick View START -->
-            <!-- Quick View END -->
-        </div>
-    </div>
+            <!-- Content Wrapper END -->
+            <!-- Footer START -->
+            @await Html.PartialAsync("Footer.cshtml")
+            <!-- Footer END -->
 
+
+
+        </div>
+        <!-- Page Container END -->
+        <!-- Search Start-->
+        <!-- Search End-->
+        <!-- Quick View START -->
+        <!-- Quick View END -->
+    </div>
+    </div>
+    <!-- ./wrapper -->
+    <!-- jQuery -->
+    <script src="~/AdminLTE-master/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="~/AdminLTE-master/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Select2 -->
+    <script src="~/AdminLTE-master/plugins/select2/js/select2.full.min.js"></script>
+    <!-- Bootstrap4 Duallistbox -->
+    <script src="~/AdminLTE-master/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
+    <!-- InputMask -->
+    <script src="~/AdminLTE-master/plugins/moment/moment.min.js"></script>
+    <script src="~/AdminLTE-master/plugins/inputmask/jquery.inputmask.min.js"></script>
+    <!-- date-range-picker -->
+    <script src="~/AdminLTE-master/plugins/daterangepicker/daterangepicker.js"></script>
+    <!-- bootstrap color picker -->
+    <script src="~/AdminLTE-master/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+    <!-- Tempusdominus Bootstrap 4 -->
+    <script src="~/AdminLTE-master/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+    <!-- Bootstrap Switch -->
+    <script src="~/AdminLTE-master/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+    <!-- BS-Stepper -->
+    <script src="~/AdminLTE-master/plugins/bs-stepper/js/bs-stepper.min.js"></script>
+    <!-- dropzonejs -->
+    <script src="~/AdminLTE-master/plugins/dropzone/min/dropzone.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="~/AdminLTE-master/dist/js/adminlte.min.js"></script>
+    <!-- AdminLTE for demo purposes -->
+    <script src="~/AdminLTE-master/dist/js/demo.js"></script>
+
+<<<<<<< HEAD
 
     <!-- Core Vendors JS -->
     <script src="~/Adminassets/js/vendors.min.js"></script>
@@ -420,6 +498,8 @@
 
     <!-- Core JS -->
     <script src="~/Adminassets/js/app.min.js"></script>
+=======
+>>>>>>> b97c7d0c0d2a21730de94ec5a503c65f406f23c6
     @await RenderSectionAsync("Scripts", required: false)
     @*  @await Component.InvokeAsync("Notyf") *@
 </body>

@@ -44,8 +44,8 @@ namespace WebBanGiay.Areas.Admin.Controllers
 					tinh = customer.Dia_Chi.FirstOrDefault(dc => dc.loai_dia_chi == 1)?.tinh,
 					huyen = customer.Dia_Chi.FirstOrDefault(dc => dc.loai_dia_chi == 1)?.huyen,
 					xa = customer.Dia_Chi.FirstOrDefault(dc => dc.loai_dia_chi == 1)?.xa,
-					dia_chi = customer.Dia_Chi.FirstOrDefault(dc => dc.loai_dia_chi == 1)?.dia_chi
-				})
+					dia_chi = customer.Dia_Chi.FirstOrDefault(dc => dc.loai_dia_chi == 1)?.dia_chi_chi_tiet
+                })
 				.ToList();
 
 			return View(tai_Khoans);
@@ -131,7 +131,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     tinh = model.tinh,
                     huyen = model.huyen,
                     xa = model.xa,
-                    dia_chi = model.dia_chi,
+                    dia_chi_chi_tiet = model.dia_chi,
                     loai_dia_chi = 1,  
                     ngay_tao = DateTime.Now,
                     
@@ -216,7 +216,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                         return Json(new { success = false, message = "Không tìm thấy địa chỉ để cập nhật!" });
                     }
 
-                    existingAddress.dia_chi = model.dia_chi;
+                    existingAddress.dia_chi_chi_tiet = model.dia_chi_chi_tiet;
                     existingAddress.tinh = model.tinh;
                     existingAddress.huyen = model.huyen;
                     existingAddress.xa = model.xa;
@@ -257,7 +257,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 {
                     ID = Guid.NewGuid(),
                     Tai_KhoanID = model.Tai_KhoanID,
-                    dia_chi = model.dia_chi,
+                    dia_chi_chi_tiet = model.dia_chi_chi_tiet,
                     tinh = model.tinh,
                     huyen = model.huyen,
                     xa = model.xa,
@@ -339,7 +339,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 .Select(a => new
                 {
                     id = a.ID,
-                    dia_chi = a.dia_chi,
+                    dia_chi = a.dia_chi_chi_tiet,
                     xa = a.xa,
                     huyen = a.huyen,
                     tinh = a.tinh,

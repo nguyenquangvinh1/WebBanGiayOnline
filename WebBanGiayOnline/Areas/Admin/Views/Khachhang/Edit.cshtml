@@ -44,7 +44,7 @@
         @foreach (var address in Model.Dia_Chi.OrderBy(x => x.loai_dia_chi)) // Sắp xếp mặc định lên đầu
         {
             <tr id="addressRow_@address.ID">
-                <td class="address-detail">@address.dia_chi</td>
+                <td class="address-detail">@address.dia_chi_chi_tiet</td>
                 <td class="address-province">@address.tinh</td>
                 <td class="address-district">@address.huyen</td>
                 <td class="address-ward">@address.xa</td>

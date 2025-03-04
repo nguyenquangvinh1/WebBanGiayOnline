@@ -15,9 +15,10 @@ namespace ClssLib
         public string tinh { get; set; }
         public string huyen { get; set; }
         public string xa { get; set; }
-        public string dia_chi { get; set; }
+        public string dia_chi_chi_tiet { get; set; }
+        public bool? is_default { get; set; }
 
-		public DateTime ngay_tao { get; set; }
+        public DateTime ngay_tao { get; set; }
         public DateTime ngay_sua { get; set; }
         [ForeignKey("Tai_Khoan")]
         public Guid Tai_KhoanID { get; set; }

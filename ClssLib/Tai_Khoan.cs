@@ -25,6 +25,10 @@ namespace ClssLib
         public string email { get; set; }
         public int trang_thai { get; set; }
         public string cccd { get; set; }
+        public string? hinh_anh { get; set; }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int EmployeeNumber { get; set; }
         public DateTime ngay_tao { get; set; }
         public DateTime? ngay_sua { get; set; }
         [ForeignKey("Vai_Tro")]

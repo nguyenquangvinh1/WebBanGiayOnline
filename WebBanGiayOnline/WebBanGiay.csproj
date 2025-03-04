@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <ItemGroup>
+	<ItemGroup>
     <PackageReference Include="AspNetCoreHero.ToastNotification" Version="1.1.0" />
 	  <PackageReference Include="MailKit" Version="4.10.0" />
     <PackageReference Include="ClosedXML" Version="0.104.2" />
@@ -20,6 +20,8 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
     <PackageReference Include="PagedList.Mvc" Version="4.5.0" />
     <PackageReference Include="X.PagedList.Mvc.Core" Version="10.5.7" />
+	  <PackageReference Include="Tesseract" Version="5.2.0" />
+	  <PackageReference Include="X.PagedList.Mvc.Core" Version="10.5.7" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,6 +30,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Areas\Admin\Views\NhanVien\Create.cshtml" />
+    <None Include="Areas\Admin\Views\NhanVien\Delete.cshtml" />
+    <None Include="Areas\Admin\Views\NhanVien\Details.cshtml" />
+    <None Include="Areas\Admin\Views\NhanVien\Edit.cshtml" />
+    <None Include="Areas\Admin\Views\NhanVien\Index.cshtml" />
     <None Include="wwwroot\AdminLTE-master\.github\codeql\codeql-config.yml" />
     <None Include="wwwroot\AdminLTE-master\.github\CONTRIBUTING.md" />
     <None Include="wwwroot\AdminLTE-master\.github\dependabot.yml" />
