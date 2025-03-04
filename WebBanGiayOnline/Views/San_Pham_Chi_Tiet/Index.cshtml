@@ -1,9 +1,10 @@
-﻿@model IEnumerable<ClssLib.San_Pham>
+﻿@model IEnumerable<ClssLib.San_Pham_Chi_Tiet>
 
 @{
-	ViewData["Title"] = "Index";
-	Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -97,12 +98,12 @@
 							</div>
 							<nav class="navbar">
 								<ul class="navbar_menu">
-									<li><a href="index.html">home</a></li>
-									<li><a href="#">shop</a></li>
-									<li><a href="#">promotion</a></li>
-									<li><a href="#">pages</a></li>
-									<li><a href="#">blog</a></li>
-									<li><a href="contact.html">contact</a></li>
+									<li><a href="#">Trang chủ </a></li>
+									<li><a asp-controller="San_Pham_Chi_Tiet" asp-action="Index">Cửa Hàng</a></li>
+									<li><a href="#">Khuyến mãi</a></li>
+									<li><a href="#">Trang</a></li>
+									<li><a href="#">Blog</a></li>
+									<li><a href="contact.html">Liên hệ </a></li>
 								</ul>
 								<ul class="navbar_user">
 									<li><a href="#"><i class="fa fa-search" aria-hidden="true"></i></a></li>
@@ -292,18 +293,7 @@
 												</ul>
 											</li>
 										</ul>
-										<div class="pages d-flex flex-row align-items-center">
-											<div class="page_current">
-												<span>1</span>
-												<ul class="page_selection">
-													<li><a href="#">1</a></li>
-													<li><a href="#">2</a></li>
-													<li><a href="#">3</a></li>
-												</ul>
-											</div>
-											<div class="page_total"><span>of</span> 3</div>
-											<div id="next_page" class="page_next"><a href="#"><i class="fa fa-long-arrow-right" aria-hidden="true"></i></a></div>
-										</div>
+										
 
 									</div>
 
@@ -318,21 +308,21 @@
 												@foreach(var item in Model)
 												{
 													<div class="product_image">
-									<img src="@item.Anh_San_Phams" alt="">
+									<img src="~/coloshop-master/images/anhdep.jpg" alt="">
 								</div>
 								<div class="favorite"></div>
-								<div class="product_bubble product_bubble_left product_bubble_green d-flex flex-column align-items-center"><span>new</span></div>
-								<div class="product_info">
-									<h6 class="product_name"><a href="single.html">@item.ten_san_pham</a></h6>
-									<div class="product_price">@item.gia</div>
-								</div>
 							
-					
+								<div class="product_info">
+									<h6 class="product_name"><a href="single.html">@item.ten_SPCT</a></h6>
+									<div class="product_price">@item.gia VNĐ</div>
+								</div>
 
+
+													<div class="red_button add_to_cart_button"><a asp-controller="San_Pham_Chi_Tiet" asp-action="Details" asp-route-id="@item.ID">Xem Chi Tiết</a></div>
 													
 												}
 											</div>
-											<div class="red_button add_to_cart_button"><a asp-controller="San_Pham" asp-action="Details">add to cart</a></div>
+											
 										</div>
 
 										<!-- Product 2 -->
