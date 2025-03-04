@@ -381,3 +381,5 @@ FodyWeavers.xsd
 /WebBanGiayOnline/Migrations/20250226135802_datn.cs
 /WebBanGiayOnline/Migrations/20250226135802_datn.Designer.cs
 /WebBanGiayOnline/Migrations/20250227025129_datn.cs
+/WebBanGiayOnline/Migrations/20250228014006_datn.cs
+/WebBanGiayOnline/Migrations/20250303065445_datn1.cs
