@@ -215,7 +215,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body " id="colorModalBody">
                 @foreach (var item in (IEnumerable<SelectListItem>)ViewData["Mau_SacID"])
                 {
                     <div class="form-check d-flex align-items-center">
@@ -264,7 +264,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body " id="sizeModalBody">
                 @foreach (var item in (IEnumerable<SelectListItem>)ViewData["Kich_ThuocID"])
                 {
                     <div class="form-check">
@@ -278,7 +278,7 @@
 
                 <!-- Chọn kích cỡ mới -->
                 <div id="sizePickerContainer" class="mt-3" style="display: none;">
-                    <label>Color picker:</label>
+                    <label>Size picker:</label>
                     <div class="input-group">
                         <input type="text" class="form-control" id="newSize">
                         
@@ -324,6 +324,10 @@
             });
         });
         
+        $('#showSizePicker').click(function () {
+            $('#sizePickerContainer').show();
+            $('#newSize').focus();
+        });
 
         // Khi nhấn Enter để thêm kích cỡ mới
         $('#newSize').keypress(function (e) {
@@ -337,7 +341,7 @@
                         data: JSON.stringify(newSize),
                         success: function (response) {
                             // Thêm checkbox kích cỡ mới vào danh sách
-                            $('.modal-body').append(`
+                            $('#sizeModalBody').append(`
                             <div class="form-check">
                                 <input class="form-check-input size-checkbox" type="checkbox" value="${response}" checked> ${response}
                             </div>
@@ -377,7 +381,7 @@
                         contentType: 'application/json', // Chuyển về JSON
                         data: JSON.stringify(newColor), // Chuyển thành JSON
                         success: function (response) {
-                            $('.modal-body').append(`<div class="form-check">
+                            $('#colorModalBody').append(`<div class="form-check">
                             <!-- Checkbox chọn màu -->
                                 <input class="form-check-input color-checkbox me-2" type="checkbox" value="${response}" checked>
                             <!-- Nút hiển thị màu -->
