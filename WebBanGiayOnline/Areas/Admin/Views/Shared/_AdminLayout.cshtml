@@ -6,32 +6,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>@ViewData["Title"]</title>
     <!-- Giữ lại phiên bản jQuery từ CDN -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/AdminLTE-master/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/AdminLTE-master/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/AdminLTE-master/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="/AdminLTE-master/plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="~/AdminLTE-master/plugins/fontawesome-free/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="~/AdminLTE-master/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+    <!-- Toastr -->
+    <link rel="stylesheet" href="~/AdminLTE-master/plugins/toastr/toastr.min.css">
     <!-- daterange picker -->
-    <link rel="stylesheet" href="/AdminLTE-master/plugins/daterangepicker/daterangepicker.css">
+    <link rel="stylesheet" href="~/AdminLTE-master/plugins/daterangepicker/daterangepicker.css">
     <!-- iCheck for checkboxes and radio inputs -->
-    <link rel="stylesheet" href="/AdminLTE-master/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <link rel="stylesheet" href="~/AdminLTE-master/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
     <!-- Bootstrap Color Picker -->
-    <link rel="stylesheet" href="/AdminLTE-master/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
+    <link rel="stylesheet" href="~/AdminLTE-master/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
     <!-- Tempusdominus Bootstrap 4 -->
-    <link rel="stylesheet" href="/AdminLTE-master/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+    <link rel="stylesheet" href="~/AdminLTE-master/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
     <!-- Select2 -->
-    <link rel="stylesheet" href="/AdminLTE-master/plugins/select2/css/select2.min.css">
-    <link rel="stylesheet" href="/AdminLTE-master/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <link rel="stylesheet" href="~/AdminLTE-master/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="~/AdminLTE-master/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
     <!-- Bootstrap4 Duallistbox -->
-    <link rel="stylesheet" href="/AdminLTE-master/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
+    <link rel="stylesheet" href="~/AdminLTE-master/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
     <!-- BS Stepper -->
-    <link rel="stylesheet" href="/AdminLTE-master/plugins/bs-stepper/css/bs-stepper.min.css">
+    <link rel="stylesheet" href="~/AdminLTE-master/plugins/bs-stepper/css/bs-stepper.min.css">
     <!-- dropzonejs -->
-    <link rel="stylesheet" href="/AdminLTE-master/plugins/dropzone/min/dropzone.min.css">
+    <link rel="stylesheet" href="~/AdminLTE-master/plugins/dropzone/min/dropzone.min.css">
     <!-- Theme style -->
-    <link rel="stylesheet" href="/AdminLTE-master/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="~/AdminLTE-master/dist/css/adminlte.min.css">
     @await RenderSectionAsync("Styles", required: false)
 </head>
 
@@ -89,10 +97,24 @@
     </div>
     </div>
     <!-- ./wrapper -->
+
     <!-- jQuery -->
     <script src="~/AdminLTE-master/plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
     <script src="~/AdminLTE-master/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables  & Plugins -->
+    <script src="~/AdminLTE-master/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/AdminLTE-master/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/AdminLTE-master/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/AdminLTE-master/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <script src="~/AdminLTE-master/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/AdminLTE-master/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/AdminLTE-master/plugins/jszip/jszip.min.js"></script>
+    <script src="~/AdminLTE-master/plugins/pdfmake/pdfmake.min.js"></script>
+    <script src="~/AdminLTE-master/plugins/pdfmake/vfs_fonts.js"></script>
+    <script src="~/AdminLTE-master/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/AdminLTE-master/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+    <script src="~/AdminLTE-master/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
     <!-- Select2 -->
     <script src="~/AdminLTE-master/plugins/select2/js/select2.full.min.js"></script>
     <!-- Bootstrap4 Duallistbox -->
@@ -100,6 +122,10 @@
     <!-- InputMask -->
     <script src="~/AdminLTE-master/plugins/moment/moment.min.js"></script>
     <script src="~/AdminLTE-master/plugins/inputmask/jquery.inputmask.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="~/AdminLTE-master/plugins/sweetalert2/sweetalert2.min.js"></script>
+    <!-- Toastr -->
+    <script src="~/AdminLTE-master/plugins/toastr/toastr.min.js"></script>
     <!-- date-range-picker -->
     <script src="~/AdminLTE-master/plugins/daterangepicker/daterangepicker.js"></script>
     <!-- bootstrap color picker -->
@@ -114,8 +140,7 @@
     <script src="~/AdminLTE-master/plugins/dropzone/min/dropzone.min.js"></script>
     <!-- AdminLTE App -->
     <script src="~/AdminLTE-master/dist/js/adminlte.min.js"></script>
-    <!-- AdminLTE for demo purposes -->
-    <script src="~/AdminLTE-master/dist/js/demo.js"></script>
+    
 
     @await RenderSectionAsync("Scripts", required: false)
     @*  @await Component.InvokeAsync("Notyf") *@

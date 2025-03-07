@@ -1,122 +1,192 @@
-﻿@model ClssLib.San_Pham
+﻿@using Newtonsoft.Json
+@model ClssLib.San_Pham
 
-<div class="card card-primary">
-    <div class="card-header">
-        <h3 class="card-title">Thêm Sản Phẩm</h3>
-    </div>
-    <div class="card-body">
-
-    <form asp-action="Edit" method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <input type="hidden" id="lstSPCT" name="lstSPCT" />
-
-        <div class="form-group mb-3">
-            <label for="ten_san_pham" class="control-label">Tên Sản Phẩm</label>
-            <select id="ten_san_pham" name="ten_san_pham" class="form-control select2" >
-            <option value="">-- Nhập hoặc chọn tên sản phẩm --</option>
-            @foreach (var item in ViewBag.TenGiay as List<string>)
-            {
-                @if (item == Model.ten_san_pham)
-                {
-                    <option value="@item" selected>@item</option>
-                }
-                else
-                {
-                    <option value="@item">@item</option>
-                }
-            }
-            </select>
-            <span id="ten_san_pham_warning" class="text-danger" style="display: none;">⚠️ Tên sản phẩm đã tồn tại!</span>
-        </div>
-
-
-        <div class="form-group mb-3">
-            <label asp-for="Loai_GiayID" class="control-label"></label>
-            <select id="Loai_GiayID" name="Loai_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddLoaiGiay" asp-items="ViewBag.Loai_GiayID"></select>
-        </div>
-
-        <div class="mb-3 row">
-            <div class="form-group col-md-4">
-            <label asp-for="Chat_LieuID" class="control-label"></label>
-            <select id="Chat_LieuID" name="Chat_LieuID" class="form-control select2" asp-items="ViewBag.Chat_LieuID" data-api="/Admin/SanPham/AddChatLieu"></select>
+<!-- Modal Hiển Thị Ảnh -->
+<div class="modal fade" id="productDetailModal" tabindex="-1" aria-labelledby="productDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="card-title">Chi tiết Sản Phẩm</h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-            <div class="form-group col-md-4">
-            <label asp-for="Co_GiayID" class="control-label"></label>
+            <div class="modal-body">
+                <form asp-action="Edit" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input class="form-control" type="text" id="lstSPCT" name="lstSPCT" value='@(ViewData["lstSPCT"] != null ? Html.Raw(ViewData["lstSPCT"]) : "[]")' />
 
-            <select id="Co_GiayID" name="Co_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddCoGiay" asp-items="ViewBag.Co_GiayID"></select>
-            </div>
-            <div class="form-group col-md-4">
-            <label asp-for="Danh_MucID" class="control-label"></label>
+                    <input class="form-control" type="text" id="productImages" name="productImages" value='@(ViewData["productImages"] != null ? Html.Raw(ViewData["productImages"]) : "[]")' />
 
+                    <button type="button" class="btn btn-secondary ms-2 anh_form" data-toggle="modal" data-target="#productImageModal">
+                        Thêm Ảnh
+                    </button>
 
-            <select id="Danh_MucID" name="Danh_MucID" class="form-control select2" data-api="/Admin/SanPham/AddDanhMuc" asp-items="ViewBag.Danh_MucID"></select>
-            </div>
-        </div>
-        <div class="mb-3 row">
-
-            <div class="form-group col-md-4">
-            <label asp-for="De_GiayID" class="control-label"></label>
-
-            <select id="De_GiayID" name="De_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddDeGiay" asp-items="ViewBag.De_GiayID"></select>
-            </div>
-            <div class="form-group col-md-4">
-            <label asp-for="Mui_GiayID" class="control-label"></label>
-
-            <select id="Mui_GiayID" name="Mui_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddMuiGiay" asp-items="ViewBag.Mui_GiayID"></select>
-            </div>
-            <div class="form-group col-md-4">
-            <label asp-for="Kieu_DangID" class="control-label"></label>
-
-            <select id="Kieu_DangID" name="Kieu_DangID" class="form-control select2" data-api="/Admin/SanPham/AddKieuDang" asp-items="ViewBag.Kieu_DangID"></select>
-            </div>
-
-        </div>
-
-        <div class="form-group mb-3">
-        <label asp-for="mo_ta" class="control-label">Mô Tả Sản Phẩm</label>
-        <textarea asp-for="mo_ta" class="form-control"></textarea>
-        <span asp-validation-for="mo_ta" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-        <input type="submit" value="Save" id="saveProduct1" class="btn btn-primary" />
-        </div>
-    </form>
-
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-12">
-        <div id="productTables" class="card">
-            <div class="card-header" id="table-${color}">
-                <h3 class="card-title">
-                    Sản phẩm Chi Tiết</h4>
-                    <div class="card-tools">
+                    <div class="form-group">
+                        <label for="ten_san_pham" class="col-form-label">Tên Sản Phẩm</label>
+                        <select id="ten_san_pham" name="ten_san_pham" class="form-control select2">
+                            <option value="">-- Nhập hoặc chọn tên sản phẩm --</option>
+                            @foreach (var item in ViewBag.TenGiay as List<string>)
+                            {
+                                @if (item == Model.ten_san_pham)
+                                {
+                                    <option value="@item" selected>@item</option>
+                                }
+                                else
+                                {
+                                    <option value="@item">@item</option>
+                                }
+                            }
+                        </select>
+                        <span id="ten_san_pham_warning" class="text-danger" style="display: none;">⚠️ Tên sản phẩm đã tồn tại!</span>
                     </div>
-            </div>
-            <div class="card-body table-responsive p-0" id="table-SPCT">
-                <table class="table table-hover text-nowrap">
-                    <thead>
-                        <tr>
-                            <th>Tên Sản Phẩm</th>
-                            <th>Màu Sắc</th>
-                            <th>Kích Cỡ</th>
-                            <th>Số Lượng</th>
-                            <th>Giá</th>
-                            <th>Trạng Thái</th>
-                            <th class="d-none">ID</th> <!-- Ô ẩn cho ID -->
-                        </tr>
-                    </thead>
-                    <tbody>
 
-                    </tbody>
-                </table>
-               
+
+                    <div class="form-group">
+                        <label asp-for="Loai_GiayID" class="control-label"></label>
+                        <select id="Loai_GiayID" name="Loai_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddLoaiGiay" asp-items="ViewBag.Loai_GiayID"></select>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label asp-for="Chat_LieuID" class="control-label"></label>
+                                <select id="Chat_LieuID" name="Chat_LieuID" class="form-control select2" asp-items="ViewBag.Chat_LieuID" data-api="/Admin/SanPham/AddChatLieu"></select>
+
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+
+                            <div class="form-group">
+                                <label asp-for="Co_GiayID" class="control-label"></label>
+
+                                <select id="Co_GiayID" name="Co_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddCoGiay" asp-items="ViewBag.Co_GiayID"></select>
+
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+
+                            <div class="form-group">
+                                <label asp-for="Danh_MucID" class="control-label"></label>
+
+
+                                <select id="Danh_MucID" name="Danh_MucID" class="form-control select2" data-api="/Admin/SanPham/AddDanhMuc" asp-items="ViewBag.Danh_MucID"></select>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label asp-for="De_GiayID" class="control-label"></label>
+
+                                <select id="De_GiayID" name="De_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddDeGiay" asp-items="ViewBag.De_GiayID"></select>
+
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+
+                            <div class="form-group">
+                                <label asp-for="Mui_GiayID" class="control-label"></label>
+
+                                <select id="Mui_GiayID" name="Mui_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddMuiGiay" asp-items="ViewBag.Mui_GiayID"></select>
+
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+
+                            <div class="form-group">
+                                <label asp-for="Kieu_DangID" class="control-label"></label>
+
+                                <select id="Kieu_DangID" name="Kieu_DangID" class="form-control select2" data-api="/Admin/SanPham/AddKieuDang" asp-items="ViewBag.Kieu_DangID"></select>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="mo_ta" class="control-label">Mô Tả Sản Phẩm</label>
+                        <textarea asp-for="mo_ta" class="form-control"></textarea>
+                        <span asp-validation-for="mo_ta" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" value="Save" class="btn btn-primary" id="saveProduct1">ktra</button>
+
+
+@*                         <input type="submit" value="Save" id="saveProduct1" class="btn btn-primary" />
+ *@                    </div>
+                </form>
+                
             </div>
+            <!-- Modal Footer with Images -->
+            <div class="modal-footer">
+                
+                        <input type="file" id="uploadProductImage" class="form-control">
+
+                   
+                        <div class="d-flex justify-content-center flex-wrap" id="imagePreviewContainer">
+                            @if (ViewData["productImages"] != null)
+                            {
+                                var images = JsonConvert.DeserializeObject<List<string>>(ViewData["productImages"].ToString());
+                                foreach (var img in images)
+                                {
+                                    <div class="image-wrapper d-inline-block m-2">
+                                        <a href="#" class="remove-image" data-url="@img">
+                                        <img src="@img" class="img-thumbnail d-block mt-1" width="100" height="100" alt="Product Image">
+                                        </a>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    
+                
+                
+            </div>
+
+
         </div>
     </div>
 </div>
+
+    
+
+    <div id="productTables" class="card card-primary">
+        <div class="card-header">
+            <h3 class="card-title">
+                Biến thể Sản Phẩm</h4>
+                <div class="card-tools">
+                <button type="button" class="btn btn-secondary ms-2" data-toggle="modal" data-target="#productDetailModal">
+                    Sửa Chi tiết sản phẩm
+                </button>
+                </div>
+        </div>
+        <div class="card-body table-responsive p-0" id="table-SPCT">
+            <table class="table table-hover text-nowrap">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Tên Sản Phẩm</th>
+                        <th>Ảnh</th>
+                        <th>Màu Sắc</th>
+                        <th>Kích Cỡ</th>
+                        <th>Số Lượng</th>
+                        <th>Giá</th>
+                        <th>Ngày tạo</th>
+                        <th>Trạng Thái</th>
+                        <th class="d-none">ID</th> <!-- Ô ẩn cho ID -->
+                        <th class="d-none">Ảnh</th>
+                        <th>Hành Động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
 
 @* 
 <div class="mt-4" id="table-SPCT">
@@ -137,6 +207,35 @@
         </tbody>
     </table>
 </div> *@
+<!-- Modal hiển thị ảnh chi tiết -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Danh sách ảnh</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <div id="ImagesContainer" class="mt-3">
+                    <div class="d-flex justify-content-center flex-wrap" id="Images">
+                        <!-- Ảnh mới sẽ được thêm vào đây -->
+
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary" id="show-add-images">Thêm ảnh</button>
+                <div id="addImagesContainer" class="mt-3 d-none">
+                    <div class="d-flex justify-content-center flex-wrap" id="newImages">
+                        <!-- Ảnh mới sẽ được thêm vào đây -->
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <input type="hidden" id="lstSPCTData" value='@Html.Raw(ViewData["lstSPCT"] as string)' />
 
 
@@ -147,7 +246,36 @@
     let jsonData = $('#lstSPCTData').val().trim();
     console.log("Chuỗi JSON từ ViewData:", jsonData);
     console.log("Kiểu dữ liệu jsonData:", typeof jsonData);
-    
+        let jsonData1 = $('#productImages').val().trim();
+    console.log("Chuỗi JSON từ ViewData:", jsonData1);
+    console.log("Kiểu dữ liệu jsonData:", typeof jsonData1);
+
+    let productImages = [];
+    try {
+        if (jsonData.startsWith('{') || jsonData.startsWith('[')) {
+                productImages = JSON.parse(jsonData1);
+        } else {
+                console.warn("Dữ liệu không hợp lệ hoặc đã được parse trước đó.");
+        }
+    } catch (error) {
+            console.error("Lỗi khi parse JSON:", error);
+    }
+        let newImagesContainer = $('#newImages');
+
+        try {
+            let newImages = JSON.parse(jsonData1);
+            newImages.forEach(url => {
+                newImagesContainer.append(`
+                                                                <a href="#" class="add-image d-inline-block m-2" data-url="${url}">
+                                                                    <img src="${url}" class="img-thumbnail" width="100" height="100" alt="Ảnh mới">
+                                                                </a>
+                                                            `);
+            });
+        } catch (error) {
+            console.error("Lỗi khi parse JSON:", error);
+        }
+        console.log("Dữ liệu productImages:", productImages);
+        console.log("Kiểu dữ liệu productImages:", typeof productImages);
     let lstSPCT = [];
     try {
         if (jsonData.startsWith('{') || jsonData.startsWith('[')) {
@@ -168,18 +296,38 @@
     function loadTable() {
         let tbody = $('#table-SPCT tbody');
         tbody.empty(); // Xóa các dòng cũ
-
+            var stt = 1;
         lstSPCT.forEach(item => {
             let kichThuoc = kichThuocList.find(k => k.value === item.Kich_ThuocID)?.text || 'Không xác định';
             let mauSac = mauSacList.find(m => m.value === item.Mau_SacID)?.text || 'Không xác định';
-            
+                var images = JSON.parse(item.imgUrl);
+                var firstImage = images.length > 0 ? images[0] : "https://via.placeholder.com/100";
             let row = `<tr>
-                <td data-id="${item.Mau_SacID}">${mauSac}</td>
-                <td data-id="${item.Kich_ThuocID}">${kichThuoc}</td>
-                <td><input type='number' class='quantity form-control' value='${item.so_luong}' /></td>
-                <td><input type='number' class='price form-control' value='${item.gia}' /></td>
-                <td><button class='toggle-status btn btn-sm ${item.trang_thai === 1 ? 'btn-success' : 'btn-danger'}' data-status="${item.trang_thai}" style='width: 150px; height: 30px; line-height: 18px; white-space: nowrap;'>${item.trang_thai === 1 ? 'Hoạt động' : 'Không hoạt động'}</button></td>
-                <td class='d-none'>${item.ID}</td>
+                            <td>${stt}</td>
+                        <td data-id="${item.Ten}">${item.Ten}</td>
+                        <td>
+                                <img src="${firstImage}" class="img-thumbnail" width="100" height="100" alt="Ảnh đại diện">
+                        </td>
+                        <td data-id="${item.Mau_Sac}">
+                            <button class="btn text-white d-flex align-items-center justify-content-center"
+                                        style="background-color: ${item.Mau_Sac};
+                           border: 1px solid #ccc;
+                           width: 50px; height: 50px;
+                           border-radius: 8px;">
+    
+                            </button>
+                        
+                        </td>
+                        <td data-id="${item.Kich_Thuoc}">${item.Kich_Thuoc}</td>
+                        <td><input type='number' class='quantity form-control' value='${item.so_luong}' /></td>
+                        <td><input type='number' class='price form-control' value='${item.gia}' /></td>
+                        <td data-id="${item.ngay_tao}">${item.ngay_tao}</td>
+                        <td><button class='toggle-status btn btn-sm ${item.trang_thai === 1 ? 'btn-success' : 'btn-danger'}' data-status="${item.trang_thai}" style='width: 150px; height: 30px; line-height: 18px; white-space: nowrap;'>${item.trang_thai === 1 ? 'Hoạt động' : 'Không hoạt động'}</button></td>
+                        <td class='d-none'>${item.ID}</td>
+                        <td class="d-none"><input type="text" class="form-control lst_img" value="${item.imgUrl}"></td>
+                        <td>
+                                <button type="button" class="btn btn-info check-images" data-images='${item.imgUrl}'>Kiểm tra ảnh</button>
+                        </td>
                 </tr>`;
             tbody.append(row);
         });
@@ -197,23 +345,26 @@
 
         // Duyệt qua các dòng của bảng
         $('#table-SPCT tbody tr').each(function () {
-            let color = $(this).find("td:first").data("id");
-            let size = $(this).find("td:nth-child(2)").data("id");
-            let quantity = $(this).find(".quantity").val();
-            let price = $(this).find(".price").val();
-            let id = $(this).find("td:nth-child(6)").text(); // Lấy ID từ ô ẩn
-            let status = $(this).find(".toggle-status").data("status");
+                let Ten = $(this).find("td:nth-child(2)").data("id");
+                let color = $(this).find("td:nth-child(4)").data("id");
+                let size = $(this).find("td:nth-child(5)").data("id");
+                let quantity = $(this).find(".quantity").val();
+                let price = $(this).find(".price").val();
+                let id = $(this).find("td:nth-child(10)").text(); // Lấy ID từ ô ẩn
+                let imgurl = $(this).find("td:nth-child(11)").text(); // Lấy ID từ ô ẩn
+                let status = $(this).find(".toggle-status").data("status");
 
             // Kiểm tra số lượng trước khi thêm vào danh sách
             if (quantity > 0) {
                 sanPhamCTList.push({
-                    Mau_SacID: color,
-                    Kich_ThuocID: size,
-                    so_luong: parseInt(quantity),
-                    gia: parseInt(price),
-                    trang_thai: status,
-                    id: id, // Thêm ID vào danh sách
-                    ngay_tao: new Date().toISOString()
+                        ID: id,
+                        so_luong: quantity,
+                        gia: price,
+                        imgUrl: imgurl,
+                        trang_thai: status,
+                        ngay_tao: new Date().toISOString(),
+                        Kich_Thuoc: size,
+                        Mau_Sac: color
                 });
             }
             });
@@ -223,6 +374,55 @@
         $('#lstSPCT').val(JSON.stringify(sanPhamCTList));
     });
 
+
+        // Nút cập nhật tất cả
+        $("#updateAll").on("click", function () {
+            let updatedData = [];
+
+            $("#table-SPCT tbody tr").each(function () {
+                let row = $(this);
+                let Ten = $(this).find("td:nth-child(2)").data("id");
+                let color = $(this).find("td:nth-child(4)").data("id");
+                let size = $(this).find("td:nth-child(5)").data("id");
+                let quantity = $(this).find(".quantity").val();
+                let price = $(this).find(".price").val();
+                let id = $(this).find("td:nth-child(10)").text(); // Lấy ID từ ô ẩn
+                let imgurl = $(this).find("td:nth-child(11)").text(); // Lấy ID từ ô ẩn
+                let status = $(this).find(".toggle-status").data("status");
+                if (quantity > 0) {
+                    let item = {
+                        ID: id,
+                        so_luong: quantity,
+                        gia: price,
+                        imgUrl: imgurl,
+                        trang_thai: status,
+                        ngay_tao: new Date().toISOString(),
+                        Kich_Thuoc: size,
+                        Mau_Sac: color
+                    };
+                    updatedData.push(item);
+                }
+                
+                
+            });
+
+            $.ajax({
+                url: "/Admin/SanPham/UpdateSPCT",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(updatedData),
+                success: function (response) {
+                    alert("Cập nhật thành công!");
+                },
+                error: function (xhr, status, error) {
+                    alert("Cập nhật thất bại: " + error);
+                }
+            });
+        });
+
+
+
+
     // Sự kiện thay đổi trạng thái mà không đẩy dòng trong bảng
     $(document).on('click', '.toggle-status', function () {
         let button = $(this);
@@ -231,6 +431,133 @@
         button.data("status", newStatus);
         button.toggleClass('btn-success btn-danger').text(newStatus === 1 ? 'Hoạt động' : 'Không hoạt động');
     });
+
+
+
+        $(document).on("click", ".remove-image", function (e) {
+            e.preventDefault(); // Ngăn chặn hành vi mặc định của thẻ <a>
+            let imageUrl = $(this).data("url");
+            $(this).parent().remove(); // Xóa ảnh và container
+
+            let input = $("#productImages");
+            let images;
+            try {
+                images = JSON.parse(input.val() || "[]");
+            } catch (error) {
+                console.error("Lỗi JSON.parse:", error);
+                images = [];
+            }
+            images = images.filter(url => url !== imageUrl);
+            input.val(JSON.stringify(images));
+        });
+
+
+
+        $(document).on("click", ".check-images", function () {
+            let jsonData2 = $(this).attr("data-images");
+            console.log("Chuỗi JSON từ ViewData:", jsonData2);
+            console.log("Kiểu dữ liệu jsonData:", typeof jsonData2);
+            let images = JSON.parse(jsonData2);
+            let modalBody = "";
+            images.forEach(url => {
+                modalBody += `<a href="#" class="remove-image" data-url="${url}">
+                            <img src="${url}" class="img-thumbnail me-2" width="100" height="100">
+                          </a>`;
+            });
+            $("#imageModal .modal-body #Images").html(modalBody);
+            $("#imageModal").modal("show");
+
+            $("#imageModal").data("selectedRow", $(this).closest("tr"));
+        });
+
+        // Xóa ảnh khi nhấn vào
+        $(document).on("click", ".remove-image", function (e) {
+            e.preventDefault();
+            $(this).remove();
+        });
+
+        // Cập nhật lst_img khi đóng modal
+        $("#imageModal").on("hidden.bs.modal", function () {
+            let selectedRow = $(this).data("selectedRow");
+            let updatedImages = [];
+
+            $("#Images img").each(function () {
+                updatedImages.push($(this).attr("src"));
+            });
+
+            if (selectedRow) {
+                selectedRow.find(".lst_img").val(JSON.stringify(updatedImages));
+            }
+        });
+        // Khi chọn ảnh, tải lên server ngay lập tức
+        $("#uploadProductImage").change(function () {
+            let fileInput = this;
+            let formData = new FormData();
+            let file = fileInput.files[0];
+
+            if (!file) return;
+
+            formData.append("file", file);
+
+            $.ajax({
+                url: "/Admin/SanPham/UploadImage",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success) {
+                        productImages.push(response.filePath);
+                        $("#imagePreviewContainer").append(`
+                                    <div class="image-wrapper d-inline-block m-2">
+                                        <a href="#" class="remove-image" data-url="${response.filePath}">
+                                                <img src="${response.filePath}" class="img-thumbnail d-block mt-1" width="100" alt="Product Image">
+                                        </a>
+                                    </div>
+                                    `);
+                        $("#productImages").val(JSON.stringify(uploadedImages)); // Lưu vào input ẩn
+                    } else {
+                        alert("❌ Lỗi khi tải ảnh!");
+                    }
+                },
+                error: function () {
+                    alert("⚠️ Có lỗi xảy ra khi tải ảnh!");
+                }
+            });
+        });
+        $("#show-add-images").on("click", function () {
+            $("#addImagesContainer").toggleClass("d-none");
+        });
+
+        $(document).on("click", ".add-image", function () {
+            let newImageUrl = $(this).data("url");
+            let imageContainer = $("#imageContainer");
+            let existingImages = imageContainer.find("img").map(function () {
+                return $(this).attr("src");
+            }).get();
+
+            if (!existingImages.includes(newImageUrl)) {
+                let newImageElement = `
+                        <div class="image-wrapper d-inline-block m-2">
+                            <a href="#" class="remove-image" data-url="${newImageUrl}">
+                                <img src="${newImageUrl}" class="img-thumbnail d-block mt-1" width="100" height="100" alt="Product Image">
+                            </a>
+                        </div>
+                    `;
+                imageContainer.append(newImageElement);
+
+                let input = $("#productImages");
+                let images;
+                try {
+                    images = JSON.parse(input.val() || "[]");
+                } catch (error) {
+                    console.error("Lỗi JSON.parse:", error);
+                    images = [];
+                }
+                images.push(newImageUrl);
+                input.val(JSON.stringify(images));
+            }
+        });
 });
 
 
