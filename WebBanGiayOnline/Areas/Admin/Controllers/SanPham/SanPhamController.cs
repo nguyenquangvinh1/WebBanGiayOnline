@@ -406,6 +406,21 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             _context.SaveChanges();
 
             return Json(new { success = true });
+        }[HttpPost]
+        public IActionResult ChangeStatusSPCT(Guid id, int trang_thai)
+        {
+            var sanPham = _context.san_Pham_Chi_Tiets.FirstOrDefault(sp => sp.ID == id);
+            if (sanPham == null)
+            {
+                return NotFound();
+            }
+
+            // Cập nhật trạng thái
+            sanPham.trang_thai = trang_thai;
+            _context.san_Pham_Chi_Tiets.Update(sanPham);
+            _context.SaveChanges();
+
+            return Json(new { success = true });
         }
 
 
@@ -542,13 +557,16 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 return RedirectToAction(nameof(Index));
             
         }
-        [HttpPost("UpdateSPCT")]
+        [HttpPost]
         public IActionResult UpdateSPCT([FromBody] List<San_PhamCTView> updatedSPCT)
         {
             if (updatedSPCT == null || !updatedSPCT.Any())
             {
                 return BadRequest(new { success = false, message = "Dữ liệu không hợp lệ" });
             }
+
+
+
 
             foreach (var spct in updatedSPCT)
             {
@@ -704,7 +722,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         // POST: KieuDangController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(San_Pham san_Pham, string lstSPCT)
+        public async Task<IActionResult> Edit(San_Pham san_Pham, string lstSPCT, string productImages)
         {
             // Kiểm tra xem san_Pham và danh sách spct có null không
             if (san_Pham == null)
@@ -712,6 +730,31 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 ModelState.AddModelError("", "Dữ liệu sản phẩm không hợp lệ.");
                 return View(san_Pham); // Hiển thị lại trang với thông báo lỗi
             }
+            // ✅ Xử lý ảnh sản phẩm nếu có
+            List<Anh_San_Pham> anhSP = new List<Anh_San_Pham>();
+            if (!string.IsNullOrEmpty(productImages))
+            {
+                var imgExisting = _context.anh_San_Phams.Where(x => x.San_PhamID == san_Pham.ID).ToList();
+                var imgUrls = JsonConvert.DeserializeObject<List<string>>(productImages);
+                foreach (var url in imgUrls)
+                {
+                    if (imgExisting.FirstOrDefault(x => x.anh_url == url) == null)
+                    {
+
+                        var anh = new Anh_San_Pham
+                        {
+                            ID = Guid.NewGuid(),
+                            anh_url = url,
+                            San_PhamID = san_Pham.ID
+                        };
+                        await _context.anh_San_Phams.AddAsync(anh);
+                        anhSP.Add(anh);
+                    }
+                    continue;
+                }
+            }
+
+
             var listCT = JsonConvert.DeserializeObject<List<San_PhamCTView>>(lstSPCT);
 
             foreach (var spct in listCT)
@@ -724,6 +767,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                     existingSPCT.gia = spct.gia;
                     existingSPCT.trang_thai = spct.trang_thai;
                     existingSPCT.ngay_sua = DateTime.Now;
+                    _context.san_Pham_Chi_Tiets.Update(existingSPCT);
                     List<Anh_San_Pham> anh = new List<Anh_San_Pham>();
                     List<string> lis = JsonConvert.DeserializeObject<List<string>>(spct.imgUrl);
                     if (lis == null)
@@ -768,7 +812,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                         _context.anh_San_Pham_San_Pham_Chi_Tiets.Add(link);
                     }
 
-                    _context.san_Pham_Chi_Tiets.Update(existingSPCT);
+                    
 
                 }
             }
@@ -779,7 +823,19 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 return NotFound();
             }
 
-            _context.Entry(san_Pham).State = EntityState.Modified;
+            san.ten_san_pham = san_Pham.ten_san_pham;
+            san.Chat_LieuID = san_Pham.Chat_LieuID;
+            san.Co_GiayID = san_Pham.Co_GiayID;
+            san.De_GiayID = san_Pham.De_GiayID;
+            san.ngay_sua = DateTime.Now;
+            san.mo_ta = san_Pham.mo_ta;
+            san.Kieu_DangID = san_Pham.Kieu_DangID;
+            san.Danh_MucID = san_Pham.Danh_MucID;
+            san.Loai_GiayID = san_Pham.Loai_GiayID;
+            san.Mui_GiayID = san_Pham.Mui_GiayID;
+
+
+            _context.Entry(san).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

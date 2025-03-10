@@ -13,7 +13,9 @@ namespace ClssLib
     public class San_Pham
     {
         public Guid ID { get; set; }
+        [Display(Name = "Tên Sản Phẩm :")]
         public string ten_san_pham { get; set; }
+        [Display(Name = "Mô Tả :")]
         public string mo_ta { get; set; }
         public int trang_thai { get; set; }
         public DateTime ngay_tao { get; set; }

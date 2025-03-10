@@ -317,13 +317,13 @@
             $("#imagePreviewContainer").html("");
             uploadedImages.forEach(url => {
                 $("#imagePreviewContainer").append(`
-                                <div class="col-md-3 mt-2">
-                                    <img src="${url}" class="img-thumbnail" width="100">
-                                </div>
-                            `);
+                                        <div class="col-md-3 mt-2">
+                                            <img src="${url}" class="img-thumbnail" width="100">
+                                        </div>
+                                    `);
             });
         });
-        
+
         $('#showSizePicker').click(function () {
             $('#sizePickerContainer').show();
             $('#newSize').focus();
@@ -342,10 +342,10 @@
                         success: function (response) {
                             // Thêm checkbox kích cỡ mới vào danh sách
                             $('#sizeModalBody').append(`
-                            <div class="form-check">
-                                <input class="form-check-input size-checkbox" type="checkbox" value="${response}" checked> ${response}
-                            </div>
-                        `);
+                                    <div class="form-check">
+                                        <input class="form-check-input size-checkbox" type="checkbox" value="${response}" checked> ${response}
+                                    </div>
+                                `);
                             $('#sizePickerContainer').hide(); // Ẩn ô nhập kích cỡ
                             $('#newSize').val(''); // Xóa nội dung nhập
                         },
@@ -382,17 +382,17 @@
                         data: JSON.stringify(newColor), // Chuyển thành JSON
                         success: function (response) {
                             $('#colorModalBody').append(`<div class="form-check">
-                            <!-- Checkbox chọn màu -->
-                                <input class="form-check-input color-checkbox me-2" type="checkbox" value="${response}" checked>
-                            <!-- Nút hiển thị màu -->
-                            <button class="btn text-white d-flex align-items-center justify-content-center"
-                                        style="background-color: ${response};
-                           border: 1px solid #ccc;
-                           width: 50px; height: 50px;
-                           border-radius: 8px;">
-        ${response}
-                            </button>
-                        </div>`);
+                                    <!-- Checkbox chọn màu -->
+                                        <input class="form-check-input color-checkbox me-2" type="checkbox" value="${response}" checked>
+                                    <!-- Nút hiển thị màu -->
+                                    <button class="btn text-white d-flex align-items-center justify-content-center"
+                                                style="background-color: ${response};
+                                   border: 1px solid #ccc;
+                                   width: 50px; height: 50px;
+                                   border-radius: 8px;">
+                ${response}
+                                    </button>
+                                </div>`);
                             $('#colorPickerContainer').hide();
                             $('#newColor').val('');
                         },
@@ -427,10 +427,10 @@
                     if (response.success) {
                         uploadedImages.push(response.filePath);
                         $("#imagePreviewContainer").append(`
-                                    <div class="col-md-3 mt-2">
-                                        <img src="${response.filePath}" class="img-thumbnail" width="100">
-                                    </div>
-                                `);
+                                            <div class="col-md-3 mt-2">
+                                                <img src="${response.filePath}" class="img-thumbnail" width="100">
+                                            </div>
+                                        `);
                         $("#productImages").val(JSON.stringify(uploadedImages)); // Lưu vào input ẩn
                     } else {
                         alert("❌ Lỗi khi tải ảnh!");
@@ -459,11 +459,11 @@
             // Hiển thị danh sách ảnh đã lưu
             uploadedImages.forEach(url => {
                 $("#imagePreviewContainer").append(`
-                                                <div class="col-md-3 mt-2 d-inline-block">
-                                    <input type="checkbox" class="image-checkbox" value="${url}">
-                                    <img src="${url}" class="img-thumbnail" width="100">
-                            </div>
-                                `);
+                                                        <div class="col-md-3 mt-2 d-inline-block">
+                                            <input type="checkbox" class="image-checkbox" value="${url}">
+                                            <img src="${url}" class="img-thumbnail" width="100">
+                                    </div>
+                                        `);
             });
 
 
@@ -497,21 +497,21 @@
                 console.log(`🎨 Màu sản phẩm: ${color}`);
 
                 // ✅ Kiểm tra bảng sản phẩm có tồn tại không
-        let table = $(`#table-${color}`);
-        if (table.length === 0) {
-            console.warn(`⚠️ Không tìm thấy bảng sản phẩm: #table-${color}, kiểm tra lại màu đã chọn!`);
-            return;
-        }
+                let table = $(`#table-${color}`);
+                if (table.length === 0) {
+                    console.warn(`⚠️ Không tìm thấy bảng sản phẩm: #table-${color}, kiểm tra lại màu đã chọn!`);
+                    return;
+                }
 
-        // ✅ Cập nhật danh sách ảnh vào bảng sản phẩm
-        table.find("tbody tr").each(function () {
-            let lstImgInput = $(this).find(".lst_img");
-            if (lstImgInput.length > 0) {
-                lstImgInput.val(selectedImages.join(",")); // Cập nhật danh sách ảnh dưới dạng chuỗi
-            } else {
-                console.warn("⚠️ Không tìm thấy input .lst_img trong hàng.");
-            }
-        });
+                // ✅ Cập nhật danh sách ảnh vào bảng sản phẩm
+                table.find("tbody tr").each(function () {
+                    let lstImgInput = $(this).find(".lst_img");
+                    if (lstImgInput.length > 0) {
+                        lstImgInput.val(selectedImages.join(",")); // Cập nhật danh sách ảnh dưới dạng chuỗi
+                    } else {
+                        console.warn("⚠️ Không tìm thấy input .lst_img trong hàng.");
+                    }
+                });
 
                 // ✅ Hiển thị danh sách ảnh trong `imgSelected`
                 let imgContainer = $(`#${color} .imgSelected`);
@@ -519,59 +519,14 @@
 
                 selectedImages.forEach(url => {
                     imgContainer.append(`
-                    <img src="${url}" class="img-thumbnail me-2" width="100">
-                `);
+                            <img src="${url}" class="img-thumbnail me-2" width="100">
+                        `);
                 });
             }
 
             // Đóng modal sau khi chọn ảnh
             $('#productImageModal').modal('hide');
         });
-
-
-
-        let danhSachTenGiay = @Html.Raw(Json.Serialize(ViewBag.TenGiay));
-        console.log("✅ Danh sách tên giày:", danhSachTenGiay);
-
-        // Khởi tạo Select2
-        $("#ten_san_pham").select2({
-            placeholder: "Nhập hoặc chọn tên sản phẩm",
-            allowClear: true,
-            tags: true,
-            tokenSeparators: [',', ' ']
-        });
-
-        function kiemTraTrungLap(tenSanPham) {
-            return danhSachTenGiay.some(item => item.toLowerCase() === tenSanPham.trim().toLowerCase());
-        }
-
-        // Bắt sự kiện khi chọn hoặc nhập mới
-        $("#ten_san_pham").on("select2:selecting", function (e) {
-            let tenSanPham = e.params.args.data.text;
-            let warningElement = $("#ten_san_pham_warning");
-
-            if (kiemTraTrungLap(tenSanPham)) {
-                warningElement.show();
-                alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
-                e.preventDefault(); // Ngăn không cho chọn giá trị trùng lặp
-            } else {
-                warningElement.hide();
-            }
-        });
-
-        // Ngăn gửi form nếu tên sản phẩm bị trùng
-        $("#saveProduct").click(function (e) {
-            let tenSanPham = $("#ten_san_pham").val();
-
-            if (kiemTraTrungLap(tenSanPham)) {
-                alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
-                e.preventDefault(); // Ngăn form gửi đi nếu trùng tên
-            }
-        });
-
-        console.log("✅ Sự kiện kiểm tra tên sản phẩm đã được kích hoạt.");
-
-
 
         console.log("✅ jQuery Version:", $.fn.jquery);
 
@@ -587,6 +542,9 @@
         console.log("🔍 jQuery version:", $.fn.jquery);
         console.log("🔍 Select2 exists:", typeof $.fn.select2 !== "undefined");
 
+
+        // Hàm khởi tạo Select2
+        // Hàm khởi tạo Select2
         function khoiTaoSelect2() {
             $(".select2").each(function () {
                 let apiUrl = $(this).data("api"); // Lấy API từ data-attribute nếu có
@@ -595,13 +553,13 @@
                     placeholder: "Nhập hoặc chọn một tùy chọn",
                     allowClear: true,
                     tags: true,
-                    tokenSeparators: [',', ' '],
+                    tokenSeparators: [','], // Giữ nguyên khoảng trắng trong giá trị nhập
                     createTag: function (params) {
-                        let term = $.trim(params.term);
-                        if (term === '') return null;
+                        let term = params.term.trim(); // Không xóa khoảng trắng giữa các từ
+                        if (term === "" || /^\s+$/.test(term)) return null; // Ngăn nhập toàn dấu cách
 
                         let exists = false;
-                        $(this).find('option').each(function () {
+                        $(this).find("option").each(function () {
                             if ($(this).text().toLowerCase() === term.toLowerCase()) {
                                 exists = true;
                                 return false;
@@ -614,26 +572,26 @@
 
                         return {
                             id: term,
-                            text: `Nhấn Enter để thêm mới "${term}"`,
+                            text: `Nhấn Enter để thêm mới \"${term}\"`,
                             newTag: true
                         };
                     }
-                }).on('select2:select', function (e) {
+                }).on("select2:select", function (e) {
                     let data = e.params.data;
                     let selectElement = $(this);
 
                     if (data.newTag) {
-                        let realValue = data.text.replace(/Nhấn Enter để thêm mới\s*"(.+)"$/, '$1');
+                        let realValue = data.text.replace(/Nhấn Enter để thêm mới\s*\"(.+)\"$/, "$1");
 
                         $.ajax({
                             url: apiUrl,
                             type: "POST",
                             contentType: "application/json",
-                            data: JSON.stringify(realValue),
+                            data: JSON.stringify(realValue), // Gửi JSON thay vì chuỗi thuần túy
                             success: function (response) {
                                 if (response.success) {
                                     let newOption = new Option(response.text, response.id, true, true);
-                                    selectElement.append(newOption).trigger('change');
+                                    selectElement.append(newOption).trigger("change");
                                 } else {
                                     alert("❌ Không thể thêm giá trị mới.");
                                 }
@@ -646,7 +604,29 @@
                 });
             });
 
-            console.log("✅ Select2 đã khởi tạo thành công!");
+            $("#ten_san_pham").on("keypress", function (e) {
+                if (e.which === 32) {
+                    return; // Bỏ qua sự kiện khi nhấn Space
+                }
+
+                if (e.which === 13) { // Chỉ bắt sự kiện khi nhấn Enter
+                    let tenSanPham = $(this).val().trim(); // Loại bỏ khoảng trắng đầu và cuối
+                    let warningElement = $("#ten_san_pham_warning");
+
+                    if (tenSanPham === "") {
+                        e.preventDefault(); // Ngăn không cho nhập chuỗi chỉ có khoảng trắng
+                        return;
+                    }
+
+                    if (kiemTraTrungLap(tenSanPham)) {
+                        warningElement.show();
+                        alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
+                        e.preventDefault();
+                    } else {
+                        warningElement.hide();
+                    }
+                }
+            });
         }
 
         // 🔹 Xử lý sự kiện kiểm tra tên sản phẩm
@@ -658,39 +638,32 @@
                 placeholder: "Nhập hoặc chọn tên sản phẩm",
                 allowClear: true,
                 tags: true,
-                tokenSeparators: [',', ' ']
+                tokenSeparators: [',']
             });
 
             function kiemTraTrungLap(tenSanPham) {
                 return danhSachTenGiay.some(item => item.toLowerCase() === tenSanPham.trim().toLowerCase());
             }
 
-            // Kiểm tra khi chọn hoặc nhập mới
+            // Kiểm tra khi chọn sản phẩm từ danh sách
             $("#ten_san_pham").on("select2:selecting", function (e) {
-                let tenSanPham = e.params.args.data.text;
+                let tenSanPham = e.params.args.data.text.trim();
                 let warningElement = $("#ten_san_pham_warning");
 
                 if (kiemTraTrungLap(tenSanPham)) {
                     warningElement.show();
                     alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
-                    e.preventDefault(); // Ngăn không cho chọn giá trị trùng lặp
+                    e.preventDefault();
                 } else {
                     warningElement.hide();
                 }
             });
 
-            // Ngăn gửi form nếu tên sản phẩm bị trùng
-            $("#saveProduct").click(function (e) {
-                let tenSanPham = $("#ten_san_pham").val();
-
-                if (kiemTraTrungLap(tenSanPham)) {
-                    alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
-                    e.preventDefault();
-                }
-            });
-
             console.log("✅ Sự kiện kiểm tra tên sản phẩm đã được kích hoạt.");
         }
+
+
+
 
         // Gọi kiểm tra tên sản phẩm sau khi Select2 đã tải
         kiemTraTenSanPham();
@@ -724,45 +697,45 @@
 
                     // Thêm bảng sản phẩm theo màu nếu chưa có
                     $('#productTables').append(`
-                    <div class="row">
-                            <div class="card col-md-6" id="table-${color}">
-                            <div class="card-header">
-                                <h3 class="card-title">Sản phẩm màu ${color}</h3>
-                                <div class="card-tools"></div>
-                            </div>
-                            <div class="card-body table-responsive p-0">
-                                <table class="table table-hover text-nowrap">
-                                    <thead>
-                                        <tr>
-                                            <th>Tên Sản Phẩm</th>
-                                            <th>Kích Cỡ</th>
-                                            <th>Số Lượng</th>
-                                            <th>Giá</th>
-                                                <th class="d-none">Ảnh</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
+                                <div class="row">
+                                        <div class="card col-md-6" id="table-${color}">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Sản phẩm màu ${color}</h3>
+                                            <div class="card-tools"></div>
+                                        </div>
+                                        <div class="card-body table-responsive p-0">
+                                            <table class="table table-hover text-nowrap">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Tên Sản Phẩm</th>
+                                                        <th>Kích Cỡ</th>
+                                                        <th>Số Lượng</th>
+                                                        <th>Giá</th>
+                                                            <th class="d-none">Ảnh</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
 
-                            </div>
-                        </div>
-                        <div class="card col-md-6" id="${color}">
-                        <div class="card-header">
-                        <h3 class="card-title">Ảnh Sản Phẩm ${color}</h3>
-                        </div>
-                        <div class="card-body">
-                        <div class="mt-2">
-                            <label class="form-label">Ảnh Sản Phẩm ${color}</label>
-                            <button type="button" class="btn btn-primary choose-image-btn" data-color="${color}">
-                                Chọn ảnh
-                            </button>
-                                <div class="mt-2 imgSelected"></div>
-                        </div>
-                        </div>
-                    </div>
-                    </div>
-                    
-                `);
+                                        </div>
+                                    </div>
+                                    <div class="card col-md-6" id="${color}">
+                                    <div class="card-header">
+                                    <h3 class="card-title">Ảnh Sản Phẩm ${color}</h3>
+                                    </div>
+                                    <div class="card-body">
+                                    <div class="mt-2">
+                                        <label class="form-label">Ảnh Sản Phẩm ${color}</label>
+                                        <button type="button" class="btn btn-primary choose-image-btn" data-color="${color}">
+                                            Chọn ảnh
+                                        </button>
+                                            <div class="mt-2 imgSelected"></div>
+                                    </div>
+                                    </div>
+                                </div>
+                                </div>
+
+                            `);
                 } else {
                     console.log(`Bảng cho màu ${color} đã tồn tại, bỏ qua.`);
                 }
@@ -798,14 +771,14 @@
                         // Nếu chưa có, thêm hàng mới vào bảng sản phẩm
                         $('#selectedSize').append(`<span id="size-${size}" class="badge bg-secondary me-2">${size}</span>`);
                         $(this).find("tbody").append(`
-                        <tr>
-                            <td>${tenSPCT}</td>
-                            <td>${size}</td>
-                            <td><input type="number" class="form-control quantity" data-size="${size}"></td>
-                            <td><input type="number" class="form-control price" data-size="${size}"></td>
-                                <td class="d-none"><input type="text" class="form-control lst_img" data-size="${size}"></td>
-                        </tr>
-                    `);
+                                    <tr>
+                                        <td>${tenSPCT}</td>
+                                        <td>${size}</td>
+                                        <td><input type="number" class="form-control quantity" data-size="${size}"></td>
+                                        <td><input type="number" class="form-control price" data-size="${size}"></td>
+                                            <td class="d-none"><input type="text" class="form-control lst_img" data-size="${size}"></td>
+                                    </tr>
+                                `);
                     } else {
                         console.log(`Kích cỡ ${size} đã tồn tại trong bảng ${color}, bỏ qua.`);
                     }
@@ -867,7 +840,7 @@
 
                     if (quantity > 0) {
                         sanPhamCTList.push({
-                            Mau_Sac: "#"+ color,
+                            Mau_Sac: "#" + color,
                             Kich_Thuoc: size,
                             so_luong: parseInt(quantity),
                             gia: parseInt(price),
@@ -886,7 +859,6 @@
                 alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
                 e.preventDefault();
             }
-            debugger;
             // Gửi form
             $('form').submit();
         });
