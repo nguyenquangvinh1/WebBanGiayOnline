@@ -1,239 +1,263 @@
 ﻿@model ClssLib.Phieu_Giam_Gia
 
-<h1>Phiếu Giảm Giá</h1>
-@{
-    ViewData["Title"] = "Create";
-}
 
-<!DOCTYPE html>
-<html lang="vi">
+
+
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phiếu Giảm Giá</title>
- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
-        body {
+        body1 {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 10px;
             background-color: #f4f4f4;
         }
 
-    .container {
-        background: white;
-        padding: 20px;
-        border-radius: 5px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);}
-            
+        .container {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
 
-     .page-header   {
+
+        .page-header {
             font-size: 24px;
             font-weight: bold;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             color: black;
         }
 
-    }
     </style>
 </head>
-<body>
-
-    <div class="container mt-5">
-              
-        <hr />
+<body1>
+    <div class="container">
         <div class="row">
-            <div class="col-md-5">
+            <h4 class="mb-3">Phiêu giảm giá </h4>
+            <div class="col-md-12">
                 <form asp-action="Create">
                     @Html.AntiForgeryToken()
 
-                    <!-- Thêm phần hiển thị lỗi -->
-                    <div asp-validation-summary="All" class="text-danger"></div>
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label asp-for="ma">Mã phiếu giảm giá</label>
-                            <input asp-for="ma" type="text" class="form-control" placeholder="Nhập mã phiếu giảm giá" />
-                            <span asp-validation-for="ma" class="text-danger"></span>
-                        </div>
+                    <!-- Bắt đầu chia hàng để có 2 cột: bên trái và bên phải -->
+                    <div class="row">
 
-                            <div class="form-group col-md-6">
-                                <label asp-for="ten_phieu_giam_gia">Tên phiếu giảm giá</label>
-                                <input asp-for="ten_phieu_giam_gia" type="text" class="form-control" placeholder="Nhập tên phiếu giảm giá"  />
-                                <span asp-validation-for="ten_phieu_giam_gia" class="text-danger"></span>
+                        <!-- CỘT BÊN TRÁI: Form nhập thông tin phiếu giảm giá -->
+                        <div class="col-md-5">
+                            <!-- Hiển thị lỗi nếu có -->
+                            <div asp-validation-summary="All" class="text-danger"></div>
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label asp-for="ma">Mã phiếu giảm giá</label>
+                                    <input asp-for="ma" type="text" class="form-control" placeholder="Nhập mã phiếu giảm giá" />
+                                    <span asp-validation-for="ma" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label asp-for="ten_phieu_giam_gia">Tên phiếu giảm giá</label>
+                                    <input asp-for="ten_phieu_giam_gia" type="text" class="form-control" placeholder="Nhập tên phiếu giảm giá" />
+                                    <span asp-validation-for="ten_phieu_giam_gia" class="text-danger"></span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label asp-for="gia_tri_giam">Giá trị</label>
-                                <div class="input-group">
-                                    <input asp-for="gia_tri_giam" type="number" class="form-control"  placeholder="0 đ"  />
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">%</span> <!-- Biểu tượng phần trăm -->
-                                        <span class="input-group-text">$</span>
+
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label asp-for="gia_tri_giam">Giá trị</label>
+                                    <div class="input-group">
+                                        <input asp-for="gia_tri_giam" type="number" class="form-control" placeholder="0 đ" />
+                                        <div class="input-group-append">
+                                            <!-- Biểu tượng: có thể thay thế hoặc giữ lại tùy ý -->
+                                            <span class="input-group-text">%</span>
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label asp-for="so_tien_giam_toi_da">Số tiền giảm tối đa</label>
+                                    <div class="input-group">
+                                        <input asp-for="so_tien_giam_toi_da" type="number" class="form-control" placeholder="0 đ" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">$</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group col-md-6">
-                                <label asp-for="so_tien_giam_toi_da">Số tiền giảm tối đa</label>
-                                <div class="input-group">
-                                    <input asp-for="so_tien_giam_toi_da" type="number" class="form-control" placeholder="0 đ"  />
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">$</span> <!-- Biểu tượng tiền -->
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group col-md-12">
+
+                            <div class="form-group">
                                 <label asp-for="so_luong">Số lượng</label>
-                                <input asp-for="so_luong" type="text" class="form-control" placeholder="Số Lượng"  />
+                                <input asp-for="so_luong" type="number" class="form-control" placeholder="Số lượng" />
                                 <span asp-validation-for="so_luong" class="text-danger"></span>
                             </div>
 
-
-                        <div class="form-group col-md-12">
-                            <label asp-for="nguoi_tao">Người tạo</label>
-                            <input asp-for="nguoi_tao" type="text" class="form-control" placeholder="Người tạo" value="admin" />
-                            <span asp-validation-for="nguoi_tao" class="text-danger"></span>
-                        </div>
-                        </div>
-                       
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                            <label asp-for="ngay_bat_dau">Từ ngày</label>
-                                <input asp-for="ngay_bat_dau" type="date" class="form-control" placeholder="Từ ngày"  />
-                                <span asp-validation-for="ngay_bat_dau" class="text-danger"></span>
+                            <!-- Ẩn trường Người tạo (nếu cần) -->
+                            <div class="form-group" hidden>
+                                <label asp-for="nguoi_tao">Người tạo</label>
+                                <input asp-for="nguoi_tao" type="text" class="form-control" value="admin" />
+                                <span asp-validation-for="nguoi_tao" class="text-danger"></span>
                             </div>
-                            <div class="form-group col-md-6">
-                            <label asp-for="ngay_ket_thuc">Đến ngày</label>
-                                <input asp-for="ngay_ket_thuc" type="date" class="form-control" placeholder="Đến ngày"  />
-                                <span asp-validation-for="ngay_ket_thuc" class="text-danger"></span>
+
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label asp-for="ngay_bat_dau">Từ ngày</label>
+                                    <input asp-for="ngay_bat_dau" type="date" class="form-control" />
+                                    <span asp-validation-for="ngay_bat_dau" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label asp-for="ngay_ket_thuc">Đến ngày</label>
+                                    <input asp-for="ngay_ket_thuc" type="date" class="form-control" />
+                                    <span asp-validation-for="ngay_ket_thuc" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="form-check form-check-inline">
+                                    <input asp-for="kieu_giam_gia" class="form-check-input" name="kieu_giam_gia" type="radio" id="cong_khai"
+                                           value="1" checked onchange="toggleForm()" />
+
+                                    <label class="form-check-label" for="cong_khai">Công khai</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input asp-for="kieu_giam_gia" class="form-check-input" name="kieu_giam_gia" type="radio" id="ca_nhan"
+                                           value="0" onchange="toggleForm()" />
+                                    <label class="form-check-label" for="ca_nhan">Cá nhân</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="gia_tri_toi_thieu"></label>
+                                <input asp-for="gia_tri_toi_thieu" class="form-control" placeholder="Nhập số tiền tối thiểu (vd: 300000)" />
+                                <span asp-validation-for="gia_tri_toi_thieu" class="text-danger"></span>
                             </div>
                         </div>
 
-                    <div class="form-group">
-                        <div class="form-check form-check-inline">
-                            <input asp-for="kieu_giam_gia" class="form-check-input" type="radio" id="cong_khai" value="1" checked onchange="toggleForm()" />
-                            <label class="form-check-label" for="cong_khai">Công khai</label>
+                        <!-- CỘT BÊN PHẢI: Tìm kiếm & chọn khách hàng (ẩn khi chưa chọn “Cá nhân”) -->
+                        <div class="col-md-7" id="personalForm" style="display:none;">
+                            <input type="text" class="form-control mb-3" id="search"
+                                   placeholder="Tìm kiếm khách hàng" onkeyup="searchCustomers()" />
+
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)" />
+                                        </th>
+                                        <th>Tên</th>
+                                        <th>Số điện thoại</th>
+                                        <th>Email</th>
+                                        <th>Ngày sinh</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.tai_khoans != null && ((List<ClssLib.Tai_Khoan>)ViewBag.tai_khoans).Count > 0)
+                                    {
+                                        @foreach (var tai_khoan in ViewBag.tai_khoans)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox" name="customerIds"
+                                                           value="@tai_khoan.ID" class="customer-checkbox" />
+                                                </td>
+                                                <td>@tai_khoan.ho_ten</td>
+                                                <td>@tai_khoan.sdt</td>
+                                                <td>@tai_khoan.email</td>
+                                                <td>@tai_khoan.ngay_sinh</td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="5">Không có khách hàng nào.</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
                         </div>
-                        <div class="form-check form-check-inline">
-                            <input asp-for="kieu_giam_gia" class="form-check-input" type="radio" id="ca_nhan" value="0" onchange="toggleForm()" />
-                            <label class="form-check-label" for="ca_nhan">Cá nhân</label>
-                        </div>
-                        <div class="form-group">
-                            <input type="submit" value="Thêm mới" onclick="generateCode()" class="btn btn-primary float-right" />
-                        </div>
+                    </div> <!-- Kết thúc .row chứa 2 cột -->
+                    <!-- Nút Thêm mới ở dưới, canh phải -->
+                    <div class="form-group text-right mt-3">
+                        <input type="submit" value="Thêm mới"
+                               onclick="generateCode()" class="btn btn-primary" />
                     </div>
-                    </>
-
                 </form>
             </div>
-            <div id="personalForm" class="col-md-7" style="display:none;">
-                <input type="text" class="form-control" id="search" placeholder="Tìm kiếm khách hàng" onkeyup="searchCustomers()">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>
-                                <input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)" /> <!-- Checkbox chọn tất cả -->
-                            </th>
-                            <th>Tên</th>
-                            <th>Số điện thoại</th>
-                            <th>Email</th>
-                            <th>Ngày sinh</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><input type="checkbox" class="customer-checkbox" /></td>
-                            <td>Nguyễn Văn Nhất</td>
-                            <td>0261748212</td>
-                            <td>dat0358043034@gmail.com</td>
-                            <td>01-01-1990</td>
-                        </tr>
-                        <tr>
-                            <td><input type="checkbox" class="customer-checkbox" /></td>
-                            <td>Anh Lê</td>
-                            <td>0562718362</td>
-                            <td>anhle@gmail.com</td>
-                            <td>02-02-1992</td>
-                        </tr>
-                        <tr>
-                            <td><input type="checkbox" class="customer-checkbox" /></td>
-                            <td>Tương Triệu</td>
-                            <td>0237183162</td>
-                            <td>tuongtrieu@gmail.com</td>
-                            <td>03-03-1993</td>
-                        </tr>
-                        <tr>
-                            <td><input type="checkbox" class="customer-checkbox" /></td>
-                            <td>Quỳnh Trang</td>
-                            <td>0457213674</td>
-                            <td>quynhtrang123@gmail.com</td>
-                            <td>04-04-1994</td>
-                        </tr>
-                        <tr>
-                            <td><input type="checkbox" class="customer-checkbox" /></td>
-                            <td>Nguyễn Thị Thùy Dương</td>
-                            <td>0467536475</td>
-                            <td>nguyentinhthuyduong948@gmail.com</td>
-                            <td>05-05-1995</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        </div>
     </div>
 
     <script>
-        // Chọn tất cả checkbox
-        document.getElementById('selectAll').onclick = function() {
-            var checkboxes = document.querySelectorAll('.customer-checkbox');
-            for (var checkbox of checkboxes) {
-                checkbox.checked = this.checked;
-            }
-        };
-                        function generateCode() {
-                // Logic để sinh mã ngẫu nhiên (VD: "DISCOUNT2023")
-                const newCode = 'DISCOUNT' + new Date().getFullYear() + Math.floor(Math.random() * 1000);
-                document.querySelector('input[name="ma"]').value = newCode;
-
-                // Gọi hàm để thêm mã nếu cần
-                // submitForm();
-            }
-                     function submitForm() {
-                // Gửi form, có thể sử dụng AJAX hoặc submit form thông thường
-                document.querySelector('form').submit();
-            }
-                function searchCustomers() {
-            const input = document.getElementById('search').value.toLowerCase();
-            const rows = document.querySelectorAll('#customerTableBody tr');
-
-            rows.forEach(row => {
-                const cells = row.getElementsByTagName('td');
-                const name = cells[1].textContent.toLowerCase();
-                row.style.display = name.includes(input) ? '' : 'none';
-            });
-        }
-
-        function toggleSelectAll(selectAllCheckbox) {
-            const checkboxes = document.querySelectorAll('.customer-checkbox');
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = selectAllCheckbox.checked;
-            });
-        }
-                 function toggleForm() {
-                var personalForm = document.getElementById('personalForm');
-                var ca_nhan = document.getElementById('ca_nhan');
-
-                // Hiển thị form nếu "Cá nhân" được chọn, ngược lại ẩn đi
-                if (ca_nhan.checked) {
-                    personalForm.style.display = 'block';
-                } else {
-                    personalForm.style.display = 'none';
+                         function toggleSelectAll(source) {
+                        const checkboxes = document.querySelectorAll('.customer-checkbox');
+                        checkboxes.forEach(cb => cb.checked = source.checked);
+                    }
+            // Chọn tất cả checkbox
+            document.getElementById('selectAll').onclick = function() {
+                var checkboxes = document.querySelectorAll('.customer-checkbox');
+                for (var checkbox of checkboxes) {
+                    checkbox.checked = this.checked;
                 }
+            };
+                            function generateCode() {
+                    // Logic để sinh mã ngẫu nhiên (VD: "DISCOUNT2023")
+                    const newCode = 'DISCOUNT' + new Date().getFullYear() + Math.floor(Math.random() * 1000);
+                    document.querySelector('input[name="ma"]').value = newCode;
+
+                    // Gọi hàm để thêm mã nếu cần
+                    // submitForm();
+                }
+                         function submitForm() {
+                    // Gửi form, có thể sử dụng AJAX hoặc submit form thông thường
+                    document.querySelector('form').submit();
+                }
+                    function searchCustomers() {
+                const input = document.getElementById('search').value.toLowerCase();
+                const rows = document.querySelectorAll('#customerTableBody tr');
+
+                rows.forEach(row => {
+                    const cells = row.getElementsByTagName('td');
+                    const name = cells[1].textContent.toLowerCase();
+                    row.style.display = name.includes(input) ? '' : 'none';
+                });
             }
-    
+
+            function toggleSelectAll(selectAllCheckbox) {
+                const checkboxes = document.querySelectorAll('.customer-checkbox');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+            }
+                     function toggleForm() {
+                    var personalForm = document.getElementById('personalForm');
+                    var ca_nhan = document.getElementById('ca_nhan');
+
+                    // Hiển thị form nếu "Cá nhân" được chọn, ngược lại ẩn đi
+                    if (ca_nhan.checked) {
+                        personalForm.style.display = 'block';
+                    } else {
+                        personalForm.style.display = 'none';
+                    }
+                }
+                        function toggleForm() {
+            var personalForm = document.getElementById('personalForm');
+            var ca_nhan = document.getElementById('ca_nhan');
+            var kieuGiamGiaInput = document.querySelector('input[name="kieu_giam_gia"]');
+
+            // Hiển thị form nếu "Cá nhân" được chọn, ngược lại ẩn đi
+            if (ca_nhan.checked) {
+                personalForm.style.display = 'block';
+                kieuGiamGiaInput.value = "1"; // Đặt giá trị thành 1 khi chọn "Cá nhân"
+            } else {
+                personalForm.style.display = 'none';
+                kieuGiamGiaInput.value = "0"; // Đặt giá trị thành 0 khi không chọn "Cá nhân"
+            }
+        }
+
+
     </script>
 
-</body>
-</html>
+</body1>
+
 
 
 @section Scripts {

@@ -12,7 +12,6 @@
 			<div class="col-sm-12">
 				<div class="page-title-box">
 					<div class="btn-group float-right">
-					
 					</div>
 					<h4 class="page-title">Khách Hàng</h4>
 				</div>
@@ -36,14 +35,14 @@
 								<span class="input-group-text">
 									<i class="fas fa-search text-orange"></i>
 								</span>
-								<input type="text" class="form-control" placeholder="Tên hoặc SĐT hoặc Email">
+								<input type="text" id="searchInput" class="form-control" placeholder="Tên hoặc SĐT hoặc Email">
 							</div>
 						</div>
 
 						<!-- bộ lọc bên trái -->
 						<div class="col-md-6 d-flex align-items-center gap-3">
 
-@* 							<!-- nút quét cccd -->
+							@* 							<!-- nút quét cccd -->
 							<button class="btn btn-outline-primary">
 								<i class="fas fa-id-card"></i>
 							</button>
@@ -68,7 +67,7 @@
 						<div class="col-md-2 text-end">
 							<a asp-action="Create" class="btn btn-outline-orange"
 							   style="border: 1px solid #e0e0e0;">
-								<i class="fas fa-plus"></i> Thêm 
+								<i class="fas fa-plus"></i> Thêm
 							</a>
 						</div>
 
@@ -84,7 +83,7 @@
 							<th>Tên Khách hàng</th>
 							<th>Email</th>
 							<th>SĐT</th>
-							<th>Địa chỉ </th>						
+							<th>Địa chỉ </th>
 							<th>Tùy Chỉnh</th>
 						</tr>
 					</thead>
@@ -134,40 +133,52 @@
 		</div>
 	</div>
 </div>
-
+@section Scripts {
 	<script>
-		document.addEventListener("DOMContentLoaded", function () {
-			let rowsPerPage = 5; // Số khách hàng trên mỗi trang
-		let table = document.getElementById("datatable-buttons").getElementsByTagName("tbody")[0];
-			let rows = table.getElementsByTagName("tr");
-			let currentPage = 1;
-			let totalPages = Math.ceil(rows.length / rowsPerPage);
+			document.addEventListener("DOMContentLoaded", function () {
+				let rowsPerPage = 5; // Số khách hàng trên mỗi trang
+			let table = document.getElementById("datatable-buttons").getElementsByTagName("tbody")[0];
+				let rows = table.getElementsByTagName("tr");
+				let currentPage = 1;
+				let totalPages = Math.ceil(rows.length / rowsPerPage);
 
-			function showPage(page) {
-				for (let i = 0; i < rows.length; i++) {
-					rows[i].style.display = (i >= (page - 1) * rowsPerPage && i < page * rowsPerPage) ? "" : "none";
+				function showPage(page) {
+					for (let i = 0; i < rows.length; i++) {
+						rows[i].style.display = (i >= (page - 1) * rowsPerPage && i < page * rowsPerPage) ? "" : "none";
+					}
+					document.getElementById("pageNumbers").innerText = `${page} / ${totalPages}`;
 				}
-				document.getElementById("pageNumbers").innerText = `${page} / ${totalPages}`;
-			}
 
-			function changePage(step) {
-				let newPage = currentPage + step;
-				if (newPage >= 1 && newPage <= totalPages) {
-					currentPage = newPage;
-					showPage(currentPage);
+				function changePage(step) {
+					let newPage = currentPage + step;
+					if (newPage >= 1 && newPage <= totalPages) {
+						currentPage = newPage;
+						showPage(currentPage);
+					}
 				}
-			}
 
-			// Gán sự kiện cho các nút bấm
-			document.getElementById("prevBtn").addEventListener("click", function () {
-				changePage(-1);
+				// Gán sự kiện cho các nút bấm
+				document.getElementById("prevBtn").addEventListener("click", function () {
+					changePage(-1);
+				});
+
+				document.getElementById("nextBtn").addEventListener("click", function () {
+					changePage(1);
+				});
+
+				// Hiển thị trang đầu tiên
+				showPage(currentPage);
+		});
+		// Chức năng lọc dữ liệu theo Mã hoặc Tên khách hàng
+		$(document).ready(function () {
+			$("#searchInput").on("input", function () {
+				let value = $(this).val().toLowerCase().trim(); // Lấy giá trị ô input và loại bỏ khoảng trắng
+				$("#datatable-buttons tbody tr").filter(function () {
+					let name = $(this).find("td:eq(3)").text().toLowerCase(); // Cột Họ tên
+					let code = $(this).find("td:eq(2)").text().toLowerCase(); // Cột Mã khách hàng
+					$(this).toggle(name.includes(value) || code.includes(value)); // Hiển thị nếu khớp
+				});
 			});
-
-			document.getElementById("nextBtn").addEventListener("click", function () {
-				changePage(1);
-			});
-
-			// Hiển thị trang đầu tiên
-			showPage(currentPage);
 		});
 	</script>
+}

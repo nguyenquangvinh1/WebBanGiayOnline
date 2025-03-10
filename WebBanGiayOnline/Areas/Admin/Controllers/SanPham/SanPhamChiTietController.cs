@@ -53,7 +53,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         // POST: KieuDangController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ma,gia,so_luong,trang_thai,Kich_ThuocID,Mau_SacID")]San_Pham_Chi_Tiet sanCT)
+        public async Task<IActionResult> Create([Bind("ma,gia,so_luong,trang_thai,Kich_ThuocID,Mau_SacID")] San_Pham_Chi_Tiet sanCT)
         {
             if (ModelState.IsValid)
             {
@@ -128,5 +128,74 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpGet]
+        public IActionResult GetAllSanPhamChiTiet()
+        {
+            try
+            {
+                var list = _context.san_Pham_Chi_Tiets
+                    .Include(x => x.Kich_Thuoc)
+                    .Include(x => x.Mau_Sac)
+                    .Select(x => new {
+                        id = x.ID,
+                        imageUrl = "",               // hoặc x.HinhAnh nếu có
+                        name = x.ten_SPCT,          // Tên sản phẩm chi tiết
+                        price = x.gia,              // Giá bán
+                        dbQuantity = x.so_luong,    // Số lượng thực tế từ DB
+                        size = x.Kich_Thuoc.ten_kich_thuoc,
+                        color = x.Mau_Sac.ma_mau,
+                        status = x.trang_thai
+                    })
+                    .ToList();
+
+                return Json(list);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        [HttpPost]
+        public IActionResult UpdateQuantity([FromBody] UpdateQuantityRequest req)
+        {
+            try
+            {
+                var sp = _context.san_Pham_Chi_Tiets.FirstOrDefault(x => x.ID == req.productId);
+                if (sp == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy sản phẩm chi tiết." });
+                }
+
+                // newQty = sp.so_luong - req.delta
+                // => delta = 1 => user +1 trong hóa đơn => DB -1
+                // => delta = -1 => user -1 trong hóa đơn => DB +1
+                int newQty = sp.so_luong - req.delta;
+
+                if (newQty < 0)
+                {
+                    return Json(new { success = false, message = "Số lượng không đủ trong kho." });
+                }
+
+                sp.so_luong = newQty;
+                _context.san_Pham_Chi_Tiets.Update(sp);
+                _context.SaveChanges();
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        public class UpdateQuantityRequest
+        {
+            public Guid productId { get; set; }
+            public int delta { get; set; }
+        }
+
+
+
     }
 }

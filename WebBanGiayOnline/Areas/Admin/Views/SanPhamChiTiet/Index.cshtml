@@ -1,72 +1,923 @@
 ﻿@model IEnumerable<ClssLib.San_Pham_Chi_Tiet>
 
+<style>
+    .close-tab {
+        cursor: pointer;
+    }
+    /* Ẩn form thông tin khách hàng ban đầu */
+    .customerForm {
+        display: none;
+    }
+    /* Ẩn template hóa đơn */
+    #invoiceTemplate {
+        display: none;
+    }
+</style>
 
-<p>
-    <a asp-action="View">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.gia)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.so_luong)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.trang_thai)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ngay_tao)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ngay_sua)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Kich_ThuocID)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Mau_SacID)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.San_PhamID)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.gia)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.so_luong)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.trang_thai)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ngay_tao)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ngay_sua)
-            </td>
-            <td>
-                    @Html.DisplayFor(modelItem => item.Kich_ThuocID)
-            </td>
-            <td>
-                    @Html.DisplayFor(modelItem => item.Mau_SacID)
-            </td>
-            <td>
-                    @Html.DisplayFor(modelItem => item.San_PhamID)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="container p-4">
+    <button class="btn btn-primary" id="createInvoice">+ Tạo hóa đơn</button>
+    <ul class="nav nav-tabs mt-3" id="invoiceTabs"></ul>
+    <div class="tab-content" id="invoiceContent"></div>
+</div>
+
+<!-- Template Hóa đơn (ẩn) -->
+<div id="invoiceTemplate">
+    <div class="tab-pane fade invoice" id="INVOICE_ID">
+        <div class="mt-3">
+            <button class="btn btn-info qrCode" data-id="INVOICE_ID">📷 QR Code</button>
+            <button class="btn btn-success selectProduct" data-id="INVOICE_ID">+ Thêm sản phẩm</button>
+        </div>
+
+        <!-- Danh sách sản phẩm của hóa đơn -->
+        <table class="table mt-3" id="invoiceTable-INVOICE_ID">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Ảnh</th>
+                    <th>Tên sp</th>
+                    <th>Giá bán</th>
+                    <th>Số lượng</th>
+                    <th>Kích thước</th>
+                    <th>Màu sắc</th>
+                    <th>Trạng thái</th>
+                    <th>Tổng tiền</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody class="productList">
+                <!-- Khi nhấn "Thêm" ở modal, sản phẩm được append vào đây -->
+            </tbody>
+        </table>
+        <!-- Danh sách sản phẩm của hóa đơn -->
+        <p>[Danh sách sản phẩm của hóa đơn]</p>
+        <h5 class="text-end">
+            Tổng tiền hóa đơn:  <span class="totalPrice" id="totalPrice-INVOICE_ID">0</span> VND
+            <button class="btn btn-primary ms-3 selectCustomer" data-id="INVOICE_ID">Tài khoản</button>
+            <button class="btn btn-outline-primary openPayment" data-id="INVOICE_ID">Thanh toán</button>
+            <button class="btn btn-success ms-3 confirmPaymentInvoice" data-id="INVOICE_ID">Xác nhận thanh toán</button>
+        </h5>
+        <div class="row mt-4">
+            <!-- Cột Tài khoản/Khách hàng -->
+            <div class="col-md-6 p-3">
+                <h5 class="mb-3">Tài khoản</h5>
+                <div class="khachLe">
+                    <p>Tên khách hàng: <span style="font-weight: bold; color: gray;">Khách lẻ</span></p>
+                </div>
+                <div class="customerForm">
+                    <input type="hidden" id="customerIdHidden" value="">
+
+                    <div class="mb-3">
+                        <input type="text" class="form-control customerName" placeholder="Nhập tên khách hàng">
+                    </div>
+                    <div class="mb-3">
+                        <input type="text" class="form-control customerPhone" placeholder="Nhập số điện thoại">
+                    </div>
+                    <div class="mb-3">
+                        <input type="email" class="form-control customerEmail" placeholder="Nhập email">
+                    </div>
+                </div>
+            </div>
+            <!-- Cột Thông tin thanh toán -->
+            <div class="col-md-6 p-3">
+                <h5 class="mb-3">Thông tin thanh toán</h5>
+                <div class="mb-3">
+                    <label class="form-label">Khách thanh toán</label>
+                    <button type="button" class="btn btn-outline-primary openPayment" data-id="INVOICE_ID">
+                        0 VND
+                    </button>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Mã giảm giá</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control discountCodeInput" placeholder="Chọn mã giảm giá" readonly>
+                        <button class="btn btn-outline-secondary selectDiscount" type="button" data-id="INVOICE_ID">Chọn mã giảm giá</button>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Giá gốc</label>
+                    <input type="text" class="form-control basePrice" placeholder="0 VND" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Giảm giá</label>
+                    <input type="text" class="form-control discountAmount" placeholder="0 VND" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Tổng tiền</label>
+                    <input type="text" class="form-control finalTotal" placeholder="0 VND" readonly>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Các modal (sản phẩm, khách hàng, mã giảm giá, thanh toán) giữ nguyên bố cục HTML tĩnh -->
+<!-- Modal sản phẩm -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productModalLabel">Danh sách sản phẩm</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-center">[Danh sách sản phẩm]</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal khách hàng -->
+<!-- Modal khách hàng -->
+<div class="modal fade" id="customerModal" tabindex="-1" aria-labelledby="customerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="customerModalLabel">Danh sách khách hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Form Thêm nhanh khách hàng, đặt ở đây -->
+                <div class="mb-3">
+                    <h6>Thêm nhanh khách hàng</h6>
+                    <form id="quickAddCustomerForm" class="row g-2">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" id="quickCustomerName" placeholder="Họ tên" required>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" id="quickCustomerPhone" placeholder="Số điện thoại" required>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="email" class="form-control" id="quickCustomerEmail" placeholder="Email" required>
+                        </div>
+
+
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Thêm nhanh</button>
+                        </div>
+                    </form>
+                </div>
+                <table class="table table-bordered" id="customerTable">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên</th>
+                            <th>SĐT</th>
+                            <th>Email</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Các dòng khách hàng sẽ được load vào đây -->
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Danh sách sản phẩm chi tiết -->
+<!-- Modal Danh sách sản phẩm chi tiết -->
+<div class="modal fade" id="detailedProductModal" tabindex="-1" aria-labelledby="detailedProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailedProductModalLabel">Danh sách sản phẩm chi tiết</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered" id="detailedProductTable">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Ảnh</th>
+                            <th>Tên sp</th>
+                            <th>Giá bán</th>
+                            <th>Số lượng</th> <!-- Lấy từ DB -->
+                            <th>Kích thước</th>
+                            <th>Màu sắc</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th> <!-- Nút "Thêm" -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Hàng sản phẩm sẽ được load ở đây -->
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Chỗ hiển thị Tổng tiền hóa đơn: ... -->
+<!-- Modal mã giảm giá -->
+
+<div class="modal fade" id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="discountModalLabel">Chọn mã giảm giá</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Chỗ hiển thị danh sách phiếu giảm giá -->
+                <table class="table table-bordered" id="discountTable">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Mã</th>
+                            <th>Tên phiếu</th>
+                            <th>Giá trị giảm</th>
+                            <th>Kiểu giảm</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Sẽ được load bằng JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal thanh toán -->
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="paymentModalLabel">Thông tin thanh toán</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-center">[Form thông tin thanh toán]</p>
+            </div>
+        </div>
+    </div>
+</div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+@section Scripts {
+    <script>
+                /* JS chỉ xử lý luồng: các sự kiện mở modal, clone template hóa đơn,
+                   cập nhật ID, chuyển hướng, … dữ liệu cụ thể (sản phẩm, khách hàng, mã giảm giá) sẽ được load từ nguồn khác sau */
+
+                      $(document).ready(function(){
+
+              let invoiceCount = 0;            // Đếm số hóa đơn hiện tại
+              let currentInvoiceId = null;     // Khi thêm sản phẩm
+              let currentInvoiceForCustomer = null; // Khi chọn khách hàng
+              let currentPaymentInvoiceId = null;   // Khi mở modal thanh toán
+
+              const MAX_INVOICE = 6;           // Giới hạn tối đa 6 hóa đơn
+
+              // Sự kiện tạo hóa đơn mới
+              $('#createInvoice').on('click', function(){
+                // Kiểm tra đã đủ 6 hóa đơn chưa
+                if (invoiceCount >= MAX_INVOICE) {
+                  alert(`Bạn chỉ được tạo tối đa ${MAX_INVOICE} hóa đơn cùng lúc!`);
+                  return;
+                }
+
+                invoiceCount++;
+
+                // Lấy template hóa đơn, clone và thay thế "INVOICE_ID" bằng id mới
+                let newInvoice = $('#invoiceTemplate').html().replace(/INVOICE_ID/g, 'invoice' + invoiceCount);
+
+                // Thêm tab vào danh sách tab
+                $('#invoiceTabs').append(`
+                  <li class="nav-item">
+                    <a class="nav-link" id="tab-invoice${invoiceCount}" data-bs-toggle="tab" href="#invoice${invoiceCount}">
+                      Hóa đơn ${invoiceCount} <span class="close-tab" data-id="invoice${invoiceCount}">✖</span>
+                    </a>
+                  </li>
+                `);
+
+                // Thêm nội dung hóa đơn
+                $('#invoiceContent').append(newInvoice);
+
+                // Hiển thị tab vừa tạo
+                let tab = new bootstrap.Tab(document.querySelector(`#tab-invoice${invoiceCount}`));
+                tab.show();
+              });
+
+
+                 function applyBestVoucher(customerId, orderTotal){
+              $.getJSON('/Admin/PhieuGiamGia/GetBestVoucher', { customerId: customerId, orderTotal: orderTotal }, function(res){
+                if(res.success){
+                  // res.voucher, res.discountAmount, res.finalTotal
+                  $(`#${currentInvoiceId} .discountCodeInput`).val(res.voucher.ma);
+                  $(`#${currentInvoiceId} .discountAmount`).val(res.discountAmount.toLocaleString() + " VND");
+                  $(`#${currentInvoiceId} .finalTotal`).val(res.finalTotal.toLocaleString() + " VND");
+                } else {
+                  // Không có voucher
+                  $(`#${currentInvoiceId} .discountCodeInput`).val("");
+                  $(`#${currentInvoiceId} .discountAmount`).val("0 VND");
+                  $(`#${currentInvoiceId} .finalTotal`).val(orderTotal.toLocaleString() + " VND");
+                }
+              }).fail(function(err){
+                console.error("Lỗi áp voucher tốt nhất:", err);
+              });
+            }
+
+
+
+                             function updateInvoiceTotal(invoiceId) {
+          let total = 0;
+          $(`#invoiceTable-${invoiceId} tbody tr`).each(function() {
+            let rowTotalText = $(this).find('.rowTotal').text();
+            let rowTotal = Number(rowTotalText.replace(/[^\d]/g, '')) || 0;
+            total += rowTotal;
+          });
+          $(`#totalPrice-${invoiceId}`).text(total.toLocaleString() + " VND");
+
+          // Kiểm tra thông tin khách hàng hiện hành
+          let customerName = $(`#${invoiceId} .customerName`).val();
+          let customerId = null; // Mặc định là null (khách lẽ)
+          if (customerName && customerName.trim().toLowerCase() !== "khách lẻ") {
+            // Nếu khách hàng đã được chọn, bạn cần lấy customerId từ input ẩn
+            customerId = $('#customerIdHidden').val() || null;
+          }
+
+          applyBestVoucher(customerId, total);
+        }
+
+
+                          // Khi nhấn nút "Chọn mã giảm giá"
+                                  // Khi nhấn nút "Chọn mã giảm giá"
+                // Khi nhấn nút "Chọn mã giảm giá"
+                   $(document).on('click', '.selectDiscount', function(){
+            currentInvoiceId = $(this).data('id');
+            let totalText = $(`#totalPrice-${currentInvoiceId}`).text();
+            let orderTotal = Number(totalText.replace(/[^\d]/g, '')) || 0;
+
+            if(orderTotal <= 0){
+                alert("Hóa đơn chưa có sản phẩm hoặc tổng tiền chưa đủ điều kiện áp voucher.");
+                return;
+            }
+
+            // Lấy thông tin khách hàng từ input của hóa đơn hiện hành
+            let customerName = $(`#${currentInvoiceId} .customerName`).val();
+            let isKhachLe = !customerName || customerName.trim().toLowerCase() === "khách lẻ";
+            // Nếu khách hàng là "khách lẽ", customerId sẽ là null
+            let customerId = isKhachLe ? null : $(`#${currentInvoiceId} #customerIdHidden`).val() || null;
+
+            $.getJSON('/Admin/PhieuGiamGia/GetAllDiscounts', { customerId: customerId, orderTotal: orderTotal }, function(data){
+                let tbody = $('#discountTable tbody');
+                tbody.empty();
+                if(data && data.length > 0){
+                    // Lọc voucher theo điều kiện tổng tiền
+                    let applicableVouchers = data.filter(function(voucher){
+                        let minTotal = voucher.gia_tri_toi_thieu != null ? Number(voucher.gia_tri_toi_thieu) : null;
+                        let condition = (minTotal !== null ? orderTotal >= minTotal : true);
+                        if(isKhachLe){
+                            // Với khách lẽ, chỉ hiển thị voucher công khai (kieu_giam_gia === 0)
+                            return voucher.kieu_giam_gia === 0 && condition;
+                        } else {
+                            // Với khách hàng đã chọn, chỉ hiển thị voucher cá nhân (kieu_giam_gia === 1)
+                            return voucher.kieu_giam_gia === 1 && condition;
+                        }
+                    });
+
+                    if(applicableVouchers.length === 0){
+                        alert("Hóa đơn chưa đủ điều kiện áp phiếu giảm giá.");
+                        return;
+                    }
+
+                    $.each(applicableVouchers, function(index, voucher){
+                        let discountTypeText = (voucher.loai_phieu_giam_gia === 0) ? "Phần trăm" : "Cố định";
+                        let voucherTypeText = (voucher.kieu_giam_gia === 0) ? "Công khai" : "Cá nhân";
+                        tbody.append(`
+                          <tr data-id="${voucher.id}">
+                            <td>${index + 1}</td>
+                            <td>${voucher.ma}</td>
+                            <td>${voucher.ten_phieu_giam_gia}</td>
+                            <td>${voucher.gia_tri_giam}</td>
+                            <td>${discountTypeText}</td>
+                            <td>${voucherTypeText}</td>
+                            <td>
+                              <button class="btn btn-primary choose-discount"
+                                data-id="${voucher.id}"
+                                data-code="${voucher.ma}"
+                                data-name="${voucher.ten_phieu_giam_gia}"
+                                data-value="${voucher.gia_tri_giam}"
+                                data-type="${voucher.loai_phieu_giam_gia}">
+                                Chọn
+                              </button>
+                            </td>
+                          </tr>
+                        `);
+                    });
+
+                    let modalEl = document.getElementById('discountModal');
+                    let modal = new bootstrap.Modal(modalEl);
+                    modal.show();
+                } else {
+                    tbody.append(`<tr><td colspan="7" class="text-center">Không có phiếu giảm giá</td></tr>`);
+                }
+            }).fail(function(jqXHR, textStatus, errorThrown){
+                console.error("Lỗi khi load voucher:", textStatus);
+            });
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+        // Khi tính tổng hóa đơn, đảm bảo truyền customerId là null nếu khách hàng là khách lẽ
+        function updateInvoiceTotal(invoiceId) {
+          let total = 0;
+          $(`#invoiceTable-${invoiceId} tbody tr`).each(function() {
+            let rowTotalText = $(this).find('.rowTotal').text();
+            let rowTotal = Number(rowTotalText.replace(/[^\d]/g, '')) || 0;
+            total += rowTotal;
+          });
+          $(`#totalPrice-${invoiceId}`).text(total.toLocaleString() + " VND");
+
+          // Kiểm tra xem khách hàng có được nhập không
+          let customerNameInput = $(`#${invoiceId} .customerName`).val();
+          let customerId = null; // Nếu khách hàng là khách lẽ, truyền null
+          if(customerNameInput && customerNameInput.trim().toLowerCase() !== "khách lẻ"){
+            // Giả sử bạn có hidden field hoặc logic lấy customerId
+            customerId = $('#customerIdHidden').val() || null;
+          }
+
+          applyBestVoucher(customerId, total);
+        }
+
+
+
+
+
+
+
+                    $(document).on('click', '.choose-discount', function(){
+              let voucherId = $(this).data('id');
+              let code = $(this).data('code');
+              let name = $(this).data('name');
+              let value = parseFloat($(this).data('value')) || 0;
+              let type = parseInt($(this).data('type')) || 0; // 0 = phần trăm, 1 = cố định
+
+              // Lấy tổng tiền hóa đơn (trước giảm) = sum of rowTotal
+              let totalText = $(`#totalPrice-${currentInvoiceId}`).text();
+              let orderTotal = Number(totalText.replace(/[^\d]/g, '')) || 0;
+
+              // Tính tiền giảm
+              let discount = 0;
+              if(type === 0){
+                // phần trăm
+                discount = orderTotal * (value / 100);
+              } else {
+                // cố định
+                discount = value;
+              }
+              if(discount > orderTotal) discount = orderTotal;
+
+              // Tính tổng tiền sau giảm
+              let finalTotal = orderTotal - discount;
+
+              // Cập nhật giao diện
+              // Giả sử bạn có:
+              //   <input type="text" class="form-control discountCodeInput" ...>
+              //   <input type="text" class="form-control discountAmount" ...>
+              //   <input type="text" class="form-control finalTotal" ...>
+              $(`#${currentInvoiceId} .discountCodeInput`).val(code);
+              $(`#${currentInvoiceId} .discountAmount`).val(discount.toLocaleString() + " VND");
+              $(`#${currentInvoiceId} .finalTotal`).val(finalTotal.toLocaleString() + " VND");
+
+              // Đóng modal
+              let modalEl = document.getElementById('discountModal');
+              let modal = bootstrap.Modal.getInstance(modalEl);
+              modal.hide();
+            });
+
+                    // Hàm gọi API lấy phiếu giảm giá tốt nhất dựa trên customerId và tổng tiền đơn hàng
+
+
+              // Các sự kiện mở modal – JS chỉ xử lý luồng
+              // Khi nhấn nút "Thêm sản phẩm" (có class "selectProduct")
+              $(document).on('click', '.selectProduct', function(){
+                // Lưu currentInvoiceId nếu cần xử lý thêm sản phẩm vào hóa đơn hiện hành
+                currentInvoiceId = $(this).data('id');
+                // Mở modal danh sách sản phẩm chi tiết (modal có id "detailedProductModal")
+                let modal = new bootstrap.Modal(document.getElementById('detailedProductModal'));
+                modal.show();
+                // Load danh sách sản phẩm chi tiết từ API
+                loadDetailedProducts();
+              });
+
+              // Sự kiện tăng/giảm số lượng và cập nhật tổng tiền cho từng dòng sản phẩm
+                                   // Sự kiện click nút + (chỉ 1 block)
+            $(document).on('click', '.plus', function(){
+              let row = $(this).closest('tr');
+
+              let qtyInput = row.find('.quantity');
+              let currentQty = parseInt(qtyInput.val()) || 1;
+
+              // Tăng số lượng hiển thị trong hóa đơn
+              qtyInput.val(currentQty + 1).trigger('input');
+
+              // Gọi API để DB trừ đi 1
+              let productId = row.data('product-id');
+              updateDBQuantity(productId, 1);
+
+              // Đồng thời cập nhật hiển thị trong modal (trừ 1)
+              let modalRow = $(`#detailedProductTable tbody tr[data-product-id="${productId}"]`);
+              let availableQty = parseInt(modalRow.data('db-quantity')) || 0;
+              if(availableQty > 0) {
+                availableQty--;
+                modalRow.data('db-quantity', availableQty);
+                modalRow.find('td:nth-child(5)').text(availableQty);
+              }
+            });
+
+
+                   $(document).on('click', '.minus', function(){
+              let row = $(this).closest('tr');
+              let qtyInput = row.find('.quantity');
+              let currentQty = parseInt(qtyInput.val()) || 1;
+              if(currentQty > 1){
+                // Giảm số lượng trong hóa đơn
+                qtyInput.val(currentQty - 1).trigger('input');
+
+                // Gọi API => DB +1
+                let productId = row.data('product-id');
+                updateDBQuantity(productId, -1);
+
+                // Tăng lại số lượng hiển thị ở modal
+                let modalRow = $(`#detailedProductTable tbody tr[data-product-id="${productId}"]`);
+                let availableQty = parseInt(modalRow.data('db-quantity')) || 0;
+                availableQty++;
+                modalRow.data('db-quantity', availableQty);
+                modalRow.find('td:nth-child(5)').text(availableQty);
+              }
+            });
+
+
+                              // Ví dụ cập nhật số tiền trong 1 dòng sản phẩm
+                   $(document).on('input', '.quantity', function(){
+              let row = $(this).closest('tr');
+              let priceText = row.find('td:nth-child(4)').text(); // Giá bán, ví dụ "300.000 VND"
+              // Loại bỏ tất cả ký tự không phải số để nhận được "300000"
+              let price = Number(priceText.replace(/[^\d]/g, '')) || 0;
+              let qty = parseInt($(this).val()) || 1;
+              let total = price * qty;
+              row.find('.rowTotal').text(total.toLocaleString() + ' VND');
+              // Sau đó cập nhật tổng tiền hóa đơn
+              updateInvoiceTotal(currentInvoiceId);
+            });
+
+
+
+
+              // Hàm load danh sách sản phẩm chi tiết từ API và hiển thị lên bảng
+                     // Hàm load danh sách sản phẩm chi tiết
+                    function loadDetailedProducts() {
+              $.getJSON('/Admin/SanPhamChiTiet/GetAllSanPhamChiTiet', function(data) {
+                let tbody = $('#detailedProductTable tbody');
+                tbody.empty();
+                if(data && data.length > 0) {
+                  $.each(data, function(index, product){
+                    let imgUrl = product.imageUrl || "";
+                    // Lấy số lượng hiện có từ DB
+                    let availableQty = product.dbQuantity;
+                    let rowHtml = `
+                      <tr data-product-id="${product.id}" data-db-quantity="${availableQty}">
+                        <td>${index + 1}</td>
+                        <td><img src="${imgUrl}" alt="${product.name}" width="50"></td>
+                        <td>${product.name}</td>
+                        <td>${parseFloat(product.price).toLocaleString()} VND</td>
+                        <td>${availableQty}</td> <!-- Hiển thị số lượng hiện có -->
+                        <td>${product.size}</td>
+                        <td>${product.color}</td>
+                        <td>${product.status}</td>
+                        <td>
+                          <button class="btn btn-success btn-sm add-product"
+                            data-id="${product.id}"
+                            data-name="${product.name}"
+                            data-price="${product.price}"
+                            data-size="${product.size}"
+                            data-color="${product.color}"
+                            data-status="${product.status}"
+                            data-img="${imgUrl}">
+                            Thêm
+                          </button>
+                        </td>
+                      </tr>
+                    `;
+                    tbody.append(rowHtml);
+                  });
+                } else {
+                  tbody.append('<tr><td colspan="9" class="text-center">Không có sản phẩm</td></tr>');
+                }
+              }).fail(function(jqXHR, textStatus, errorThrown){
+                console.error("Lỗi khi lấy dữ liệu sản phẩm chi tiết:", textStatus);
+              });
+            }
+
+
+                    //// Sự kiện khi nhấn nút xóa sản phẩm trong bảng hóa đơn
+                            $(document).on('click', '.deleteProduct', function(){
+              let row = $(this).closest('tr');
+              let productId = row.data('product-id');
+              let quantity = parseInt(row.find('.quantity').val()) || 1;
+
+              // Tăng lại số lượng trên modal: cập nhật số lượng hiển thị của sản phẩm trong modal
+              let modalRow = $(`#detailedProductTable tbody tr[data-product-id="${productId}"]`);
+              let availableQty = parseInt(modalRow.data('db-quantity')) || 0;
+              availableQty += quantity;
+              modalRow.data('db-quantity', availableQty);
+              modalRow.find('td:nth-child(5)').text(availableQty);
+
+              // Cập nhật lại số lượng trong DB (tăng lại số lượng bằng cách gọi API với delta âm)
+              updateDBQuantity(productId, -quantity);
+
+              // Xóa dòng sản phẩm khỏi bảng hóa đơn
+              row.remove();
+
+                      // Sau khi xóa dòng, cập nhật tổng tiền hóa đơn
+            updateInvoiceTotal(currentInvoiceId);
+            });
+
+                                function updateDBQuantity(productId, delta){
+              $.ajax({
+                url: '/Admin/SanPhamChiTiet/UpdateQuantity',
+                type: 'POST',
+                data: JSON.stringify({ productId: productId, delta: delta }),
+                contentType: 'application/json; charset=utf-8',
+                success: function(res){
+                  if(!res.success){
+                    alert("Cập nhật số lượng thất bại: " + res.message);
+                  }
+                },
+                error: function(err){
+                  console.error("Lỗi updateDBQuantity:", err);
+                }
+              });
+            }
+
+
+
+
+                    // Sự kiện khi nhấn nút “Thêm” trong bảng sản phẩm chi tiết
+                                      $(document).on('click', '.add-product', function(){
+              let productId = $(this).data('id');
+              let name = $(this).data('name');
+              let price = parseFloat($(this).data('price')) || 0;
+              let size = $(this).data('size');
+              let color = $(this).data('color');
+              let status = $(this).data('status');
+              let imgUrl = $(this).data('img') || "";
+
+              // Lấy dòng sản phẩm ở modal (bảng A) và số lượng hiện có trong kho (read-only)
+            let modalRow = $(`#detailedProductTable tbody tr[data-product-id="${productId}"]`);
+            let availableQty = parseInt(modalRow.data('db-quantity')) || 0;
+                          if(availableQty <= 0){
+              alert("Sản phẩm đã hết hàng!");
+              return;
+            }
+              // Giảm số lượng hiển thị ở modal đi 1
+             availableQty--;
+                     modalRow.data('db-quantity', availableQty);
+            modalRow.find('td:nth-child(5)').text(availableQty);
+
+                   // DB -1
+            updateDBQuantity(productId, 1);
+
+              // Bảng hóa đơn: kiểm tra xem sản phẩm đã có chưa
+              let invoiceTbody = $(`#invoiceTable-${currentInvoiceId} tbody`);
+              let existingRow = invoiceTbody.find(`tr[data-product-id="${productId}"]`);
+
+              if(existingRow.length > 0){
+                // Nếu đã có, tăng số lượng dòng đó lên 1
+                let qtyInput = existingRow.find('.quantity');
+                let currentQty = parseInt(qtyInput.val()) || 1;
+                qtyInput.val(currentQty + 1).trigger('input');
+              } else {
+                // Nếu chưa có, tạo dòng mới trong bảng hóa đơn (B)
+                let quantity = 1;
+                let rowTotal = price * quantity;
+                let rowCount = invoiceTbody.children('tr').length + 1;
+
+                let newRow = `
+                  <tr data-product-id="${productId}">
+                    <td>${rowCount}</td>
+                    <td><img src="${imgUrl}" alt="${name}" width="50"></td>
+                    <td>${name}</td>
+                    <td class="price" data-price="${price}">${price.toLocaleString()} VND</td>
+                    <td>
+                      <div class="input-group" style="max-width:120px;">
+                        <button class="btn btn-outline-secondary minus" type="button">-</button>
+                        <input type="number" class="form-control quantity" value="${quantity}" min="1">
+                        <button class="btn btn-outline-secondary plus" type="button">+</button>
+                      </div>
+                    </td>
+                    <td>${size}</td>
+                    <td>${color}</td>
+                    <td>${status}</td>
+                    <td class="rowTotal">${rowTotal.toLocaleString()} VND</td>
+                    <td><button class="btn btn-danger btn-sm deleteProduct">🗑️</button></td>
+                  </tr>
+                `;
+                invoiceTbody.append(newRow);
+                updateInvoiceTotal(currentInvoiceId);
+              }
+            });
+
+
+
+
+
+              // Sự kiện mở modal thanh toán
+              $(document).on('click', '.openPayment', function(){
+                currentPaymentInvoiceId = $(this).data('id');
+                let modal = new bootstrap.Modal(document.getElementById('paymentModal'));
+                modal.show();
+              });
+
+              // Sự kiện đóng (xóa) tab hóa đơn
+              $(document).on('click', '.close-tab', function(e){
+                e.stopPropagation();
+                let oldId = $(this).attr('data-id'); // ID cũ của hóa đơn
+                // Xóa tab <li> và nội dung tab-pane
+                $(`#tab-${oldId}`).parent().remove();
+                $(`#${oldId}`).remove();
+
+                // Lấy tất cả tab <li> còn lại
+                let tabs = $('#invoiceTabs li');
+                // Lấy tất cả nội dung tab còn lại
+                let panes = $('#invoiceContent .tab-pane');
+
+                // Cập nhật biến đếm = số tab còn lại
+                invoiceCount = tabs.length;
+
+                // Duyệt qua từng tab để cập nhật ID và tên hiển thị
+                tabs.each(function(index){
+                  let newId = 'invoice' + (index + 1); // Tạo ID mới (invoice1, invoice2, ...)
+                  let anchor = $(this).find('a');
+                  // Tìm nút đóng trong anchor
+                  let closeBtnHtml = anchor.find('.close-tab').prop('outerHTML');
+
+                  // Đặt lại id cho anchor (tab-xxx) và href
+                  anchor
+                    .attr('id', 'tab-' + newId)
+                    .attr('href', '#' + newId)
+                    .html(`Hóa đơn ${index + 1} ${closeBtnHtml}`); // Ví dụ: “Hóa đơn 1 ✖”
+
+                  // Cập nhật data-id cho nút đóng
+                  anchor.find('.close-tab').attr('data-id', newId);
+
+                  // Đồng thời, đổi ID của phần nội dung tab-pane tương ứng
+                  // (theo cùng chỉ số index)
+                  $(panes[index]).attr('id', newId);
+
+                  // Nếu trong nội dung có phần tử như <span class="totalPrice" id="totalPrice-invoice5">,
+                  // cũng cần thay thế 'invoice5' => newId (nếu có)
+                  $(panes[index]).find('.totalPrice').attr('id', 'totalPrice-' + newId);
+                });
+
+                // Hiển thị tab cuối (nếu còn)
+                $('#invoiceTabs a:last').tab('show');
+              });
+
+              // Sự kiện mở modal khách hàng
+              $(document).on('click', '.selectCustomer', function(){
+                currentInvoiceForCustomer = $(this).data('id');
+                populateCustomerModal(); // Load dữ liệu khách hàng từ API
+                let modal = new bootstrap.Modal(document.getElementById('customerModal'));
+                modal.show();
+              });
+
+              // Call API khách hàng
+              function populateCustomerModal() {
+                $.getJSON('/Admin/Khachhang/GetAllKhachHang', function(data) {
+                  let tbody = $('#customerTable tbody');
+                  tbody.empty();
+                  if(data && data.length > 0) {
+                    $.each(data, function(index, customer) {
+                      tbody.append(`
+                        <tr>
+                          <td>${index + 1}</td>
+                          <td>${customer.ho_ten}</td>
+                          <td>${customer.phoneNumber}</td>
+                          <td>${customer.email}</td>
+                          <td>
+                            <button class="btn btn-primary btn-sm choose-customer" data-id="${customer.id}">
+                              Chọn
+                            </button>
+                          </td>
+                        </tr>
+                      `);
+                    });
+                  } else {
+                    tbody.append(`<tr><td colspan="5" class="text-center">Không có dữ liệu khách hàng</td></tr>`);
+                  }
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                  console.error("Lỗi khi lấy dữ liệu khách hàng:", textStatus);
+                });
+              }
+
+              // Sự kiện khi nhấn nút "Chọn" trong modal khách hàng
+                              $(document).on('click', '.choose-customer', function(){
+            let row = $(this).closest('tr');
+            let customerId = $(this).data('id'); // Lấy id từ button "Chọn"
+            let name = row.find('td:nth-child(2)').text();
+            let phone = row.find('td:nth-child(3)').text();
+            let email = row.find('td:nth-child(4)').text();
+
+            // Cập nhật input ẩn trong hóa đơn hiện hành
+            $(`#${currentInvoiceForCustomer} #customerIdHidden`).val(customerId);
+
+            let container = $('#' + currentInvoiceForCustomer);
+            container.find('.khachLe').hide();
+            container.find('.customerForm').slideDown();
+
+            container.find('.customerName').val(name);
+            container.find('.customerPhone').val(phone);
+            container.find('.customerEmail').val(email);
+
+            let modalEl = document.getElementById('customerModal');
+            let modal = bootstrap.Modal.getInstance(modalEl);
+            modal.hide();
+        });
+
+
+
+              // Khi submit form "Thêm nhanh khách hàng"
+              $(document).on('submit', '#quickAddCustomerForm', function(e) {
+                e.preventDefault();
+
+                let customerData = {
+                  Ho_ten: $('#quickCustomerName').val().trim(),
+                  PhoneNumber: $('#quickCustomerPhone').val().trim(),
+                  Email: $('#quickCustomerEmail').val().trim(),
+                  // Gán rỗng cho các trường địa chỉ
+                  Tinh: "",
+                  Huyen: "",
+                  Xa: "",
+                  Dia_chi_chi_tiet: ""
+                };
+
+                if(!customerData.Ho_ten || !customerData.PhoneNumber || !customerData.Email){
+                  alert("Vui lòng nhập ít nhất Họ tên, SĐT, Email!");
+                  return;
+                }
+
+                $.ajax({
+                  url: '/Admin/Khachhang/AddQuickCustomer',
+                  type: 'POST',
+                  data: JSON.stringify(customerData),
+                  contentType: 'application/json; charset=utf-8',
+                  dataType: 'json',
+                  success: function(newCustomer) {
+                    let tbody = $('#customerTable tbody');
+                    if(tbody.find('tr td').first().attr('colspan') == "5"){
+                      tbody.empty();
+                    }
+                    let stt = tbody.find('tr').length + 1;
+                    tbody.append(`
+                      <tr>
+                        <td>${stt}</td>
+                        <td>${newCustomer.ho_ten}</td>
+                        <td>${newCustomer.phoneNumber}</td>
+                        <td>${newCustomer.email}</td>
+                        <td><button class="btn btn-primary btn-sm choose-customer" data-id="${newCustomer.id}">Chọn</button></td>
+                      </tr>
+                    `);
+
+                    $('#quickAddCustomerForm')[0].reset();
+                    alert("Thêm khách hàng thành công!");
+                  },
+                  error: function(err) {
+                    console.error("Lỗi khi thêm khách hàng:", err);
+                    alert("Có lỗi xảy ra, vui lòng thử lại sau.");
+                  }
+                });
+              });
+
+              // Khởi chạy ban đầu populate các modal (nếu cần)
+              populateCustomerModal();
+              populateDiscountModal();
+
+              // Xóa focus của phần tử khi modal "detailedProductModal" ẩn
+              $('#detailedProductModal').on('hidden.bs.modal', function() {
+                $(this).find(':focus').blur();
+              });
+
+            });
+
+    </script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                        }

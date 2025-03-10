@@ -9,6 +9,7 @@ using System.Text;
 using WebBanGiay.Areas.Admin.Data;
 using WebBanGiay.Areas.Admin.Models.ViewModel;
 using WebBanGiay.Data;
+using WebBanGiay.ViewModel;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace WebBanGiay.Areas.Admin.Controllers
@@ -19,40 +20,41 @@ namespace WebBanGiay.Areas.Admin.Controllers
         //HttpClient _httpClient;
         private readonly AppDbContext _context;
 
-        public KhachhangController(AppDbContext context )
+        public KhachhangController(AppDbContext context)
         {
             _context = context;
             //this._httpClient = httpClient;
         }
 
-		public IActionResult Index()
-		{
-			var tai_Khoans = _context.tai_Khoans
-				.Include(tk => tk.Dia_Chi)
-				.OrderByDescending(tk => tk.ngay_tao) // Sắp xếp theo ngày tạo mới nhất
-				.ToList()
-				.Select(customer => new CreateCustomerViewModel
-				{
-					Id = customer.ID,
-					Ho_ten = customer.ho_ten,
-					Makh = customer.ma,
-					PhoneNumber = customer.sdt,
-					Email = customer.email,
-					DateOfBirth = customer.ngay_sinh,
-					Gender = customer.gioi_tinh,
+        public IActionResult Index()
+        {
+            var tai_Khoans = _context.tai_Khoans
+                .Where(t => t.Vai_Tro.ten_vai_tro == "Khách Hàng")
+                .Include(tk => tk.Dia_Chi)
+                .OrderByDescending(tk => tk.ngay_tao) // Sắp xếp theo ngày tạo mới nhất
+                .ToList()
+                .Select(customer => new CreateCustomerViewModel
+                {
+                    Id = customer.ID,
+                    Ho_ten = customer.ho_ten,
+                    Makh = customer.ma,
+                    PhoneNumber = customer.sdt,
+                    Email = customer.email,
+                    DateOfBirth = customer.ngay_sinh,
+                    Gender = customer.gioi_tinh,
                     Createdate = customer.ngay_tao,
-					tinh = customer.Dia_Chi.FirstOrDefault(dc => dc.loai_dia_chi == 1)?.tinh,
-					huyen = customer.Dia_Chi.FirstOrDefault(dc => dc.loai_dia_chi == 1)?.huyen,
-					xa = customer.Dia_Chi.FirstOrDefault(dc => dc.loai_dia_chi == 1)?.xa,
-					dia_chi = customer.Dia_Chi.FirstOrDefault(dc => dc.loai_dia_chi == 1)?.dia_chi_chi_tiet
+                    tinh = customer.Dia_Chi.FirstOrDefault(dc => dc.loai_dia_chi == 1)?.tinh,
+                    huyen = customer.Dia_Chi.FirstOrDefault(dc => dc.loai_dia_chi == 1)?.huyen,
+                    xa = customer.Dia_Chi.FirstOrDefault(dc => dc.loai_dia_chi == 1)?.xa,
+                    dia_chi = customer.Dia_Chi.FirstOrDefault(dc => dc.loai_dia_chi == 1)?.dia_chi_chi_tiet
                 })
-				.ToList();
+                .ToList();
 
-			return View(tai_Khoans);
-		}
+            return View(tai_Khoans);
+        }
 
 
-		public async Task<IActionResult> Details(Guid? id)
+        public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
             {
@@ -69,12 +71,12 @@ namespace WebBanGiay.Areas.Admin.Controllers
             return View(kh);
         }
 
-        public  IActionResult Create()
+        public IActionResult Create()
         {
 
             var viewModel = new CreateCustomerViewModel
             {
-               
+
             }; // Khởi tạo model mới
             return View(viewModel);
         }
@@ -85,11 +87,23 @@ namespace WebBanGiay.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateCustomerViewModel model)
         {
-            if (ModelState.IsValid )
+            if (_context.tai_Khoans.Any(n => n.email == model.Email))
+            {
+                ModelState.AddModelError("email", "Email đã tồn tại!");
+            }
+            if (_context.tai_Khoans.Any(n => n.cccd == model.CCCD))
+            {
+                ModelState.AddModelError("cccd", "Số CCCD đã tồn tại!");
+            }
+            if (_context.tai_Khoans.Any(n => n.sdt == model.PhoneNumber))
+            {
+                ModelState.AddModelError("sdt", "Số điện thoại đã tồn tại!");
+            }
+            if (ModelState.IsValid)
             {
 
-				// Truy vấn vai trò "Khách Hàng" trong cơ sở dữ liệu
-				var vaiTro = await _context.vai_Tros.FirstOrDefaultAsync(v => v.ten_vai_tro == "Khách Hàng");
+                // Truy vấn vai trò "Khách Hàng" trong cơ sở dữ liệu
+                var vaiTro = await _context.vai_Tros.FirstOrDefaultAsync(v => v.ten_vai_tro == "Khách Hàng");
 
                 if (vaiTro == null)
                 {
@@ -97,8 +111,8 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     return View(model);
                 }
 
-				// Tạo mới tài khoản
-				var taiKhoan = new Tai_Khoan
+                // Tạo mới tài khoản
+                var taiKhoan = new Tai_Khoan
                 {
                     ID = Guid.NewGuid(),
                     user_name = model.UserName,
@@ -113,12 +127,12 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     ngay_tao = DateTime.Now,
                     Vai_TroID = vaiTro.ID,
                     ma = GenerateUniqueMaKhachHang(),
-                    
+
                 };
 
-           
+
                 //taiKhoan.GenerateCustomerCode();
-               
+
 
                 _context.tai_Khoans.Add(taiKhoan);
                 await _context.SaveChangesAsync();
@@ -132,9 +146,9 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     huyen = model.huyen,
                     xa = model.xa,
                     dia_chi_chi_tiet = model.dia_chi,
-                    loai_dia_chi = 1,  
+                    loai_dia_chi = 1,
                     ngay_tao = DateTime.Now,
-                    
+
                 };
 
 
@@ -143,16 +157,16 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 _context.dia_Chis.Add(diaChi);
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", "Khachhang");
             }
             return View(model);
         }
 
-		private string GenerateUniqueMaKhachHang()
-		{
-			return "KH" + new Random().Next(100000, 999999);
-            
-		}
+        private string GenerateUniqueMaKhachHang()
+        {
+            return "KH" + new Random().Next(100000, 999999);
+
+        }
 
         //----------------------------------------Edit----------------------------------//
 
@@ -209,31 +223,34 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
             try
             {
-                
-                    var existingAddress = _context.dia_Chis.Find(model.ID);
-                    if (existingAddress == null)
-                    {
-                        return Json(new { success = false, message = "Không tìm thấy địa chỉ để cập nhật!" });
-                    }
 
-                    existingAddress.dia_chi_chi_tiet = model.dia_chi_chi_tiet;
-                    existingAddress.tinh = model.tinh;
-                    existingAddress.huyen = model.huyen;
-                    existingAddress.xa = model.xa;
-                
-                 
-                   
-                    _context.dia_Chis.Update(existingAddress);
-                
+                var existingAddress = _context.dia_Chis.Find(model.ID);
+                if (existingAddress == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy địa chỉ để cập nhật!" });
+                }
+
+                existingAddress.dia_chi_chi_tiet = model.dia_chi_chi_tiet;
+                existingAddress.tinh = model.tinh;
+                existingAddress.huyen = model.huyen;
+                existingAddress.xa = model.xa;
+
+
+
+                _context.dia_Chis.Update(existingAddress);
+
 
                 _context.SaveChanges();
-                return Json(new { success = true, message =  "Cập nhật địa chỉ thành công!"  });
+                return Json(new { success = true, message = "Cập nhật địa chỉ thành công!" });
             }
             catch (Exception ex)
             {
                 return Json(new { success = false, message = "Lỗi khi lưu dữ liệu: " + ex.Message });
             }
         }
+
+
+
         //-----------------Thêm địa chỉ----------------------//
         [HttpPost]
         public JsonResult AddAddress(Dia_Chi model)
@@ -348,6 +365,115 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 .ToList();
 
             return Json(new { success = true, message = "Cập nhật thành công!", sortedAddresses });
+        }
+
+
+
+        [HttpGet]
+        public IActionResult GetAllKhachHang()
+        {
+            var tai_Khoans = _context.tai_Khoans
+                 .Where(t => t.Vai_Tro.ten_vai_tro == "Khách Hàng")
+                 .Include(tk => tk.Dia_Chi)
+                 .OrderByDescending(tk => tk.ngay_tao) // Sắp xếp theo ngày tạo mới nhất
+                 .ToList()
+                 .Select(customer => new CreateCustomerViewModel
+                 {
+                     Id = customer.ID,
+                     Ho_ten = customer.ho_ten,
+                     Makh = customer.ma,
+                     PhoneNumber = customer.sdt,
+                     Email = customer.email,
+                     DateOfBirth = customer.ngay_sinh,
+                     Gender = customer.gioi_tinh,
+                     Createdate = customer.ngay_tao,
+                     tinh = customer.Dia_Chi.FirstOrDefault(dc => dc.loai_dia_chi == 1)?.tinh,
+                     huyen = customer.Dia_Chi.FirstOrDefault(dc => dc.loai_dia_chi == 1)?.huyen,
+                     xa = customer.Dia_Chi.FirstOrDefault(dc => dc.loai_dia_chi == 1)?.xa,
+                     dia_chi = customer.Dia_Chi.FirstOrDefault(dc => dc.loai_dia_chi == 1)?.dia_chi_chi_tiet
+                 })
+                 .ToList();
+
+            return Json(tai_Khoans);
+        }
+
+
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> AddQuickCustomer([FromBody] QuickCustomerViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var vaiTro = await _context.vai_Tros.FirstOrDefaultAsync(v => v.ten_vai_tro == "Khách Hàng");
+                if (vaiTro == null)
+                    return BadRequest("Vai trò Khách Hàng không tồn tại.");
+
+                if (_context.tai_Khoans.Any(n => n.email == model.Email))
+                    return BadRequest("Email đã tồn tại!");
+                if (_context.tai_Khoans.Any(n => n.sdt == model.PhoneNumber))
+                    return BadRequest("SĐT đã tồn tại!");
+
+                var newCustomer = new Tai_Khoan
+                {
+                    ID = Guid.NewGuid(),
+                    user_name = "",                   // Gán mặc định
+                    ho_ten = model.Ho_ten,
+                    sdt = model.PhoneNumber,
+                    email = model.Email,
+                    ngay_tao = DateTime.Now,
+                    Vai_TroID = vaiTro.ID,
+                    ma = GenerateUniqueMaKhachHang(),
+                    gioi_tinh = 0,
+                    ngay_sinh = new DateTime(2000, 1, 1),
+                    cccd = "",
+                    trang_thai = 1
+                };
+
+                _context.tai_Khoans.Add(newCustomer);
+                await _context.SaveChangesAsync();
+
+                // Tạo Dia_Chi với giá trị rỗng cho địa chỉ
+                var diaChi = new Dia_Chi
+                {
+                    ID = Guid.NewGuid(),
+                    loai_dia_chi = 1, // địa chỉ chính
+                    tinh = "",      // rỗng
+                    huyen = "",     // rỗng
+                    xa = "",        // rỗng
+                    dia_chi_chi_tiet = "",
+                    Tai_KhoanID = newCustomer.ID,
+                    ngay_tao = DateTime.Now,
+                    ngay_sua = DateTime.Now
+                };
+
+                _context.dia_Chis.Add(diaChi);
+                await _context.SaveChangesAsync();
+
+                return Json(new
+                {
+                    id = newCustomer.ID,
+                    ho_ten = newCustomer.ho_ten,
+                    phoneNumber = newCustomer.sdt,
+                    email = newCustomer.email,
+                    dia_chi = new
+                    {
+                        diaChiID = diaChi.ID,
+                        dia_chi_chi_tiet = diaChi.dia_chi_chi_tiet,
+                        tinh = diaChi.tinh,
+                        huyen = diaChi.huyen,
+                        xa = diaChi.xa
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
 
