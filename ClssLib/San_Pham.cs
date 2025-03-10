@@ -17,6 +17,8 @@ namespace ClssLib
         public string ten_san_pham { get; set; }
         [Display(Name = "Mô Tả :")]
         public string mo_ta { get; set; }
+
+        public decimal gia { get; set; }
         public int trang_thai { get; set; }
         public DateTime ngay_tao { get; set; }
         public DateTime? ngay_sua { get; set; }

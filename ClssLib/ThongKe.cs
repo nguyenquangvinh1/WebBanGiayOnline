@@ -23,11 +23,15 @@ namespace ClssLib
 
         [ForeignKey("Hoa_Don")]
         public Guid Hoa_DonID { get; set; }
+
         [ForeignKey("San_Pham_Chi_Tiet")]
-        public Guid San_Pham_Chi_TietID { get; set; }
+        public Guid? San_Pham_Chi_TietID { get; set; }
+       
         [JsonIgnore]
         public virtual Hoa_Don Hoa_Don { get; set; }
         [JsonIgnore]
-        public virtual San_Pham_Chi_Tiet San_Pham_Chi_Tiet { get; set; }
+        public virtual San_Pham_Chi_Tiet San_Pham_Chi_Tiet { get; set; } 
+
+
     }
 }

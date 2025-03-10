@@ -14,6 +14,7 @@ using DocumentFormat.OpenXml.Office2010.Excel;
 namespace WebBanGiay.Areas.Admin.Controllers
 {
     [Area("Admin")]
+
     public class ThongKesController : Controller
     {
         private readonly AppDbContext _context;
@@ -24,13 +25,14 @@ namespace WebBanGiay.Areas.Admin.Controllers
         }
 
         // GET: Admin/ThongKes
+       
         public async Task<IActionResult> Index(Guid? id)
         {
             var thongke = _context.thongKes
                 .Include(x => x.San_Pham_Chi_Tiet)
-                .AsQueryable()
+                .OrderByDescending(x => x.SoLuongSP)
                 .ToList();
-            
+
             var today = DateTime.Today;
             var startOfWeek = today.AddDays(-(int)today.DayOfWeek + (today.DayOfWeek == DayOfWeek.Sunday ? -6 : 1));
             var endOfWeek = startOfWeek.AddDays(6);
@@ -53,7 +55,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 .Select(x =>
                        new ThongKe()
                        {
-                           TongTien = x.Sum(x => x.tong_tien),
+                           TongTien = x.Where(x => x.trang_thai == 3).Sum(x => x.tong_tien),
                            DonThanhCong = x.Count(x => x.trang_thai == 3),
                            DonHuy = x.Count(x => x.trang_thai == 4),
                        }).ToList();
@@ -64,7 +66,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 .Select(x =>
                        new ThongKe()
                        {
-                           TongTien = x.Sum(x => x.tong_tien),
+                           TongTien = x.Where(x => x.trang_thai == 3).Sum(x => x.tong_tien),
                            DonThanhCong = x.Count(x => x.trang_thai == 3),
                            DonHuy = x.Count(x => x.trang_thai == 4),
                        }).ToList();
@@ -75,13 +77,13 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 .Select(x =>
                        new ThongKe()
                        {
-                           TongTien = x.Sum(x => x.tong_tien),
+                           TongTien = x.Where(x => x.trang_thai == 3).Sum(x => x.tong_tien),
                            DonThanhCong = x.Count(x => x.trang_thai == 3),
                            DonHuy = x.Count(x => x.trang_thai == 4),
                        }).ToList();
 
             var thongKeList = new List<ThongKe>
-           
+
     {
         new ThongKe
         {
@@ -122,5 +124,28 @@ namespace WebBanGiay.Areas.Admin.Controllers
         }
 
 
+        [HttpPost]
+        [Route("Getdata")]
+        public async Task<IActionResult> Getdata(Guid? id)
+        {
+            var thongKe = _context.hoa_Dons
+               .ToList()
+                .Select(x => new 
+                {
+                    DoanhThu = x.ngay_tao.ToString("dd/MM/yyyy"),
+                    TongTien = x.tong_tien,
+                    DonThanhCong =x.trang_thai==3 ? 1 : 0,
+                    DonHuy = x.trang_thai == 4 ? 1 : 0,
+                }).ToList();
+
+       
+            return Json(thongKe);
+        }
+
+       
+
+
+
     }
+
 }

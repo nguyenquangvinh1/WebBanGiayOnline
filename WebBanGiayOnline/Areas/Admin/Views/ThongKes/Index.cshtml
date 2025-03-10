@@ -24,7 +24,7 @@
         }
 
         .table thead {
-        background-color: #ff6600;
+            background-color: #007bff;
         color: white;
         text-align: center;
         }
@@ -88,22 +88,10 @@
         .blue {
         background-color: #007bff;
         color: white;
+        width: 20%;
+        text-align : justify;
         }
-
-        .green {
-        background-color: #009688;
-        color: white;
-        }
-
-        .orange {
-        background-color: #ff9800;
-        color: white;
-        }
-
-        .darkblue {
-        background-color: #3f51b5;
-        color: white;
-        }
+         
     </style>
 </head>
 <body>
@@ -113,19 +101,16 @@
         {
             var today = DateTime.Today;
             var startOfWeek = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek + (DateTime.Today.DayOfWeek == DayOfWeek.Sunday ? -6 : 1));
-
-
-
             var endOfWeek = startOfWeek.AddDays(6);
 
 
             var startOfMonth = new DateTime(today.Year, today.Month, 1);
             var startOfYear = new DateTime(today.Year, 1, 1);
             var doanhThuDate = item.DoanhThu.Date;
-            string cardColor = doanhThuDate == today ? "green" :
-            (doanhThuDate >= startOfWeek && doanhThuDate <= endOfWeek) ? "orange" :
+            string cardColor = doanhThuDate == today ? "blue" :
+            (doanhThuDate >= startOfWeek && doanhThuDate <= endOfWeek) ? "blue" :
             doanhThuDate == startOfMonth ? "blue" :
-            doanhThuDate == startOfYear ? "darkblue" : "gray";
+            doanhThuDate == startOfYear ? "blue" : "blue";
 
             <div class="card @cardColor">
                 <div class="card-header">
@@ -155,49 +140,32 @@
             </div>
         }
 
-
-        <div class="container mt-4">
-            <h5>Bộ lọc</h5>
-            <div class="filter-buttons mb-3">
-                <button class="btn btn-outline-dark" id="today">NGÀY</button>
-                <button class="btn btn-outline-dark"id="weeks">TUẦN</button>
-                <button class="btn btn-outline-dark" id="month">THÁNG</button>
-                <button class="btn btn-outline-dark" id="years">NĂM</button>
-
-                <input type="date" class="form-control d-inline-block w-auto" placeholder="Từ ngày">
+        <div class="container">
+            <div class="row">
+                <h4>Lọc dữ liệu theo :</h4>
+                <div class="col-md-3">
+                   
+                    <select class="filter-select">
+    <option value="30">Lọc dữ liệu</option>
+    <option value="7">7 ngày trước</option>
+    <option value="30">Tháng qua</option>
+    <option value="90">3 Tháng quá</option>
+    <option value="365">Năm qua</option>
+</select>
+                </div>
             </div>
+        </div>
+        <h2 style="text-align: center;">Biểu đồ thống kê</h2>
+        <div id="myfirstchart" style="height: 100%; width : 100%"></div>
 
 
-            <table class="table table-bordered">
 
-                <thead>
-
-                    <tr>
-                        <th>Ảnh</th>
-                        <th>Tên sản phẩm</th>
-                        <th>Số lượng</th>
-                        <th>Giá tiền</th>
-                        <th>Kích cỡ</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    
-              @*     @foreach(var item in Model )
-                              {
-                        <tr>
-                            <td>@item.San_Pham_Chi_Tiet.ma</td>
-                            <td>@item.San_Pham_Chi_Tiet.so_luong</td>
-                            <td>@item.San_Pham_Chi_Tiet.gia</td>
-                            <td>@item.San_Pham_Chi_Tiet.Kich_ThuocID</td>
-                        </tr>
-                    } *@
-
+       
                
                   
 
 
-                </tbody>
-            </table>
+              >
         </div>
 @*         
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -222,10 +190,47 @@
                                 position: 'bottom'
                             }
                         }
-                    }
+                        
                 });
             </script> *@
          
     </div>
 </body>
+@section Scripts {
+  <script>
+      $(document).ready(function(){
+          $.ajax({
+             url : "@Url.Action("Getdata","ThongKes")",
+             type : "POST",
+             datatype : "json",
+             success : function(data){
+                 
+            new Morris.Line({
+          element: 'myfirstchart',
+          data: data,
+         xkey: 'doanhThu',  // Trùng với key trong JSON
+                  ykeys: ['tongTien', 'donThanhCong', 'donHuy'],
+                  labels: ['Tổng Tiền', 'Đơn hàng thành công', 'Đơn Hủy'],
+                  parseTime: true, // Quan trọng: kích hoạt parse thời gian
+                  xLabelFormat: function (x) {
+                      var date = new Date(x);
+                      return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
+                  }
+
+          
+        });
+             }
+          });
+
+           
+
+      })
+
+      
+            
+  </script>
+            }
+
 </html>
+
+ 
