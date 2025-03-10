@@ -8,7 +8,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Ảnh Sản Phẩm</h5>
-                <button type="button" class="btn-close clsbtn" data-bs-dismiss="modal"><span aria-hidden="true">x</span></button></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <input type="file" id="uploadProductImage" class="form-control">
@@ -34,12 +36,13 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             
+            
             <input class="form-control" type="hidden" id="lstSPCT" required="" name="lstSPCT" />
 
             <input class="form-control" type="hidden" id="productImages" name="productImages" />
 
 
-            <button type="button" class="btn btn-secondary ms-2 anh_form" data-bs-toggle="modal" data-bs-target="#productImageModal">
+            <button type="button" class="btn btn-secondary ms-2 anh_form" data-toggle="modal" data-target="#productImageModal">
                 Thêm Ảnh
             </button>
 
@@ -162,7 +165,8 @@
                 <span asp-validation-for="mo_ta" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" id="saveProduct" class="btn btn-primary" />
+                <button class="btn btn-primary" id="saveProduct">ktra</button>
+                @* <input type="submit" value="Create" id="saveProduct" class="btn btn-primary" /> *@
             </div>
 
         </form>
@@ -180,8 +184,8 @@
         <form>
             <div class="form-group">
                 <label class="form-label">Màu Sắc:</label>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                        data-bs-target="#colorModal">
+                <button type="button" class="btn btn-primary" data-toggle="modal"
+                        data-target="#colorModal">
                     +
                 </button>
             </div>
@@ -189,37 +193,59 @@
 
             <div class="form-group">
                 <label class="form-label">Kích Cỡ:</label>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                        data-bs-target="#sizeModal">
+                <button type="button" class="btn btn-primary" data-toggle="modal"
+                        data-target="#sizeModal">
                     +
                 </button>
             </div>
-
+            <div id="selectedSize" class="mb-3"></div>
             
         </form>
     </div>
 </div>
 
 <!-- Thêm màu sắc -->
-
-
 <!-- Modal chọn màu -->
 <div class="modal fade" id="colorModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Chọn Màu Sắc</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"><span aria-hidden="true">x</span></button></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body " id="colorModalBody">
                 @foreach (var item in (IEnumerable<SelectListItem>)ViewData["Mau_SacID"])
                 {
-                    <div class="form-check">
-                        <input class="form-check-input color-checkbox" type="checkbox"
-                               value="@item.Text">@item.Text
+                    <div class="form-check d-flex align-items-center">
+                        <!-- Checkbox chọn màu -->
+                        <input class="form-check-input color-checkbox me-2" type="checkbox" value="@item.Text">
+                        <!-- Nút hiển thị màu -->
+                        <button class="btn text-white d-flex align-items-center justify-content-center"
+                                style="background-color: @item.Text;
+                       border: 1px solid #ccc;
+                       width: 50px; height: 50px;
+                       border-radius: 8px;">
+                            @item.Text
+                        </button>
                     </div>
                 }
 
+                <!-- Nút thêm màu mới -->
+                <button class="btn btn-primary mt-3" id="showColorPicker">Thêm Màu Mới</button>
+
+                <!-- Chọn màu mới -->
+                <div id="colorPickerContainer" class="mt-3" style="display: none;">
+                    <label>Color picker:</label>
+                    <div class="input-group ChonMau">
+                        <input type="text" class="form-control" id="newColor">
+                        <div class="input-group-append">
+                            <span class="input-group-text"><i class="fas fa-square"></i></span>
+                        </div>
+                    </div>
+                    
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-success" id="addColor">Thêm</button>
@@ -234,9 +260,11 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Chọn Kích Cỡ</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"><span aria-hidden="true">x</span></button></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body " id="sizeModalBody">
                 @foreach (var item in (IEnumerable<SelectListItem>)ViewData["Kich_ThuocID"])
                 {
                     <div class="form-check">
@@ -245,6 +273,18 @@
                     </div>
                 }
 
+                <!-- Nút thêm kích cỡ mới -->
+                <button class="btn btn-primary mt-3" id="showSizePicker">Thêm kích cỡ Mới</button>
+
+                <!-- Chọn kích cỡ mới -->
+                <div id="sizePickerContainer" class="mt-3" style="display: none;">
+                    <label>Size picker:</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="newSize">
+                        
+                    </div>
+
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-success" id="addSize">Thêm</button>
@@ -264,6 +304,8 @@
 
 <script>
     $(document).ready(function () {
+        console.log("Document is ready!");
+        // Các function khác
         let selectedSizes = [];
         let uploadedImages = []; // Mảng lưu đường dẫn ảnh
 
@@ -275,39 +317,95 @@
             $("#imagePreviewContainer").html("");
             uploadedImages.forEach(url => {
                 $("#imagePreviewContainer").append(`
-                        <div class="col-md-3 mt-2">
-                            <img src="${url}" class="img-thumbnail" width="100">
-                        </div>
-                    `);
-            });
-        });
-        $(document).on("click", ".anh_form", function () {
-
-            console.log(`🔹 Chọn ảnh `);
-            $("#selectImages").hide(); // Ẩn nút "Chọn Ảnh" khi mở modal
-            $("#imagePreviewContainer").html("");
-            uploadedImages.forEach(url => {
-                $("#imagePreviewContainer").append(`
-                        <div class="col-md-3 mt-2">
-                            <img src="${url}" class="img-thumbnail" width="100">
-                        </div>
-                    `);
+                                        <div class="col-md-3 mt-2">
+                                            <img src="${url}" class="img-thumbnail" width="100">
+                                        </div>
+                                    `);
             });
         });
 
+        $('#showSizePicker').click(function () {
+            $('#sizePickerContainer').show();
+            $('#newSize').focus();
+        });
+
+        // Khi nhấn Enter để thêm kích cỡ mới
+        $('#newSize').keypress(function (e) {
+            if (e.which == 13) { // Nhấn Enter
+                let newSize = $('#newSize').val().trim();
+                if (newSize !== "") {
+                    $.ajax({
+                        url: '/Admin/SanPham/ThemKichCo',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(newSize),
+                        success: function (response) {
+                            // Thêm checkbox kích cỡ mới vào danh sách
+                            $('#sizeModalBody').append(`
+                                    <div class="form-check">
+                                        <input class="form-check-input size-checkbox" type="checkbox" value="${response}" checked> ${response}
+                                    </div>
+                                `);
+                            $('#sizePickerContainer').hide(); // Ẩn ô nhập kích cỡ
+                            $('#newSize').val(''); // Xóa nội dung nhập
+                        },
+                        error: function () {
+                            alert("Có lỗi xảy ra khi thêm kích cỡ.");
+                        }
+                    });
+                }
+            }
+        });
+
+        $('.ChonMau').colorpicker()
+
+        $('.ChonMau').on('colorpickerChange', function (event) {
+            $('.ChonMau .fa-square').css('color', event.color.toString());
+        })
+
+        $('#showColorPicker').click(function () {
+            $('#colorPickerContainer').show();
+            $('#newColor').focus();
+        });
+
+        // Thêm màu mới khi nhấn Enter
+
+        // Khi người dùng nhấn phím Enter trong ô nhập màu
+        $('#newColor').keypress(function (e) {
+            if (e.which == 13) { // Nhấn Enter
+                let newColor = $('#newColor').val().trim();
+                if (newColor !== "") {
+                    $.ajax({
+                        url: '/Admin/SanPham/ThemMau',
+                        type: 'POST',
+                        contentType: 'application/json', // Chuyển về JSON
+                        data: JSON.stringify(newColor), // Chuyển thành JSON
+                        success: function (response) {
+                            $('#colorModalBody').append(`<div class="form-check">
+                                    <!-- Checkbox chọn màu -->
+                                        <input class="form-check-input color-checkbox me-2" type="checkbox" value="${response}" checked>
+                                    <!-- Nút hiển thị màu -->
+                                    <button class="btn text-white d-flex align-items-center justify-content-center"
+                                                style="background-color: ${response};
+                                   border: 1px solid #ccc;
+                                   width: 50px; height: 50px;
+                                   border-radius: 8px;">
+                ${response}
+                                    </button>
+                                </div>`);
+                            $('#colorPickerContainer').hide();
+                            $('#newColor').val('');
+                        },
+                        error: function () {
+                            alert("Có lỗi xảy ra khi thêm màu.");
+                        }
+                    });
+                }
+            }
+        });
 
 
-        // // Khi mở modal, hiển thị ảnh đã có
-        // $("#productImageModal").on("show.bs.modal", function () {
-        //     $("#imagePreviewContainer").html("");
-        //     uploadedImages.forEach(url => {
-        //         $("#imagePreviewContainer").append(`
-        //             <div class="col-md-3 mt-2">
-        //                 <img src="${url}" class="img-thumbnail" width="100">
-        //             </div>
-        //         `);
-        //     });
-        // });
+
 
         // Khi chọn ảnh, tải lên server ngay lập tức
         $("#uploadProductImage").change(function () {
@@ -329,10 +427,10 @@
                     if (response.success) {
                         uploadedImages.push(response.filePath);
                         $("#imagePreviewContainer").append(`
-                            <div class="col-md-3 mt-2">
-                                <img src="${response.filePath}" class="img-thumbnail" width="100">
-                            </div>
-                        `);
+                                            <div class="col-md-3 mt-2">
+                                                <img src="${response.filePath}" class="img-thumbnail" width="100">
+                                            </div>
+                                        `);
                         $("#productImages").val(JSON.stringify(uploadedImages)); // Lưu vào input ẩn
                     } else {
                         alert("❌ Lỗi khi tải ảnh!");
@@ -361,115 +459,74 @@
             // Hiển thị danh sách ảnh đã lưu
             uploadedImages.forEach(url => {
                 $("#imagePreviewContainer").append(`
-                                        <div class="col-md-3 mt-2 d-inline-block">
-                            <input type="checkbox" class="image-checkbox" value="${url}">
-                            <img src="${url}" class="img-thumbnail" width="100">
-                    </div>
-                        `);
+                                                        <div class="col-md-3 mt-2 d-inline-block">
+                                            <input type="checkbox" class="image-checkbox" value="${url}">
+                                            <img src="${url}" class="img-thumbnail" width="100">
+                                    </div>
+                                        `);
             });
 
 
-            // storedImages.forEach(img => {
-            //     $("#uploadedImages").append(`
-            //         <div class="m-2 d-inline-block text-center">
-            //         <input type="checkbox" class="image-checkbox" value="${img}">
-            //         <img src="${img}" class="img-thumbnail" width="100">
-            //     </div>
-            // `);
-            // });
 
             $('#productImageModal').modal('show');
         });
-
         // Khi bấm nút "Select Images"
         $(document).on("click", "#selectImages", function () {
             let selectedImages = [];
+            let exceededLimit = false;
 
-            // Lấy danh sách ảnh đã chọn
-            $(".image-checkbox:checked").each(function () {
-                selectedImages.push($(this).val());
+            // Lấy danh sách ảnh đã chọn, giới hạn tối đa 6 ảnh
+            $(".image-checkbox:checked").each(function (index) {
+                if (index < 6) {
+                    selectedImages.push($(this).val());
+                } else {
+                    exceededLimit = true;
+                    return false; // Dừng khi đã đủ 6 ảnh
+                }
             });
+
+            if (exceededLimit) {
+                alert("⚠️ Ảnh quá giới hạn! Chỉ có thể chọn tối đa 6 ảnh, các ảnh sau ảnh thứ 6 đã bị loại bỏ.");
+            }
+
 
             console.log("✅ Ảnh đã chọn:", selectedImages);
 
             if (selectedImages.length > 0) {
-                let color = $("#selectImages").data("color"); // Lấy màu đã lưu từ nút chọn ảnhconsole.log(`🎨 Màu sản phẩm: ${color}`);
+                let color = $("#selectImages").data("color"); // Lấy màu sản phẩm
                 console.log(`🎨 Màu sản phẩm: ${color}`);
 
-                let firstImage = selectedImages[0]; // Ảnh đầu tiên làm ảnh đại diện
-
-                // ✅ Kiểm tra nếu tồn tại ảnh đại diện thì cập nhật
-                let imgElement = $(`#img-${color}`);
-                if (imgElement.length > 0) {
-                    imgElement.attr("src", firstImage);
-                } else {
-                    console.warn(`⚠️ Không tìm thấy ảnh đại diện: #img-${color}`);
-                }
-
-                // ✅ Kiểm tra nếu bảng sản phẩm tồn tại thì lưu ảnh vào từng hàng chi tiết
+                // ✅ Kiểm tra bảng sản phẩm có tồn tại không
                 let table = $(`#table-${color}`);
-                if (table.length > 0) {
-                    table.find("tbody tr").each(function () {
-                        let lstImgInput = $(this).find(".lst_img");
-                        if (lstImgInput.length > 0) {
-                            lstImgInput.val(JSON.stringify(selectedImages));
-                        } else {
-                            console.warn("⚠️ Không tìm thấy input .lst_img trong hàng.");
-                        }
-                    });
-                } else {
-                    console.warn(`⚠️ Không tìm thấy bảng sản phẩm: #table-${color}`);
+                if (table.length === 0) {
+                    console.warn(`⚠️ Không tìm thấy bảng sản phẩm: #table-${color}, kiểm tra lại màu đã chọn!`);
+                    return;
                 }
+
+                // ✅ Cập nhật danh sách ảnh vào bảng sản phẩm
+                table.find("tbody tr").each(function () {
+                    let lstImgInput = $(this).find(".lst_img");
+                    if (lstImgInput.length > 0) {
+                        lstImgInput.val(selectedImages.join(",")); // Cập nhật danh sách ảnh dưới dạng chuỗi
+                    } else {
+                        console.warn("⚠️ Không tìm thấy input .lst_img trong hàng.");
+                    }
+                });
+
+                // ✅ Hiển thị danh sách ảnh trong `imgSelected`
+                let imgContainer = $(`#${color} .imgSelected`);
+                imgContainer.empty(); // Xóa ảnh cũ trước khi thêm mới
+
+                selectedImages.forEach(url => {
+                    imgContainer.append(`
+                            <img src="${url}" class="img-thumbnail me-2" width="100">
+                        `);
+                });
             }
 
             // Đóng modal sau khi chọn ảnh
             $('#productImageModal').modal('hide');
         });
-
-
-
-        let danhSachTenGiay = @Html.Raw(Json.Serialize(ViewBag.TenGiay));
-        console.log("✅ Danh sách tên giày:", danhSachTenGiay);
-
-        // Khởi tạo Select2
-        $("#ten_san_pham").select2({
-            placeholder: "Nhập hoặc chọn tên sản phẩm",
-            allowClear: true,
-            tags: true,
-            tokenSeparators: [',', ' ']
-        });
-
-        function kiemTraTrungLap(tenSanPham) {
-            return danhSachTenGiay.some(item => item.toLowerCase() === tenSanPham.trim().toLowerCase());
-        }
-
-        // Bắt sự kiện khi chọn hoặc nhập mới
-        $("#ten_san_pham").on("select2:selecting", function (e) {
-            let tenSanPham = e.params.args.data.text;
-            let warningElement = $("#ten_san_pham_warning");
-
-            if (kiemTraTrungLap(tenSanPham)) {
-                warningElement.show();
-                alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
-                e.preventDefault(); // Ngăn không cho chọn giá trị trùng lặp
-            } else {
-                warningElement.hide();
-            }
-        });
-
-        // Ngăn gửi form nếu tên sản phẩm bị trùng
-        $("#saveProduct").click(function (e) {
-            let tenSanPham = $("#ten_san_pham").val();
-
-            if (kiemTraTrungLap(tenSanPham)) {
-                alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
-                e.preventDefault(); // Ngăn form gửi đi nếu trùng tên
-            }
-        });
-
-        console.log("✅ Sự kiện kiểm tra tên sản phẩm đã được kích hoạt.");
-
-
 
         console.log("✅ jQuery Version:", $.fn.jquery);
 
@@ -485,6 +542,9 @@
         console.log("🔍 jQuery version:", $.fn.jquery);
         console.log("🔍 Select2 exists:", typeof $.fn.select2 !== "undefined");
 
+
+        // Hàm khởi tạo Select2
+        // Hàm khởi tạo Select2
         function khoiTaoSelect2() {
             $(".select2").each(function () {
                 let apiUrl = $(this).data("api"); // Lấy API từ data-attribute nếu có
@@ -493,13 +553,13 @@
                     placeholder: "Nhập hoặc chọn một tùy chọn",
                     allowClear: true,
                     tags: true,
-                    tokenSeparators: [',', ' '],
+                    tokenSeparators: [','], // Giữ nguyên khoảng trắng trong giá trị nhập
                     createTag: function (params) {
-                        let term = $.trim(params.term);
-                        if (term === '') return null;
+                        let term = params.term.trim(); // Không xóa khoảng trắng giữa các từ
+                        if (term === "" || /^\s+$/.test(term)) return null; // Ngăn nhập toàn dấu cách
 
                         let exists = false;
-                        $(this).find('option').each(function () {
+                        $(this).find("option").each(function () {
                             if ($(this).text().toLowerCase() === term.toLowerCase()) {
                                 exists = true;
                                 return false;
@@ -512,26 +572,26 @@
 
                         return {
                             id: term,
-                            text: `Nhấn Enter để thêm mới "${term}"`,
+                            text: `Nhấn Enter để thêm mới \"${term}\"`,
                             newTag: true
                         };
                     }
-                }).on('select2:select', function (e) {
+                }).on("select2:select", function (e) {
                     let data = e.params.data;
                     let selectElement = $(this);
 
                     if (data.newTag) {
-                        let realValue = data.text.replace(/Nhấn Enter để thêm mới\s*"(.+)"$/, '$1');
+                        let realValue = data.text.replace(/Nhấn Enter để thêm mới\s*\"(.+)\"$/, "$1");
 
                         $.ajax({
                             url: apiUrl,
                             type: "POST",
                             contentType: "application/json",
-                            data: JSON.stringify(realValue),
+                            data: JSON.stringify(realValue), // Gửi JSON thay vì chuỗi thuần túy
                             success: function (response) {
                                 if (response.success) {
                                     let newOption = new Option(response.text, response.id, true, true);
-                                    selectElement.append(newOption).trigger('change');
+                                    selectElement.append(newOption).trigger("change");
                                 } else {
                                     alert("❌ Không thể thêm giá trị mới.");
                                 }
@@ -544,7 +604,29 @@
                 });
             });
 
-            console.log("✅ Select2 đã khởi tạo thành công!");
+            $("#ten_san_pham").on("keypress", function (e) {
+                if (e.which === 32) {
+                    return; // Bỏ qua sự kiện khi nhấn Space
+                }
+
+                if (e.which === 13) { // Chỉ bắt sự kiện khi nhấn Enter
+                    let tenSanPham = $(this).val().trim(); // Loại bỏ khoảng trắng đầu và cuối
+                    let warningElement = $("#ten_san_pham_warning");
+
+                    if (tenSanPham === "") {
+                        e.preventDefault(); // Ngăn không cho nhập chuỗi chỉ có khoảng trắng
+                        return;
+                    }
+
+                    if (kiemTraTrungLap(tenSanPham)) {
+                        warningElement.show();
+                        alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
+                        e.preventDefault();
+                    } else {
+                        warningElement.hide();
+                    }
+                }
+            });
         }
 
         // 🔹 Xử lý sự kiện kiểm tra tên sản phẩm
@@ -556,84 +638,112 @@
                 placeholder: "Nhập hoặc chọn tên sản phẩm",
                 allowClear: true,
                 tags: true,
-                tokenSeparators: [',', ' ']
+                tokenSeparators: [',']
             });
 
             function kiemTraTrungLap(tenSanPham) {
                 return danhSachTenGiay.some(item => item.toLowerCase() === tenSanPham.trim().toLowerCase());
             }
 
-            // Kiểm tra khi chọn hoặc nhập mới
+            // Kiểm tra khi chọn sản phẩm từ danh sách
             $("#ten_san_pham").on("select2:selecting", function (e) {
-                let tenSanPham = e.params.args.data.text;
+                let tenSanPham = e.params.args.data.text.trim();
                 let warningElement = $("#ten_san_pham_warning");
 
                 if (kiemTraTrungLap(tenSanPham)) {
                     warningElement.show();
                     alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
-                    e.preventDefault(); // Ngăn không cho chọn giá trị trùng lặp
+                    e.preventDefault();
                 } else {
                     warningElement.hide();
-                }
-            });
-
-            // Ngăn gửi form nếu tên sản phẩm bị trùng
-            $("#saveProduct").click(function (e) {
-                let tenSanPham = $("#ten_san_pham").val();
-
-                if (kiemTraTrungLap(tenSanPham)) {
-                    alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
-                    e.preventDefault();
                 }
             });
 
             console.log("✅ Sự kiện kiểm tra tên sản phẩm đã được kích hoạt.");
         }
 
+
+
+
         // Gọi kiểm tra tên sản phẩm sau khi Select2 đã tải
         kiemTraTenSanPham();
-        
-        $('#addColor').click(function () {
-            console.log("đã nhấn thêm");
+        $("#colorModal").on("show.bs.modal", function () {
+            console.log("Modal đang mở");
+        });
+
+        $('#colorModal').on('hidden.bs.modal', function () {
+            $('.color-checkbox').prop('checked', false); // Bỏ chọn tất cả checkbox
+        });
+
+        $('.color-checkbox:checked').each(function () {
+            let color = $(this).val();
+            if ($(`#color-${color}`).length === 0) { // Chỉ thêm nếu chưa có
+                $('#selectedColors').append(`<span id="color-${color}" class="badge bg-secondary me-2">${color}</span>`);
+            }
+        });
+
+
+        $(document).off("click", "#addColor").on("click", "#addColor", function () {
+            console.log("Đã nhấn thêm");
+
             $('.color-checkbox:checked').each(function () {
-                let color = $(this).val();
-                if ($(`#color-${color}`).length === 0) {
+                let color = $(this).val().replace("#", ""); // Loại bỏ dấu # nếu có
+
+
+                // Kiểm tra nếu bảng màu đã tồn tại trong productTables
+                if ($("#productTables").find("#table-" + color).length === 0) {
+                    // Thêm badge màu vào danh sách màu đã chọn
                     $('#selectedColors').append(`<span id="color-${color}" class="badge bg-secondary me-2">${color}</span>`);
+
+                    // Thêm bảng sản phẩm theo màu nếu chưa có
                     $('#productTables').append(`
-                    <div class="card-header" id="table-${color}">
-                        <h3 class="card-title">Sản phẩm màu ${color}</h4>
-                        <div class="card-tools">
-                            
-                        </div>
-                     </div>
-                     <div class="card-body table-responsive p-0">
-                        <table class="table table-hover text-nowrap">
-                            <thead>
-                                <tr>
-                                    <th>Tên Sản Phẩm</th>
-                                    <th>Kích Cỡ</th>
-                                    <th>Số Lượng</th>
-                                    <th>Giá</th>
-                                    <th >Ảnh</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                            </table>
-                            <!-- Khu vực chọn ảnh thay vì tải ảnh -->
-                        <div class="mt-2">
-                            <label class="form-label">Ảnh Sản Phẩm ${color}</label>
-                            <button type="button" class="btn btn-primary choose-image-btn" data-color="${color}">
-                                Chọn ảnh
-                            </button>
-                            <div class="mt-2">
-                                <img src="/img/default.png" class="img-thumbnail product-img" width="100" id="img-${color}">
-                            </div>
-                        </div>
-                    </div>
-                `);
+                                <div class="row">
+                                        <div class="card col-md-6" id="table-${color}">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Sản phẩm màu ${color}</h3>
+                                            <div class="card-tools"></div>
+                                        </div>
+                                        <div class="card-body table-responsive p-0">
+                                            <table class="table table-hover text-nowrap">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Tên Sản Phẩm</th>
+                                                        <th>Kích Cỡ</th>
+                                                        <th>Số Lượng</th>
+                                                        <th>Giá</th>
+                                                            <th class="d-none">Ảnh</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+
+                                        </div>
+                                    </div>
+                                    <div class="card col-md-6" id="${color}">
+                                    <div class="card-header">
+                                    <h3 class="card-title">Ảnh Sản Phẩm ${color}</h3>
+                                    </div>
+                                    <div class="card-body">
+                                    <div class="mt-2">
+                                        <label class="form-label">Ảnh Sản Phẩm ${color}</label>
+                                        <button type="button" class="btn btn-primary choose-image-btn" data-color="${color}">
+                                            Chọn ảnh
+                                        </button>
+                                            <div class="mt-2 imgSelected"></div>
+                                    </div>
+                                    </div>
+                                </div>
+                                </div>
+
+                            `);
+                } else {
+                    console.log(`Bảng cho màu ${color} đã tồn tại, bỏ qua.`);
                 }
             });
+
+            // Đóng modal sau khi chọn xong màu
             $('#colorModal').modal('hide');
+
             setTimeout(() => {
                 $('.modal-backdrop').fadeOut(300, function () {
                     $(this).remove();
@@ -643,36 +753,48 @@
             }, 300); // Đợi 300ms để hiệu ứng fade chạy
         });
 
-        $('#addSize').click(function () {
-            let tenSanPham = $("#ten_san_pham").val(); // Lấy tên sản phẩm đang chọn
+
+
+        $(document).off("click", "#addSize").on("click", "#addSize", function () {
+            let tenSanPham = $("#ten_san_pham").val(); // Lấy tên sản phẩm
 
             $('.size-checkbox:checked').each(function () {
-                let size = $(this).val();
+                let size = $(this).val(); // Lấy kích cỡ đã chọn
 
+                // Duyệt qua tất cả bảng sản phẩm có màu sắc
                 $("[id^='table-']").each(function () {
-                    let color = $(this).attr("id").replace("table-", ""); // Lấy màu từ ID của bảng
-                    let tenSPCT = `${tenSanPham} [${color} - ${size}]`; // Định dạng tên sản phẩm
+                    let color = $(this).attr("id").replace("table-", ""); // Lấy màu từ ID bảng
+                    let tenSPCT = `${tenSanPham} [${color} - ${size}]`; // Tạo tên sản phẩm chi tiết
 
-                    $(this).find("tbody").append(`
-                    <tr>
-                        <td>${tenSPCT}</td>
-                        <td>${size}</td>
-                        <td><input type="number" class="form-control quantity" data-size="${size}"></td>
-                        <td><input type="number" class="form-control price" data-size="${size}"></td>
-                        <td ><input type="text" class="form-control lst_img" data-size="${size}"></td>
-                    </tr>
-                `);
+                    // Kiểm tra nếu kích cỡ đã tồn tại trong bảng
+                    if ($(this).find(`tbody tr:has(td:contains('${size}'))`).length === 0) {
+                        // Nếu chưa có, thêm hàng mới vào bảng sản phẩm
+                        $('#selectedSize').append(`<span id="size-${size}" class="badge bg-secondary me-2">${size}</span>`);
+                        $(this).find("tbody").append(`
+                                    <tr>
+                                        <td>${tenSPCT}</td>
+                                        <td>${size}</td>
+                                        <td><input type="number" class="form-control quantity" data-size="${size}"></td>
+                                        <td><input type="number" class="form-control price" data-size="${size}"></td>
+                                            <td class="d-none"><input type="text" class="form-control lst_img" data-size="${size}"></td>
+                                    </tr>
+                                `);
+                    } else {
+                        console.log(`Kích cỡ ${size} đã tồn tại trong bảng ${color}, bỏ qua.`);
+                    }
                 });
             });
 
+            // Đóng modal sau khi thêm kích cỡ
             $('#sizeModal').modal('hide');
+
             setTimeout(() => {
                 $('.modal-backdrop').fadeOut(300, function () {
                     $(this).remove();
                 });
                 $('body').removeClass('modal-open'); // Loại bỏ lớp giữ nền bị tối
                 initPerfectScrollbar();
-            }, 300); // Đợi 300ms để hiệu ứng fade chạy
+            }, 300);
         });
 
 
@@ -697,12 +819,12 @@
 
         $('#saveProduct').click(function () {
             let sanPhamCTList = [];
+            console.log("đã chạy save");
 
             $("[id^='table-']").each(function () {
                 let color = $(this).attr('id').replace('table-', ''); // Lấy màu
 
                 console.log(`🟢 Đang kiểm tra bảng: #table-${color}`);
-
                 let table = $(this);
                 let rows = table.find("tbody tr");
 
@@ -710,22 +832,15 @@
                     console.warn(`⚠️ Không có hàng sản phẩm nào trong #table-${color}`);
                 }
 
-
-                $(this).find("tbody tr").each(function () {
+                rows.each(function () {
                     let size = $(this).find("td:nth-child(2)").text(); // Lấy kích cỡ
                     let quantity = $(this).find(".quantity").val(); // Lấy số lượng
                     let price = $(this).find(".price").val(); // Lấy giá
-
                     let imgUrl = $(this).find(".lst_img").val(); // Lấy danh sách ảnh từ ô ẩn
-
-                    if (!tenSPCT) {
-                console.warn(`⚠️ ten_SPCT bị null hoặc rỗng trong bảng #table-${color}`);
-            }
-                    
 
                     if (quantity > 0) {
                         sanPhamCTList.push({
-                            Mau_Sac: color,
+                            Mau_Sac: "#" + color,
                             Kich_Thuoc: size,
                             so_luong: parseInt(quantity),
                             gia: parseInt(price),
@@ -744,17 +859,11 @@
                 alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
                 e.preventDefault();
             }
-
             // Gửi form
             $('form').submit();
         });
-
     });
-
-    
 </script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 
 @section Scripts {
