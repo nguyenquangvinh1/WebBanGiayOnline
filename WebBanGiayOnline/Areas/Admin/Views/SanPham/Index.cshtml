@@ -1,5 +1,4 @@
 ﻿@model IEnumerable<ClssLib.San_Pham>
-
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
@@ -9,15 +8,16 @@
 
 
 <!-- Nút mở modal lọc -->
-
 <!-- Modal lọc -->
 <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="filterModalLabel">Lọc sản phẩm</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">x</span></button>
+                <button type="button" class="btn-close" id="closeFilterModal" aria-label="Close">
+                    <span aria-hidden="true">x</span>
+                </button>
+
             </div>
             <div class="modal-body">
                 <label for="filterChatLieu">Chất liệu:</label>
@@ -28,7 +28,7 @@
                         <option value="@item.Value">@item.Text</option>
                     }
                 </select>
-                
+
                 <label for="filterCoGiay">Cổ giày:</label>
                 <select id="filterCoGiay" class="form-control filter-select">
                     <option value="">Tất cả</option>
@@ -37,7 +37,7 @@
                         <option value="@item.Value">@item.Text</option>
                     }
                 </select>
-                
+
                 <label for="filterDanhMuc">Danh mục:</label>
                 <select id="filterDanhMuc" class="form-control filter-select">
                     <option value="">Tất cả</option>
@@ -46,7 +46,7 @@
                         <option value="@item.Value">@item.Text</option>
                     }
                 </select>
-                
+
                 <label for="filterDeGiay">Đế giày:</label>
                 <select id="filterDeGiay" class="form-control filter-select">
                     <option value="">Tất cả</option>
@@ -55,7 +55,7 @@
                         <option value="@item.Value">@item.Text</option>
                     }
                 </select>
-                
+
                 <label for="filterMuiGiay">Mũi giày:</label>
                 <select id="filterMuiGiay" class="form-control filter-select">
                     <option value="">Tất cả</option>
@@ -64,7 +64,7 @@
                         <option value="@item.Value">@item.Text</option>
                     }
                 </select>
-                
+
                 <label for="filterKieuDang">Kiểu dáng:</label>
                 <select id="filterKieuDang" class="form-control filter-select">
                     <option value="">Tất cả</option>
@@ -73,7 +73,7 @@
                         <option value="@item.Value">@item.Text</option>
                     }
                 </select>
-                
+
                 <label for="filterLoaiGiay">Loại giày:</label>
                 <select id="filterLoaiGiay" class="form-control filter-select">
                     <option value="">Tất cả</option>
@@ -96,87 +96,88 @@
             <div class="card-header">
                 <h3 class="card-title">Bảng Sản Phẩm</h3>
             </div>
-            <div class="card-body">
-                <div class="dataTables_wrapper dt-bootstrap4">
-                    <div class="row">
-                        <div class="col-sm-12 col-md-6">
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
-                                Lọc sản phẩm
-                            </button>
-                            <button type="button" class="btn btn-primary" >
-                                <a asp-action="Create" style="color:white">Tạo mới</a>
-                            </button>
-                        </div>
-                        <div class="col-sm-12 col-md-6">
-                            
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">
+            <div class="row">
+                <div class="col-sm-12 col-md-10">
+                    <div class="dt-button btn-group flex-wrap">
+                        <button type="button" class="btn btn-primary buttons-html5" id="openFilterModal" tabindex="0" type="button">
+                            Lọc sản phẩm
+                        </button>
 
-                            <table class="table table-bordered table-hover dataTable dtr-inline" id="sanPhamTable">
-                                <thead>
-                                    <tr>
-                                        <th>@Html.DisplayNameFor(model => model.ten_san_pham)</th>
-                                        <th>@Html.DisplayNameFor(model => model.mo_ta)</th>
-                                        <th>@Html.DisplayNameFor(model => model.trang_thai)</th>
-                                        <th>@Html.DisplayNameFor(model => model.ngay_tao)</th>
-                                        <th class="filterable">Tên kiểu dáng</th>
-                                        <th class="filterable">Tên danh mục</th>
-                                        <th class="filterable">Tên loại giày</th>
-                                        <th class="filterable">Tên mũi giày</th>
-                                        <th class="filterable">Tên cổ giày</th>
-                                        <th class="filterable">Tên đế giày</th>
-                                        <th class="filterable">Tên chất liệu</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var item in Model)
-                                    {
-                                        <tr>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.ten_san_pham)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.mo_ta)
-                                            </td>
-                                            <td>
-                                                <button class='toggle-status btn btn-sm @(item.trang_thai == 1 ? "btn-success" : "btn-danger")' data-id='@item.ID' data-status='@item.trang_thai' style='width: 150px; height: 30px; line-height: 18px; white-space: nowrap;'>@(item.trang_thai == 1 ? "Hoạt động" : "Không hoạt động")</button>
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.ngay_tao)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Kieu_Dang.ten_kieu_dang)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Danh_Muc.ten_danh_muc)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Loai_Giay.ten_loai_giay)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Mui_Giay.ten_mui_giay)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Co_Giay.ten_loai_co_giay)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.De_Giay.ten_de_giay)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Chat_Lieu.ten_chat_lieu)
-                                            </td>
-                                            <td><a asp-action="Edit" asp-route-id="@item.ID">Edit</a></td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-
-                        </div>
+                        <button type="button" class="btn btn-primary buttons-html5" tabindex="0" type="button">
+                            <a asp-action="Create" style="color:white">Tạo mới</a>
+                        </button>
                     </div>
                 </div>
+            </div>
+            <div class="card-body">
+
+                <table class="table table-bordered table-striped" id="sanPhamTable">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>@Html.DisplayNameFor(model => model.First().ten_san_pham)</th>
+                            <th>@Html.DisplayNameFor(model => model.First().mo_ta)</th>
+                            <th>@Html.DisplayNameFor(model => model.First().trang_thai)</th>
+                            <th>@Html.DisplayNameFor(model => model.First().ngay_tao)</th>
+                            <th class="filterable">Tên kiểu dáng</th>
+                            <th class="filterable">Tên danh mục</th>
+                            <th class="filterable">Tên loại giày</th>
+                            <th class="filterable">Tên mũi giày</th>
+                            <th class="filterable">Tên cổ giày</th>
+                            <th class="filterable">Tên đế giày</th>
+                            <th class="filterable">Tên chất liệu</th>
+                            <th>Tùy chỉnh</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int stt = 1;
+                        }
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@stt</td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ten_san_pham)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.mo_ta)
+                                </td>
+                                <td>
+                                    <button class='toggle-status btn btn-sm @(item.trang_thai == 1 ? "btn-success" : "btn-danger")' data-id='@item.ID' data-status='@item.trang_thai' style='width: 150px; height: 30px; line-height: 18px; white-space: nowrap;'>@(item.trang_thai == 1 ? "Hoạt động" : "Không hoạt động")</button>
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ngay_tao)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Kieu_Dang.ten_kieu_dang)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Danh_Muc.ten_danh_muc)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Loai_Giay.ten_loai_giay)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Mui_Giay.ten_mui_giay)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Co_Giay.ten_loai_co_giay)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.De_Giay.ten_de_giay)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Chat_Lieu.ten_chat_lieu)
+                                </td>
+                                <td><a asp-area="Admin" asp-action="Edit" asp-route-id="@item.ID" class="btn btn-warning"><i class="fa fa-xs fa-pen"></i></a></td>
+                            </tr>
+                            stt++;
+                        }
+                    </tbody>
+                </table>
+
+
             </div>
         </div>
     </div>
@@ -184,6 +185,28 @@
 <script>
     $(document).ready(function () {
 
+        $("#sanPhamTable").DataTable({
+            "responsive": true, "lengthChange": true, "autoWidth": false, "paging": true,
+
+            "info": true,
+            "searching": true,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        }).buttons().container().appendTo('#sanPhamTable_wrapper .col-md-6:eq(0)');
+
+        $(document).ready(function () {
+            $("#openFilterModal").click(function () {
+                console.log("📌 Đã bấm nút Lọc sản phẩm!");
+                $("#filterModal").modal("show");
+            });
+        });
+        $("#closeFilterModal").click(function () {
+            console.log("📌 Đóng modal filterModal");
+            $("#filterModal").modal("hide"); // Đóng modal
+        });
+        $('#filterModal').on('shown.bs.modal', function () {
+            console.log("📌 Modal đã mở!");
+        });
+        console.log("✅ jQuery đã tải thành công!");
         $(document).on('click', '#applyFilter', function () {
             console.log("📌 Nút lọc đã được nhấn!"); // Kiểm tra sự kiện click có chạy không
             applyFilter();

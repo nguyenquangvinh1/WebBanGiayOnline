@@ -19,7 +19,7 @@ namespace ClssLib
         public bool? is_default { get; set; }
 
         public DateTime ngay_tao { get; set; }
-        public DateTime ngay_sua { get; set; }
+        public DateTime ? ngay_sua { get; set; }
         [ForeignKey("Tai_Khoan")]
         public Guid Tai_KhoanID { get; set; }
         [JsonIgnore]

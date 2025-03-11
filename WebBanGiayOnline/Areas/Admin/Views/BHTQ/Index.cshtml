@@ -1,0 +1,380 @@
+﻿@model IEnumerable<ClssLib.San_Pham_Chi_Tiet>
+
+<style>
+    .close-tab {
+        cursor: pointer;
+    }
+    /* Ẩn form thông tin khách hàng ban đầu */
+    .customerForm {
+        display: none;
+    }
+    /* Ẩn template hóa đơn */
+    #invoiceTemplate {
+        display: none;
+    }
+</style>
+
+<div class="container p-4">
+    <button class="btn btn-primary" id="createInvoice">+ Tạo hóa đơn</button>
+    <ul class="nav nav-tabs mt-3" id="invoiceTabs"></ul>
+    <div class="tab-content" id="invoiceContent"></div>
+</div>
+
+<!-- Template Hóa đơn (ẩn) -->
+<div id="invoiceTemplate">
+    <div class="tab-pane fade invoice" id="INVOICE_ID">
+        <div class="mt-3">
+            <button class="btn btn-info qrCode" data-id="INVOICE_ID">📷 QR Code</button>
+            <button class="btn btn-success selectProduct" data-id="INVOICE_ID">+ Thêm sản phẩm</button>
+        </div>
+
+        <!-- Danh sách sản phẩm của hóa đơn -->
+        <table class="table mt-3" id="invoiceTable-INVOICE_ID">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Ảnh</th>
+                    <th>Tên sp</th>
+                    <th>Giá bán</th>
+                    <th>Số lượng</th>
+                    <th>Kích thước</th>
+                    <th>Màu sắc</th>
+                    <th>Trạng thái</th>
+                    <th>Tổng tiền</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody class="productList">
+                <!-- Khi nhấn "Thêm" ở modal, sản phẩm được append vào đây -->
+            </tbody>
+        </table>
+        <!-- Danh sách sản phẩm của hóa đơn -->
+        <p>[Danh sách sản phẩm của hóa đơn]</p>
+        <h5 class="text-end">
+            Tổng tiền hóa đơn: <span class="totalPrice" id="totalPrice-INVOICE_ID">0</span> VND
+            <button class="btn btn-primary ms-3 selectCustomer" data-id="INVOICE_ID">Tài khoản</button>
+            <button class="btn btn-outline-primary openPayment" data-id="INVOICE_ID">Thanh toán</button>
+            <button class="btn btn-success ms-3 confirmPaymentInvoice" data-id="INVOICE_ID">Xác nhận thanh toán</button>
+        </h5>
+        <div class="row mt-4">
+            <!-- Cột Tài khoản/Khách hàng -->
+            <div class="col-md-6 p-3">
+                <h5 class="mb-3">Tài khoản</h5>
+                <div class="khachLe">
+                    <p>Tên khách hàng: <span style="font-weight: bold; color: gray;">Khách lẻ</span></p>
+                </div>
+                <div class="customerForm">
+                    <div class="mb-3">
+                        <input type="text" class="form-control customerName" placeholder="Nhập tên khách hàng">
+                    </div>
+                    <div class="mb-3">
+                        <input type="text" class="form-control customerPhone" placeholder="Nhập số điện thoại">
+                    </div>
+                    <div class="mb-3">
+                        <input type="email" class="form-control customerEmail" placeholder="Nhập email">
+                    </div>
+                </div>
+            </div>
+            <!-- Cột Thông tin thanh toán -->
+            <div class="col-md-6 p-3">
+                <h5 class="mb-3">Thông tin thanh toán</h5>
+                <div class="mb-3">
+                    <label class="form-label">Khách thanh toán</label>
+                    <button type="button" class="btn btn-outline-primary openPayment" data-id="INVOICE_ID">
+                        0 VND
+                    </button>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Mã giảm giá</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control discountCodeInput" placeholder="Chọn mã giảm giá" readonly>
+                        <button class="btn btn-outline-secondary selectDiscount" type="button" data-id="INVOICE_ID">Chọn mã giảm giá</button>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Giá gốc</label>
+                    <input type="text" class="form-control basePrice" placeholder="0 VND" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Giảm giá</label>
+                    <input type="text" class="form-control discountAmount" placeholder="0 VND" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Tổng tiền</label>
+                    <input type="text" class="form-control finalTotal" placeholder="0 VND" readonly>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Các modal (sản phẩm, khách hàng, mã giảm giá, thanh toán) giữ nguyên bố cục HTML tĩnh -->
+<!-- Modal sản phẩm -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productModalLabel">Danh sách sản phẩm</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-center">[Danh sách sản phẩm]</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal khách hàng -->
+<!-- Modal khách hàng -->
+<div class="modal fade" id="customerModal" tabindex="-1" aria-labelledby="customerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="customerModalLabel">Danh sách khách hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Form Thêm nhanh khách hàng, đặt ở đây -->
+                <div class="mb-3">
+                    <h6>Thêm nhanh khách hàng</h6>
+                    <form id="quickAddCustomerForm" class="row g-2">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" id="quickCustomerName" placeholder="Họ tên" required>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" id="quickCustomerPhone" placeholder="Số điện thoại" required>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="email" class="form-control" id="quickCustomerEmail" placeholder="Email" required>
+                        </div>
+
+
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Thêm nhanh</button>
+                        </div>
+                    </form>
+                </div>
+                <table class="table table-bordered" id="customerTable">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên</th>
+                            <th>SĐT</th>
+                            <th>Email</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Các dòng khách hàng sẽ được load vào đây -->
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Danh sách sản phẩm chi tiết -->
+<!-- Modal Danh sách sản phẩm chi tiết -->
+<div class="modal fade" id="detailedProductModal" tabindex="-1" aria-labelledby="detailedProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailedProductModalLabel">Danh sách sản phẩm chi tiết</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered" id="detailedProductTable">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Ảnh</th>
+                            <th>Tên sp</th>
+                            <th>Giá bán</th>
+                            <th>Số lượng</th> <!-- Lấy từ DB -->
+                            <th>Kích thước</th>
+                            <th>Màu sắc</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th> <!-- Nút "Thêm" -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Hàng sản phẩm sẽ được load ở đây -->
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Chỗ hiển thị Tổng tiền hóa đơn: ... -->
+<!-- Modal mã giảm giá -->
+<div class="modal fade" id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="discountModalLabel">Chọn mã giảm giá</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-center">[Danh sách mã giảm giá]</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal thanh toán -->
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="paymentModalLabel">Thông tin thanh toán</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-center">[Form thông tin thanh toán]</p>
+            </div>
+        </div>
+    </div>
+</div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+@section Scripts {
+        
+    <script>
+            // 1. Tạo hóa đơn mới
+        $('#createInvoice').on('click', function(){
+            $.ajax({
+                url: '/Admin/HoaDon/CreateInvoice',
+                type: 'POST',
+                success: function(res){
+                    if(res.success){
+                        // Tăng biến đếm, clone template, gắn invoiceId vào DOM...
+                        // Ví dụ:
+                        invoiceCount++;
+                        let newInvoiceDomId = 'invoice' + invoiceCount;
+                        let newInvoiceHtml = $('#invoiceTemplate').html().replace(/INVOICE_ID/g, newInvoiceDomId);
+                        $('#invoiceTabs').append(`
+                        <li class="nav-item">
+                            <a class="nav-link" id="tab-${newInvoiceDomId}" data-bs-toggle="tab" href="#${newInvoiceDomId}">
+                                Hóa đơn ${invoiceCount} <span class="close-tab" data-id="${newInvoiceDomId}">✖</span>
+                            </a>
+                        </li>`);
+                                        $('#invoiceContent').append(newInvoiceHtml);
+                        // Gắn invoiceId của DB vào container hóa đơn
+                        $(`#${newInvoiceDomId}`).attr('data-db-invoice-id', res.invoiceId);
+                        let tab = new bootstrap.Tab(document.querySelector(`#tab-${newInvoiceDomId}`));
+                        tab.show();
+                    } else {
+                        alert("Lỗi tạo hóa đơn: " + res.message);
+                    }
+                },
+                error: function(err){
+                    console.error(err);
+                    alert("Không thể tạo hóa đơn, vui lòng thử lại!");
+                }
+            });
+        });
+
+        // 2. Thêm sản phẩm vào hóa đơn
+        $(document).on('click', '.add-product', function(){
+            // Lấy thông tin sản phẩm từ nút bấm
+            let productId = $(this).data('id');
+            let quantity = 1; // Ví dụ: thêm 1 sản phẩm
+            let price = parseFloat($(this).data('price')) || 0;
+
+            // Lấy invoiceId từ container hiện hành
+            let invoiceDomId = currentInvoiceId; // đã được lưu từ sự kiện mở hóa đơn
+            let dbInvoiceId = $(`#${invoiceDomId}`).attr('data-db-invoice-id');
+
+            $.ajax({
+                url: '/Admin/HoaDon/AddProductToInvoice',
+                type: 'POST',
+                data: JSON.stringify({
+                    InvoiceId: dbInvoiceId,
+                    ProductId: productId,
+                    Quantity: quantity,
+                    Price: price
+                }),
+                contentType: 'application/json; charset=utf-8',
+                success: function(res){
+                    if(res.success){
+                        // Cập nhật bảng sản phẩm của hóa đơn trên giao diện
+                        loadInvoiceDetails();
+                    } else {
+                        alert("Lỗi thêm sản phẩm: " + res.message);
+                    }
+                }
+            });
+        });
+
+        // 3. Hiển thị danh sách sản phẩm trong hóa đơn
+        function loadInvoiceDetails() {
+            let dbInvoiceId = $(`#${currentInvoiceId}`).attr('data-db-invoice-id');
+            $.ajax({
+                url: '/Admin/HoaDon/GetInvoiceDetails',
+                type: 'GET',
+                data: { invoiceId: dbInvoiceId },
+                success: function(res){
+                    if(res.success){
+                        // Build HTML từ res.data
+                        let html = "";
+                        res.data.forEach((p, index) => {
+                            html += `
+        <tr>
+            <td>${index + 1}</td>
+            <td>${p.TenSanPham}</td>
+            <td>${p.SoLuong}</td>
+            <td>${p.DonGia}</td>
+            <td>${p.ThanhTien}</td>
+        </tr>`;
+                        });
+                        $(`#invoiceTable-${currentInvoiceId} tbody`).html(html);
+                    }
+                }
+            });
+        }
+
+        // 4. Thanh toán hóa đơn
+        $('#checkoutInvoice').on('click', function(){
+            let dbInvoiceId = $(`#${currentInvoiceId}`).attr('data-db-invoice-id');
+            $.ajax({
+                url: '/Admin/HoaDon/CheckoutInvoice',
+                type: 'POST',
+                data: { invoiceId: dbInvoiceId },
+                success: function(res){
+                    if(res.success){
+                        alert("Thanh toán thành công!");
+                        // Cập nhật lại trạng thái hóa đơn trên giao diện hoặc reload trang
+                    } else {
+                        alert("Lỗi: " + res.message);
+                    }
+                }
+            });
+        });
+
+        // 5. Hủy hóa đơn
+        $('#cancelInvoice').on('click', function(){
+            let dbInvoiceId = $(`#${currentInvoiceId}`).attr('data-db-invoice-id');
+            $.ajax({
+                url: '/Admin/HoaDon/CancelInvoice',
+                type: 'POST',
+                data: { invoiceId: dbInvoiceId },
+                success: function(res){
+                    if(res.success){
+                        alert("Hóa đơn đã bị hủy!");
+                        // Cập nhật lại giao diện: xóa tab, chuyển trạng thái, v.v.
+                    } else {
+                        alert("Lỗi: " + res.message);
+                    }
+                }
+            });
+        });
+    </script>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+}

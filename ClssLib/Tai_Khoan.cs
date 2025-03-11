@@ -28,7 +28,6 @@ namespace ClssLib
         public string? hinh_anh { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int EmployeeNumber { get; set; }
         public DateTime ngay_tao { get; set; }
         public DateTime? ngay_sua { get; set; }
         [ForeignKey("Vai_Tro")]

@@ -13,6 +13,7 @@ namespace WebBanGiay.ViewModel
         public DateTime ngay_tao { get; set; }
         public string? Kich_Thuoc { get; set; }
         public string? Mau_Sac { get; set; }
+        public string? Ten { get; set; }
     }
     public class San_PhamViewModel
     {

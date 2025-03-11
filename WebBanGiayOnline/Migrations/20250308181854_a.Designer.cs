@@ -12,8 +12,8 @@ using WebBanGiay.Data;
 namespace WebBanGiay.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250227025129_datn")]
-    partial class datn
+    [Migration("20250308181854_a")]
+    partial class a
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,17 +37,6 @@ namespace WebBanGiay.Migrations
                     b.Property<string>("anh_url")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ma")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("mo_ta")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("trang_thai")
-                        .HasColumnType("int");
 
                     b.HasKey("ID");
 
@@ -83,20 +72,9 @@ namespace WebBanGiay.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ma")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("mo_ta")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ten_chat_lieu")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("trang_thai")
-                        .HasColumnType("int");
 
                     b.HasKey("ID");
 
@@ -109,20 +87,9 @@ namespace WebBanGiay.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ma")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("mo_ta")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ten_loai_co_giay")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("trang_thai")
-                        .HasColumnType("int");
 
                     b.HasKey("ID");
 
@@ -135,20 +102,9 @@ namespace WebBanGiay.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ma")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("mo_ta")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ten_danh_muc")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("trang_thai")
-                        .HasColumnType("int");
 
                     b.HasKey("ID");
 
@@ -161,20 +117,9 @@ namespace WebBanGiay.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ma")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("mo_ta")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ten_de_giay")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("trang_thai")
-                        .HasColumnType("int");
 
                     b.HasKey("ID");
 
@@ -190,14 +135,21 @@ namespace WebBanGiay.Migrations
                     b.Property<Guid>("Tai_KhoanID")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("dia_chi_chi_tiet")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("huyen")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool?>("is_default")
+                        .HasColumnType("bit");
+
                     b.Property<int>("loai_dia_chi")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ngay_sua")
+                    b.Property<DateTime?>("ngay_sua")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("ngay_tao")
@@ -402,20 +354,9 @@ namespace WebBanGiay.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ma")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("mo_ta")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ten_kich_thuoc")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("trang_thai")
-                        .HasColumnType("int");
 
                     b.HasKey("ID");
 
@@ -428,20 +369,9 @@ namespace WebBanGiay.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ma")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("mo_ta")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ten_kieu_dang")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("trang_thai")
-                        .HasColumnType("int");
 
                     b.HasKey("ID");
 
@@ -454,20 +384,9 @@ namespace WebBanGiay.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ma")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("mo_ta")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ten_loai_giay")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("trang_thai")
-                        .HasColumnType("int");
 
                     b.HasKey("ID");
 
@@ -480,20 +399,9 @@ namespace WebBanGiay.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ma")
+                    b.Property<string>("ma_mau")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("mo_ta")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ten_mau")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("trang_thai")
-                        .HasColumnType("int");
 
                     b.HasKey("ID");
 
@@ -506,20 +414,9 @@ namespace WebBanGiay.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ma")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("mo_ta")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ten_mui_giay")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("trang_thai")
-                        .HasColumnType("int");
 
                     b.HasKey("ID");
 
@@ -546,7 +443,8 @@ namespace WebBanGiay.Migrations
 
                     b.Property<string>("ma")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime>("ngay_bat_dau")
                         .HasColumnType("datetime2");
@@ -561,11 +459,13 @@ namespace WebBanGiay.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("nguoi_sua")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("nguoi_tao")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("so_luong")
                         .HasColumnType("int");
@@ -575,7 +475,8 @@ namespace WebBanGiay.Migrations
 
                     b.Property<string>("ten_phieu_giam_gia")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("trang_thai")
                         .HasColumnType("int");
@@ -682,7 +583,6 @@ namespace WebBanGiay.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("nguoi_tao")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ten_san_pham")
@@ -717,10 +617,10 @@ namespace WebBanGiay.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("Kich_ThuocID")
+                    b.Property<Guid?>("Kich_ThuocID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("Mau_SacID")
+                    b.Property<Guid?>("Mau_SacID")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("San_PhamID")
@@ -728,10 +628,6 @@ namespace WebBanGiay.Migrations
 
                     b.Property<decimal>("gia")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("ma")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ngay_sua")
                         .HasColumnType("datetime2");
@@ -741,6 +637,10 @@ namespace WebBanGiay.Migrations
 
                     b.Property<int>("so_luong")
                         .HasColumnType("int");
+
+                    b.Property<string>("ten_SPCT")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("trang_thai")
                         .HasColumnType("int");
@@ -776,6 +676,9 @@ namespace WebBanGiay.Migrations
                     b.Property<int>("gioi_tinh")
                         .HasColumnType("int");
 
+                    b.Property<string>("hinh_anh")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ho_ten")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -784,18 +687,17 @@ namespace WebBanGiay.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ngay_sinh")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("ngay_sinh")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("ngay_sua")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("ngay_tao")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2");
 
                     b.Property<string>("pass_word")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("sdt")
@@ -903,7 +805,7 @@ namespace WebBanGiay.Migrations
                     b.Property<Guid>("Hoa_DonID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("San_Pham_Chi_TietID")
+                    b.Property<Guid?>("San_Pham_Chi_TietID")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("SoLuongSP")
@@ -947,22 +849,22 @@ namespace WebBanGiay.Migrations
                     b.HasData(
                         new
                         {
-                            ID = new Guid("74f5a393-5e9b-47ef-8fe7-c7e541ac1b3d"),
-                            ngay_tao = new DateTime(2025, 2, 27, 9, 51, 27, 371, DateTimeKind.Local).AddTicks(4898),
+                            ID = new Guid("dbdd9948-7e19-4171-a4e2-9272c70f3ec4"),
+                            ngay_tao = new DateTime(2025, 3, 9, 1, 18, 47, 376, DateTimeKind.Local).AddTicks(1443),
                             ten_vai_tro = "Admin",
                             trang_thai = 1
                         },
                         new
                         {
-                            ID = new Guid("8df16b6b-6404-4f7a-9c9a-5b4f6efc86be"),
-                            ngay_tao = new DateTime(2025, 2, 27, 9, 51, 27, 371, DateTimeKind.Local).AddTicks(4915),
+                            ID = new Guid("78d55f7c-f1af-449b-925e-f0ff0aaaa391"),
+                            ngay_tao = new DateTime(2025, 3, 9, 1, 18, 47, 376, DateTimeKind.Local).AddTicks(1465),
                             ten_vai_tro = "Nhân Viên",
                             trang_thai = 1
                         },
                         new
                         {
-                            ID = new Guid("08945b59-5928-421f-a0aa-565543c6f350"),
-                            ngay_tao = new DateTime(2025, 2, 27, 9, 51, 27, 371, DateTimeKind.Local).AddTicks(4917),
+                            ID = new Guid("7704467c-19da-4a98-92a3-c069f1deb947"),
+                            ngay_tao = new DateTime(2025, 3, 9, 1, 18, 47, 376, DateTimeKind.Local).AddTicks(1469),
                             ten_vai_tro = "Khách Hàng",
                             trang_thai = 1
                         });
@@ -1141,15 +1043,11 @@ namespace WebBanGiay.Migrations
                 {
                     b.HasOne("ClssLib.Kich_Thuoc", "Kich_Thuoc")
                         .WithMany("San_Pham_Chi_Tiets")
-                        .HasForeignKey("Kich_ThuocID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("Kich_ThuocID");
 
                     b.HasOne("ClssLib.Mau_Sac", "Mau_Sac")
                         .WithMany("San_Pham_Chi_Tiets")
-                        .HasForeignKey("Mau_SacID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("Mau_SacID");
 
                     b.HasOne("ClssLib.San_Pham", "San_Pham")
                         .WithMany("San_Pham_Chi_Tiets")
@@ -1221,9 +1119,7 @@ namespace WebBanGiay.Migrations
 
                     b.HasOne("ClssLib.San_Pham_Chi_Tiet", "San_Pham_Chi_Tiet")
                         .WithMany()
-                        .HasForeignKey("San_Pham_Chi_TietID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("San_Pham_Chi_TietID");
 
                     b.Navigation("Hoa_Don");
 

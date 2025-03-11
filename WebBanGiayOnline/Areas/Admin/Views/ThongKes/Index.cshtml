@@ -15,94 +15,82 @@
 
 
         .filter-buttons .btn {
-        margin-right: 5px;
+            margin-right: 5px;
         }
 
         .active-filter {
-        background-color: #ff6600;
-        color: white;
+            background-color: #ff6600;
+            color: white;
         }
 
         .table thead {
-        background-color: #ff6600;
-        color: white;
-        text-align: center;
+            background-color: #007bff;
+            color: white;
+            text-align: center;
         }
 
 
         .card-body p {
-        color: black !important; 
-        font-weight: bold; /* Làm đậm chữ */
-        font-size: 16px; /* Tăng kích thước chữ để rõ ràng hơn */
+            color: black !important;
+            font-weight: bold; /* Làm đậm chữ */
+            font-size: 16px; /* Tăng kích thước chữ để rõ ràng hơn */
         }
 
         .card-header {
-        color: white; /* Màu trắng giúp nổi bật trên nền màu */
-        font-weight: bold;
-        font-size: 20px;
+            color: white; /* Màu trắng giúp nổi bật trên nền màu */
+            font-weight: bold;
+            font-size: 20px;
         }
 
         .card-body {
-        color: #f8f9fa; /* Màu chữ xám nhạt giúp dễ nhìn hơn */
-        font-size: 18px;
+            color: #f8f9fa; /* Màu chữ xám nhạt giúp dễ nhìn hơn */
+            font-size: 18px;
         }
 
-        .card-body span {
-        font-weight: bold;
-        }
+            .card-body span {
+                font-weight: bold;
+            }
+
         body {
-        font-family: Arial, sans-serif;
-        background-color: #f5f5f5;
-        padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
         }
 
         .container {
-        max-width: 1200px;
-        margin: auto;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        justify-content: space-between;
+            max-width: 1200px;
+            margin: auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between;
         }
 
         .card {
-        width: 48%; 
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        text-align: center;
-        position: relative;
+            width: 48%;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
         }
 
-        .card h3 {
-        margin: 10px 0;
-        font-size: 18px;
-        }
+            .card h3 {
+                margin: 10px 0;
+                font-size: 18px;
+            }
 
-        .card .amount {
-        font-size: 24px;
-        font-weight: bold;
-        }
+            .card .amount {
+                font-size: 24px;
+                font-weight: bold;
+            }
 
         .blue {
-        background-color: #007bff;
-        color: white;
-        }
-
-        .green {
-        background-color: #009688;
-        color: white;
-        }
-
-        .orange {
-        background-color: #ff9800;
-        color: white;
-        }
-
-        .darkblue {
-        background-color: #3f51b5;
-        color: white;
+            background-color: #007bff;
+            color: white;
+            width: 20%;
+            text-align: justify;
         }
     </style>
 </head>
@@ -113,19 +101,16 @@
         {
             var today = DateTime.Today;
             var startOfWeek = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek + (DateTime.Today.DayOfWeek == DayOfWeek.Sunday ? -6 : 1));
-
-
-
             var endOfWeek = startOfWeek.AddDays(6);
 
 
             var startOfMonth = new DateTime(today.Year, today.Month, 1);
             var startOfYear = new DateTime(today.Year, 1, 1);
             var doanhThuDate = item.DoanhThu.Date;
-            string cardColor = doanhThuDate == today ? "green" :
-            (doanhThuDate >= startOfWeek && doanhThuDate <= endOfWeek) ? "orange" :
+            string cardColor = doanhThuDate == today ? "blue" :
+            (doanhThuDate >= startOfWeek && doanhThuDate <= endOfWeek) ? "blue" :
             doanhThuDate == startOfMonth ? "blue" :
-            doanhThuDate == startOfYear ? "darkblue" : "gray";
+            doanhThuDate == startOfYear ? "blue" : "blue";
 
             <div class="card @cardColor">
                 <div class="card-header">
@@ -155,53 +140,105 @@
             </div>
         }
 
+        <div class="container">
+            <div class="row">
+                <h4>Lọc dữ liệu </h4>
 
-        <div class="container mt-4">
-            <h5>Bộ lọc</h5>
-            <div class="filter-buttons mb-3">
-                <button class="btn btn-outline-dark" id="today">NGÀY</button>
-                <button class="btn btn-outline-dark"id="weeks">TUẦN</button>
-                <button class="btn btn-outline-dark" id="month">THÁNG</button>
-                <button class="btn btn-outline-dark" id="years">NĂM</button>
+                <div class="col-md-12">
+                    <form class="row g-3 d-flex align-items-end">
+                        <div class="col-md-4">
+                            <label for="fromDate" class="form-label fw-bold">Từ ngày:</label>
+                            <input type="date" id="fromDate" name="fromDate" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="toDate" class="form-label fw-bold">Đến ngày:</label>
+                            <input type="date" id="toDate" name="toDate" class="form-control">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" id="filter" class="btn btn-primary w-100">
+                                <i class="fas fa-filter"></i> Lọc
+                            </button>
+                        </div>
+                        <asp:Label ID="lblMessage" runat="server" ForeColor="Red"></asp:Label>
 
-                <input type="date" class="form-control d-inline-block w-auto" placeholder="Từ ngày">
+                    </form>
+                    @if (!string.IsNullOrEmpty(ViewBag.ThongBao))
+                    {
+                        <p style="color: red;">@ViewBag.ThongBao</p>
+                    }
+
+                </div>
             </div>
 
+        </div>
+    </div>
 
-            <table class="table table-bordered">
+    <h2 style="text-align: center;">Biểu đồ thống kê</h2>
+    <div id="myfirstchart" style="height: 100%; width : 100%"></div>
+    <h2 style="text-align: center;">Thống kê Sản phẩm</h2>
 
+    <div class="row">
+        <div class="card">
+            <h3>Sản phẩm bán chạy</h3>
+            <table class="table">
                 <thead>
-
                     <tr>
-                        <th>Ảnh</th>
+                        <th>#</th>
                         <th>Tên sản phẩm</th>
-                        <th>Số lượng</th>
-                        <th>Giá tiền</th>
-                        <th>Kích cỡ</th>
+                        <th>Số lượng bán</th>
                     </tr>
                 </thead>
                 <tbody>
-                    
-              @*     @foreach(var item in Model )
-                              {
-                        <tr>
-                            <td>@item.San_Pham_Chi_Tiet.ma</td>
-                            <td>@item.San_Pham_Chi_Tiet.so_luong</td>
-                            <td>@item.San_Pham_Chi_Tiet.gia</td>
-                            <td>@item.San_Pham_Chi_Tiet.Kich_ThuocID</td>
-                        </tr>
-                    } *@
-
-               
-                  
-
-
+                    @if (ViewBag.SanPhamBanChay != null)
+                    {
+                        int stt = 1;
+                        foreach (var sp in ViewBag.SanPhamBanChay)
+                        {
+                            <tr>
+                                <td>@(stt++)</td>
+                                <td>@sp.TenSanPham</td>
+                                <td>@sp.SoLuongBan</td>
+                            </tr>
+                        }
+                    }
                 </tbody>
             </table>
         </div>
-@*         
+
+        <div class="card">
+            <h3>Sản phẩm tồn kho</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Số lượng tồn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ViewBag.SanPhamTonKho != null)
+                    {
+                        int stt = 1;
+                        foreach (var sp in ViewBag.SanPhamTonKho)
+                        {
+                            <tr>
+                                <td>@(stt++)</td>
+                                <td>@sp.TenSanPham</td>
+                                <td>@sp.SoLuongTon</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+
+    @*         
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-       
+
         <title>Biểu đồ trạng thái</title>
             <canvas id="statusChart" width="100" height="100"></canvas>
             <script>
@@ -222,10 +259,89 @@
                                 position: 'bottom'
                             }
                         }
-                    }
+
                 });
-            </script> *@
-         
-    </div>
+</script> *@
+
+
+
 </body>
+@section Scripts {
+    <script>
+        $(document).ready(function(){
+            $.ajax({
+               url : "@Url.Action("Getdata", "ThongKes")",
+               type : "POST",
+               datatype : "json",
+               success : function(data){
+
+              new Morris.Line({
+            element: 'myfirstchart',
+            data: data,
+           xkey: 'doanhThu',  // Trùng với key trong JSON
+                    ykeys: ['tongTien', 'donThanhCong', 'donHuy'],
+                    labels: ['Tổng Tiền', 'Đơn hàng thành công', 'Đơn Hủy'],
+                    parseTime: true, // Quan trọng: kích hoạt parse thời gian
+                    xLabelFormat: function (x) {
+                        var date = new Date(x);
+                        return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
+                    }
+
+
+          });
+               }
+            });
+
+
+
+        })
+        var chart = null;
+                function updateChart(newData) {
+                $("#myfirstchart").empty();
+                 if(chart){
+                     chart = null;
+                 }
+             chart = new Morris.Line({
+                    element: 'myfirstchart',
+                  data: newData,
+                     xkey: 'doanhThu',
+                      ykeys: ['tongTien', 'donThanhCong', 'donHuy'],
+                      labels: ['Tổng Tiền', 'Đơn hàng thành công', 'Đơn Hủy'],
+                      parseTime: true,
+                      xLabelFormat: function (x) {
+                          var date = new Date(x);
+                          return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
+                      }
+                      });
+
+          }
+
+
+        $("#filter").click(function(e){
+                 e.preventDefault(); // Ngăn chặn reload trang khi nhấn submit
+            var fromDate =$("#fromDate").val();
+              var toDate =$("#toDate").val();
+
+            $.ajax({
+                url : "@Url.Action("filter", "ThongKes")",
+                data :{fromDate : fromDate,toDate: toDate},
+                type :"POST",
+                          success: function (data) {
+
+                      updateChart(data);
+                  },
+                  error: function () {
+                      alert("Lỗi khi lấy dữ liệu!");
+                  }
+              });
+          });
+
+
+
+
+
+
+    </script>
+}
+
 </html>
