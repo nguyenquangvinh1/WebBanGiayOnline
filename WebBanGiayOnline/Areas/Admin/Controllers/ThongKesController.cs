@@ -75,16 +75,17 @@ namespace WebBanGiay.Areas.Admin.Controllers
                            DonThanhCong = x.Count(x => x.trang_thai == 3),
                            DonHuy = x.Count(x => x.trang_thai == 4),
                        }).ToList();
+
             var thangNay = _context.hoa_Dons
-                            .Where(hd => hd.ngay_tao.Month == today.Month && hd.ngay_tao.Year == today.Year && (hd.trang_thai == 3 || hd.trang_thai == 4))
-                            .GroupBy(_ => 1)
-                            .Select(x =>
-                                   new ThongKe()
-                                   {
-                                       TongTien = x.Where(x => x.trang_thai == 3).Sum(x => x.tong_tien),
-                                       DonThanhCong = x.Count(x => x.trang_thai == 3),
-                                       DonHuy = x.Count(x => x.trang_thai == 4),
-                                   }).ToList();
+                .Where(hd => hd.ngay_tao.Month == today.Month && hd.ngay_tao.Year == today.Year && (hd.trang_thai == 3 || hd.trang_thai == 4))
+                .GroupBy(_ => 1)
+                .Select(x =>
+                       new ThongKe()
+                       {
+                           TongTien = x.Where(x => x.trang_thai == 3).Sum(x => x.tong_tien),
+                           DonThanhCong = x.Count(x => x.trang_thai == 3),
+                           DonHuy = x.Count(x => x.trang_thai == 4),
+                       }).ToList();
 
             var namNay = _context.hoa_Dons
                 .Where(hd => hd.ngay_tao.Year == today.Year && (hd.trang_thai == 3 || hd.trang_thai == 4))
