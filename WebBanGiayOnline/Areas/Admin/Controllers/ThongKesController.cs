@@ -35,9 +35,9 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
             var sanPhamBanChay = new List<dynamic>
     {
-        new { Id = Guid.NewGuid(), TenSanPham = "Giày Nike Air Force 1", SoLuongBan = 120 },
-        new { Id = Guid.NewGuid(), TenSanPham = "Giày Adidas Ultraboost", SoLuongBan = 90 },
-        new { Id = Guid.NewGuid(), TenSanPham = "Giày Puma RS-X", SoLuongBan = 75 }
+        new { Id = Guid.NewGuid(), TenSanPham = "Giày Nike Air Force 1", SoLuongBan = 10 },
+        new { Id = Guid.NewGuid(), TenSanPham = "Giày Adidas Ultraboost", SoLuongBan =  9},
+        new { Id = Guid.NewGuid(), TenSanPham = "Giày Puma RS-X", SoLuongBan = 5 }
     };
 
             // Dữ liệu fake cho sản phẩm tồn kho

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ClssLib;
 using WebBanGiay.Data;
+using WebBanGiay.Models;
 
 namespace WebBanGiay.Controllers
 {
@@ -22,25 +23,39 @@ namespace WebBanGiay.Controllers
         // GET: San_Pham_Chi_Tiet
         public async Task<IActionResult> Index()
         {
-            var appDbContext = _context.san_Pham_Chi_Tiets.Include(s => s.Kich_Thuoc).Include(s => s.Mau_Sac).Include(s => s.San_Pham);
-            return View(await appDbContext.ToListAsync());
+            var sanPham = _context.san_Pham_Chi_Tiets.AsQueryable();
+            var result = sanPham.Select(x => new HangHoaVM
+            {
+                ID = x.ID,
+                MaHh = x.MaSP,
+                TenHH = x.ten_SPCT,
+                DonGia = x.gia,
+                MoTa = x.moTa ?? ""
+
+            });
+            return View(result);
         }
 
         // GET: San_Pham_Chi_Tiet/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
-      
-
-            var san_Pham_Chi_Tiet = await _context.san_Pham_Chi_Tiets
-             
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (san_Pham_Chi_Tiet == null)
+            var data1 = _context.san_Pham_Chi_Tiets.SingleOrDefault(x => x.ID == id);
+            if(data1 == null)
             {
-                return NotFound();
+                TempData["Message"] = $"Không tìm thấy {id}";
+                return Redirect("/404");
             }
+            var result = new ChiTietHangHoaVM
+            {
+                ID = data1.ID,
+                MaHh = data1.MaSP,
+                TenHH = data1.ten_SPCT,
+                DonGia = data1.gia,
+                MoTa = data1.moTa,
+                SoLuongTon = data1.so_luong
 
-
-            return View(san_Pham_Chi_Tiet);
+            };
+            return View(result);
         }
 
         // GET: San_Pham_Chi_Tiet/Create
@@ -57,7 +72,7 @@ namespace WebBanGiay.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,ten_SPCT,gia,so_luong,trang_thai,ngay_tao,ngay_sua,Kich_ThuocID,Mau_SacID,San_PhamID")] San_Pham_Chi_Tiet san_Pham_Chi_Tiet)
+        public async Task<IActionResult> Create([Bind("ID,MaSP,moTa,ten_SPCT,gia,so_luong,trang_thai,ngay_tao,ngay_sua,Kich_ThuocID,Mau_SacID,San_PhamID")] San_Pham_Chi_Tiet san_Pham_Chi_Tiet)
         {
             if (ModelState.IsValid)
             {
@@ -96,7 +111,7 @@ namespace WebBanGiay.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("ID,ten_SPCT,gia,so_luong,trang_thai,ngay_tao,ngay_sua,Kich_ThuocID,Mau_SacID,San_PhamID")] San_Pham_Chi_Tiet san_Pham_Chi_Tiet)
+        public async Task<IActionResult> Edit(Guid id, [Bind("ID,MaSP,moTa,ten_SPCT,gia,so_luong,trang_thai,ngay_tao,ngay_sua,Kich_ThuocID,Mau_SacID,San_PhamID")] San_Pham_Chi_Tiet san_Pham_Chi_Tiet)
         {
             if (id != san_Pham_Chi_Tiet.ID)
             {
