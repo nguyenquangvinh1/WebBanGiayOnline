@@ -3,12 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace WebBanGiay.Migrations
 {
     /// <inheritdoc />
-    public partial class a : Migration
+    public partial class test1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -321,6 +319,8 @@ namespace WebBanGiay.Migrations
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    MaSP = table.Column<int>(type: "int", nullable: true),
+                    moTa = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ten_SPCT = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     gia = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     so_luong = table.Column<int>(type: "int", nullable: false),
@@ -607,16 +607,6 @@ namespace WebBanGiay.Migrations
                         principalTable: "san_Pham_Chi_Tiets",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.InsertData(
-                table: "vai_Tros",
-                columns: new[] { "ID", "ngay_sua", "ngay_tao", "ten_vai_tro", "trang_thai" },
-                values: new object[,]
-                {
-                    { new Guid("7704467c-19da-4a98-92a3-c069f1deb947"), null, new DateTime(2025, 3, 9, 1, 18, 47, 376, DateTimeKind.Local).AddTicks(1469), "Khách Hàng", 1 },
-                    { new Guid("78d55f7c-f1af-449b-925e-f0ff0aaaa391"), null, new DateTime(2025, 3, 9, 1, 18, 47, 376, DateTimeKind.Local).AddTicks(1465), "Nhân Viên", 1 },
-                    { new Guid("dbdd9948-7e19-4171-a4e2-9272c70f3ec4"), null, new DateTime(2025, 3, 9, 1, 18, 47, 376, DateTimeKind.Local).AddTicks(1443), "Admin", 1 }
                 });
 
             migrationBuilder.CreateIndex(
