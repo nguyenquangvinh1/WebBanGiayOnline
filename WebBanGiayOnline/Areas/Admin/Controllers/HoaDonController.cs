@@ -191,8 +191,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
             return View(hoa_Don);
         }
 
-        // POST: Admin/HoaDon/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -356,121 +355,86 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
 
         }
-        [HttpPost]
-        public JsonResult HuyDonHang(Guid? id)
-        {
-            var hoaDon = _context.hoa_Dons.FirstOrDefault(h => h.ID == id);
-            if (hoaDon == null)
-            {
-                return Json(new { success = false, message = "Không tìm thấy đơn hàng!" });
-            }
-
-
-            if (hoaDon.trang_thai == 3 || hoaDon.trang_thai == 2) // Hoàn thành hoặc Đang giao hàng
-            {
-                return Json(new { success = false, message = "Không thể hủy đơn hàng đã hoàn thành hoặc đang giao hàng!" });
-            }
-            if (hoaDon.trang_thai == 4)
-            {
-
-                return Json(new { success = false, message = "Đơn hàng đã bị hủy, không thể thay đổi trạng thái!" });
-            }
-            hoaDon.tong_tien = 0;
-            hoaDon.trang_thai = 4;
-
-
-
-            _context.hoa_Dons.Update(hoaDon);
-            _context.SaveChanges();
-            Console.WriteLine($"Hủy đơn hàng: {hoaDon.ID} - Sau khi cập nhật: Tổng tiền = {hoaDon.tong_tien}");
-
-
-            return Json(new { success = true });
-        }
-
-
-        [HttpPost]
-        public IActionResult CreateInvoice()
-        {
-            try
-            {
-                var newInvoice = new Hoa_Don
-                {
-                    ID = Guid.NewGuid(),            // Tạo ID hóa đơn mới
-                    MaHoaDon = GenerateNewHoaDonID(), // Tạo mã "HD00001"
-                    trang_thai = 0,                 // Đặt trạng thái "Chờ xử lý"
-                    ngay_tao = DateTime.Now
-                };
-                _context.hoa_Dons.Add(newInvoice);
-                _context.SaveChanges(); // Lưu vào DB
-
-                return Json(new {
-                    success = true,
-                    invoiceId = newInvoice.ID, // Trả về ID hóa đơn mới tạo
-                    message = "Tạo hóa đơn mới thành công!"
-                });
-            }
-            catch (Exception ex)
-            {
-                return Json(new {
-                    success = false,
-                    message = "Lỗi khi tạo hóa đơn: " + ex.Message
-                });
-            }
-        }
-        public IActionResult GetInvoiceById(Guid id)
-        {
-            var invoice = _context.hoa_Dons
-                                  .Include(h => h.Hoa_Don_Chi_Tiets) // Lấy luôn chi tiết sản phẩm
-                                  .FirstOrDefault(h => h.ID == id);
-
-            if (invoice == null)
-                return Json(new { success = false, message = "Không tìm thấy hóa đơn" });
-
-            return Json(new
-            {
-                success = true,
-                invoice = invoice
-            });
-        }
-
-
-        // Action thêm chi tiết sản phẩm vào bảng hoa_Don_Chi_Tiet
         //[HttpPost]
-        //public IActionResult AddProductToInvoice([FromBody] AddProductViewModel model)
+        //public JsonResult HuyDonHang(Guid? id)
         //{
-        //    try 
+        //    var hoaDon = _context.hoa_Dons.FirstOrDefault(h => h.ID == id);
+        //    if (hoaDon == null)
         //    {
-        //        // Kiểm tra hóa đơn
-        //        var hoaDon = _context.hoa_Dons.FirstOrDefault(h => h.ID == model.InvoiceId);
-        //        if (hoaDon == null)
-        //            return Json(new { success = false, message = "Không tìm thấy hóa đơn" });
+        //        return Json(new { success = false, message = "Không tìm thấy đơn hàng!" });
+        //    }
 
-        //        // Kiểm tra sản phẩm chi tiết
-        //        var sanPhamCT = _context.san_Pham_Chi_Tiets.FirstOrDefault(sp => sp.ID == model.ProductId);
-        //        if (sanPhamCT == null)
-        //            return Json(new { success = false, message = "Không tìm thấy sản phẩm" });
 
-        //        // Tạo chi tiết
-        //        var hoadonchiTiet = new Hoa_Don_Chi_Tiet
+        //    if (hoaDon.trang_thai == 3 || hoaDon.trang_thai == 2) // Hoàn thành hoặc Đang giao hàng
+        //    {
+        //        return Json(new { success = false, message = "Không thể hủy đơn hàng đã hoàn thành hoặc đang giao hàng!" });
+        //    }
+        //    if (hoaDon.trang_thai == 4)
+        //    {
+
+        //        return Json(new { success = false, message = "Đơn hàng đã bị hủy, không thể thay đổi trạng thái!" });
+        //    }
+        //    hoaDon.tong_tien = 0;
+        //    hoaDon.trang_thai = 4;
+
+
+
+        //    _context.hoa_Dons.Update(hoaDon);
+        //    _context.SaveChanges();
+        //    Console.WriteLine($"Hủy đơn hàng: {hoaDon.ID} - Sau khi cập nhật: Tổng tiền = {hoaDon.tong_tien}");
+
+
+        //    return Json(new { success = true });
+        //}
+
+
+        //[HttpPost]
+        //public IActionResult CreateInvoice()
+        //{
+        //    try
+        //    {
+        //        var newInvoice = new Hoa_Don
         //        {
-        //            ID = Guid.NewGuid(),
-        //            Hoa_DonID = hoaDon.ID,
-        //            San_Pham_Chi_TietID = sanPhamCT.ID,
-        //            so_luong = model.Quantity,
-        //            gia = model.Price,         // Lưu giá tại thời điểm mua
-        //                                       // ... cột khác (nếu có)
+        //            ID = Guid.NewGuid(),            
+        //            MaHoaDon = GenerateNewHoaDonID(), 
+        //            trang_thai = 0,                 
+        //            ngay_tao = DateTime.Now
         //        };
-        //        _context.don_Chi_Tiets.Add(hoadonchiTiet);
-        //        _context.SaveChanges();
+                
+        //        _context.SaveChanges(); // Lưu vào DB
 
-        //        return Json(new { success = true, message = "Đã thêm sản phẩm vào hóa đơn" });
+        //        return Json(new {
+        //            success = true,
+        //            invoiceId = newInvoice.ID, // Trả về ID hóa đơn mới tạo
+        //            message = "Tạo hóa đơn mới thành công!"
+        //        });
         //    }
         //    catch (Exception ex)
         //    {
-        //        return Json(new { success = false, message = "Lỗi: " + ex.Message });
+        //        return Json(new {
+        //            success = false,
+        //            message = "Lỗi khi tạo hóa đơn: " + ex.Message
+        //        });
         //    }
         //}
+        //public IActionResult GetInvoiceById(Guid id)
+        //{
+        //    var invoice = _context.hoa_Dons
+        //                          .Include(h => h.Hoa_Don_Chi_Tiets) // Lấy luôn chi tiết sản phẩm
+        //                          .FirstOrDefault(h => h.ID == id);
+
+        //    if (invoice == null)
+        //        return Json(new { success = false, message = "Không tìm thấy hóa đơn" });
+
+        //    return Json(new
+        //    {
+        //        success = true,
+        //        invoice = invoice
+        //    });
+        //}
+
+
+       
 
 
     }

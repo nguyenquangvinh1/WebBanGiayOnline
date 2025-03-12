@@ -1,6 +1,4 @@
-﻿using WebBanGiay.Areas.Admin.Models.ViewModel;
-
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 namespace WebBanGiay.ViewModel
 {
     public class QuickCustomerViewModel
