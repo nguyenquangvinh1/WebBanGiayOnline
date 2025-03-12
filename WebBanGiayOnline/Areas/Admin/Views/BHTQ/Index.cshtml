@@ -26,6 +26,8 @@
         <div class="mt-3">
             <button class="btn btn-info qrCode" data-id="INVOICE_ID">📷 QR Code</button>
             <button class="btn btn-success selectProduct" data-id="INVOICE_ID">+ Thêm sản phẩm</button>
+            
+
         </div>
 
         <!-- Danh sách sản phẩm của hóa đơn -->
@@ -244,26 +246,35 @@
 @section Scripts {
         
     <script>
+                
+        const MAX_INVOICE = 6;
+
+                let invoiceCount = 0;
+        let currentInvoiceId = null;
+
             // 1. Tạo hóa đơn mới
-        $('#createInvoice').on('click', function(){
+               $('#createInvoice').on('click', function(){
+            if (invoiceCount >= MAX_INVOICE) {
+                alert(`Bạn chỉ được tạo tối đa ${MAX_INVOICE} hóa đơn cùng lúc!`);
+                return;
+            }
+            // Nếu chưa đạt, gọi Ajax để tạo hóa đơn mới
             $.ajax({
-                url: '/Admin/HoaDon/CreateInvoice',
+                url: '/Admin/BHTQ/CreateInvoice',
                 type: 'POST',
                 success: function(res){
                     if(res.success){
-                        // Tăng biến đếm, clone template, gắn invoiceId vào DOM...
-                        // Ví dụ:
                         invoiceCount++;
+                        // Clone template, tạo tab và gán invoiceId vào DOM...
                         let newInvoiceDomId = 'invoice' + invoiceCount;
                         let newInvoiceHtml = $('#invoiceTemplate').html().replace(/INVOICE_ID/g, newInvoiceDomId);
                         $('#invoiceTabs').append(`
-                        <li class="nav-item">
-                            <a class="nav-link" id="tab-${newInvoiceDomId}" data-bs-toggle="tab" href="#${newInvoiceDomId}">
-                                Hóa đơn ${invoiceCount} <span class="close-tab" data-id="${newInvoiceDomId}">✖</span>
-                            </a>
-                        </li>`);
-                                        $('#invoiceContent').append(newInvoiceHtml);
-                        // Gắn invoiceId của DB vào container hóa đơn
+                            <li class="nav-item">
+                                <a class="nav-link" id="tab-${newInvoiceDomId}" data-bs-toggle="tab" href="#${newInvoiceDomId}">
+                                    Hóa đơn ${invoiceCount} <span class="close-tab" data-id="${newInvoiceDomId}">✖</span>
+                                </a>
+                            </li>`);
+                        $('#invoiceContent').append(newInvoiceHtml);
                         $(`#${newInvoiceDomId}`).attr('data-db-invoice-id', res.invoiceId);
                         let tab = new bootstrap.Tab(document.querySelector(`#tab-${newInvoiceDomId}`));
                         tab.show();
@@ -278,43 +289,39 @@
             });
         });
 
-        // 2. Thêm sản phẩm vào hóa đơn
-        $(document).on('click', '.add-product', function(){
-            // Lấy thông tin sản phẩm từ nút bấm
-            let productId = $(this).data('id');
-            let quantity = 1; // Ví dụ: thêm 1 sản phẩm
-            let price = parseFloat($(this).data('price')) || 0;
 
-            // Lấy invoiceId từ container hiện hành
-            let invoiceDomId = currentInvoiceId; // đã được lưu từ sự kiện mở hóa đơn
-            let dbInvoiceId = $(`#${invoiceDomId}`).attr('data-db-invoice-id');
+        //close hoa don
+                // Sự kiện khi nhấn nút "close-tab" trên tab hóa đơn
+                    $(document).on('click', '.close-tab', function(e) {
+            e.stopPropagation();
+            let removedInvoiceDomId = $(this).attr('data-id');
+            // Xóa tab và nội dung hóa đơn tương ứng
+            $(`#tab-${removedInvoiceDomId}`).parent().remove();
+            $(`#${removedInvoiceDomId}`).remove();
 
-            $.ajax({
-                url: '/Admin/HoaDon/AddProductToInvoice',
-                type: 'POST',
-                data: JSON.stringify({
-                    InvoiceId: dbInvoiceId,
-                    ProductId: productId,
-                    Quantity: quantity,
-                    Price: price
-                }),
-                contentType: 'application/json; charset=utf-8',
-                success: function(res){
-                    if(res.success){
-                        // Cập nhật bảng sản phẩm của hóa đơn trên giao diện
-                        loadInvoiceDetails();
-                    } else {
-                        alert("Lỗi thêm sản phẩm: " + res.message);
-                    }
-                }
+            // Tính lại số hóa đơn hiện có dựa trên số lượng tab
+            invoiceCount = $('#invoiceTabs li').length;
+
+            // Cập nhật lại số thứ tự hiển thị (nếu cần)
+            $('#invoiceTabs a').each(function(index) {
+                let closeBtnHtml = $(this).find('.close-tab').prop('outerHTML');
+                $(this).html(`Hóa đơn ${index + 1} ${closeBtnHtml}`);
             });
+
+            // Nếu không còn hóa đơn, bạn có thể đặt lại invoiceCount = 0 (hoặc dựa trên số lượng tab)
+            if ($('#invoiceTabs li').length === 0) {
+                invoiceCount = 0;
+            }
+
+            // Hiển thị tab cuối nếu còn
+            $('#invoiceTabs a:last').tab('show');
         });
 
-        // 3. Hiển thị danh sách sản phẩm trong hóa đơn
+         // 3. Hiển thị danh sách sản phẩm trong hóa đơn
         function loadInvoiceDetails() {
             let dbInvoiceId = $(`#${currentInvoiceId}`).attr('data-db-invoice-id');
             $.ajax({
-                url: '/Admin/HoaDon/GetInvoiceDetails',
+                url: '/Admin/BHTQ/GetInvoiceDetails',
                 type: 'GET',
                 data: { invoiceId: dbInvoiceId },
                 success: function(res){
@@ -336,12 +343,108 @@
                 }
             });
         }
+                //Ví dụ, khi nhấn nút có class selectProduct, bạn cần gán:
+               $(document).on('click', '.selectProduct', function(){
+            currentInvoiceId = $(this).data('id');
+            let modal = new bootstrap.Modal(document.getElementById('detailedProductModal'));
+            modal.show();
+            loadDetailedProducts();
+        });
+
+
+
+        // 2. Thêm sản phẩm vào hóa đơn
+        $(document).on('click', '.add-product', function(){
+            // Lấy thông tin sản phẩm từ nút bấm
+            let productId = $(this).data('id');
+            let quantity = 1; // Ví dụ: thêm 1 sản phẩm
+            let price = parseFloat($(this).data('price')) || 0;
+
+            // Lấy invoiceId từ container hiện hành
+            let invoiceDomId = currentInvoiceId; // đã được lưu từ sự kiện mở hóa đơn
+            let dbInvoiceId = $(`#${invoiceDomId}`).attr('data-db-invoice-id');
+
+            $.ajax({
+                url: '/Admin/BHTQ/AddProductToInvoice',
+                type: 'POST',
+                data: JSON.stringify({
+                    InvoiceId: dbInvoiceId,
+                    ProductId: productId,
+                    Quantity: quantity,
+                    Price: price
+                }),
+                contentType: 'application/json; charset=utf-8',
+                success: function(res){
+                    console.log("Kết quả thêm sản phẩm:", res);
+                    if(res.success){
+                        // Cập nhật bảng sản phẩm của hóa đơn trên giao diện
+                        loadInvoiceDetails();
+                    } else {
+                        alert("Lỗi thêm sản phẩm: " + res.message);
+                    }
+                }
+            });
+        });
+                $(document).on('click', '.selectProduct', function(){
+            // Lưu ID hóa đơn hiện hành (nếu cần)
+            currentInvoiceId = $(this).data('id');
+            // Khởi tạo và hiển thị modal có id 'detailedProductModal'
+            let modal = new bootstrap.Modal(document.getElementById('detailedProductModal'));
+            modal.show();
+            // Gọi hàm loadDetailedProducts để load danh sách sản phẩm
+            loadDetailedProducts();
+        });
+
+                function loadDetailedProducts() {
+            $.getJSON('/Admin/SanPhamChiTiet/GetAllSanPhamChiTiet', function(data) {
+                let tbody = $('#detailedProductTable tbody');
+                tbody.empty();
+                if(data && data.length > 0) {
+                    $.each(data, function(index, product){
+                        let imgUrl = product.imageUrl || "";
+                        let availableQty = product.dbQuantity || 0;
+                        let rowHtml = `
+                            <tr data-product-id="${product.id}" data-db-quantity="${availableQty}">
+                                <td>${index + 1}</td>
+                                <td><img src="${imgUrl}" alt="${product.name}" width="50"></td>
+                                <td>${product.name}</td>
+                                <td>${parseFloat(product.price).toLocaleString()} VND</td>
+                                <td>${availableQty}</td>
+                                <td>${product.size}</td>
+                                <td>${product.color}</td>
+                                <td>${product.status}</td>
+                                <td>
+                                    <button class="btn btn-success btn-sm add-product"
+                                        data-id="${product.id}"
+                                        data-name="${product.name}"
+                                        data-price="${product.price}"
+                                        data-size="${product.size}"
+                                        data-color="${product.color}"
+                                        data-status="${product.status}"
+                                        data-img="${imgUrl}">
+                                        Thêm
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                        tbody.append(rowHtml);
+                    });
+                } else {
+                    tbody.append('<tr><td colspan="9" class="text-center">Không có sản phẩm</td></tr>');
+                }
+            }).fail(function(jqXHR, textStatus, errorThrown){
+                console.error("Lỗi khi lấy dữ liệu sản phẩm chi tiết:", textStatus);
+            });
+        }
+
+
+       
 
         // 4. Thanh toán hóa đơn
         $('#checkoutInvoice').on('click', function(){
             let dbInvoiceId = $(`#${currentInvoiceId}`).attr('data-db-invoice-id');
             $.ajax({
-                url: '/Admin/HoaDon/CheckoutInvoice',
+                url: '/Admin/BHTQ/CheckoutInvoice',
                 type: 'POST',
                 data: { invoiceId: dbInvoiceId },
                 success: function(res){

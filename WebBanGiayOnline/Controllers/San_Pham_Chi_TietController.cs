@@ -27,7 +27,7 @@ namespace WebBanGiay.Controllers
             var result = sanPham.Select(x => new HangHoaVM
             {
                 ID = x.ID,
-                MaHh = x.MaSP,
+                MaHh =(int) x.MaSP,
                 TenHH = x.ten_SPCT,
                 DonGia = x.gia,
                 MoTa = x.moTa ?? ""
@@ -48,7 +48,7 @@ namespace WebBanGiay.Controllers
             var result = new ChiTietHangHoaVM
             {
                 ID = data1.ID,
-                MaHh = data1.MaSP,
+                MaHh = (int)data1.MaSP,
                 TenHH = data1.ten_SPCT,
                 DonGia = data1.gia,
                 MoTa = data1.moTa,
