@@ -12,8 +12,13 @@ using WebBanGiay.Data;
 namespace WebBanGiay.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250312132504_test1")]
-    partial class test1
+<<<<<<<< HEAD:WebBanGiayOnline/Migrations/20250308181854_a.Designer.cs
+    [Migration("20250308181854_a")]
+    partial class a
+========
+    [Migration("20250311034044_datn")]
+    partial class datn
+>>>>>>>> ec7e66e806e8d8a24212eba6a2b878879c83439e:WebBanGiayOnline/Migrations/20250311034044_datn.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -620,9 +625,12 @@ namespace WebBanGiay.Migrations
                     b.Property<Guid?>("Kich_ThuocID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("MaSP")
+<<<<<<<< HEAD:WebBanGiayOnline/Migrations/20250308181854_a.Designer.cs
+========
+                    b.Property<int>("MaSP")
                         .HasColumnType("int");
 
+>>>>>>>> ec7e66e806e8d8a24212eba6a2b878879c83439e:WebBanGiayOnline/Migrations/20250311034044_datn.Designer.cs
                     b.Property<Guid?>("Mau_SacID")
                         .HasColumnType("uniqueidentifier");
 
@@ -632,9 +640,13 @@ namespace WebBanGiay.Migrations
                     b.Property<decimal>("gia")
                         .HasColumnType("decimal(18,2)");
 
+<<<<<<<< HEAD:WebBanGiayOnline/Migrations/20250308181854_a.Designer.cs
+========
                     b.Property<string>("moTa")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+>>>>>>>> ec7e66e806e8d8a24212eba6a2b878879c83439e:WebBanGiayOnline/Migrations/20250311034044_datn.Designer.cs
                     b.Property<DateTime?>("ngay_sua")
                         .HasColumnType("datetime2");
 
@@ -667,6 +679,12 @@ namespace WebBanGiay.Migrations
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("EmployeeNumber")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeNumber"));
 
                     b.Property<Guid>("Vai_TroID")
                         .HasColumnType("uniqueidentifier");
@@ -851,6 +869,44 @@ namespace WebBanGiay.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("vai_Tros");
+
+                    b.HasData(
+                        new
+                        {
+<<<<<<<< HEAD:WebBanGiayOnline/Migrations/20250308181854_a.Designer.cs
+                            ID = new Guid("dbdd9948-7e19-4171-a4e2-9272c70f3ec4"),
+                            ngay_tao = new DateTime(2025, 3, 9, 1, 18, 47, 376, DateTimeKind.Local).AddTicks(1443),
+========
+                            ID = new Guid("a84fb1a3-e2b0-4d75-a5ad-442bb1a11463"),
+                            ngay_tao = new DateTime(2025, 3, 11, 10, 40, 39, 811, DateTimeKind.Local).AddTicks(1544),
+>>>>>>>> ec7e66e806e8d8a24212eba6a2b878879c83439e:WebBanGiayOnline/Migrations/20250311034044_datn.Designer.cs
+                            ten_vai_tro = "Admin",
+                            trang_thai = 1
+                        },
+                        new
+                        {
+<<<<<<<< HEAD:WebBanGiayOnline/Migrations/20250308181854_a.Designer.cs
+                            ID = new Guid("78d55f7c-f1af-449b-925e-f0ff0aaaa391"),
+                            ngay_tao = new DateTime(2025, 3, 9, 1, 18, 47, 376, DateTimeKind.Local).AddTicks(1465),
+========
+                            ID = new Guid("17ca9c07-9730-407e-a7bc-bdb98eb37d5c"),
+                            ngay_tao = new DateTime(2025, 3, 11, 10, 40, 39, 811, DateTimeKind.Local).AddTicks(1593),
+>>>>>>>> ec7e66e806e8d8a24212eba6a2b878879c83439e:WebBanGiayOnline/Migrations/20250311034044_datn.Designer.cs
+                            ten_vai_tro = "Nhân Viên",
+                            trang_thai = 1
+                        },
+                        new
+                        {
+<<<<<<<< HEAD:WebBanGiayOnline/Migrations/20250308181854_a.Designer.cs
+                            ID = new Guid("7704467c-19da-4a98-92a3-c069f1deb947"),
+                            ngay_tao = new DateTime(2025, 3, 9, 1, 18, 47, 376, DateTimeKind.Local).AddTicks(1469),
+========
+                            ID = new Guid("13a5fd0b-c459-4ecd-b82e-633f58343b7c"),
+                            ngay_tao = new DateTime(2025, 3, 11, 10, 40, 39, 811, DateTimeKind.Local).AddTicks(1595),
+>>>>>>>> ec7e66e806e8d8a24212eba6a2b878879c83439e:WebBanGiayOnline/Migrations/20250311034044_datn.Designer.cs
+                            ten_vai_tro = "Khách Hàng",
+                            trang_thai = 1
+                        });
                 });
 
             modelBuilder.Entity("ClssLib.Anh_San_Pham", b =>
