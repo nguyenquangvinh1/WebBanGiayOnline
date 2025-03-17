@@ -1,18 +1,20 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 namespace WebBanGiay.ViewModel
 {
     public class QuickCustomerViewModel
     {
-        [Required]
-        public string Ho_ten { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Họ tên không được để trống")]
+        [JsonPropertyName("HoTen")]
+        public string HoTen { get; set; }
+
+        [Required(ErrorMessage = "Số điện thoại không được để trống")]
+        [JsonPropertyName("PhoneNumber")]
         public string PhoneNumber { get; set; }
-        [Required, EmailAddress]
+
+        [Required(ErrorMessage = "Email không được để trống")]
+        [EmailAddress(ErrorMessage = "Email không hợp lệ")]
+        [JsonPropertyName("Email")]
         public string Email { get; set; }
-        // Nếu không cần địa chỉ, bạn có thể bỏ các trường này hoặc để rỗng:
-        public string Tinh { get; set; } = "";
-        public string Huyen { get; set; } = "";
-        public string Xa { get; set; } = "";
-        public string Dia_chi_chi_tiet { get; set; } = "";
     }
 }

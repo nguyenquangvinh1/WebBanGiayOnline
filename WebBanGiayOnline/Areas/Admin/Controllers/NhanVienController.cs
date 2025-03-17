@@ -38,9 +38,9 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
 
 
-       
 
-        public async Task<IActionResult> Index(int? pageNumber, int pageSize = 3)
+
+        public async Task<IActionResult> Index(int? pageNumber, int pageSize = 7)
         {
             ViewBag.PageSizes = new List<SelectListItem>
     {
@@ -172,7 +172,49 @@ namespace WebBanGiay.Areas.Admin.Controllers
             }
         }
 
+        //public async Task<IActionResult> Index(int? pageNumber, int pageSize = 5)
+        //{
+        //    ViewBag.PageSizes = new List<SelectListItem>
+        //{
+        //    new SelectListItem { Value = "5", Text = "5" },
+        //    new SelectListItem { Value = "10", Text = "10" },
+        //    new SelectListItem { Value = "20", Text = "20" },
+        //    new SelectListItem { Value = "50", Text = "50" },
+        //    new SelectListItem { Value = "100", Text = "100" }
+        //};
 
+        //    ViewBag.SelectedPageSize = pageSize; // Giá trị mặc định
+
+        //    int currentPage = pageNumber ?? 1; // Nếu không có tham số, mặc định là trang 1
+
+        //    var nhanVien = _context.vai_Tros.FirstOrDefault(x => x.ten_vai_tro == "Nhân Viên");
+        //    var list = await _context.tai_Khoans
+        //          .Where(x => x.Vai_TroID == nhanVien.ID)
+        //          .ToListAsync();
+
+        //    var lst = new List<NhanVien_Model>();
+        //    foreach (var item in list)
+        //    {
+        //        var diachi = _context.dia_Chis.FirstOrDefault(x => x.Tai_KhoanID == item.ID && x.loai_dia_chi == 1);
+        //        lst.Add(new NhanVien_Model()
+        //        {
+        //            Id = item.ID,
+        //            user_name = item.user_name,
+        //            pass_word = item.pass_word,
+        //            ho_ten = item.ho_ten,
+        //            ngay_sinh = item.ngay_sinh,
+        //            gioi_tinh = item.gioi_tinh,
+        //            sdt = item.sdt,
+        //            email = item.email,
+        //            cccd = item.cccd,
+        //            tinh = (diachi?.tinh ?? "") + (diachi?.huyen ?? "") + (diachi?.xa ?? "")
+        //        });
+        //    }
+
+        //    // Phân trang
+        //    var paginatedList = lst.ToPagedList(currentPage, pageSize);
+        //    return View(paginatedList);
+        //}
 
 
         public async Task<IActionResult> Search(string keyword)
@@ -231,7 +273,6 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
 
 
-
         public JsonResult FilterByStatus(int? status)
         {
             // Lấy vai trò "Nhân Viên" từ bảng vai_Tros
@@ -277,32 +318,32 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
 
 
-        [HttpPost]
-        public IActionResult ChangeStatus(Guid id, int trang_thai)
-        {
-            var employee = _context.tai_Khoans.FirstOrDefault(e => e.ID == id);
-            if (employee == null)
-            {
-                return Json(new { success = false, message = "Nhân viên không tồn tại." });
-            }
 
-            // Nếu trạng thái mới khác trạng thái hiện tại, cập nhật
-            if (employee.trang_thai != trang_thai)
-            {
-                employee.trang_thai = trang_thai;
-                _context.tai_Khoans.Update(employee);
-                int updated = _context.SaveChanges();
-                System.Diagnostics.Debug.WriteLine($"Employee ID {id}: New trang_thai = {employee.trang_thai}, updated = {updated}");
-                return Json(new { success = updated > 0, message = updated > 0 ? "Trạng thái đã được cập nhật." : "Cập nhật không thành công.", newStatus = employee.trang_thai });
-            }
-            else
-            {
-                return Json(new { success = true, message = "Không có thay đổi.", newStatus = employee.trang_thai });
-            }
-        }
+        //Update trang thai nhan vien[HttpPost]
+        //[HttpPost]
+        //public IActionResult ChangeStatus(Guid id, int trang_thai)
+        //{
+        //    var employee = _context.tai_Khoans.FirstOrDefault(e => e.ID == id);
+        //    if (employee == null)
+        //    {
+        //        return Json(new { success = false, message = "Nhân viên không tồn tại." });
+        //    }
 
+        //    // Nếu trạng thái mới bằng với trạng thái hiện tại, không cần cập nhật
+        //    if (employee.trang_thai == trang_thai)
+        //    {
+        //        return Json(new { success = true, message = "Không có thay đổi." });
+        //    }
 
+        //    employee.trang_thai = trang_thai;
+        //    // Ép EF nhận biết thay đổi của property
+        //    _context.Entry(employee).Property(x => x.trang_thai).IsModified = true;
 
+        //    int updated = _context.SaveChanges();
+        //    System.Diagnostics.Debug.WriteLine($"Employee ID {id}: New trang_thai = {employee.trang_thai}, updated = {updated}");
+
+        //    return Json(new { success = updated > 0, message = updated > 0 ? "Trạng thái đã được cập nhật." : "Cập nhật không thành công." });
+        //}
 
 
 
@@ -411,23 +452,28 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
             //bool isDuplicate = _context.tai_Khoans.Any(n =>
             //   n.email == nv.email || n.cccd == nv.cccd || n.sdt == nv.sdt);
-            var nhanVienRole = _context.vai_Tros.FirstOrDefault(x => x.ten_vai_tro == "Nhân Viên");
-            if (nhanVienRole == null)
+
+            if (_context.tai_Khoans.Any(n => n.email == nv.email))
             {
-                return BadRequest("Vai trò Nhân Viên không tồn tại!");
+                ModelState.AddModelError("email", "Email đã tồn tại!");
+            }
+            if (_context.tai_Khoans.Any(n => n.cccd == nv.cccd))
+            {
+                ModelState.AddModelError("cccd", "Số CCCD đã tồn tại!");
+            }
+            if (_context.tai_Khoans.Any(n => n.sdt == nv.sdt))
+            {
+                ModelState.AddModelError("sdt", "Số điện thoại đã tồn tại!");
             }
 
-            if (_context.tai_Khoans.Any(n => n.email == nv.email && n.Vai_TroID == nhanVienRole.ID))
+            if (string.IsNullOrEmpty(nv.pass_word))
             {
-                ModelState.AddModelError("email", "Email đã tồn tại cho nhân viên!");
+                nv.pass_word = GenerateRandomPassword();
             }
-            if (_context.tai_Khoans.Any(n => n.cccd == nv.cccd && n.Vai_TroID == nhanVienRole.ID))
+            if (!ModelState.IsValid)
             {
-                ModelState.AddModelError("cccd", "Số CCCD đã tồn tại cho nhân viên!");
-            }
-            if (_context.tai_Khoans.Any(n => n.sdt == nv.sdt && n.Vai_TroID == nhanVienRole.ID))
-            {
-                ModelState.AddModelError("sdt", "Số điện thoại đã tồn tại cho nhân viên!");
+                ViewData["Vai_TroID"] = new SelectList(_context.vai_Tros.ToList(), "ID", "ten_vai_tro");
+                return View(nv);
             }
 
             string uniqueFileName = "default-avatar.png";
@@ -477,7 +523,11 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
 
             Guid newID = Guid.NewGuid();
-
+            var nhanVienRole = _context.vai_Tros.FirstOrDefault(x => x.ten_vai_tro == "Nhân Viên");
+            if (nhanVienRole == null)
+            {
+                return BadRequest("Vai trò Nhân Viên không tồn tại!");
+            }
 
             var taikhoan = new Tai_Khoan()
             {
@@ -491,11 +541,9 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 email = nv.email,
                 sdt = nv.sdt,
                 gioi_tinh = nv.gioi_tinh,
+                ngay_tao=DateTime.Now,
                 Vai_TroID = nhanVienRole.ID,
-                hinh_anh = uniqueFileName,
-                ngay_tao = DateTime.Now,    // Gán ngày tạo là ngày hiện tại
-                                            // Nếu bạn muốn ngày sửa ban đầu là null, bạn có thể không gán hoặc gán null nếu thuộc tính kiểu DateTime? 
-                ngay_sua = null
+                hinh_anh = uniqueFileName
             };
 
             _context.tai_Khoans.Add(taikhoan);
@@ -511,7 +559,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 dia_chi_chi_tiet = nv.dia_chi_chi_tiet,
 
                 ngay_tao = DateTime.Now, // Sửa ở đây
-                ngay_sua = DateTime.Now,
+                //ngay_sua = null,
                 Tai_KhoanID = newID
             };
 
@@ -527,7 +575,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 // Bạn có thể log lỗi gửi email nếu cần, nhưng record đã được lưu.
             }
 
-            return RedirectToAction("Index", new { pageNumber = 1 });
+            return RedirectToAction("Index", "NhanVien", new { pageNumber = 1 });
 
         }
 

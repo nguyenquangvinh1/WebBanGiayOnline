@@ -103,7 +103,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
             {
 
                 // Truy vấn vai trò "Khách Hàng" trong cơ sở dữ liệu
-                var vaiTro = await _context.vai_Tros.FirstOrDefaultAsync(v => v.ten_vai_tro == "Khách Hàng");
+                var vaiTro = await _context.vai_Tros.FirstOrDefaultAsync(v => v.ten_vai_tro == "Khách hàng");
 
                 if (vaiTro == null)
                 {
@@ -368,25 +368,22 @@ namespace WebBanGiay.Areas.Admin.Controllers
         }
 
 
-
         [HttpGet]
         public IActionResult GetAllKhachHang()
         {
             var tai_Khoans = _context.tai_Khoans
-                 .Where(t => t.Vai_Tro.ten_vai_tro == "Khách Hàng")
+                 .Where(t => t.Vai_Tro.ten_vai_tro == "Khách hàng")
                  .Include(tk => tk.Dia_Chi)
-                 .OrderByDescending(tk => tk.ngay_tao) // Sắp xếp theo ngày tạo mới nhất
+                 .OrderByDescending(tk => tk.ngay_tao)
                  .ToList()
-                 .Select(customer => new CreateCustomerViewModel
-                 {
-                     Id = customer.ID,
-                     Ho_ten = customer.ho_ten,
-                     Makh = customer.ma,
-                     PhoneNumber = customer.sdt,
-                     Email = customer.email,
-                     DateOfBirth = customer.ngay_sinh,
-                     Gender = customer.gioi_tinh,
-                     Createdate = customer.ngay_tao,
+                 .Select(customer => new {
+                     id = customer.ID,                 // Sử dụng "id" (chữ thường)
+                     ho_ten = customer.ho_ten,
+                     phoneNumber = customer.sdt,
+                     email = customer.email,
+                     dateOfBirth = customer.ngay_sinh,
+                     gender = customer.gioi_tinh,
+                     createdate = customer.ngay_tao,
                      tinh = customer.Dia_Chi.FirstOrDefault(dc => dc.loai_dia_chi == 1)?.tinh,
                      huyen = customer.Dia_Chi.FirstOrDefault(dc => dc.loai_dia_chi == 1)?.huyen,
                      xa = customer.Dia_Chi.FirstOrDefault(dc => dc.loai_dia_chi == 1)?.xa,
@@ -394,40 +391,66 @@ namespace WebBanGiay.Areas.Admin.Controllers
                  })
                  .ToList();
 
-            return Json(tai_Khoans);
+            return Json(new { success = true, data = tai_Khoans });
         }
 
 
 
+        public static void Seed(AppDbContext context)
+        {
+            if (!context.vai_Tros.Any())
+            {
+                context.vai_Tros.Add(new Vai_Tro
+                {
+                    ID = Guid.NewGuid(),
+                    ten_vai_tro = "Khách Hàng"
+                    // thêm các thuộc tính khác nếu cần
+                });
+                context.SaveChanges();
+            }
+        }
 
-       
+
+
         [HttpPost]
         public async Task<IActionResult> AddQuickCustomer([FromBody] QuickCustomerViewModel model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                .Select(e => e.ErrorMessage)
+                                .ToList();
+                return BadRequest(new { success = false, message = "Invalid model", errors });
+            }
 
             try
             {
+                //Kiểm tra vai trò "Khách Hàng"
                 var vaiTro = await _context.vai_Tros.FirstOrDefaultAsync(v => v.ten_vai_tro == "Khách Hàng");
                 if (vaiTro == null)
-                    return BadRequest("Vai trò Khách Hàng không tồn tại.");
+                {
+                    return BadRequest(new { success = false, message = "Vai trò Khách Hàng không tồn tại." });
+                }
 
-                if (_context.tai_Khoans.Any(n => n.email == model.Email))
-                    return BadRequest("Email đã tồn tại!");
-                if (_context.tai_Khoans.Any(n => n.sdt == model.PhoneNumber))
-                    return BadRequest("SĐT đã tồn tại!");
+                if (await _context.tai_Khoans.AnyAsync(n => n.email == model.Email))
+                {
+                    return BadRequest(new { success = false, message = "Email đã tồn tại!" });
+                }
+                if (await _context.tai_Khoans.AnyAsync(n => n.sdt == model.PhoneNumber))
+                {
+                    return BadRequest(new { success = false, message = "SĐT đã tồn tại!" });
+                }
 
                 var newCustomer = new Tai_Khoan
                 {
                     ID = Guid.NewGuid(),
-                    user_name = "",                   // Gán mặc định
-                    ho_ten = model.Ho_ten,
+                    user_name = "",
+                    ho_ten = model.HoTen,
                     sdt = model.PhoneNumber,
                     email = model.Email,
                     ngay_tao = DateTime.Now,
                     Vai_TroID = vaiTro.ID,
-                    ma = GenerateUniqueMaKhachHang(),
+                    ma = GenerateUniqueMaKhachHang(), // Hàm tạo mã khách hàng duy nhất
                     gioi_tinh = 0,
                     ngay_sinh = new DateTime(2000, 1, 1),
                     cccd = "",
@@ -437,14 +460,13 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 _context.tai_Khoans.Add(newCustomer);
                 await _context.SaveChangesAsync();
 
-                // Tạo Dia_Chi với giá trị rỗng cho địa chỉ
                 var diaChi = new Dia_Chi
                 {
                     ID = Guid.NewGuid(),
-                    loai_dia_chi = 1, // địa chỉ chính
-                    tinh = "",      // rỗng
-                    huyen = "",     // rỗng
-                    xa = "",        // rỗng
+                    loai_dia_chi = 1,
+                    tinh = "",
+                    huyen = "",
+                    xa = "",
                     dia_chi_chi_tiet = "",
                     Tai_KhoanID = newCustomer.ID,
                     ngay_tao = DateTime.Now,
@@ -456,25 +478,30 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
                 return Json(new
                 {
-                    id = newCustomer.ID,
-                    ho_ten = newCustomer.ho_ten,
-                    phoneNumber = newCustomer.sdt,
-                    email = newCustomer.email,
-                    dia_chi = new
+                    success = true,
+                    data = new
                     {
-                        diaChiID = diaChi.ID,
-                        dia_chi_chi_tiet = diaChi.dia_chi_chi_tiet,
-                        tinh = diaChi.tinh,
-                        huyen = diaChi.huyen,
-                        xa = diaChi.xa
+                        id = newCustomer.ID,
+                        ho_ten = newCustomer.ho_ten,
+                        phoneNumber = newCustomer.sdt,
+                        email = newCustomer.email,
+                        dia_chi = new
+                        {
+                            diaChiID = diaChi.ID,
+                            dia_chi_chi_tiet = diaChi.dia_chi_chi_tiet,
+                            tinh = diaChi.tinh,
+                            huyen = diaChi.huyen,
+                            xa = diaChi.xa
+                        }
                     }
                 });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
+
 
 
 
