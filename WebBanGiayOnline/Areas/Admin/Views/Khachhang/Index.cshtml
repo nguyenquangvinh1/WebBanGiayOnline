@@ -133,52 +133,51 @@
 		</div>
 	</div>
 </div>
-@section Scripts {
-	<script>
-			document.addEventListener("DOMContentLoaded", function () {
-				let rowsPerPage = 5; // Số khách hàng trên mỗi trang
-			let table = document.getElementById("datatable-buttons").getElementsByTagName("tbody")[0];
-				let rows = table.getElementsByTagName("tr");
-				let currentPage = 1;
-				let totalPages = Math.ceil(rows.length / rowsPerPage);
 
-				function showPage(page) {
-					for (let i = 0; i < rows.length; i++) {
-						rows[i].style.display = (i >= (page - 1) * rowsPerPage && i < page * rowsPerPage) ? "" : "none";
-					}
-					document.getElementById("pageNumbers").innerText = `${page} / ${totalPages}`;
+<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			let rowsPerPage = 5; // Số khách hàng trên mỗi trang
+		let table = document.getElementById("datatable-buttons").getElementsByTagName("tbody")[0];
+			let rows = table.getElementsByTagName("tr");
+			let currentPage = 1;
+			let totalPages = Math.ceil(rows.length / rowsPerPage);
+
+			function showPage(page) {
+				for (let i = 0; i < rows.length; i++) {
+					rows[i].style.display = (i >= (page - 1) * rowsPerPage && i < page * rowsPerPage) ? "" : "none";
 				}
+				document.getElementById("pageNumbers").innerText = `${page} / ${totalPages}`;
+			}
 
-				function changePage(step) {
-					let newPage = currentPage + step;
-					if (newPage >= 1 && newPage <= totalPages) {
-						currentPage = newPage;
-						showPage(currentPage);
-					}
+			function changePage(step) {
+				let newPage = currentPage + step;
+				if (newPage >= 1 && newPage <= totalPages) {
+					currentPage = newPage;
+					showPage(currentPage);
 				}
+			}
 
-				// Gán sự kiện cho các nút bấm
-				document.getElementById("prevBtn").addEventListener("click", function () {
-					changePage(-1);
-				});
+			// Gán sự kiện cho các nút bấm
+			document.getElementById("prevBtn").addEventListener("click", function () {
+				changePage(-1);
+			});
 
-				document.getElementById("nextBtn").addEventListener("click", function () {
-					changePage(1);
-				});
+			document.getElementById("nextBtn").addEventListener("click", function () {
+				changePage(1);
+			});
 
-				// Hiển thị trang đầu tiên
-				showPage(currentPage);
-		});
-		// Chức năng lọc dữ liệu theo Mã hoặc Tên khách hàng
-		$(document).ready(function () {
-			$("#searchInput").on("input", function () {
-				let value = $(this).val().toLowerCase().trim(); // Lấy giá trị ô input và loại bỏ khoảng trắng
-				$("#datatable-buttons tbody tr").filter(function () {
-					let name = $(this).find("td:eq(3)").text().toLowerCase(); // Cột Họ tên
-					let code = $(this).find("td:eq(2)").text().toLowerCase(); // Cột Mã khách hàng
-					$(this).toggle(name.includes(value) || code.includes(value)); // Hiển thị nếu khớp
-				});
+			// Hiển thị trang đầu tiên
+			showPage(currentPage);
+	});
+	// Chức năng lọc dữ liệu theo Mã hoặc Tên khách hàng
+	$(document).ready(function () {
+		$("#searchInput").on("input", function () {
+			let value = $(this).val().toLowerCase().trim(); // Lấy giá trị ô input và loại bỏ khoảng trắng
+			$("#datatable-buttons tbody tr").filter(function () {
+				let name = $(this).find("td:eq(3)").text().toLowerCase(); // Cột Họ tên
+				let code = $(this).find("td:eq(2)").text().toLowerCase(); // Cột Mã khách hàng
+				$(this).toggle(name.includes(value) || code.includes(value)); // Hiển thị nếu khớp
 			});
 		});
-	</script>
-}
+	});
+</script>

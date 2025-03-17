@@ -129,9 +129,10 @@
                                             <i class="fa fa-xs fa-pen"></i>
                                         </a>
                                         <button type="button" class="btn btn-sm btn-secondary"
-                                                onclick="changeStatus('@item.Id', '@(item.trang_thai == 0 ? 1 : 0)')">
+                                                onclick="changeStatus('@item.Id', @(item.trang_thai == 0 ? 1 : 0))">
                                             <i class="fa fa-sync"></i>
                                         </button>
+
                                     </div>
                                 </td>
                             </tr>
@@ -221,11 +222,12 @@
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <script src="~/lib/perfect-scrollbar/perfect-scrollbar.min.js"></script>
 <script src="~/js/core.js"></script>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
@@ -239,32 +241,42 @@
                 .then(data => {
                     let tableBody = $("#nhanVienTableBody");
                     tableBody.empty();
+
                     data.forEach((item, index) => {
+                        // Badge hiển thị trạng thái
+                        let statusBadge = "";
+                        if (item.trang_thai == 0) {
+                            statusBadge = '<span class="badge bg-success">Hoạt động</span>';
+                        } else {
+                            statusBadge = '<span class="badge bg-danger">Không hoạt động</span>';
+                        }
+
+                        // Tạo dòng HTML giống với bảng ban đầu
                         let row = `
-                                    <tr>
-                                        <td>${index + 1}</td>
-                                        <td>${item.ho_ten}</td>
-                                        <td>${item.email}</td>
-                                        <td>${item.sdt}</td>
-                                        <td>${item.cccd}</td>
-                                        <td>${item.gioi_tinh == 1 ? "Nam" : "Nữ"}</td>
-                                        <td>${item.tinh}</td>
-                                        <td>
-                                            <select class="form-select status-dropdown" data-id="${item.Id}" name="trang_thai">
-                                                <option value="0" ${item.trang_thai == 0 ? "selected" : ""}>Hoạt động</option>
-                                                <option value="1" ${item.trang_thai == 1 ? "selected" : ""}>Ngừng hoạt động</option>
-                                                <option value="2" ${item.trang_thai == 2 ? "selected" : ""}>Chờ duyệt</option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <div class="btn-group btn-group-xs">
-                                                <a href="/Admin/NhanVien/Edit/${item.Id}" class="btn btn-warning">
-                                                    <i class="fa fa-xs fa-pen"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                `;
+                            <tr>
+                                <td class="align-center">${index + 1}</td>
+                                <td class="align-center">${item.ho_ten}</td>
+                                <td class="align-center">${item.email}</td>
+                                <td class="align-center">${item.sdt}</td>
+                                <td class="align-center">${item.cccd}</td>
+                                <td class="align-center">${item.gioi_tinh == 1 ? "Nam" : "Nữ"}</td>
+                                <td class="align-center">${item.fulldiachi}</td>
+                                <td class="align-center">
+                                    ${statusBadge}
+                                </td>
+                                <td class="align-center">
+                                    <div class="btn-group btn-group-xs">
+                                        <a href="/Admin/NhanVien/Edit/${item.id}" class="btn btn-warning">
+                                            <i class="fa fa-xs fa-pen"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-secondary"
+                                                onclick="changeStatus('${item.id}', '${item.trang_thai == 0 ? 1 : 0}')">
+                                            <i class="fa fa-sync"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
                         tableBody.append(row);
                     });
                 })
@@ -272,6 +284,7 @@
                     console.error("Lỗi tìm kiếm:", error);
                 });
         });
+
 
         // 2. Lọc trạng thái
         $("#statusFilterMenu").on("click", "a", function (event) {
@@ -285,54 +298,70 @@
                     let tableBody = $("#nhanVienTableBody");
                     tableBody.empty();
                     data.forEach((item, index) => {
+                        // Tạo badge hiển thị trạng thái
+                        let statusBadge = item.trang_thai == 0
+                            ? '<span class="badge bg-success">Hoạt động</span>'
+                            : '<span class="badge bg-danger">Không hoạt động</span>';
+
                         let row = `
-                                    <tr>
-                                        <td>${index + 1}</td>
-                                        <td>${item.ho_ten}</td>
-                                        <td>${item.email}</td>
-                                        <td>${item.sdt}</td>
-                                        <td>${item.cccd}</td>
-                                        <td>${item.gioi_tinh == 1 ? "Nam" : "Nữ"}</td>
-                                        <td>${item.dia_chi}</td>
-                                        <td>
-                                            <select class="form-select status-dropdown" data-id="${item.Id}" name="trang_thai">
-                                                <option value="0" ${item.trang_thai == 0 ? "selected" : ""}>Hoạt động</option>
-                                                <option value="1" ${item.trang_thai == 1 ? "selected" : ""}>Ngừng hoạt động</option>
-                                                <option value="2" ${item.trang_thai == 2 ? "selected" : ""}>Chờ duyệt</option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <div class="btn-group btn-group-xs">
-                                                <a href="/Admin/NhanVien/Edit/${item.Id}" class="btn btn-warning">
-                                                    <i class="fa fa-xs fa-pen"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                `;
+                            <tr>
+                                <td class="align-center">${index + 1}</td>
+                                <td class="align-center">${item.ho_ten}</td>
+                                <td class="align-center">${item.email}</td>
+                                <td class="align-center">${item.sdt}</td>
+                                <td class="align-center">${item.cccd}</td>
+                                <td class="align-center">${item.gioi_tinh == 1 ? "Nam" : "Nữ"}</td>
+                                <td class="align-center">${item.fulldiachi}</td>
+                                <td class="align-center">
+                                    ${statusBadge}
+                                </td>
+                                <td class="align-center">
+                                    <div class="btn-group btn-group-xs">
+                                        <a href="/Admin/NhanVien/Edit/${item.id}" class="btn btn-warning">
+                                            <i class="fa fa-xs fa-pen"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-secondary"
+                                                onclick="changeStatus('${item.id}', '${item.trang_thai == 0 ? 1 : 0}')">
+                                            <i class="fa fa-sync"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
                         tableBody.append(row);
                     });
                 })
                 .catch(error => console.error("Lỗi lọc trạng thái:", error));
         });
 
-        // 3. Đổi trạng thái (giữ nguyên logic AJAX)
-        function changeStatus(id, newStatus) {
-            $.ajax({
-                type: "POST",
-                url: "/Admin/NhanVien/ChangeStatus",
-                data: { id: id, trang_thai: newStatus },
-                success: function (response) {
-                    if (response.success) {
-                        location.reload();
-                    } else {
-                        alert("Lỗi: " + response.message);
-                    }
-                },
-                error: function () {
-                    alert("Đã xảy ra lỗi khi cập nhật trạng thái.");
-                }
-            });
-        }
+        // doi trang thai
+        //         function changeStatus(id, newStatus) {
+        //     $.ajax({
+        //         type: "POST",
+        //         url: "/Admin/NhanVien/ChangeStatus", 
+        //         Đường dẫn tới action ChangeStatus
+        //         data: { id: id, trang_thai: newStatus },
+        //                success: function (response) {
+        //     console.log("Response:", response);
+        //           if (response.success) {
+        //     let btn = $(`button[data-id='${id}']`);
+        //     let newBadge = response.newStatus == 0
+        //         ? '<span class="badge bg-success">Hoạt động</span>'
+        //         : '<span class="badge bg-danger">Không hoạt động</span>';
+        //     btn.closest("tr").find("td.status-col").html(newBadge);
+        // } else {
+        //     alert("Cập nhật không thành công: " + response.message);
+        // }
+        // }
+
+        //         error: function() {
+        //             alert("Có lỗi xảy ra khi cập nhật trạng thái.");
+        //         }
+        //     });
+        // }
+
+
+
+      
     </script>
 }

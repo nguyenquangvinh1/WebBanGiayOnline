@@ -1,4 +1,4 @@
-﻿@using Newtonsoft.Json
+﻿﻿﻿@using Newtonsoft.Json
 @model ClssLib.San_Pham
 
 <!-- Modal Hiển Thị Ảnh -->
@@ -12,141 +12,141 @@
                 </button>
             </div>
             <div class="modal-body">
-                
-                        <form asp-action="Edit" method="post">
-                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                            <input class="form-control" type="hidden" id="lstSPCT" name="lstSPCT" value='@(ViewData["lstSPCT"] != null ? Html.Raw(ViewData["lstSPCT"]) : "[]")' />
+
+                <form asp-action="Edit" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input class="form-control" type="hidden" id="lstSPCT" name="lstSPCT" value='@(ViewData["lstSPCT"] != null ? Html.Raw(ViewData["lstSPCT"]) : "[]")' />
 
                     <input class="form-control" type="hidden" id="productImages" name="productImages" value='@(ViewData["productImages"] != null ? Html.Raw(ViewData["productImages"]) : "[]")' />
 
-                            <button type="button" class="btn btn-secondary ms-2 anh_form" data-toggle="modal" data-target="#productImageModal">
-                                Thêm Ảnh
-                            </button>
+                    <button type="button" class="btn btn-secondary ms-2 anh_form" data-toggle="modal" data-target="#productImageModal">
+                        Thêm Ảnh
+                    </button>
+
+                    <div class="form-group">
+                        <label for="ten_san_pham" class="col-form-label">Tên Sản Phẩm</label>
+                        <select id="ten_san_pham" name="ten_san_pham" class="form-control select2">
+                            <option value="">-- Nhập hoặc chọn tên sản phẩm --</option>
+                            @foreach (var item in ViewBag.TenGiay as List<string>)
+                            {
+                                @if (item == Model.ten_san_pham)
+                                {
+                                    <option value="@item" selected>@item</option>
+                                }
+                                else
+                                {
+                                    <option value="@item">@item</option>
+                                }
+                            }
+                        </select>
+                        <span id="ten_san_pham_warning" class="text-danger" style="display: none;">⚠️ Tên sản phẩm đã tồn tại!</span>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label asp-for="Loai_GiayID" class="control-label"></label>
+                        <select id="Loai_GiayID" name="Loai_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddLoaiGiay" asp-items="ViewBag.Loai_GiayID"></select>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label asp-for="Chat_LieuID" class="control-label"></label>
+                                <select id="Chat_LieuID" name="Chat_LieuID" class="form-control select2" asp-items="ViewBag.Chat_LieuID" data-api="/Admin/SanPham/AddChatLieu"></select>
+
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
 
                             <div class="form-group">
-                                <label for="ten_san_pham" class="col-form-label">Tên Sản Phẩm</label>
-                                <select id="ten_san_pham" name="ten_san_pham" class="form-control select2">
-                                    <option value="">-- Nhập hoặc chọn tên sản phẩm --</option>
-                                    @foreach (var item in ViewBag.TenGiay as List<string>)
-                                    {
-                                        @if (item == Model.ten_san_pham)
-                                        {
-                                            <option value="@item" selected>@item</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@item">@item</option>
-                                        }
-                                    }
-                                </select>
-                                <span id="ten_san_pham_warning" class="text-danger" style="display: none;">⚠️ Tên sản phẩm đã tồn tại!</span>
-                            </div>
+                                <label asp-for="Co_GiayID" class="control-label"></label>
 
+                                <select id="Co_GiayID" name="Co_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddCoGiay" asp-items="ViewBag.Co_GiayID"></select>
+
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
 
                             <div class="form-group">
-                                <label asp-for="Loai_GiayID" class="control-label"></label>
-                                <select id="Loai_GiayID" name="Loai_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddLoaiGiay" asp-items="ViewBag.Loai_GiayID"></select>
+                                <label asp-for="Danh_MucID" class="control-label"></label>
+
+
+                                <select id="Danh_MucID" name="Danh_MucID" class="form-control select2" data-api="/Admin/SanPham/AddDanhMuc" asp-items="ViewBag.Danh_MucID"></select>
 
                             </div>
+                        </div>
 
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <label asp-for="Chat_LieuID" class="control-label"></label>
-                                        <select id="Chat_LieuID" name="Chat_LieuID" class="form-control select2" asp-items="ViewBag.Chat_LieuID" data-api="/Admin/SanPham/AddChatLieu"></select>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label asp-for="De_GiayID" class="control-label"></label>
 
-                                    </div>
-                                </div>
-                                <div class="col-sm-4">
-
-                                    <div class="form-group">
-                                        <label asp-for="Co_GiayID" class="control-label"></label>
-
-                                        <select id="Co_GiayID" name="Co_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddCoGiay" asp-items="ViewBag.Co_GiayID"></select>
-
-                                    </div>
-                                </div>
-                                <div class="col-sm-4">
-
-                                    <div class="form-group">
-                                        <label asp-for="Danh_MucID" class="control-label"></label>
-
-
-                                        <select id="Danh_MucID" name="Danh_MucID" class="form-control select2" data-api="/Admin/SanPham/AddDanhMuc" asp-items="ViewBag.Danh_MucID"></select>
-
-                                    </div>
-                                </div>
+                                <select id="De_GiayID" name="De_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddDeGiay" asp-items="ViewBag.De_GiayID"></select>
 
                             </div>
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <label asp-for="De_GiayID" class="control-label"></label>
-
-                                        <select id="De_GiayID" name="De_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddDeGiay" asp-items="ViewBag.De_GiayID"></select>
-
-                                    </div>
-                                </div>
-                                <div class="col-sm-4">
-
-                                    <div class="form-group">
-                                        <label asp-for="Mui_GiayID" class="control-label"></label>
-
-                                        <select id="Mui_GiayID" name="Mui_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddMuiGiay" asp-items="ViewBag.Mui_GiayID"></select>
-
-                                    </div>
-                                </div>
-                                <div class="col-sm-4">
-
-                                    <div class="form-group">
-                                        <label asp-for="Kieu_DangID" class="control-label"></label>
-
-                                        <select id="Kieu_DangID" name="Kieu_DangID" class="form-control select2" data-api="/Admin/SanPham/AddKieuDang" asp-items="ViewBag.Kieu_DangID"></select>
-                                    </div>
-                                </div>
-
-                            </div>
+                        </div>
+                        <div class="col-sm-4">
 
                             <div class="form-group">
-                                <label asp-for="mo_ta" class="control-label">Mô Tả Sản Phẩm</label>
-                                <textarea asp-for="mo_ta" class="form-control"></textarea>
-                                <span asp-validation-for="mo_ta" class="text-danger"></span>
+                                <label asp-for="Mui_GiayID" class="control-label"></label>
+
+                                <select id="Mui_GiayID" name="Mui_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddMuiGiay" asp-items="ViewBag.Mui_GiayID"></select>
+
                             </div>
+                        </div>
+                        <div class="col-sm-4">
 
                             <div class="form-group">
-                                <button type="submit" value="Save" class="btn btn-primary" id="saveProduct1">ktra</button>
+                                <label asp-for="Kieu_DangID" class="control-label"></label>
+
+                                <select id="Kieu_DangID" name="Kieu_DangID" class="form-control select2" data-api="/Admin/SanPham/AddKieuDang" asp-items="ViewBag.Kieu_DangID"></select>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="mo_ta" class="control-label">Mô Tả Sản Phẩm</label>
+                        <textarea asp-for="mo_ta" class="form-control"></textarea>
+                        <span asp-validation-for="mo_ta" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" value="Save" class="btn btn-primary" id="saveProduct1">ktra</button>
 
 
-                                @*                         <input type="submit" value="Save" id="saveProduct1" class="btn btn-primary" />
+                        @*                         <input type="submit" value="Save" id="saveProduct1" class="btn btn-primary" />
                                 *@
-                            </div>
-                        </form>
+                    </div>
+                </form>
 
-               
+
             </div>
             <!-- Modal Footer with Images -->
             <div class="modal-footer">
-                
-                        <input type="file" id="uploadProductImage" class="form-control">
 
-                   
-                        <div class="d-flex justify-content-center flex-wrap" id="imagePreviewContainer">
-                            @if (ViewData["productImages"] != null)
-                            {
-                                var images = JsonConvert.DeserializeObject<List<string>>(ViewData["productImages"].ToString());
-                                foreach (var img in images)
-                                {
-                                    <div class="image-wrapper d-inline-block m-2">
-                                        <a href="#" class="remove-image" data-url="@img">
-                                        <img src="@img" class="img-thumbnail d-block mt-1" width="100" height="100" alt="Product Image">
-                                        </a>
-                                    </div>
-                                }
-                            }
-                        </div>
-                    
-                
-                
+                <input type="file" id="uploadProductImage" class="form-control">
+
+
+                <div class="d-flex justify-content-center flex-wrap" id="imagePreviewContainer">
+                    @if (ViewData["productImages"] != null)
+                    {
+                        var images = JsonConvert.DeserializeObject<List<string>>(ViewData["productImages"].ToString());
+                        foreach (var img in images)
+                        {
+                            <div class="image-wrapper d-inline-block m-2">
+                                <a href="#" class="remove-image" data-url="@img">
+                                    <img src="@img" class="img-thumbnail d-block mt-1" width="100" height="100" alt="Product Image">
+                                </a>
+                            </div>
+                        }
+                    }
+                </div>
+
+
+
             </div>
 
 
@@ -154,43 +154,43 @@
     </div>
 </div>
 
-    
 
-    <div id="productTables" class="card card-primary">
-        <div class="card-header">
-            <h3 class="card-title">
-                Biến thể Sản Phẩm</h4>
-                <div class="card-tools">
+
+<div id="productTables" class="card card-primary">
+    <div class="card-header">
+        <h3 class="card-title">
+            Biến thể Sản Phẩm</h4>
+            <div class="card-tools">
                 <button type="button" class="btn btn-secondary ms-2" data-toggle="modal" data-target="#productDetailModal">
                     Sửa Chi tiết sản phẩm
                 </button>
                 <button type="button" class="btn btn-secondary ms-2" id="updateAll">Update All</button>
-                </div>
-        </div>
-        <div class="card-body table-responsive p-0" id="table-SPCT">
-            <table class="table table-hover text-nowrap">
-                <thead>
-                    <tr>
-                        <th>STT</th>
-                        <th>Tên Sản Phẩm</th>
-                        <th>Ảnh</th>
-                        <th>Màu Sắc</th>
-                        <th>Kích Cỡ</th>
-                        <th>Số Lượng</th>
-                        <th>Giá</th>
-                        <th>Ngày tạo</th>
-                        <th>Trạng Thái</th>
-                        <th class="d-none">ID</th> <!-- Ô ẩn cho ID -->
-                    <th class='d-none'>Ảnh</th>
-                        <th>Hành Động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-
-        </div>
+            </div>
     </div>
+    <div class="card-body table-responsive p-0" id="table-SPCT">
+        <table class="table table-hover text-nowrap">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Tên Sản Phẩm</th>
+                    <th>Ảnh</th>
+                    <th>Màu Sắc</th>
+                    <th>Kích Cỡ</th>
+                    <th>Số Lượng</th>
+                    <th>Giá</th>
+                    <th>Ngày tạo</th>
+                    <th>Trạng Thái</th>
+                    <th class="d-none">ID</th> <!-- Ô ẩn cho ID -->
+                    <th class='d-none'>Ảnh</th>
+                    <th>Hành Động</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+
+    </div>
+</div>
 
 @* 
 <div class="mt-4" id="table-SPCT">
@@ -207,7 +207,7 @@
             </tr>
         </thead>
         <tbody>
-            
+
         </tbody>
     </table>
 </div> *@
@@ -232,7 +232,7 @@
                 <div id="addImagesContainer" class="mt-3 d-none">
                     <div class="d-flex justify-content-center flex-wrap" id="newImages">
                         <!-- Ảnh mới sẽ được thêm vào đây -->
-                        
+
                     </div>
                 </div>
             </div>
@@ -596,7 +596,7 @@
         console.log("🔍 jQuery version:", $.fn.jquery);
         console.log("🔍 Select2 exists:", typeof $.fn.select2 !== "undefined");
 
-        
+
         // Hàm khởi tạo Select2
         function khoiTaoSelect2() {
 
@@ -745,4 +745,3 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
-

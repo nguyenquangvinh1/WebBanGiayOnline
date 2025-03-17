@@ -13,9 +13,9 @@ namespace ClssLib
     {
         public Guid ID { get; set; }
 
-        public int MaSP { get; set; }
+        public int? MaSP { get; set; }
 
-        public string moTa { get; set; }
+        public string? moTa { get; set; }
         public string ten_SPCT { get; set; }
         public double gia { get; set; }
         public int so_luong { get; set; }

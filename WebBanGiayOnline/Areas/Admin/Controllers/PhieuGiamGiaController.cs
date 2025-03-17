@@ -73,7 +73,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
 
         //GET: KieuDangController/Create
-        [HttpGet]
+       [HttpGet]
         public IActionResult Create()
         {
             var tai_khoan = _context.tai_Khoans.ToList();

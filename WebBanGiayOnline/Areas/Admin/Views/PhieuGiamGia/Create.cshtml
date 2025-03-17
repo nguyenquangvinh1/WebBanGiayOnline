@@ -1,80 +1,108 @@
 ﻿@model ClssLib.Phieu_Giam_Gia
 
-
-
-
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <style>
-        body1 {
-            font-family: Arial, sans-serif;
-            margin: 10px;
-            background-color: #f4f4f4;
-        }
-
-        .container {
-            background: white;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-
-        .page-header {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: black;
-        }
-
-    </style>
-</head>
-<body1>
-    <div class="container">
+<div class="page-content-wrapper">
+    <div class="container-fluid">
+        <!-- Tiêu đề trang -->
         <div class="row">
-            <h4 class="mb-3">Phiêu giảm giá </h4>
-            <div class="col-md-12">
-                <form asp-action="Create">
-                    @Html.AntiForgeryToken()
+            <div class="col-sm-12">
+                <div class="page-title-box">
+                    <div class="btn-group float-right">
+                        <ol class="breadcrumb hide-phone p-0 m-0">
+                            <li class="breadcrumb-item">
+                                <a href="#">Adidas</a>
+                            </li>
+                            <li class="breadcrumb-item active">Giảm giá</li>
+                        </ol>
+                    </div>
+                    <h4 class="page-title">Phiếu giảm giá</h4>
+                </div>
+            </div>
+        </div>
 
-                    <!-- Bắt đầu chia hàng để có 2 cột: bên trái và bên phải -->
-                    <div class="row">
 
-                        <!-- CỘT BÊN TRÁI: Form nhập thông tin phiếu giảm giá -->
-                        <div class="col-md-5">
-                            <!-- Hiển thị lỗi nếu có -->
-                            <div asp-validation-summary="All" class="text-danger"></div>
-                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label asp-for="ma">Mã phiếu giảm giá</label>
-                                    <input asp-for="ma" type="text" class="form-control" placeholder="Nhập mã phiếu giảm giá" />
-                                    <span asp-validation-for="ma" class="text-danger"></span>
+    </div>
+    @{
+        ViewData["Title"] = "Create";
+    }
+
+    <!DOCTYPE html>
+    <html lang="vi">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+        <style>
+            body1 {
+                font-family: Arial, sans-serif;
+                margin: 10px;
+                background-color: #f4f4f4;
+            }
+
+            .container {
+                background: white;
+                padding: 10px;
+                border-radius: 5px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+
+
+            .page-header {
+                font-size: 24px;
+                font-weight: bold;
+                margin-bottom: 10px;
+                color: black;
+            }
+
+            }
+        </style>
+    </head>
+    <body1>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <form asp-action="Create">
+                        @Html.AntiForgeryToken()
+
+                        <!-- Bắt đầu chia hàng để có 2 cột: bên trái và bên phải -->
+                        <div class="row">
+
+                            <!-- CỘT BÊN TRÁI: Form nhập thông tin phiếu giảm giá -->
+                            <div class="col-md-5">
+                                <!-- Hiển thị lỗi nếu có -->
+                                <div asp-validation-summary="All" class="text-danger"></div>
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label asp-for="ma">Mã phiếu giảm giá</label>
+                                        <input asp-for="ma" type="text" class="form-control" placeholder="Nhập mã phiếu giảm giá" />
+                                        <span asp-validation-for="ma" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label asp-for="ten_phieu_giam_gia">Tên phiếu giảm giá</label>
+                                        <input asp-for="ten_phieu_giam_gia" type="text" class="form-control" placeholder="Nhập tên phiếu giảm giá" />
+                                        <span asp-validation-for="ten_phieu_giam_gia" class="text-danger"></span>
+                                    </div>
                                 </div>
-                                <div class="form-group col-md-6">
-                                    <label asp-for="ten_phieu_giam_gia">Tên phiếu giảm giá</label>
-                                    <input asp-for="ten_phieu_giam_gia" type="text" class="form-control" placeholder="Nhập tên phiếu giảm giá" />
-                                    <span asp-validation-for="ten_phieu_giam_gia" class="text-danger"></span>
-                                </div>
-                            </div>
 
-                            <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label asp-for="gia_tri_giam">Giá trị</label>
                                     <div class="input-group">
-                                        <input asp-for="gia_tri_giam" type="number" class="form-control" placeholder="0 đ" />
+                                        <input id="gia_tri_giam" name="gia_tri_giam" type="number" class="form-control" placeholder="0" />
                                         <div class="input-group-append">
-                                            <!-- Biểu tượng: có thể thay thế hoặc giữ lại tùy ý -->
-                                            <span class="input-group-text">%</span>
-                                            <span class="input-group-text">$</span>
+                                            <button type="button" id="btnPercent" value="1" class="btn btn-light" onclick="setDiscountType(1)">%</button>
+                                            <button type="button" id="btnDollar" value="0" class="btn btn-light" onclick="setDiscountType(0)">$</button>
                                         </div>
                                     </div>
+                                    <span id="gia_tri_giam_error" class="text-danger"></span>
                                 </div>
+
+                                <!-- Ô ẩn để bind vào Model, thay thế cho radio -->
+                                <input asp-for="loai_phieu_giam_gia" type="hidden" id="loai_phieu_giam_gia" />
+
+                                <!-- Số tiền giảm tối  -->
                                 <div class="form-group col-md-6">
                                     <label asp-for="so_tien_giam_toi_da">Số tiền giảm tối đa</label>
                                     <div class="input-group">
@@ -84,109 +112,180 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="form-group">
-                                <label asp-for="so_luong">Số lượng</label>
-                                <input asp-for="so_luong" type="number" class="form-control" placeholder="Số lượng" />
-                                <span asp-validation-for="so_luong" class="text-danger"></span>
-                            </div>
 
-                            <!-- Ẩn trường Người tạo (nếu cần) -->
-                            <div class="form-group" hidden>
-                                <label asp-for="nguoi_tao">Người tạo</label>
-                                <input asp-for="nguoi_tao" type="text" class="form-control" value="admin" />
-                                <span asp-validation-for="nguoi_tao" class="text-danger"></span>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label asp-for="ngay_bat_dau">Từ ngày</label>
-                                    <input asp-for="ngay_bat_dau" type="date" class="form-control" />
-                                    <span asp-validation-for="ngay_bat_dau" class="text-danger"></span>
+                                <div class="form-group">
+                                    <label asp-for="so_luong">Số lượng</label>
+                                    <input asp-for="so_luong" type="number" class="form-control" placeholder="Số lượng" />
+                                    <span asp-validation-for="so_luong" class="text-danger"></span>
                                 </div>
-                                <div class="form-group col-md-6">
-                                    <label asp-for="ngay_ket_thuc">Đến ngày</label>
-                                    <input asp-for="ngay_ket_thuc" type="date" class="form-control" />
-                                    <span asp-validation-for="ngay_ket_thuc" class="text-danger"></span>
+
+                                <!-- Ẩn trường Người tạo (nếu cần) -->
+                                <div class="form-group" hidden>
+                                    <label asp-for="nguoi_tao">Người tạo</label>
+                                    <input asp-for="nguoi_tao" type="text" class="form-control" value="admin" />
+                                    <span asp-validation-for="nguoi_tao" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label asp-for="ngay_bat_dau">Từ ngày</label>
+                                        <input asp-for="ngay_bat_dau" type="date" class="form-control" />
+                                        <span asp-validation-for="ngay_bat_dau" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label asp-for="ngay_ket_thuc">Đến ngày</label>
+                                        <input asp-for="ngay_ket_thuc" type="date" class="form-control" />
+                                        <span asp-validation-for="ngay_ket_thuc" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="form-check form-check-inline">
+                                        <input asp-for="kieu_giam_gia" class="form-check-input" type="radio" id="cong_khai"
+                                               value="1" checked onchange="toggleForm()" />
+                                        <label class="form-check-label" for="cong_khai">Công khai</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input asp-for="kieu_giam_gia" class="form-check-input" type="radio" id="ca_nhan"
+                                               value="0" onchange="toggleForm()" />
+                                        <label class="form-check-label" for="ca_nhan">Cá nhân</label>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <div class="form-check form-check-inline">
-                                    <input asp-for="kieu_giam_gia" class="form-check-input" name="kieu_giam_gia" type="radio" id="cong_khai"
-                                           value="1" checked onchange="toggleForm()" />
+                            <!-- CỘT BÊN PHẢI: Tìm kiếm & chọn khách hàng (ẩn khi chưa chọn “Cá nhân”) -->
+                            <div class="col-md-7" id="personalForm" style="display:none;">
+                                <input type="text" class="form-control mb-3" id="search"
+                                       placeholder="Tìm kiếm khách hàng" onkeyup="searchCustomers()" />
 
-                                    <label class="form-check-label" for="cong_khai">Công khai</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input asp-for="kieu_giam_gia" class="form-check-input" name="kieu_giam_gia" type="radio" id="ca_nhan"
-                                           value="0" onchange="toggleForm()" />
-                                    <label class="form-check-label" for="ca_nhan">Cá nhân</label>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="gia_tri_toi_thieu"></label>
-                                <input asp-for="gia_tri_toi_thieu" class="form-control" placeholder="Nhập số tiền tối thiểu (vd: 300000)" />
-                                <span asp-validation-for="gia_tri_toi_thieu" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <!-- CỘT BÊN PHẢI: Tìm kiếm & chọn khách hàng (ẩn khi chưa chọn “Cá nhân”) -->
-                        <div class="col-md-7" id="personalForm" style="display:none;">
-                            <input type="text" class="form-control mb-3" id="search"
-                                   placeholder="Tìm kiếm khách hàng" onkeyup="searchCustomers()" />
-
-                            <table class="table table-bordered table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>
-                                            <input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)" />
-                                        </th>
-                                        <th>Tên</th>
-                                        <th>Số điện thoại</th>
-                                        <th>Email</th>
-                                        <th>Ngày sinh</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if (ViewBag.tai_khoans != null && ((List<ClssLib.Tai_Khoan>)ViewBag.tai_khoans).Count > 0)
-                                    {
-                                        @foreach (var tai_khoan in ViewBag.tai_khoans)
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)" />
+                                            </th>
+                                            <th>Tên</th>
+                                            <th>Số điện thoại</th>
+                                            <th>Email</th>
+                                            <th>Ngày sinh</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (ViewBag.tai_khoans != null && ((List<ClssLib.Tai_Khoan>)ViewBag.tai_khoans).Count > 0)
+                                        {
+                                            foreach (var tai_khoan in ViewBag.tai_khoans)
+                                            {
+                                                if (tai_khoan.Vai_TroID == new Guid("fcf49dad-811a-47f4-8ec6-b124ec020bf9"))
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <input type="checkbox" name="customerIds" value="@tai_khoan.ID" class="customer-checkbox" />
+                                                        </td>
+                                                        <td>@tai_khoan.ho_ten</td>
+                                                        <td>@tai_khoan.sdt</td>
+                                                        <td>@tai_khoan.email</td>
+                                                        <td>@tai_khoan.ngay_sinh</td>
+                                                    </tr>
+                                                }
+                                            }
+                                        }
+                                        else
                                         {
                                             <tr>
-                                                <td>
-                                                    <input type="checkbox" name="customerIds"
-                                                           value="@tai_khoan.ID" class="customer-checkbox" />
-                                                </td>
-                                                <td>@tai_khoan.ho_ten</td>
-                                                <td>@tai_khoan.sdt</td>
-                                                <td>@tai_khoan.email</td>
-                                                <td>@tai_khoan.ngay_sinh</td>
+                                                <td colspan="5">Không có khách hàng nào.</td>
                                             </tr>
                                         }
-                                    }
-                                    else
-                                    {
-                                        <tr>
-                                            <td colspan="5">Không có khách hàng nào.</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div> <!-- Kết thúc .row chứa 2 cột -->
+                        <!-- Nút Thêm mới ở dưới, canh phải -->
+                        <div class="form-group text-right mt-3">
+                            <input type="submit" value="Thêm mới"
+                                   onclick="generateCode()" class="btn btn-primary" />
                         </div>
-                    </div> <!-- Kết thúc .row chứa 2 cột -->
-                    <!-- Nút Thêm mới ở dưới, canh phải -->
-                    <div class="form-group text-right mt-3">
-                        <input type="submit" value="Thêm mới"
-                               onclick="generateCode()" class="btn btn-primary" />
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
 
-    <script>
+        <script>
+            //validate Tên
+                            function validateTenPhieu() {
+                const tenPhieu = document.getElementById('ten_phieu_giam_gia');
+                const errorSpan = document.getElementById('ten_phieu_giam_gia_error');
+
+                if (!tenPhieu.value.trim()) {
+                    errorSpan.textContent = 'Tên phiếu giảm giá không được để trống';
+                } else if (tenPhieu.value.length > 100) {
+                    errorSpan.textContent = 'Tên phiếu giảm giá không được vượt quá 100 ký tự';
+                } else {
+                    errorSpan.textContent = '';
+                }
+            }
+
+            function validateGiaTri() {
+                const giaTriGiam = document.getElementById('gia_tri_giam');
+                const giaTriGiamError = document.getElementById('gia_tri_giam_error');
+                const isPercent = document.getElementById('btnPercent').classList.contains('active');
+                const value = parseFloat(giaTriGiam.value);
+
+                if (isPercent) {
+                    if (value < 0 || value > 100) {
+                        giaTriGiamError.textContent = 'Giá trị giảm theo % phải từ 0 đến 100';
+                    } else {
+                        giaTriGiamError.textContent = '';
+                    }
+                } else {
+                    if (value <= 0) {
+                        giaTriGiamError.textContent = 'Giá trị giảm theo $ phải lớn hơn 0';
+                    } else {
+                        giaTriGiamError.textContent = '';
+                    }
+                }
+            }
+
+            function setDiscountType(type) {
+                document.getElementById('btnPercent').classList.toggle('active', type === 1);
+                document.getElementById('btnDollar').classList.toggle('active', type === 0);
+                validateGiaTri();
+            }
+
+
+                      // Hàm gán giá trị và đổi màu nút được chọn
+            function setDiscountType(value) {
+                // Gán vào input ẩn để khi submit form sẽ gửi giá trị này
+                document.getElementById("loai_phieu_giam_gia").value = value;
+
+                // Đổi màu nút dựa trên value
+                if (value === 1) {
+                    // Chọn nút %
+                    document.getElementById("btnPercent").classList.remove("btn-light");
+                    document.getElementById("btnPercent").classList.add("btn-warning");
+
+                    // Bỏ màu nút $
+                    document.getElementById("btnDollar").classList.remove("btn-warning");
+                    document.getElementById("btnDollar").classList.add("btn-light");
+                } else {
+                    // Chọn nút $
+                    document.getElementById("btnDollar").classList.remove("btn-light");
+                    document.getElementById("btnDollar").classList.add("btn-warning");
+
+                    // Bỏ màu nút %
+                    document.getElementById("btnPercent").classList.remove("btn-warning");
+                    document.getElementById("btnPercent").classList.add("btn-light");
+                }
+            }
+
+            // (Tuỳ chọn) Xử lý giá trị mặc định nếu Model có sẵn loai_phieu_giam_gia
+            window.addEventListener("load", function() {
+                let defaultValue = document.getElementById("loai_phieu_giam_gia").value;
+                if (defaultValue === "0" || defaultValue === "1") {
+                    setDiscountType(parseInt(defaultValue));
+                }
+            })
+
                          function toggleSelectAll(source) {
                         const checkboxes = document.querySelectorAll('.customer-checkbox');
                         checkboxes.forEach(cb => cb.checked = source.checked);
@@ -238,31 +337,16 @@
                         personalForm.style.display = 'none';
                     }
                 }
-                        function toggleForm() {
-            var personalForm = document.getElementById('personalForm');
-            var ca_nhan = document.getElementById('ca_nhan');
-            var kieuGiamGiaInput = document.querySelector('input[name="kieu_giam_gia"]');
 
-            // Hiển thị form nếu "Cá nhân" được chọn, ngược lại ẩn đi
-            if (ca_nhan.checked) {
-                personalForm.style.display = 'block';
-                kieuGiamGiaInput.value = "1"; // Đặt giá trị thành 1 khi chọn "Cá nhân"
-            } else {
-                personalForm.style.display = 'none';
-                kieuGiamGiaInput.value = "0"; // Đặt giá trị thành 0 khi không chọn "Cá nhân"
-            }
+        </script>
+
+    </body1>
+</html>
+
+
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
         }
-
-
-    </script>
-
-</body1>
-
-
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-}
 

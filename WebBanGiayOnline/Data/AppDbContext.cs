@@ -45,14 +45,11 @@ namespace WebBanGiay.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Seed();
-            base.OnModelCreating(modelBuilder);
+            //modelBuilder.Seed();
+            //base.OnModelCreating(modelBuilder);
+           
 
-            modelBuilder.Entity<Tai_Khoan>()
-                .Property(t => t.EmployeeNumber)
-                .UseIdentityColumn(1, 1);  // Cấu hình IDENTITY(1,1)
         }
-
 
         internal object Find(int id)
         {

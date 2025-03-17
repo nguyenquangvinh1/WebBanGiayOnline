@@ -400,7 +400,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
 
 
-
+       
         [HttpPost]
         public async Task<IActionResult> AddQuickCustomer([FromBody] QuickCustomerViewModel model)
         {

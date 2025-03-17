@@ -53,7 +53,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         // POST: KieuDangController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ma,gia,so_luong,trang_thai,Kich_ThuocID,Mau_SacID")] San_Pham_Chi_Tiet sanCT)
+        public async Task<IActionResult> Create([Bind("ma,gia,so_luong,trang_thai,Kich_ThuocID,Mau_SacID")]San_Pham_Chi_Tiet sanCT)
         {
             if (ModelState.IsValid)
             {
@@ -139,13 +139,17 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                     .Include(x => x.Mau_Sac)
                     .Select(x => new {
                         id = x.ID,
-                        imageUrl = "",               // hoặc x.HinhAnh nếu có
-                        name = x.ten_SPCT,          // Tên sản phẩm chi tiết
-                        price = x.gia,              // Giá bán
-                        dbQuantity = x.so_luong,    // Số lượng thực tế từ DB
-                        size = x.Kich_Thuoc.ten_kich_thuoc,
-                        color = x.Mau_Sac.ma_mau,
-                        status = x.trang_thai
+                        // Lấy URL ảnh bằng cách join bảng anh_San_Pham_San_Pham_Chi_Tiets và anh_San_Phams
+                        imageUrl = (from asp in _context.anh_San_Pham_San_Pham_Chi_Tiets
+                                    join a in _context.anh_San_Phams on asp.Anh_San_PhamID equals a.ID
+                                    where asp.San_Pham_Chi_TietID == x.ID
+                                    select a.anh_url).FirstOrDefault(),
+                        name = x.ten_SPCT,
+                        price = x.gia,
+                        dbQuantity = x.so_luong,
+                        size = x.Kich_Thuoc != null ? x.Kich_Thuoc.ten_kich_thuoc : "Không xác định",
+                        color = x.Mau_Sac != null ? x.Mau_Sac.ma_mau : "Không xác định",
+                status = x.trang_thai == 1 ? "Hoạt động" : "Không hoạt động"
                     })
                     .ToList();
 
@@ -156,6 +160,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 return StatusCode(500, ex.Message);
             }
         }
+
         [HttpPost]
         public IActionResult UpdateQuantity([FromBody] UpdateQuantityRequest req)
         {
@@ -196,6 +201,6 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         }
 
 
-
+       
     }
 }
