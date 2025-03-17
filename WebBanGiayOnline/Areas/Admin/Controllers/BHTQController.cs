@@ -29,7 +29,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     MaHoaDon = GenerateNewHoaDonID(),
                     tong_tien = 0,
                     ghi_chu = "",             // Gán rỗng nếu chưa có ghi chú
-                    SoLuongSP = 0,
+                
                     trang_thai = 0,           // 0: Chờ xử lý
                     dia_chi = "",             // Gán rỗng nếu chưa có địa chỉ
                     sdt_nguoi_nhan = "",      // Gán rỗng
