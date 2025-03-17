@@ -128,30 +128,28 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
         [HttpGet]
         public IActionResult GetAllSanPhamChiTiet()
         {
             try
             {
                 var list = _context.san_Pham_Chi_Tiets
-                    .Include(x => x.Kich_Thuoc)
-                    .Include(x => x.Mau_Sac)
-                    .Select(x => new {
-                        id = x.ID,
-                        // Lấy URL ảnh bằng cách join bảng anh_San_Pham_San_Pham_Chi_Tiets và anh_San_Phams
-                        imageUrl = (from asp in _context.anh_San_Pham_San_Pham_Chi_Tiets
-                                    join a in _context.anh_San_Phams on asp.Anh_San_PhamID equals a.ID
-                                    where asp.San_Pham_Chi_TietID == x.ID
-                                    select a.anh_url).FirstOrDefault(),
-                        name = x.ten_SPCT,
-                        price = x.gia,
-                        dbQuantity = x.so_luong,
-                        size = x.Kich_Thuoc != null ? x.Kich_Thuoc.ten_kich_thuoc : "Không xác định",
-                        color = x.Mau_Sac != null ? x.Mau_Sac.ma_mau : "Không xác định",
-                status = x.trang_thai == 1 ? "Hoạt động" : "Không hoạt động"
-                    })
-                    .ToList();
+                .Include(x => x.Kich_Thuoc)
+                .Include(x => x.Mau_Sac)
+                .Select(x => new {
+                    id = x.ID,
+                    imageUrl = (from asp in _context.anh_San_Pham_San_Pham_Chi_Tiets
+                                join a in _context.anh_San_Phams on asp.Anh_San_PhamID equals a.ID
+                                where asp.San_Pham_Chi_TietID == x.ID
+                                select a.anh_url).FirstOrDefault() ?? "/img/default.jpg",  // Nếu null, dùng ảnh mặc định
+                    ten_SPCT = x.ten_SPCT, // Đổi lại để đồng bộ với JS
+                    price = x.gia,
+                    dbQuantity = x.so_luong,
+                    size = x.Kich_Thuoc != null ? x.Kich_Thuoc.ten_kich_thuoc : "Không xác định",
+                    color = x.Mau_Sac != null ? x.Mau_Sac.ma_mau : "Không xác định",
+                    status = x.trang_thai == 1 ? "Hoạt động" : "Không hoạt động"
+                })
+                .ToList();
 
                 return Json(list);
             }

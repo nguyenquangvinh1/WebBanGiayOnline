@@ -384,6 +384,7 @@ FodyWeavers.xsd
 /WebBanGiayOnline/Migrations/20250228014006_datn.cs
 /WebBanGiayOnline/Migrations/20250303065445_datn1.cs
 /WebBanGiayOnline/Migrations/20250311034044_datn.cs
+<<<<<<< HEAD
 /WebBanGiayOnline/Migrations/20250308181854_a.cs
 /WebBanGiayOnline/Migrations/20250312063129_datnv.cs
 /WebBanGiayOnline/Migrations/20250312084730_datnvinh.cs
@@ -394,3 +395,6 @@ FodyWeavers.xsd
 /WebBanGiayOnline/Migrations/20250312084730_datnvinh.cs
 /WebBanGiayOnline/Migrations/20250312093921_datnvinh1.cs
 /WebBanGiayOnline/Migrations/20250314095725_datn32.cs
+=======
+/WebBanGiayOnline/Migrations/20250314173120_a.cs
+>>>>>>> 8e6e2b06bae70913e2ce566a7219261e78cfd99d
