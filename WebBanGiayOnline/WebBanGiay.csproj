@@ -19,7 +19,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
     <PackageReference Include="PagedList.Mvc" Version="4.5.0" />
-    <PackageReference Include="X.PagedList" Version="10.5.7" />
+    <PackageReference Include="RestSharp" Version="112.1.0" />
     <PackageReference Include="X.PagedList.Mvc.Core" Version="10.5.7" />
 	  <PackageReference Include="Tesseract" Version="5.2.0" />
 	  <PackageReference Include="X.PagedList.Mvc.Core" Version="10.5.7" />

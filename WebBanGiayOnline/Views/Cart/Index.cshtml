@@ -124,12 +124,12 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th scope="col">Products</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Price</th>
-                            <th scope="col">Quantity</th>
-                            <th scope="col">Total</th>
-                            <th scope="col">Handle</th>
+                            <th scope="col">Ảnh</th>
+                            <th scope="col">Tên Sản Phẩm</th>
+                            <th scope="col">Gía</th>
+                            <th scope="col">Số Lượng</th>
+                            <th scope="col">Tổng tiền</th>
+                            <th scope="col">Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -203,7 +203,7 @@
                             <h5 class="mb-0 ps-4 me-4">Total</h5>
                             <p class="mb-0 pe-4">@Model.Sum(x => x.ThanhTien)</p>
                         </div>
-                        <button class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4" type="button">Proceed Checkout</button>
+                        <a asp-controller="Cart" asp-action="CheckOut"  class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4" >Proceed Checkout</a>
                     </div>
                 </div>
             </div>

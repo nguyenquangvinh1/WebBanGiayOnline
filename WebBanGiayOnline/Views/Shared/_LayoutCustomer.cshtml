@@ -105,12 +105,13 @@
 
 		<div style="min-height:400px;" class="hero-header">
 			@RenderBody()
+			
 		</div>
 
 
 
 		@await Html.PartialAsync("_Footer")
-
+	
 		@await Html.PartialAsync("_Copyright")
 	</div>
 
@@ -128,5 +129,7 @@
 
 	<!-- Template Javascript -->
 	<script src="~/js/main.js"></script>
+	@RenderSection("Scripts", required: false)
+
 </body>
 </html>
