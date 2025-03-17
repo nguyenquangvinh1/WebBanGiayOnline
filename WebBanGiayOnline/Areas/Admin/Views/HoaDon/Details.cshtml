@@ -198,34 +198,38 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>#</th>
-                <th>Phương Thức</th>
+                <th>Mã</th>
+                <th>Tên Sản Phẩm</th>
                 <th>Số Tiền</th>
+                <th>Số lượng</th>
                 <th>Thời Gian</th>
-                <th>Nhân Viên Xác Nhận</th>
-                <th>Ghi Chú</th>
+                 
+            
             </tr>
         </thead>
-        <tbody>
+   @*      <tbody>
                 <tr>
-                    <td colspan="6" class="text-center text-muted">Không có dữ liệu</td>
+                    <td>Không có dữ liệu</td>
                 </tr>
-        </tbody>
-      @*   <tbody>
-            @if (Model.LichSuThanhToan != null && Model.LichSuThanhToan.Any())
+        </tbody> *@
+        <tbody>
+                @if (Model?.Hoa_Don_Chi_Tiets != null && Model.Hoa_Don_Chi_Tiets.Any())
+
             {
-                int index = 1;
-                foreach (var item in Model.LichSuThanhToan)
-                {
+            
+                foreach (var item in Model?.Hoa_Don_Chi_Tiets)
+                {   
                     <tr>
-                        <td>@index</td>
-                        <td>@item.PhuongThuc</td>
-                        <td>@item.SoTien.ToString("N0") đ</td>
-                        <td>@item.ThoiGian.ToString("dd/MM/yyyy HH:mm")</td>
-                        <td>@item.NhanVienXacNhan</td>
-                        <td>@item.GhiChu</td>
+                       
+                        <td>@item.ma</td>
+                       <td>@item.San_Pham_Chi_Tiet.ten_SPCT</td>
+                        <td>@item.gia.ToString("N0") đ</td>
+                        <td>@item.so_luong</td>
+                        <td>@item.ngay_tao.ToString("dd/MM/yyyy HH:mm")</td>
+                      
+                      
                     </tr>
-                    index++;
+                
                 }
             }
             else
@@ -234,7 +238,7 @@
                     <td colspan="6" class="text-center text-muted">Không có lịch sử thanh toán nào.</td>
                 </tr>
             }
-        </tbody> *@
+        </tbody>
     </table>
     <br />
 
@@ -242,34 +246,36 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>#</th>
-                <th>Hình ảnh</th>
+                <th>Mã</th>
+                
                 <th>Sản phẩm</th>
                 <th>Đơn giá</th>
                 <th>Số lượng</th>
                 <th>Số tiền</th>
+                    <th>Mã</th>
             </tr>
         </thead>
-            <tbody>
+       @*      <tbody>
                 <tr>
                     <td colspan="6" class="text-center text-muted">Không có dữ liệu</td>
                 </tr>
-            </tbody>
-     @*    <tbody>
-            @if (Model.SanPhamTrongDonHang != null && Model.SanPhamTrongDonHang.Any())
+            </tbody> *@
+        <tbody>
+            @if (Model.Hoa_Don_Chi_Tiets != null && Model.Hoa_Don_Chi_Tiets.Any())
             {
-                int index = 1;
-                foreach (var item in Model.SanPhamTrongDonHang)
+               
+                foreach (var item in Model.Hoa_Don_Chi_Tiets)
                 {
                     <tr>
-                        <td>@index</td>
-                        <td><img src="@item.HinhAnhUrl" alt="Ảnh sản phẩm" width="50"></td>
-                        <td>@item.TenSanPham</td>
-                        <td>@item.DonGia.ToString("N0") đ</td>
-                        <td>@item.SoLuong</td>
-                        <td>@(item.DonGia * item.SoLuong).ToString("N0") đ</td>
+                        <td>@item.ma</td>
+                     
+                        <td>@item.San_Pham_Chi_Tiet.ten_SPCT</td>
+                        <td>@item.gia.ToString("N0") đ</td>
+                        <td>@item.so_luong</td>
+                        <td>@(item.gia * item.so_luong).ToString("N0") đ</td>
+                            <td>@item.Hoa_DonID</td>
                     </tr>
-                    index++;
+                   
                 }
             }
             else
@@ -278,7 +284,7 @@
                     <td colspan="6" class="text-center text-muted">Không có dữ liệu</td>
                 </tr>
             }
-        </tbody> *@
+        </tbody>
     </table>
 
  @*    <div class="row">

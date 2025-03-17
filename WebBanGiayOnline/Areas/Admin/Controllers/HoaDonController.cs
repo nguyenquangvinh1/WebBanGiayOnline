@@ -97,10 +97,9 @@ namespace WebBanGiay.Areas.Admin.Controllers
         // GET: Admin/HoaDon/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
-            var order = _context.hoa_Dons
-            .Include(o => o.Tai_Khoan_Hoa_Dons)
-            .ThenInclude(tkh => tkh.Tai_Khoan)
-            .FirstOrDefault(o => o.ID == id);
+            var hoaDon = _context.hoa_Dons
+        .Include(h => h.Hoa_Don_Chi_Tiets) // Nối bảng chi tiết
+        .FirstOrDefault(h => h.ID == id);
             ViewBag.TrangThaiList = new List<SelectListItem>
 {
     new SelectListItem { Value = "0", Text = "Chờ xử lý" },
@@ -110,7 +109,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
     new SelectListItem { Value = "4", Text = "Đã hủy" }
 };
 
-            if (order == null)
+            if (hoaDon == null)
             {
                 return NotFound();
             }
@@ -119,7 +118,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
 
 
-            return View(order);
+            return View(hoaDon);
         }
 
         [HttpPost]

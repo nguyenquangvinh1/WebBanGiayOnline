@@ -12,7 +12,7 @@ namespace ClssLib
     { 
         public Guid? Id { get; set; }
         
-        public decimal TongTien { get; set; }
+        public double TongTien { get; set; }
          public int DonThanhCong { get; set; }
         public int DonHuy { get; set; }
 

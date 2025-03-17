@@ -17,7 +17,7 @@ namespace ClssLib
 
         public string moTa { get; set; }
         public string ten_SPCT { get; set; }
-        public decimal gia { get; set; }
+        public double gia { get; set; }
         public int so_luong { get; set; }
         public int trang_thai { get; set; }
         public DateTime ngay_tao { get; set; }
