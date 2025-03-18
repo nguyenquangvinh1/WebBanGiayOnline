@@ -10,7 +10,7 @@
 
 <div class="card">
     <div class="card-header">
-
+        
     </div>
     <div class="card-body">
         <div class="row">
@@ -26,7 +26,7 @@
                     <option value="">Tất cả</option>
                     @foreach (var item in (SelectList)ViewData["Chat_LieuID"])
                     {
-                            <option value="@item.Value">@item.Text</option>
+                        <option value="@item.Value">@item.Text</option>
                     }
                 </select>
             </div>
@@ -37,7 +37,7 @@
                     <option value="">Tất cả</option>
                     @foreach (var item in (SelectList)ViewData["Co_GiayID"])
                     {
-                            <option value="@item.Value">@item.Text</option>
+                        <option value="@item.Value">@item.Text</option>
                     }
                 </select>
             </div>
@@ -48,7 +48,7 @@
                     <option value="">Tất cả</option>
                     @foreach (var item in (SelectList)ViewData["Danh_MucID"])
                     {
-                            <option value="@item.Value">@item.Text</option>
+                        <option value="@item.Value">@item.Text</option>
                     }
                 </select>
             </div>
@@ -60,7 +60,7 @@
                     <option value="">Tất cả</option>
                     @foreach (var item in (SelectList)ViewData["De_GiayID"])
                     {
-                            <option value="@item.Value">@item.Text</option>
+                        <option value="@item.Value">@item.Text</option>
                     }
                 </select>
             </div>
@@ -72,7 +72,7 @@
                     <option value="">Tất cả</option>
                     @foreach (var item in (SelectList)ViewData["Mui_GiayID"])
                     {
-                            <option value="@item.Value">@item.Text</option>
+                        <option value="@item.Value">@item.Text</option>
                     }
                 </select>
             </div>
@@ -83,7 +83,7 @@
                     <option value="">Tất cả</option>
                     @foreach (var item in (SelectList)ViewData["Kieu_DangID"])
                     {
-                            <option value="@item.Value">@item.Text</option>
+                        <option value="@item.Value">@item.Text</option>
                     }
                 </select>
             </div>
@@ -93,13 +93,13 @@
                     <option value="">Tất cả</option>
                     @foreach (var item in (SelectList)ViewData["Loai_GiayID"])
                     {
-                            <option value="@item.Value">@item.Text</option>
+                        <option value="@item.Value">@item.Text</option>
                     }
                 </select>
             </div>
-
+            
         </div>
-
+        
         <button type="button" class="btn btn-primary" id="applyFilter">Lọc</button>
     </div>
 </div>
@@ -137,87 +137,87 @@
                 }
                 @foreach (var item in Model)
                 {
-                        <tr>
-                            <td>@stt</td>
-                            <td>
+                    <tr>
+                        <td>@stt</td>
+                        <td>
                             @if (!string.IsNullOrEmpty(item.imgUrl))
                             {
                                 var images = JsonConvert.DeserializeObject<List<string>>(item.imgUrl);
                                 if (images != null && images.Count > 0)
                                 {
-                                                <img src="@images.First()" alt="Ảnh sản phẩm" width="80" height="80" />
+                                    <img src="@images.First()" alt="Ảnh sản phẩm" width="80" height="80" />
                                 }
                                 else
                                 {
-                                                <span>Không có ảnh</span>
+                                    <span>Không có ảnh</span>
                                 }
                             }
                             else
                             {
-                                        <span>Không có ảnh</span>
+                                <span>Không có ảnh</span>
                             }
-                            </td>
-                            <td>
+                        </td>
+                        <td>
                             @Html.DisplayFor(modelItem => item.Ten)
-                            </td>
-                            <td>
+                        </td>
+                        <td>
                             @Html.DisplayFor(modelItem => item.Kich_Thuoc)
-                            </td>
-                            <td>
+                        </td>
+                        <td>
                             @Html.DisplayFor(modelItem => item.Mau_Sac)
-                            </td>
-                            <td>
+                        </td>
+                        <td>
                             @Html.DisplayFor(modelItem => item.Kieu_Dang)
-                            </td>
-                            <td>
+                        </td>
+                        <td>
                             @Html.DisplayFor(modelItem => item.Danh_Muc)
-                            </td>
-                            <td>
+                        </td>
+                        <td>
                             @Html.DisplayFor(modelItem => item.Loai_Giay)
-                            </td>
-                            <td>
+                        </td>
+                        <td>
                             @Html.DisplayFor(modelItem => item.Mui_Giay)
-                            </td>
-                            <td>
+                        </td>
+                        <td>
                             @Html.DisplayFor(modelItem => item.Co_Giay)
-                            </td>
-                            <td>
+                        </td>
+                        <td>
                             @Html.DisplayFor(modelItem => item.De_Giay)
-                            </td>
-                            <td>
+                        </td>
+                        <td>
                             @Html.DisplayFor(modelItem => item.Chat_Lieu)
-                            </td>
-                            <td>
+                        </td>
+                        <td>
                             @Html.DisplayFor(modelItem => item.so_luong)
-                            </td>
-                            <td>
+                        </td>
+                        <td>
                             @Html.DisplayFor(modelItem => item.gia)
-                            </td>
-                            <td>
-                                <button class='toggle-status btn btn-sm @(item.trang_thai == 1 ? "btn-success" : "btn-danger")' data-id='@item.ID' data-status='@item.trang_thai' style='width: 150px; height: 30px; line-height: 18px; white-space: nowrap;'>@(item.trang_thai == 1 ? "Hoạt động" : "Không hoạt động")</button>
-                            </td>
-                            <td>
-                                <a href="#" class="btn btn-warning btn-edit"
-                                   data-id="@item.ID"
-                                   data-ten="@item.Ten"
-                                   data-gia="@item.gia"
-                                   data-so-luong="@item.so_luong"
-                                   data-trang-thai="@item.trang_thai"
-                                   data-ngay-tao="@item.ngay_tao"
-                                   data-kich-thuoc="@item.Kich_Thuoc"
-                                   data-mau-sac="@item.Mau_Sac"
-                                   data-kieu-dang="@item.Kieu_Dang"
-                                   data-danh-muc="@item.Danh_Muc"
-                                   data-loai-giay="@item.Loai_Giay"
-                                   data-mui-giay="@item.Mui_Giay"
-                                   data-co-giay="@item.Co_Giay"
-                                   data-de-giay="@item.De_Giay"
-                                   data-chat-lieu="@item.Chat_Lieu"
-                                   data-img-url="@item.imgUrl">
-                                    <i class="fa fa-xs fa-pen"></i>
-                                </a>
-                            </td>
-                        </tr>
+                        </td>
+                        <td>
+                            <button class='toggle-status btn btn-sm @(item.trang_thai == 1 ? "btn-success" : "btn-danger")' data-id='@item.ID' data-status='@item.trang_thai' style='width: 150px; height: 30px; line-height: 18px; white-space: nowrap;'>@(item.trang_thai == 1 ? "Hoạt động" : "Không hoạt động")</button>
+                        </td>
+                        <td>
+                            <a href="#" class="btn btn-warning btn-edit"
+                               data-id="@item.ID"
+                               data-ten="@item.Ten"
+                               data-gia="@item.gia"
+                               data-so-luong="@item.so_luong"
+                               data-trang-thai="@item.trang_thai"
+                               data-ngay-tao="@item.ngay_tao"
+                               data-kich-thuoc="@item.Kich_Thuoc"
+                               data-mau-sac="@item.Mau_Sac"
+                               data-kieu-dang="@item.Kieu_Dang"
+                               data-danh-muc="@item.Danh_Muc"
+                               data-loai-giay="@item.Loai_Giay"
+                               data-mui-giay="@item.Mui_Giay"
+                               data-co-giay="@item.Co_Giay"
+                               data-de-giay="@item.De_Giay"
+                               data-chat-lieu="@item.Chat_Lieu"
+                               data-img-url="@item.imgUrl">
+                                <i class="fa fa-xs fa-pen"></i>
+                            </a>
+                        </td>
+                    </tr>
                     stt++;
                 }
             </tbody>
@@ -425,7 +425,7 @@
 
             // Hiển thị ảnh sản phẩm
             $('#editImages').empty();
-            if (imgUrl) {
+            if (imgUrl != null) {
                 let images = JSON.parse(imgUrl);
                 images.forEach(url => {
                     $('#editImages').append(`<img src="${url}" class="m-1" width="80" height="80">`);
@@ -469,4 +469,3 @@
 
     });
 </script>
-

@@ -586,6 +586,8 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                     existingSPCT.gia = spct.gia;
                     existingSPCT.trang_thai = spct.trang_thai;
                     existingSPCT.ngay_sua = DateTime.Now;
+
+                    _context.san_Pham_Chi_Tiets.Update(existingSPCT);
                     List<Anh_San_Pham> anh = new List<Anh_San_Pham>();
                     List<string> lis = JsonConvert.DeserializeObject<List<string>>(spct.imgUrl);
                     if (lis == null)
@@ -630,7 +632,6 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                         _context.anh_San_Pham_San_Pham_Chi_Tiets.Add(link);
                     }
 
-                    _context.san_Pham_Chi_Tiets.Update(existingSPCT);
 
 
                 }

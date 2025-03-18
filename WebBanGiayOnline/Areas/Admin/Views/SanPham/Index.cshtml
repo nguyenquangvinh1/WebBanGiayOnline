@@ -119,7 +119,7 @@
                             <th>@Html.DisplayNameFor(model => model.First().mo_ta)</th>
                             <th>@Html.DisplayNameFor(model => model.First().trang_thai)</th>
                             <th>@Html.DisplayNameFor(model => model.First().ngay_tao)</th>
-
+                            
                             <th>Tùy chỉnh</th>
                         </tr>
                     </thead>
@@ -143,7 +143,7 @@
                                 <td>
                                     @Html.DisplayFor(modelItem => item.ngay_tao)
                                 </td>
-
+                                
                                 <td><a asp-area="Admin" asp-action="Edit" asp-route-id="@item.ID" class="btn btn-warning"><i class="fa fa-xs fa-pen"></i></a></td>
                             </tr>
                             stt++;
@@ -159,7 +159,7 @@
 <script>
     $(document).ready(function () {
 
-
+        
         $(document).ready(function () {
             $("#openFilterModal").click(function () {
                 console.log("📌 Đã bấm nút Lọc sản phẩm!");
