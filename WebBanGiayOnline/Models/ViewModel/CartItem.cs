@@ -3,7 +3,7 @@
     public class CartItem
     {
         public Guid id { get; set; }
-        public int Mahh { get; set; }
+        public string Mahh { get; set; }
         public string TenHH { get; set; }
         public double DonGia { get; set; }
         public int SoLuong { get; set; }

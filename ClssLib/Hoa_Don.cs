@@ -19,8 +19,7 @@ namespace ClssLib
         public double tong_tien { get; set; }
         [Display(Name = "Ghi chú :")]
         public string ghi_chu { get; set; }
-        [Display(Name = "Sô lượng:")]
-        public int SoLuongSP { get; set; }
+       
         [Display(Name = "Trạng thái :")]
         public int trang_thai { get; set; }
         [Display(Name = "Địa chỉ :")]
@@ -40,7 +39,7 @@ namespace ClssLib
         [Display(Name = "Ngày thay đổi :")]
         public DateTime? ngay_sua { get; set; }
         [Display(Name = "Nhân viên :")]
-        public string nguoi_tao { get; set; }
+        public string? nguoi_tao { get; set; }
         [Display(Name = "Người sửa :")]
         public string? nguoi_sua { get; set; }
         [JsonIgnore]

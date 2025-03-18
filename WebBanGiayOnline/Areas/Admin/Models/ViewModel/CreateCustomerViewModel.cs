@@ -1,10 +1,9 @@
-﻿using ClssLib;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-
-namespace WebBanGiay.Areas.Admin.Models.ViewModel
+﻿
+    namespace WebBanGiay.Areas.Admin.Models.ViewModel
 {
     public class CreateCustomerViewModel
     {
+
         public Guid Id { get; set; }
         public string UserName { get; set; }
 
@@ -22,14 +21,12 @@ namespace WebBanGiay.Areas.Admin.Models.ViewModel
         public string dia_chi { get; set; }
 
 
-		public int loai_dia_chi { get; set; }
+        public int loai_dia_chi { get; set; }
 
         public int Gender { get; set; }
 
         public string FullAddress => $"{dia_chi}, {xa}, {huyen}, {tinh}";
 
-        public DateTime Createdate { get; set; } 
-
+        public DateTime Createdate { get; set; }
     }
-
 }
