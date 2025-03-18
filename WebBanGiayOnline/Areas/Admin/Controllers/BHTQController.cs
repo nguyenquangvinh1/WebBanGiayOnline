@@ -30,7 +30,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     MaHoaDon = GenerateNewHoaDonID(),
                     tong_tien = 0,
                     ghi_chu = "",
-                    SoLuongSP = 0,
+              
                     trang_thai = 0,
                     dia_chi = "",
                     sdt_nguoi_nhan = "",
@@ -67,9 +67,9 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     gia = c.gia,
                     thanhTien = c.thanh_tien,
                     anhUrl = c.San_Pham_Chi_Tiet
-            .Anh_San_Pham_San_Pham_Chi_Tiets
-            .Select(a => a.Anh_San_Pham.anh_url)
-            .FirstOrDefault() ?? "/img/default.jpg",
+                    .Anh_San_Pham_San_Pham_Chi_Tiets
+                    .Select(a => a.Anh_San_Pham.anh_url)
+                    .FirstOrDefault() ?? "/img/default.jpg",
                     kichThuoc = c.San_Pham_Chi_Tiet.Kich_Thuoc.ten_kich_thuoc, // Lấy tên kích thước
                     mauSac = c.San_Pham_Chi_Tiet.Mau_Sac.ma_mau, // Lấy tên màu sắc
                     trangThai = c.San_Pham_Chi_Tiet.trang_thai == 1 ? "Hoạt động" : "Không hoạt động"
@@ -244,7 +244,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 // Tính lại tổng tiền
                 invoice.tong_tien = _context.don_Chi_Tiets
                     .Where(x => x.Hoa_DonID == invoice.ID)
-                    .Sum(x => (decimal?)x.thanh_tien) ?? 0;
+                    .Sum(x => (double?)x.thanh_tien) ?? 0;
 
                 _context.hoa_Dons.Update(invoice);
 
@@ -406,7 +406,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                                    && ct.San_Pham_Chi_TietID == request.ProductId);
 
             // Tính giá cuối cùng: nếu request.Price > 0 thì dùng, còn không dùng giá gốc của sản phẩm
-            decimal finalPrice = request.Price > 0 ? request.Price : productDetail.gia;
+            double finalPrice = request.Price > 0 ? request.Price : productDetail.gia;
 
             if (existing != null)
             {
@@ -511,7 +511,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
         {
             public Guid Hoa_DonID { get; set; }
             public Guid Phuong_Thuc_Thanh_ToanID { get; set; }
-            public decimal SoTien { get; set; }
+            public double SoTien { get; set; }
             public string MoTa { get; set; }
         }
 
@@ -566,10 +566,10 @@ namespace WebBanGiay.Areas.Admin.Controllers
             // 4. Tính tổng tiền đã thanh toán
             var totalPaid = _context.thanh_Toans
                 .Where(t => t.Hoa_DonID == model.Hoa_DonID)
-                .Sum(x => (decimal?)x.so_tien_thanh_toan) ?? 0;
+                .Sum(x => (double?)x.so_tien_thanh_toan) ?? 0;
 
             // 5. Tính tiền còn thiếu (nếu bảng hoa_Dons có cột tong_tien)
-            decimal remaining = (invoice.tong_tien - totalPaid);
+            double remaining = (invoice.tong_tien - totalPaid);
             if (remaining < 0) remaining = 0;
 
             // (Tuỳ logic) Nếu remaining = 0 => cập nhật trạng thái hóa đơn
@@ -639,6 +639,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
             }
 
             // 4. Update trạng thái hóa đơn thành 3 (Hoàn thành)
+            invoice.loai_hoa_don = 1;
             invoice.trang_thai = 3;
             _context.hoa_Dons.Update(invoice);
             _context.SaveChanges();

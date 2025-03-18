@@ -12,8 +12,8 @@ using WebBanGiay.Data;
 namespace WebBanGiay.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250312063129_datnv")]
-    partial class datnv
+    [Migration("20250318084314_v123")]
+    partial class v123
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -268,7 +268,6 @@ namespace WebBanGiay.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("nguoi_tao")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("sdt_nguoi_nhan")
@@ -282,8 +281,8 @@ namespace WebBanGiay.Migrations
                     b.Property<DateTime>("thoi_gian_nhan_hang")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("tong_tien")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("tong_tien")
+                        .HasColumnType("float");
 
                     b.Property<int>("trang_thai")
                         .HasColumnType("int");
@@ -301,14 +300,14 @@ namespace WebBanGiay.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("Hoa_DonID")
+                    b.Property<Guid?>("Hoa_DonID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("San_Pham_Chi_TietID")
+                    b.Property<Guid?>("San_Pham_Chi_TietID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("gia")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("gia")
+                        .HasColumnType("float");
 
                     b.Property<string>("ma")
                         .IsRequired()
@@ -324,16 +323,15 @@ namespace WebBanGiay.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("nguoi_tao")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("so_luong")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("thanh_tien")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("thanh_tien")
+                        .HasColumnType("float");
 
-                    b.Property<int>("trang_thai")
+                    b.Property<int?>("trang_thai")
                         .HasColumnType("int");
 
                     b.HasKey("ID");
@@ -610,23 +608,43 @@ namespace WebBanGiay.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("Chat_LieuID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("Co_GiayID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("Danh_MucID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("De_GiayID")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("Kich_ThuocID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("MaSP")
+                    b.Property<Guid?>("Kieu_DangID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("Loai_GiayID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("MaSP")
                         .HasColumnType("int");
 
                     b.Property<Guid?>("Mau_SacID")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("Mui_GiayID")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("San_PhamID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("gia")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("gia")
+                        .HasColumnType("float");
 
                     b.Property<string>("moTa")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ngay_sua")
@@ -647,9 +665,23 @@ namespace WebBanGiay.Migrations
 
                     b.HasKey("ID");
 
+                    b.HasIndex("Chat_LieuID");
+
+                    b.HasIndex("Co_GiayID");
+
+                    b.HasIndex("Danh_MucID");
+
+                    b.HasIndex("De_GiayID");
+
                     b.HasIndex("Kich_ThuocID");
 
+                    b.HasIndex("Kieu_DangID");
+
+                    b.HasIndex("Loai_GiayID");
+
                     b.HasIndex("Mau_SacID");
+
+                    b.HasIndex("Mui_GiayID");
 
                     b.HasIndex("San_PhamID");
 
@@ -661,12 +693,6 @@ namespace WebBanGiay.Migrations
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("EmployeeNumber")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeNumber"));
 
                     b.Property<Guid>("Vai_TroID")
                         .HasColumnType("uniqueidentifier");
@@ -700,6 +726,7 @@ namespace WebBanGiay.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("ngay_tao")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2");
 
                     b.Property<string>("pass_word")
@@ -777,8 +804,8 @@ namespace WebBanGiay.Migrations
                     b.Property<DateTime>("ngay_thanh_toan")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("so_tien_thanh_toan")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("so_tien_thanh_toan")
+                        .HasColumnType("float");
 
                     b.Property<int>("trang_thai")
                         .HasColumnType("int");
@@ -816,8 +843,8 @@ namespace WebBanGiay.Migrations
                     b.Property<int>("SoLuongSP")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("TongTien")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("TongTien")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -850,29 +877,6 @@ namespace WebBanGiay.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("vai_Tros");
-
-                    b.HasData(
-                        new
-                        {
-                            ID = new Guid("4a98188f-69eb-4b93-9118-4752aa544e35"),
-                            ngay_tao = new DateTime(2025, 3, 12, 13, 31, 25, 6, DateTimeKind.Local).AddTicks(5318),
-                            ten_vai_tro = "Admin",
-                            trang_thai = 1
-                        },
-                        new
-                        {
-                            ID = new Guid("9341619e-4091-4b06-bf4f-c860c18d7dd3"),
-                            ngay_tao = new DateTime(2025, 3, 12, 13, 31, 25, 6, DateTimeKind.Local).AddTicks(5354),
-                            ten_vai_tro = "Nhân Viên",
-                            trang_thai = 1
-                        },
-                        new
-                        {
-                            ID = new Guid("3635fe21-d196-4941-a9cb-5224c25426c1"),
-                            ngay_tao = new DateTime(2025, 3, 12, 13, 31, 25, 6, DateTimeKind.Local).AddTicks(5356),
-                            ten_vai_tro = "Khách Hàng",
-                            trang_thai = 1
-                        });
                 });
 
             modelBuilder.Entity("ClssLib.Anh_San_Pham", b =>
@@ -965,15 +969,11 @@ namespace WebBanGiay.Migrations
                 {
                     b.HasOne("ClssLib.Hoa_Don", "Hoa_Don")
                         .WithMany("Hoa_Don_Chi_Tiets")
-                        .HasForeignKey("Hoa_DonID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("Hoa_DonID");
 
                     b.HasOne("ClssLib.San_Pham_Chi_Tiet", "San_Pham_Chi_Tiet")
                         .WithMany("Hoa_Don_Chi_Tiets")
-                        .HasForeignKey("San_Pham_Chi_TietID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("San_Pham_Chi_TietID");
 
                     b.Navigation("Hoa_Don");
 
@@ -1046,13 +1046,41 @@ namespace WebBanGiay.Migrations
 
             modelBuilder.Entity("ClssLib.San_Pham_Chi_Tiet", b =>
                 {
+                    b.HasOne("ClssLib.Chat_Lieu", null)
+                        .WithMany("San_Pham_Chi_Tiets")
+                        .HasForeignKey("Chat_LieuID");
+
+                    b.HasOne("ClssLib.Co_Giay", null)
+                        .WithMany("San_Pham_Chi_Tiets")
+                        .HasForeignKey("Co_GiayID");
+
+                    b.HasOne("ClssLib.Danh_Muc", null)
+                        .WithMany("San_Pham_Chi_Tiets")
+                        .HasForeignKey("Danh_MucID");
+
+                    b.HasOne("ClssLib.De_Giay", null)
+                        .WithMany("San_Pham_Chi_Tiets")
+                        .HasForeignKey("De_GiayID");
+
                     b.HasOne("ClssLib.Kich_Thuoc", "Kich_Thuoc")
                         .WithMany("San_Pham_Chi_Tiets")
                         .HasForeignKey("Kich_ThuocID");
 
+                    b.HasOne("ClssLib.Kieu_Dang", null)
+                        .WithMany("San_Pham_Chi_Tiets")
+                        .HasForeignKey("Kieu_DangID");
+
+                    b.HasOne("ClssLib.Loai_Giay", null)
+                        .WithMany("San_Pham_Chi_Tiets")
+                        .HasForeignKey("Loai_GiayID");
+
                     b.HasOne("ClssLib.Mau_Sac", "Mau_Sac")
                         .WithMany("San_Pham_Chi_Tiets")
                         .HasForeignKey("Mau_SacID");
+
+                    b.HasOne("ClssLib.Mui_Giay", null)
+                        .WithMany("San_Pham_Chi_Tiets")
+                        .HasForeignKey("Mui_GiayID");
 
                     b.HasOne("ClssLib.San_Pham", "San_Pham")
                         .WithMany("San_Pham_Chi_Tiets")
@@ -1138,21 +1166,29 @@ namespace WebBanGiay.Migrations
 
             modelBuilder.Entity("ClssLib.Chat_Lieu", b =>
                 {
+                    b.Navigation("San_Pham_Chi_Tiets");
+
                     b.Navigation("San_Phams");
                 });
 
             modelBuilder.Entity("ClssLib.Co_Giay", b =>
                 {
+                    b.Navigation("San_Pham_Chi_Tiets");
+
                     b.Navigation("San_Phams");
                 });
 
             modelBuilder.Entity("ClssLib.Danh_Muc", b =>
                 {
+                    b.Navigation("San_Pham_Chi_Tiets");
+
                     b.Navigation("San_Phams");
                 });
 
             modelBuilder.Entity("ClssLib.De_Giay", b =>
                 {
+                    b.Navigation("San_Pham_Chi_Tiets");
+
                     b.Navigation("San_Phams");
                 });
 
@@ -1177,11 +1213,15 @@ namespace WebBanGiay.Migrations
 
             modelBuilder.Entity("ClssLib.Kieu_Dang", b =>
                 {
+                    b.Navigation("San_Pham_Chi_Tiets");
+
                     b.Navigation("San_Phams");
                 });
 
             modelBuilder.Entity("ClssLib.Loai_Giay", b =>
                 {
+                    b.Navigation("San_Pham_Chi_Tiets");
+
                     b.Navigation("San_Phams");
                 });
 
@@ -1192,6 +1232,8 @@ namespace WebBanGiay.Migrations
 
             modelBuilder.Entity("ClssLib.Mui_Giay", b =>
                 {
+                    b.Navigation("San_Pham_Chi_Tiets");
+
                     b.Navigation("San_Phams");
                 });
 

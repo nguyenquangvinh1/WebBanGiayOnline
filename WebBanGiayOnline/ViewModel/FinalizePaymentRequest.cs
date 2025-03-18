@@ -9,7 +9,7 @@
     }
     public class PaymentRowDto
     {
-        public decimal Amount { get; set; }
+        public double Amount { get; set; }
         public string Method { get; set; } // "cash" / "transfer"
     }
 }

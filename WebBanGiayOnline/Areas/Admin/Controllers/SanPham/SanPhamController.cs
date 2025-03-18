@@ -531,7 +531,14 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                         ngay_tao = item.ngay_tao,
                         Kich_ThuocID = kichThuoc.ID,
                         Mau_SacID = mauSac.ID,
-                        San_PhamID = SP.ID
+                        San_PhamID = SP.ID,
+                        Kieu_DangID = SP.Kieu_DangID,
+                        Danh_MucID = SP.Danh_MucID,
+                        Loai_GiayID = SP.Loai_GiayID,
+                        Mui_GiayID = SP.Mui_GiayID,
+                        Co_GiayID = SP.Co_GiayID,
+                        De_GiayID = SP.De_GiayID,
+                        Chat_LieuID = SP.Chat_LieuID
                     };
 
                     _context.san_Pham_Chi_Tiets.Add(sp);
