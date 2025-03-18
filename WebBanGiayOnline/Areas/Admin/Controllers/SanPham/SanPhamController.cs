@@ -531,7 +531,14 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                         ngay_tao = item.ngay_tao,
                         Kich_ThuocID = kichThuoc.ID,
                         Mau_SacID = mauSac.ID,
-                        San_PhamID = SP.ID
+                        San_PhamID = SP.ID,
+                        Kieu_DangID = SP.Kieu_DangID,
+                        Danh_MucID = SP.Danh_MucID,
+                        Loai_GiayID = SP.Loai_GiayID,
+                        Mui_GiayID = SP.Mui_GiayID,
+                        Co_GiayID = SP.Co_GiayID,
+                        De_GiayID = SP.De_GiayID,
+                        Chat_LieuID = SP.Chat_LieuID
                     };
 
                     _context.san_Pham_Chi_Tiets.Add(sp);
@@ -579,6 +586,8 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                     existingSPCT.gia = spct.gia;
                     existingSPCT.trang_thai = spct.trang_thai;
                     existingSPCT.ngay_sua = DateTime.Now;
+
+                    _context.san_Pham_Chi_Tiets.Update(existingSPCT);
                     List<Anh_San_Pham> anh = new List<Anh_San_Pham>();
                     List<string> lis = JsonConvert.DeserializeObject<List<string>>(spct.imgUrl);
                     if (lis == null)
@@ -623,7 +632,6 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                         _context.anh_San_Pham_San_Pham_Chi_Tiets.Add(link);
                     }
 
-                    _context.san_Pham_Chi_Tiets.Update(existingSPCT);
 
 
                 }

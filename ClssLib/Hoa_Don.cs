@@ -16,7 +16,7 @@ namespace ClssLib
         public string MaHoaDon { get; set; }
 
         [Display(Name = "Tổng tiền đơn hàng :")]
-        public decimal tong_tien { get; set; }
+        public double tong_tien { get; set; }
         [Display(Name = "Ghi chú :")]
         public string ghi_chu { get; set; }
         [Display(Name = "Sô lượng:")]

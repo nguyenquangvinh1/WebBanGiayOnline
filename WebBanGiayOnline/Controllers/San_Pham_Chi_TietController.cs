@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ClssLib;
 using WebBanGiay.Data;
 using WebBanGiay.Models;
+using System.ComponentModel;
 
 namespace WebBanGiay.Controllers
 {
@@ -23,14 +24,16 @@ namespace WebBanGiay.Controllers
         // GET: San_Pham_Chi_Tiet
         public async Task<IActionResult> Index()
         {
-            var sanPham = _context.san_Pham_Chi_Tiets.AsQueryable();
+            var sanPham = _context.san_Phams
+                .Include(x => x.Loai_Giay).AsQueryable();
             var result = sanPham.Select(x => new HangHoaVM
             {
                 ID = x.ID,
-                MaHh =(int) x.MaSP,
-                TenHH = x.ten_SPCT,
-                DonGia = x.gia,
-                MoTa = x.moTa ?? ""
+                TenHH = x.ten_san_pham,
+                DonGia = Convert.ToString(_context.san_Pham_Chi_Tiets.Where(z => z.San_PhamID == x.ID).Select(x => x.gia).Min()),
+                MoTa = x.mo_ta ?? "",
+                Hinh = _context.anh_San_Phams.FirstOrDefault(z => z.San_PhamID == x.ID).anh_url,
+                TenLoai = x.Loai_Giay.ten_loai_giay
 
             });
             return View(result);
@@ -40,6 +43,7 @@ namespace WebBanGiay.Controllers
         public async Task<IActionResult> Details(Guid? id)
         {
             var data1 = _context.san_Pham_Chi_Tiets.SingleOrDefault(x => x.ID == id);
+            var sp = _context.san_Phams.Include(x => x.Loai_Giay).FirstOrDefault(x => x.ID == data1.San_PhamID);
             if(data1 == null)
             {
                 TempData["Message"] = $"Không tìm thấy {id}";
@@ -48,11 +52,12 @@ namespace WebBanGiay.Controllers
             var result = new ChiTietHangHoaVM
             {
                 ID = data1.ID,
-                MaHh = (int)data1.MaSP,
                 TenHH = data1.ten_SPCT,
-                DonGia = data1.gia,
-                MoTa = data1.moTa,
-                SoLuongTon = data1.so_luong
+                DonGia = Convert.ToString(data1.gia),
+                MoTa = sp.mo_ta,
+                SoLuongTon = data1.so_luong,
+                TenLoai = sp.Loai_Giay.ten_loai_giay,
+                ChiTiet = sp.mo_ta
 
             };
             return View(result);
