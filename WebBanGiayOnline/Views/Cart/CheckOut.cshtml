@@ -117,44 +117,65 @@
     <div class="container-fluid py-5">
         <div class="container py-5">
             <h1 class="mb-4">Billing details</h1>
-            @foreach (var item in Model)
-            {
-                <form asp-action="Checkout" >
-                    <div class="row g-5">
-                 
-                    <form asp-action="Checkout" asp-controller="Cart" asp-route-id="@item.id">
-                        <div class="col-md-12 col-lg-6 col-xl-7">
-                            <div class="form-check my-3">
-                                <input type="checkbox" name="GiongKhachHang" class="form-check-input" id="GiongKhachHang" value="false">
-                                <label class="form-check-label" for="GiongKhachHang">Lấy thông tin khách hàng?</label>
-                            </div>
-                            <div class="form-item delivery-info">
-                                <label class="form-label my-3">Người nhận hàng<sup>*</sup></label>
-                                <input type="text" name="TenKhachHang" class="form-control">
-                            </div>
-                            <div class="form-item delivery-info">
-                                <label class="form-label my-3">Email<sup>*</sup></label>
-                                <input type="text" name="Email" class="form-control">
-                            </div>
-                            <div class="form-item delivery-info">
-                                <label class="form-label my-3">Địa chỉ nhận hàng<sup>*</sup></label>
-                                <input type="text" name="DiaChi" class="form-control" placeholder="">
-                            </div>
-                            <div class="form-item delivery-info">
-                                <label class="form-label my-3">Điện thoại<sup>*</sup></label>
-                                <input type="text" name="Sdt" class="form-control">
-                            </div>
-                            <div class="form-item mt-3">
-                                <textarea name="GhiChu" class="form-control" spellcheck="false" cols="30" rows="11" placeholder="Ghi chú"></textarea>
-                            </div>
-                                <input type="submit" name="payment" class="btn border-secondary text-uppercase text-primary w-100 mt-2" value="Thanh toán khi nhận hàng">
-                                <button asp-action="PayMent" asp-controller="Cart" asp-route-id="@item.id" class="btn border-secondary text-uppercase text-primary w-100 mt-2">Thanh Toán với VNPAY </button>
-                                <button asp-action="PaymentMoMo" asp-controller="Cart" asp-route-id="@item.id" class="btn border-secondary text-uppercase text-primary w-100 mt-2">Thanh Toán với MoMo </button>
-
-
+            
+            <form asp-action="Checkout" asp-controller="Cart" >
+                <div class="row g-5">
+                    <div class="col-md-12 col-lg-6 col-xl-7">
+                        <div class="form-check my-3">
+                            <input type="checkbox" name="GiongKhachHang" class="form-check-input" id="GiongKhachHang" value="false">
+                            <label class="form-check-label" for="GiongKhachHang">Lấy thông tin khách hàng?</label>
                         </div>
-                        
-                    </form>
+                        <div class="form-item delivery-info">
+                            <label class="form-label my-3">Người nhận hàng<sup>*</sup></label>
+                            <input name="TenKhachHang" class="form-control">
+                         
+                           
+
+                            
+                        </div>
+                        <div class="form-item delivery-info">
+                            <label class="form-label my-3">Email<sup>*</sup></label>
+                            <input name="Email" class="form-control">
+                          
+                        </div>
+
+                        <div class="form-item mt-3">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label>* Tỉnh/Thành phố</label>
+                                    <select class="form-control" id="tinh" name="tinh">
+                                        <option value="">Chọn tỉnh/thành phố</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label>* Quận/Huyện</label>
+                                    <select class="form-control" id="huyen" name="huyen">
+                                        <option value="">Chọn quận/huyện</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label>* Xã/Phường</label>
+                                    <select class="form-control" id="xa" name="xa">
+                                        <option value="">Chọn xã/phường</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-item delivery-info">
+                            <label class="form-label my-3">Điện thoại<sup>*</sup></label>
+                            <input name="Sdt" class="form-control">
+                           
+                        </div>
+                        <div class="form-item mt-3">
+                            <textarea name="GhiChu" class="form-control" spellcheck="false" cols="30" rows="11" placeholder="Ghi chú"></textarea>
+                        </div>
+
+                        <input type="submit" name="payment" class="btn border-secondary text-uppercase text-primary w-100 mt-2" value="Thanh toán khi nhận hàng">
+                        <button asp-action="PayMent" asp-controller="Cart" class="btn border-secondary text-uppercase text-primary w-100 mt-2">Thanh Toán với VNPAY</button>
+                        <button asp-action="PaymentMoMo" asp-controller="Cart" class="btn border-secondary text-uppercase text-primary w-100 mt-2">Thanh Toán với MoMo</button>
+                    </div>
+
                     <div class="col-md-12 col-lg-6 col-xl-5">
                         <div class="table-responsive">
                             <table class="table">
@@ -162,13 +183,14 @@
                                     <tr>
                                         <th scope="col">Ảnh</th>
                                         <th scope="col">Tên</th>
-                                        <th scope="col">Gía</th>
+                                        <th scope="col">Giá</th>
                                         <th scope="col">Số lượng</th>
                                         <th scope="col">Tổng tiền</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                  
+                                    @foreach (var item in Model)
+                                    {
                                         <tr>
                                             <th scope="row">
                                                 <div class="d-flex align-items-center mt-2">
@@ -176,37 +198,31 @@
                                                 </div>
                                             </th>
                                             <td class="py-5">@item.TenHH</td>
-                                            <td class="py-5">@item.DonGia VNĐ</td>
+                                            <td class="py-5">@item.DonGia.ToString("#,##0 VNĐ")</td>
                                             <td class="py-5">@item.SoLuong</td>
-                                            <td class="py-5" name="TongTien">@item.ThanhTien</td>
+                                            <td class="py-5">@item.ThanhTien.ToString("#,##0 VNĐ")</td>
                                         </tr>
-                                   
+                                    }
                                     <tr>
-                                        <th scope="row">
-                                        </th>
-                                        <td class="py-5"></td>
-                                        <td class="py-5"></td>
+                                        <td colspan="3"></td>
                                         <td class="py-5">
                                             <p class="mb-0 text-dark py-3">Subtotal</p>
                                         </td>
                                         <td class="py-5">
                                             <div class="py-3 border-bottom border-top">
-                                                <p class="mb-0 text-dark">$@Model.Sum(p => p.ThanhTien).ToString("#,##0 VNĐ")</p>
+                                                <p class="mb-0 text-dark">@Model.Sum(p => p.ThanhTien).ToString("#,##0 VNĐ")</p>
                                             </div>
                                         </td>
                                     </tr>
-                                  
-                                   
                                 </tbody>
                             </table>
                         </div>
-                       
                     </div>
                 </div>
             </form>
-            }
         </div>
     </div>
+
     <!-- Checkout Page End -->
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
@@ -215,8 +231,8 @@
                 <div class="row g-4">
                     <div class="col-lg-3">
                         <a href="#">
-                            <h1 class="text-primary mb-0">Fruitables</h1>
-                            <p class="text-secondary mb-0">Fresh products</p>
+                            <h1 class="text-primary mb-0">Adidas Sport</h1>
+                            <p class="text-secondary mb-0">Adidas Products</p>
                         </a>
                     </div>
                     <div class="col-lg-6">
@@ -318,16 +334,86 @@
 </html>
 @section Scripts{
     <script>
-        $(document).ready(function(){
-            $('#GiongKhachHang').change(function(){
-                if($(this).prop("checked")){
-                    $(this).val(true);
-                        $(".delivery-info").addClass("d-none");
-                }else{
-                     $(this).val(false);
-                       $(".delivery-info").removeClass("d-none");
+        // $(document).ready(function(){
+        //     $('#GiongKhachHang').change(function(){
+        //         if($(this).prop("checked")){
+        //             $(this).val(true);
+        //                 $(".delivery-info").addClass("d-none");
+        //         }else{
+        //              $(this).val(false);
+        //                $(".delivery-info").removeClass("d-none");
+        //         }
+        //     })
+        // }
+          
+        $(document).ready(function () {
+            // Load danh sách tỉnh
+            $.ajax({
+                url: "https://provinces.open-api.vn/api/p/",
+                method: "GET",
+                success: function (data) {
+                    data.forEach(function (province) {
+                        $("#tinh").append('<option value="' + province.name + '">' + province.name + '</option>');
+                    });
                 }
-            })
-        }
+            });
+
+            // Khi chọn tỉnh -> Load danh sách huyện
+            $("#tinh").change(function () {
+                var provinceName = $(this).val();
+                $("#huyen").empty().append('<option value="">Chọn huyện</option>');
+                $("#xa").empty().append('<option value="">Chọn xã</option>');
+
+                if (provinceName) {
+                    $.ajax({
+                        url: "https://provinces.open-api.vn/api/p/",
+                        method: "GET",
+                        success: function (data) {
+                            var province = data.find(p => p.name === provinceName);
+                            if (province) {
+                                $.ajax({
+                                    url: "https://provinces.open-api.vn/api/p/" + province.code + "?depth=2",
+                                    method: "GET",
+                                    success: function (districtData) {
+                                        districtData.districts.forEach(function (district) {
+                                            $("#huyen").append('<option value="' + district.name + '">' + district.name + '</option>');
+                                        });
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+
+            // Khi chọn huyện -> Load danh sách xã
+            $("#huyen").change(function () {
+                var districtName = $(this).val();
+                $("#xa").empty().append('<option value="">Chọn xã</option>');
+
+                if (districtName) {
+                    $.ajax({
+                        url: "https://provinces.open-api.vn/api/d/",
+                        method: "GET",
+                        success: function (data) {
+                            var district = data.find(d => d.name === districtName);
+                            if (district) {
+                                $.ajax({
+                                    url: "https://provinces.open-api.vn/api/d/" + district.code + "?depth=2",
+                                    method: "GET",
+                                    success: function (wardData) {
+                                        wardData.wards.forEach(function (ward) {
+                                            $("#xa").append('<option value="' + ward.name + '">' + ward.name + '</option>');
+                                        });
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
     </script>
+  
 }

@@ -36,9 +36,7 @@
 <body>
 
     <!-- Spinner Start -->
-    <div id="spinner" class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50  d-flex align-items-center justify-content-center">
-        <div class="spinner-grow text-primary" role="status"></div>
-    </div>
+ 
     <!-- Spinner End -->
     <!-- Navbar start -->
     <div class="container-fluid fixed-top">
@@ -305,7 +303,7 @@
                                                 <h4>@item.TenHH</h4>
                                                 <p>@item.MoTa</p>
                                                 <div class="d-flex justify-content-between flex-lg-wrap">
-                                                    <p class="text-dark fs-5 fw-bold mb-0">@item.DonGia VND</p>
+                                                    <p class="text-dark fs-5 fw-bold mb-0">@item.DonGia.ToString("#,##0 VNĐ")</p>
                                                     <a asp-controller="Cart" asp-action="AddCart" asp-route-id="@item.ID"  class="btn border border-secondary rounded-pill px-3 text-primary"><i class="fa fa-shopping-bag me-2 text-primary"></i> Thêm vào giỏ hàng</a>
                                                 </div>
                                             </div>

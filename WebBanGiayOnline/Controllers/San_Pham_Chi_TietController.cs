@@ -25,12 +25,16 @@ namespace WebBanGiay.Controllers
         public async Task<IActionResult> Index()
         {
             var sanPham = _context.san_Phams
-                .Include(x => x.Loai_Giay).AsQueryable();
+                .Include(x => x.Loai_Giay)
+                .Where(sp => sp.San_Pham_Chi_Tiets.Any(ct => ct.so_luong > 0)) // Chỉ lấy sản phẩm có số lượng > 0
+                .AsQueryable();
+
+
             var result = sanPham.Select(x => new HangHoaVM
             {
                 ID = x.ID,
                 TenHH = x.ten_san_pham,
-                DonGia = Convert.ToString(_context.san_Pham_Chi_Tiets.Where(z => z.San_PhamID == x.ID).Select(x => x.gia).Min()),
+                DonGia = _context.san_Pham_Chi_Tiets.Where(z => z.San_PhamID == x.ID).Select(x => x.gia).Min(),
                 MoTa = x.mo_ta ?? "",
                 Hinh = _context.anh_San_Phams.FirstOrDefault(z => z.San_PhamID == x.ID).anh_url,
                 TenLoai = x.Loai_Giay.ten_loai_giay
@@ -42,9 +46,8 @@ namespace WebBanGiay.Controllers
         // GET: San_Pham_Chi_Tiet/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
-            var data1 = _context.san_Pham_Chi_Tiets.SingleOrDefault(x => x.ID == id);
-            var sp = _context.san_Phams.Include(x => x.Loai_Giay).FirstOrDefault(x => x.ID == data1.San_PhamID);
-            if(data1 == null)
+            var data1 = _context.san_Phams.Include(x => x.Loai_Giay).FirstOrDefault(x => x.ID == id);
+            if (data1 == null)
             {
                 TempData["Message"] = $"Không tìm thấy {id}";
                 return Redirect("/404");
@@ -52,17 +55,16 @@ namespace WebBanGiay.Controllers
             var result = new ChiTietHangHoaVM
             {
                 ID = data1.ID,
-                TenHH = data1.ten_SPCT,
-                DonGia = Convert.ToString(data1.gia),
-                MoTa = sp.mo_ta,
-                SoLuongTon = data1.so_luong,
-                TenLoai = sp.Loai_Giay.ten_loai_giay,
-                ChiTiet = sp.mo_ta
+                TenHH = data1.ten_san_pham,
+                DonGia = _context.san_Pham_Chi_Tiets.Where(z => z.San_PhamID == data1.ID).Select(x => x.gia).Min(),
+                MoTa = data1.mo_ta,
+                SoLuongTon = _context.san_Pham_Chi_Tiets.Where(z => z.San_PhamID == data1.ID).Select(x => x.so_luong).Min(),
+               
+                ChiTiet = data1.mo_ta
 
             };
             return View(result);
         }
-
         // GET: San_Pham_Chi_Tiet/Create
         public IActionResult Create()
         {

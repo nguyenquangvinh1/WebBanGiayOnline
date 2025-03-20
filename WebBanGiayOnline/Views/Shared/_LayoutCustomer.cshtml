@@ -27,6 +27,24 @@
 
 	<!-- Template Stylesheet -->
 	<link href="~/css/style.css" rel="stylesheet">
+	<style>
+		.main_slider {
+			background-size: cover; /* Đảm bảo ảnh phủ toàn bộ */
+			background-position: center; /* Căn giữa ảnh */
+			background-repeat: no-repeat; /* Không lặp ảnh */
+			height: 500px; /* Đảm bảo có chiều cao đủ lớn */
+		}
+
+		.main_slider_content{
+		padding-top:220px;
+		}
+
+		.main_slider_content  {
+			padding-top: 220px;
+		}
+	
+
+	</style>
 </head>
 <body>
 	<div>
@@ -67,7 +85,7 @@
 									<a href="cart.html" class="dropdown-item">Cart</a>
 									<a href="chackout.html" class="dropdown-item">Chackout</a>
 									<a href="testimonial.html" class="dropdown-item">Testimonial</a>
-									<a href="404.html" class="dropdown-item">404 Page</a>
+									<a asp-controller="Shipping" asp-action="Index" class="dropdown-item">404 Page</a>
 								</div>
 							</div>
 							<a href="contact.html" class="nav-item nav-link">Contact</a>
@@ -84,27 +102,25 @@
 			</div>
 		</div>
 		<!-- Navbar End -->
-		<!-- Modal Search Start -->
-		<div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-			<div class="modal-dialog modal-fullscreen">
-				<div class="modal-content rounded-0">
-					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLabel">Search by keyword</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body d-flex align-items-center">
-						<div class="input-group w-75 mx-auto d-flex">
-							<input type="search" class="form-control p-3" placeholder="keywords" aria-describedby="search-icon-1">
-							<span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
+		
+		<!-- Modal Search End -->
+
+		<div style="min-height:1000px;" class="hero-header">
+			@RenderBody()
+			<div class="main_slider" style="background-image:url(/coloshop-master/images/anhdep.jpg)">
+				<div class="container fill_height">
+					<div class="row align-items-center fill_height">
+						<div class="col">
+							<div class="main_slider_content">
+								<h6>Spring / Summer Collection 2017</h6>
+								<h1>Get up to 30% Off New Arrivals</h1>
+								<button class="red_button shop_now_button"><a href="#">Shop now</a></button>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-		<!-- Modal Search End -->
 
-		<div style="min-height:400px;" class="hero-header">
-			@RenderBody()
 			
 		</div>
 

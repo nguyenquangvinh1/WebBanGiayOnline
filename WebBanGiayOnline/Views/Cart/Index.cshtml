@@ -145,7 +145,7 @@
                                     <p class="mb-0 mt-4">@item.TenHH</p>
                                 </td>
                                 <td>
-                                    <p class="mb-0 mt-4">@item.DonGia</p>
+                                    <p class="mb-0 mt-4">@item.DonGia.ToString("#,##0 VNĐ")</p>
                                 </td>
                                 <td>
                                     <div class="input-group quantity mt-4" style="width: 100px;">
@@ -163,7 +163,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <p class="mb-0 mt-4">@item.ThanhTien VNĐ</p>
+                                    <p class="mb-0 mt-4">@item.ThanhTien.ToString("#,##0 VNĐ")</p>
                                 </td>
                                 <td>
                                     <a asp-action="RemoveCart" asp-controller="Cart" asp-route-id="@item.id" class="btn btn-md rounded-circle bg-light border mt-4">

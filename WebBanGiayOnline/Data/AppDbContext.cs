@@ -37,6 +37,7 @@ namespace WebBanGiay.Data
         public DbSet<Thanh_Toan> thanh_Toans { get; set; }
         public DbSet<ThongKe> thongKes { get; set; }
         public DbSet<Vai_Tro> vai_Tros { get; set; }
+        public DbSet<ShippingModel> shippingModels { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -45,9 +46,9 @@ namespace WebBanGiay.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.Seed();
-            //base.OnModelCreating(modelBuilder);
-           
+            modelBuilder.Seed();
+            base.OnModelCreating(modelBuilder);
+
 
         }
 

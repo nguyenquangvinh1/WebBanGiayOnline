@@ -198,10 +198,12 @@
     <table class="table table-bordered">
         <thead>
             <tr>
+               
                 <th>Mã</th>
-                <th>Tên Sản Phẩm</th>
+               @*  <th>Tên Sản Phẩm</th> *@
                 <th>Số Tiền</th>
                 <th>Số lượng</th>
+                 <th>Tổng tiền</th>
                 <th>Thời Gian</th>
                  
             
@@ -212,19 +214,21 @@
                     <td>Không có dữ liệu</td>
                 </tr>
         </tbody> *@
-       @*  <tbody>
-                @if (Model?.Hoa_Don_Chi_Tiets != null && Model.Hoa_Don_Chi_Tiets.Any())
+        <tbody>
+                @if (Model.Hoa_Don_Chi_Tiets != null && Model.Hoa_Don_Chi_Tiets.Any())
 
             {
+                var hoadon = Model.Hoa_Don_Chi_Tiets;
             
-                foreach (var item in Model?.Hoa_Don_Chi_Tiets)
+                foreach (var item in hoadon)
                 {   
                     <tr>
-                       
+                      
                         <td>@item.ma</td>
-                       <td>@item.San_Pham_Chi_Tiet.ten_SPCT</td>
-                        <td>@item.gia.ToString("N0") đ</td>
+
+                            <td>@item.gia.ToString("#,##0 VNĐ")</td>
                         <td>@item.so_luong</td>
+                            <td>@item.thanh_tien?.ToString("#,##0 VNĐ")</td>
                         <td>@item.ngay_tao.ToString("dd/MM/yyyy HH:mm")</td>
                       
                       
@@ -238,7 +242,7 @@
                     <td colspan="6" class="text-center text-muted">Không có lịch sử thanh toán nào.</td>
                 </tr>
             }
-        </tbody> *@
+        </tbody>
     </table>
     <br />
 
@@ -248,11 +252,11 @@
             <tr>
                 <th>Mã</th>
                 
-                <th>Sản phẩm</th>
+            @*     <th>Sản phẩm</th> *@
                 <th>Đơn giá</th>
                 <th>Số lượng</th>
                 <th>Số tiền</th>
-                    <th>Mã</th>
+                   
             </tr>
         </thead>
        @*      <tbody>
@@ -260,7 +264,7 @@
                     <td colspan="6" class="text-center text-muted">Không có dữ liệu</td>
                 </tr>
             </tbody> *@
-       @*  <tbody>
+        <tbody>
             @if (Model.Hoa_Don_Chi_Tiets != null && Model.Hoa_Don_Chi_Tiets.Any())
             {
                
@@ -268,12 +272,11 @@
                 {
                     <tr>
                         <td>@item.ma</td>
-                     
-                        <td>@item.San_Pham_Chi_Tiet.ten_SPCT</td>
-                        <td>@item.gia.ToString("N0") đ</td>
+                     @*    <td>@item.San_Pham_Chi_Tiet.ten_SPCT</td> *@
+                            <td>@item.gia.ToString("#,##0 VNĐ")</td>
                         <td>@item.so_luong</td>
-                        <td>@(item.gia * item.so_luong).ToString("N0") đ</td>
-                            <td>@item.Hoa_DonID</td>
+                            <td>@item.thanh_tien?.ToString("#,##0 VNĐ")</td>
+                           
                     </tr>
                    
                 }
@@ -284,7 +287,7 @@
                     <td colspan="6" class="text-center text-muted">Không có dữ liệu</td>
                 </tr>
             }
-        </tbody> *@
+        </tbody>
     </table>
 
  @*    <div class="row">
@@ -369,7 +372,10 @@
             "Hoàn thành",
 
         ];
-        
+
+        }else if (currentStep === 2){
+            prevBtn.style.display ="none";
+            huy.style.display ="none"
         } else {
             nextBtn.style.display = "inline-block";
             prevBtn.style.display = "inline-block";

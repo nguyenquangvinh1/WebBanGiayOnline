@@ -14,7 +14,7 @@ namespace ClssLib
         public string ma { get; set; }
         public double gia { get; set; }
         public int? trang_thai { get; set; }
-        public double thanh_tien { get; set; }
+        public double? thanh_tien { get; set; }
         public int so_luong { get; set; }
         public DateTime ngay_tao { get; set; }
         public DateTime? ngay_sua { get; set; }
