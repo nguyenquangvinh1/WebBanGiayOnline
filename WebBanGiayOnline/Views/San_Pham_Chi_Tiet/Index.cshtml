@@ -1,6 +1,9 @@
 ﻿@model IEnumerable<WebBanGiay.Models.HangHoaVM>
 
-
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -36,9 +39,7 @@
 <body>
 
     <!-- Spinner Start -->
-    <div id="spinner" class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50  d-flex align-items-center justify-content-center">
-        <div class="spinner-grow text-primary" role="status"></div>
-    </div>
+    
     <!-- Spinner End -->
     <!-- Navbar start -->
     <div class="container-fluid fixed-top">
@@ -151,7 +152,20 @@
                                     <div class="mb-3">
                                         <h4>Categories</h4>
                                         <ul class="list-unstyled fruite-categorie">
+
                                             <li>
+                                                <div class=" dropdown">
+                                                    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        Chất Liệu
+                                                        </a>
+                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                                        @foreach (var item in (SelectList)ViewData["Chat_LieuID"])
+                                                        {
+                                                            <a href="#" class="dropdown-item" data-chat-lieu="@item.Value">@item.Text</a>
+                                                            <li><a class="dropdown-item" href="#">Action</a></li>
+                                                        }
+                                                    </ul>
+                                                </div>
                                                 <div class="d-flex justify-content-between fruite-name">
                                                     <a href="#"><i class="fas fa-apple-alt me-2"></i>Apples</a>
                                                     <span>(3)</span>
@@ -297,7 +311,7 @@
                                         <div class="rounded position-relative fruite-item">
                                             <div class="fruite-img">
                                                 <a asp-controller="San_Pham_Chi_Tiet" asp-action="Details" asp-route-id ="@item.ID">
-                                                <img src="~/coloshop-master/images/anhdep.jpg" class="img-fluid w-100 rounded-top" alt="">
+                                                <img src="@item.Hinh" class="img-fluid w-100 rounded-top" alt="">
                                                 </a>
                                             </div>
                                             <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">New</div>
