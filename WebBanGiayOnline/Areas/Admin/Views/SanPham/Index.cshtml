@@ -4,7 +4,7 @@
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-@* <h1>Index</h1> *@
+<h1>Sản Phẩm</h1>
 
 
 <!-- Nút mở modal lọc -->
@@ -94,24 +94,49 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Bảng Sản Phẩm</h3>
-            </div>
-            <div class="row">
-                <div class="col-sm-12 col-md-10">
-                    <div class="dt-button btn-group flex-wrap">
-                        @* <button type="button" class="btn btn-primary buttons-html5" id="openFilterModal" tabindex="0" type="button">
-                            Lọc sản phẩm
-                        </button> *@
+                <div class="row">
+                    <div class="col-md-6 row">
+                        <div class="col-12">
+                            <input type="text" id="searchProduct" class="form-control" placeholder="Tìm kiếm sản phẩm..." value="@Context.Request.Query["tenSanPham"]">
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center col-12 row">
+                            <div class="col-7">
+                                <label><strong>Trạng thái:</strong></label>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="trangThai" id="trangThaiHoatDong" value="1"
+                                    @(ViewData["SelectedTrangThai"]?.ToString() == "1" ? "checked" : "")>
+                                    <label class="form-check-label" for="trangThaiHoatDong">Hoạt động</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="trangThai" id="trangThaiKhongHoatDong" value="0"
+                                    @(ViewData["SelectedTrangThai"]?.ToString() == "0" ? "checked" : "")>
+                                    <label class="form-check-label" for="trangThaiKhongHoatDong">Không hoạt động</label>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2 d-md-block col-5">
 
-                        <button type="button" class="btn btn-primary buttons-html5" tabindex="0" type="button">
-                            <a asp-action="Create" style="color:white">Tạo mới</a>
-                        </button>
+                            <!-- Nút Xuất Excel -->
+                            <button id="exportExcel" class="btn btn-success">
+                                <i class="fas fa-file-excel"></i> Xuất Excel
+                            </button>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="button" class="btn btn-primary buttons-html5 me-md-2" tabindex="0" type="button">
+                                <a asp-action="Create" style="color:white">Tạo mới</a>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="card-body">
+            
+            <div class="card-body table-responsive p-0">
 
-                <table class="table table-bordered table-striped" id="sanPhamTable">
+                <table class="table table-hover text-nowrap" id="sanPhamTable">
                     <thead>
                         <tr>
                             <th>STT</th>
@@ -156,6 +181,8 @@
         </div>
     </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 <script>
     $(document).ready(function () {
         $("#sanPhamTable").DataTable({
@@ -166,6 +193,16 @@
             "info": true,
             "autoWidth": false,
             "responsive": true,
+        });
+        $('#exportExcel').click(function () {
+            let table = document.getElementById("sanPhamTable"); // Lấy bảng dữ liệu
+            let wb = XLSX.utils.book_new(); // Tạo file Excel mới
+            let ws = XLSX.utils.table_to_sheet(table); // Chuyển bảng thành Sheet
+
+            XLSX.utils.book_append_sheet(wb, ws, "SanPham"); // Thêm sheet vào file
+
+            // Xuất file Excel
+            XLSX.writeFile(wb, "DanhSachSanPham.xlsx");
         });
 
         
@@ -187,30 +224,53 @@
             console.log("📌 Nút lọc đã được nhấn!"); // Kiểm tra sự kiện click có chạy không
             applyFilter();
         });
+        $('#searchProduct').keypress(function (e) {
+            if (e.which === 13) { // 13 là phím Enter
+                e.preventDefault();
+                applyFilter();
+            }
+        });
         window.applyFilter = function () {
             console.log("📌 Hàm applyFilter đã chạy!");
 
             let filters = {};
 
+            // Lấy dữ liệu từ các dropdown
             $('select.filter-select').each(function () {
                 let id = $(this).attr('id');
                 let value = $(this).val();
-                console.log(`🎯 Lọc ID: ${id}, Giá trị: ${value}`);
-
                 if (value && value !== '') {
                     let paramName = id.replace("filter", "").charAt(0).toLowerCase() + id.replace("filter", "").slice(1);
                     filters[paramName] = value;
                 }
             });
 
+            // Lấy dữ liệu từ ô tìm kiếm
+            let searchValue = $('#searchProduct').val().trim();
+            if (searchValue !== '') {
+                filters.tenSanPham = searchValue;
+            }
+
+            // Lấy giá trị trạng thái từ radio button
+            let trangThai = $('input[name="trangThai"]:checked').val();
+            if (trangThai !== undefined) {
+                filters.trangThai = trangThai;
+            }
+
             console.log("📌 Dữ liệu lọc gửi đi:", filters);
 
             let queryString = $.param(filters);
             console.log("🔗 URL lọc: /Admin/SanPham/Filter?" + queryString);
 
-
             window.location.href = '/Admin/SanPham/Filter?' + queryString;
         };
+
+        // Khi chọn radio button, tự động lọc
+        $('input[name="trangThai"]').change(function () {
+            applyFilter();
+        });
+
+
 
 
         $(document).on('click', '.toggle-status', function () {

@@ -26,7 +26,9 @@
                     <option value="">Tất cả</option>
                     @foreach (var item in (SelectList)ViewData["Chat_LieuID"])
                     {
-                        <option value="@item.Value">@item.Text</option>
+                        <option value="@item.Value" selected="@(ViewData["SelectedChatLieu"]?.ToString() == item.Value ? "selected" : null)">
+                            @item.Text
+                        </option>
                     }
                 </select>
             </div>
@@ -37,7 +39,9 @@
                     <option value="">Tất cả</option>
                     @foreach (var item in (SelectList)ViewData["Co_GiayID"])
                     {
-                        <option value="@item.Value">@item.Text</option>
+                        <option value="@item.Value" selected="@(ViewData["SelectedCoGiay"]?.ToString() == item.Value ? "selected" : null)">
+                            @item.Text
+                        </option>
                     }
                 </select>
             </div>
@@ -48,7 +52,9 @@
                     <option value="">Tất cả</option>
                     @foreach (var item in (SelectList)ViewData["Danh_MucID"])
                     {
-                        <option value="@item.Value">@item.Text</option>
+                        <option value="@item.Value" selected="@(ViewData["SelectedDanhMuc"]?.ToString() == item.Value ? "selected" : null)">
+                            @item.Text
+                        </option>
                     }
                 </select>
             </div>
@@ -60,7 +66,9 @@
                     <option value="">Tất cả</option>
                     @foreach (var item in (SelectList)ViewData["De_GiayID"])
                     {
-                        <option value="@item.Value">@item.Text</option>
+                        <option value="@item.Value" selected="@(ViewData["SelectedDeGiay"]?.ToString() == item.Value ? "selected" : null)">
+                            @item.Text
+                        </option>
                     }
                 </select>
             </div>
@@ -72,7 +80,9 @@
                     <option value="">Tất cả</option>
                     @foreach (var item in (SelectList)ViewData["Mui_GiayID"])
                     {
-                        <option value="@item.Value">@item.Text</option>
+                        <option value="@item.Value" selected="@(ViewData["SelectedMuiGiay"]?.ToString() == item.Value ? "selected" : null)">
+                            @item.Text
+                        </option>
                     }
                 </select>
             </div>
@@ -83,7 +93,9 @@
                     <option value="">Tất cả</option>
                     @foreach (var item in (SelectList)ViewData["Kieu_DangID"])
                     {
-                        <option value="@item.Value">@item.Text</option>
+                        <option value="@item.Value" selected="@(ViewData["SelectedKieuDang"]?.ToString() == item.Value ? "selected" : null)">
+                            @item.Text
+                        </option>
                     }
                 </select>
             </div>
@@ -93,14 +105,15 @@
                     <option value="">Tất cả</option>
                     @foreach (var item in (SelectList)ViewData["Loai_GiayID"])
                     {
-                        <option value="@item.Value">@item.Text</option>
+                        <option value="@item.Value" selected="@(ViewData["SelectedLoaiGiay"]?.ToString() == item.Value ? "selected" : null)">
+                            @item.Text
+                        </option>
                     }
                 </select>
             </div>
             
         </div>
         
-        <button type="button" class="btn btn-primary" id="applyFilter">Lọc</button>
     </div>
 </div>
 
@@ -234,7 +247,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editModalLabel">Chỉnh sửa sản phẩm</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="editForm">
@@ -334,29 +347,35 @@
 <script>
     $(document).ready(function () {
         window.applyFilter = function () {
+            console.log("📌 Hàm applyFilter đã chạy!");
+
             let filters = {};
 
             // Lấy dữ liệu từ các dropdown
             $('select.filter-select').each(function () {
                 let id = $(this).attr('id');
                 let value = $(this).val();
-
                 if (value && value !== '') {
                     let paramName = id.replace("filter", "").charAt(0).toLowerCase() + id.replace("filter", "").slice(1);
                     filters[paramName] = value;
                 }
             });
 
-            // Lấy giá trị tìm kiếm từ input
-            let searchValue = $('#searchProduct').val();
-            if (searchValue.trim() !== '') {
-                filters.tenSanPham = searchValue.trim();
+            // Lấy dữ liệu từ ô tìm kiếm
+            let searchValue = $('#searchProduct').val().trim();
+            if (searchValue !== '') {
+                filters.tenSanPham = searchValue;
             }
 
-            // Chuyển đổi dữ liệu thành query string
+            console.log("📌 Dữ liệu lọc gửi đi:", filters);
+
             let queryString = $.param(filters);
+            console.log("🔗 URL lọc: /Admin/SanPhamChiTiet/Filter?" + queryString);
+
             window.location.href = '/Admin/SanPhamChiTiet/Filter?' + queryString;
         };
+
+
 
         // Bắt sự kiện khi nhấn Enter trong ô tìm kiếm
         $('#searchProduct').keypress(function (e) {
@@ -416,6 +435,8 @@
             let chatlieu = $(this).data('chat-lieu');
             let imgUrl = $(this).data('img-url');
 
+            console.log("url anh:"+ imgUrl);
+
             // Đổ dữ liệu vào modal
             $('#editID').val(id);
             $('#editTen').val(ten);
@@ -424,15 +445,50 @@
             $('#editTrangThai').val(trangThai);
 
             // Hiển thị ảnh sản phẩm
+            // Hiển thị ảnh sản phẩm
             $('#editImages').empty();
-            if (imgUrl != null) {
-                let images = JSON.parse(imgUrl);
-                images.forEach(url => {
-                    $('#editImages').append(`<img src="${url}" class="m-1" width="80" height="80">`);
-                });
+
+            // Đảm bảo imgUrl là một chuỗi
+            if (typeof imgUrl !== "string") {
+                console.warn("⚠️ imgUrl không phải chuỗi, ép kiểu:", imgUrl);
+                imgUrl = String(imgUrl); // Chuyển đổi thành chuỗi
+            }
+
+            if (imgUrl && imgUrl.trim() !== "") {
+                let images = [];
+
+                try {
+                    // Kiểm tra nếu imgUrl là JSON hợp lệ (chuỗi chứa [])
+                    if (imgUrl.trim().startsWith("[") && imgUrl.trim().endsWith("]")) {
+                        images = JSON.parse(imgUrl);
+                    }
+                    // Nếu imgUrl là chuỗi URL phân tách bằng dấu ",", thì tách thành mảng
+                    else if (imgUrl.includes(",")) {
+                        images = imgUrl.split(",").map(url => url.trim());
+                    }
+                    // Nếu imgUrl chỉ chứa một URL, đưa vào mảng
+                    else {
+                        images = [imgUrl.trim()];
+                    }
+                } catch (e) {
+                    console.error("❌ Lỗi parse JSON imgUrl:", e, "👉 Giá trị nhận được:", imgUrl);
+                }
+
+                console.log("✅ Ảnh sau khi xử lý:", images);
+
+                // Hiển thị ảnh
+                if (images.length > 0) {
+                    images.forEach(url => {
+                        $('#editImages').append(`<img src="${url}" class="m-1 border rounded" width="80" height="80">`);
+                    });
+                } else {
+                    $('#editImages').append("<p>Không có ảnh</p>");
+                }
             } else {
                 $('#editImages').append("<p>Không có ảnh</p>");
             }
+
+
 
             // Hiển thị modal
             $('#editModal').modal('show');

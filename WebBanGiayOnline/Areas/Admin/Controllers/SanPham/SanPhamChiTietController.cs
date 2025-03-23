@@ -144,6 +144,17 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 
             Console.WriteLine($"🔍 Tổng sản phẩm tìm thấy: {result.Count}");
 
+            // Truyền giá trị đã chọn vào ViewData để giữ lại sau khi lọc
+            ViewData["SelectedChatLieu"] = chatLieu;
+            ViewData["SelectedCoGiay"] = coGiay;
+            ViewData["SelectedDanhMuc"] = danhMuc;
+            ViewData["SelectedDeGiay"] = deGiay;
+            ViewData["SelectedMuiGiay"] = muiGiay;
+            ViewData["SelectedKieuDang"] = kieuDang;
+            ViewData["SelectedLoaiGiay"] = loaiGiay;
+            ViewData["SelectedTenSanPham"] = tenSanPham;
+
+
             ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu", chatLieu);
             ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.ToList(), "ID", "ten_loai_co_giay", coGiay);
             ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.ToList(), "ID", "ten_danh_muc", danhMuc);
