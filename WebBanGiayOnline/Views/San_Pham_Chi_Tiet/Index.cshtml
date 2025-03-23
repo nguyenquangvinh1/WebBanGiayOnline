@@ -34,6 +34,34 @@
 
     <!-- Template Stylesheet -->
     <link href="~/css/style.css" rel="stylesheet">
+<style>
+        .fruite-item {
+            height: 100%; /* Đảm bảo tất cả thẻ sản phẩm có cùng chiều cao */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .fruite-img img {
+            width: 100%;
+            height: 250px; /* Định chiều cao cố định cho ảnh */
+            object-fit: cover; /* Cắt ảnh để vừa khung, không bị méo */
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .p-4 {
+            flex-grow: 1; /* Đảm bảo nội dung mở rộng theo chiều cao */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .d-flex.justify-content-between {
+            margin-top: auto; /* Đẩy phần giá và nút thêm vào giỏ hàng xuống dưới */
+        }
+
+</style>
 </head>
 
 <body>
@@ -321,7 +349,7 @@
                                                 <h4>@item.TenHH</h4>
                                                 <p>@item.MoTa</p>
                                                 <div class="d-flex justify-content-between flex-lg-wrap">
-                                                    <p class="text-dark fs-5 fw-bold mb-0">@item.DonGia.ToString("#,##0 VNĐ")</p>
+                                                    <p class="text-dark fs-5 fw-bold mb-0">@item.DonGia?.ToString("#,##0 VNĐ")</p>
                                                     <a asp-controller="Cart" asp-action="AddCart" asp-route-id="@item.ID"  class="btn border border-secondary rounded-pill px-3 text-primary"><i class="fa fa-shopping-bag me-2 text-primary"></i> Thêm vào giỏ hàng</a>
                                                 </div>
                                             </div>

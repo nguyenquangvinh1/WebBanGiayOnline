@@ -12,8 +12,8 @@ using WebBanGiay.Data;
 namespace WebBanGiay.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250318134211_datn")]
-    partial class datn
+    [Migration("20250322055607_datn1")]
+    partial class datn1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -328,7 +328,7 @@ namespace WebBanGiay.Migrations
                     b.Property<int>("so_luong")
                         .HasColumnType("int");
 
-                    b.Property<double>("thanh_tien")
+                    b.Property<double?>("thanh_tien")
                         .HasColumnType("float");
 
                     b.Property<int?>("trang_thai")
@@ -682,6 +682,34 @@ namespace WebBanGiay.Migrations
                     b.ToTable("san_Pham_Chi_Tiets");
                 });
 
+            modelBuilder.Entity("ClssLib.ShippingModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<double>("Gia")
+                        .HasColumnType("float");
+
+                    b.Property<string>("huyen")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("tinh")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("xa")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("shippingModels");
+                });
+
             modelBuilder.Entity("ClssLib.Tai_Khoan", b =>
                 {
                     b.Property<Guid>("ID")
@@ -871,6 +899,29 @@ namespace WebBanGiay.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("vai_Tros");
+
+                    b.HasData(
+                        new
+                        {
+                            ID = new Guid("416c4a91-17ae-49f6-ac27-646ceda35ad9"),
+                            ngay_tao = new DateTime(2025, 3, 22, 12, 56, 3, 851, DateTimeKind.Local).AddTicks(9266),
+                            ten_vai_tro = "Admin",
+                            trang_thai = 1
+                        },
+                        new
+                        {
+                            ID = new Guid("d36e64ea-416c-4d86-bf06-b0e86e31db44"),
+                            ngay_tao = new DateTime(2025, 3, 22, 12, 56, 3, 851, DateTimeKind.Local).AddTicks(9295),
+                            ten_vai_tro = "Nhân Viên",
+                            trang_thai = 1
+                        },
+                        new
+                        {
+                            ID = new Guid("4783c717-c9d0-4d0f-b05a-3e81aa9d92bd"),
+                            ngay_tao = new DateTime(2025, 3, 22, 12, 56, 3, 851, DateTimeKind.Local).AddTicks(9297),
+                            ten_vai_tro = "Khách hàng",
+                            trang_thai = 1
+                        });
                 });
 
             modelBuilder.Entity("ClssLib.Anh_San_Pham", b =>

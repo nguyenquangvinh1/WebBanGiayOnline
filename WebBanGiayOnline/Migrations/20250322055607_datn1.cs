@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace WebBanGiay.Migrations
 {
     /// <inheritdoc />
-    public partial class datn : Migration
+    public partial class datn1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -156,6 +158,22 @@ namespace WebBanGiay.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_phuong_Thuc_Thanh_Toans", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "shippingModels",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Gia = table.Column<double>(type: "float", nullable: false),
+                    tinh = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    huyen = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    xa = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_shippingModels", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -564,7 +582,7 @@ namespace WebBanGiay.Migrations
                     ma = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     gia = table.Column<double>(type: "float", nullable: false),
                     trang_thai = table.Column<int>(type: "int", nullable: true),
-                    thanh_tien = table.Column<double>(type: "float", nullable: false),
+                    thanh_tien = table.Column<double>(type: "float", nullable: true),
                     so_luong = table.Column<int>(type: "int", nullable: false),
                     ngay_tao = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ngay_sua = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -644,6 +662,16 @@ namespace WebBanGiay.Migrations
                         principalTable: "san_Pham_Chi_Tiets",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "vai_Tros",
+                columns: new[] { "ID", "ngay_sua", "ngay_tao", "ten_vai_tro", "trang_thai" },
+                values: new object[,]
+                {
+                    { new Guid("416c4a91-17ae-49f6-ac27-646ceda35ad9"), null, new DateTime(2025, 3, 22, 12, 56, 3, 851, DateTimeKind.Local).AddTicks(9266), "Admin", 1 },
+                    { new Guid("4783c717-c9d0-4d0f-b05a-3e81aa9d92bd"), null, new DateTime(2025, 3, 22, 12, 56, 3, 851, DateTimeKind.Local).AddTicks(9297), "Khách hàng", 1 },
+                    { new Guid("d36e64ea-416c-4d86-bf06-b0e86e31db44"), null, new DateTime(2025, 3, 22, 12, 56, 3, 851, DateTimeKind.Local).AddTicks(9295), "Nhân Viên", 1 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -849,6 +877,9 @@ namespace WebBanGiay.Migrations
 
             migrationBuilder.DropTable(
                 name: "phieu_Giam_Gia_Tai_Khoans");
+
+            migrationBuilder.DropTable(
+                name: "shippingModels");
 
             migrationBuilder.DropTable(
                 name: "tai_Khoan_Hoa_Dons");
