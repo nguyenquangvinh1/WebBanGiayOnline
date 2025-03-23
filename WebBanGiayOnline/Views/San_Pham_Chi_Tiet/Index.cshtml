@@ -152,48 +152,82 @@
                                     <div class="mb-3">
                                         <h4>Categories</h4>
                                         <ul class="list-unstyled fruite-categorie">
+                                            <li>
+                                                <label for="filterChatLieu">Chất liệu:</label>
+                                                <select id="filterChatLieu" class="form-control filter-select">
+                                                    <option value="">Tất cả</option>
+                                                    @foreach (var item in (SelectList)ViewData["Chat_LieuID"])
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
 
-                                            <li>
-                                                <div class=" dropdown">
-                                                    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        Chất Liệu
-                                                        </a>
-                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                                        @foreach (var item in (SelectList)ViewData["Chat_LieuID"])
-                                                        {
-                                                            <a href="#" class="dropdown-item" data-chat-lieu="@item.Value">@item.Text</a>
-                                                            <li><a class="dropdown-item" href="#">Action</a></li>
-                                                        }
-                                                    </ul>
-                                                </div>
-                                                <div class="d-flex justify-content-between fruite-name">
-                                                    <a href="#"><i class="fas fa-apple-alt me-2"></i>Apples</a>
-                                                    <span>(3)</span>
-                                                </div>
                                             </li>
                                             <li>
-                                                <div class="d-flex justify-content-between fruite-name">
-                                                    <a href="#"><i class="fas fa-apple-alt me-2"></i>Oranges</a>
-                                                    <span>(5)</span>
-                                                </div>
+
+                                                <label for="filterCoGiay">Cổ giày:</label>
+                                                <select id="filterCoGiay" class="form-control filter-select">
+                                                    <option value="">Tất cả</option>
+                                                    @foreach (var item in (SelectList)ViewData["Co_GiayID"])
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
                                             </li>
                                             <li>
-                                                <div class="d-flex justify-content-between fruite-name">
-                                                    <a href="#"><i class="fas fa-apple-alt me-2"></i>Strawbery</a>
-                                                    <span>(2)</span>
-                                                </div>
+                                                <label for="filterDanhMuc">Danh mục:</label>
+                                                <select id="filterDanhMuc" class="form-control filter-select">
+                                                    <option value="">Tất cả</option>
+                                                    @foreach (var item in (SelectList)ViewData["Danh_MucID"])
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
                                             </li>
                                             <li>
-                                                <div class="d-flex justify-content-between fruite-name">
-                                                    <a href="#"><i class="fas fa-apple-alt me-2"></i>Banana</a>
-                                                    <span>(8)</span>
-                                                </div>
+                                                <label for="filterDeGiay">Đế giày:</label>
+                                                <select id="filterDeGiay" class="form-control filter-select">
+                                                    <option value="">Tất cả</option>
+                                                    @foreach (var item in (SelectList)ViewData["De_GiayID"])
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
                                             </li>
                                             <li>
-                                                <div class="d-flex justify-content-between fruite-name">
-                                                    <a href="#"><i class="fas fa-apple-alt me-2"></i>Pumpkin</a>
-                                                    <span>(5)</span>
-                                                </div>
+
+                                                <label for="filterMuiGiay">Mũi giày:</label>
+                                                <select id="filterMuiGiay" class="form-control filter-select">
+                                                    <option value="">Tất cả</option>
+                                                    @foreach (var item in (SelectList)ViewData["Mui_GiayID"])
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </li>
+                                            <li>
+
+
+                                                <label for="filterKieuDang">Kiểu dáng:</label>
+                                                <select id="filterKieuDang" class="form-control filter-select">
+                                                    <option value="">Tất cả</option>
+                                                    @foreach (var item in (SelectList)ViewData["Kieu_DangID"])
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </li>
+                                            <li>
+
+
+                                                <label for="filterLoaiGiay">Loại giày:</label>
+                                                <select id="filterLoaiGiay" class="form-control filter-select">
+                                                    <option value="">Tất cả</option>
+                                                    @foreach (var item in (SelectList)ViewData["Loai_GiayID"])
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
                                             </li>
                                         </ul>
                                     </div>
@@ -453,6 +487,34 @@
 
     <!-- Template Javascript -->
     <script src="~/js/main.js"></script>
+    <script>
+        $(document).ready(function () {
+            window.applyFilter = function () {
+            console.log("📌 Hàm applyFilter đã chạy!");
+
+            let filters = {};
+
+            $('select.filter-select').each(function () {
+                let id = $(this).attr('id');
+                let value = $(this).val();
+                console.log(`🎯 Lọc ID: ${id}, Giá trị: ${value}`);
+
+                if (value && value !== '') {
+                    let paramName = id.replace("filter", "").charAt(0).toLowerCase() + id.replace("filter", "").slice(1);
+                    filters[paramName] = value;
+                }
+            });
+
+            console.log("📌 Dữ liệu lọc gửi đi:", filters);
+
+            let queryString = $.param(filters);
+            console.log("🔗 URL lọc: /Admin/SanPham/Filter?" + queryString);
+
+
+            window.location.href = '/Admin/SanPham/Filter?' + queryString;
+        };
+            });
+    </script>
 </body>
 
 </html>
