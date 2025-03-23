@@ -158,7 +158,9 @@
                                                     <option value="">Tất cả</option>
                                                     @foreach (var item in (SelectList)ViewData["Chat_LieuID"])
                                                     {
-                                                        <option value="@item.Value">@item.Text</option>
+                                                        <option value="@item.Value" selected="@(ViewData["SelectedChatLieu"]?.ToString() == item.Value ? "selected" : null)">
+                                                            @item.Text
+                                                        </option>
                                                     }
                                                 </select>
 
@@ -170,7 +172,9 @@
                                                     <option value="">Tất cả</option>
                                                     @foreach (var item in (SelectList)ViewData["Co_GiayID"])
                                                     {
-                                                        <option value="@item.Value">@item.Text</option>
+                                                        <option value="@item.Value" selected="@(ViewData["SelectedCoGiay"]?.ToString() == item.Value ? "selected" : null)">
+                                                            @item.Text
+                                                        </option>
                                                     }
                                                 </select>
                                             </li>
@@ -180,7 +184,9 @@
                                                     <option value="">Tất cả</option>
                                                     @foreach (var item in (SelectList)ViewData["Danh_MucID"])
                                                     {
-                                                        <option value="@item.Value">@item.Text</option>
+                                                        <option value="@item.Value" selected="@(ViewData["SelectedDanhMuc"]?.ToString() == item.Value ? "selected" : null)">
+                                                            @item.Text
+                                                        </option>
                                                     }
                                                 </select>
                                             </li>
@@ -190,7 +196,9 @@
                                                     <option value="">Tất cả</option>
                                                     @foreach (var item in (SelectList)ViewData["De_GiayID"])
                                                     {
-                                                        <option value="@item.Value">@item.Text</option>
+                                                        <option value="@item.Value" selected="@(ViewData["SelectedDeGiay"]?.ToString() == item.Value ? "selected" : null)">
+                                                            @item.Text
+                                                        </option>
                                                     }
                                                 </select>
                                             </li>
@@ -201,7 +209,9 @@
                                                     <option value="">Tất cả</option>
                                                     @foreach (var item in (SelectList)ViewData["Mui_GiayID"])
                                                     {
-                                                        <option value="@item.Value">@item.Text</option>
+                                                        <option value="@item.Value" selected="@(ViewData["SelectedMuiGiay"]?.ToString() == item.Value ? "selected" : null)">
+                                                            @item.Text
+                                                        </option>
                                                     }
                                                 </select>
                                             </li>
@@ -213,7 +223,9 @@
                                                     <option value="">Tất cả</option>
                                                     @foreach (var item in (SelectList)ViewData["Kieu_DangID"])
                                                     {
-                                                        <option value="@item.Value">@item.Text</option>
+                                                        <option value="@item.Value" selected="@(ViewData["SelectedKieuDang"]?.ToString() == item.Value ? "selected" : null)">
+                                                            @item.Text
+                                                        </option>
                                                     }
                                                 </select>
                                             </li>
@@ -225,7 +237,9 @@
                                                     <option value="">Tất cả</option>
                                                     @foreach (var item in (SelectList)ViewData["Loai_GiayID"])
                                                     {
-                                                        <option value="@item.Value">@item.Text</option>
+                                                        <option value="@item.Value" selected="@(ViewData["SelectedLoaiGiay"]?.ToString() == item.Value ? "selected" : null)">
+                                                            @item.Text
+                                                        </option>
                                                     }
                                                 </select>
                                             </li>
@@ -363,14 +377,37 @@
 
                                 <div class="col-12">
                                     <div class="pagination d-flex justify-content-center mt-5">
-                                        <a href="#" class="rounded">&laquo;</a>
-                                        <a href="#" class="active rounded">1</a>
-                                        <a href="#" class="rounded">2</a>
-                                        <a href="#" class="rounded">3</a>
-                                        <a href="#" class="rounded">4</a>
-                                        <a href="#" class="rounded">5</a>
-                                        <a href="#" class="rounded">6</a>
-                                        <a href="#" class="rounded">&raquo;</a>
+                                        <nav>
+                                            <ul class="pagination d-flex justify-content-center mt-5">
+                                                @{
+                                                    int totalItems = (int)ViewData["TotalItems"];
+                                                    int pageNumber = (int)ViewData["PageNumber"];
+                                                    int pageSize = (int)ViewData["PageSize"];
+                                                    int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+                                                }
+
+                                                @if (pageNumber > 1)
+                                                {
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="?pageNumber=@(pageNumber - 1)&pageSize=12">Trước</a>
+                                                    </li>
+                                                }
+
+                                                @for (int i = 1; i <= totalPages; i++)
+                                                {
+                                                    <li class="page-item @(i == pageNumber ? "active" : "")">
+                                                        <a class="page-link" href="?pageNumber=@i&pageSize=12">@i</a>
+                                                    </li>
+                                                }
+
+                                                @if (pageNumber < totalPages)
+                                                {
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="?pageNumber=@(pageNumber + 1)&pageSize=12">Sau</a>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </nav>
                                     </div>
                                 </div>
                             </div>
@@ -489,11 +526,13 @@
     <script src="~/js/main.js"></script>
     <script>
         $(document).ready(function () {
-            window.applyFilter = function () {
+                 // Hàm lọc sản phẩm
+        window.applyFilter = function () {
             console.log("📌 Hàm applyFilter đã chạy!");
 
             let filters = {};
 
+            // Lấy dữ liệu từ tất cả select box
             $('select.filter-select').each(function () {
                 let id = $(this).attr('id');
                 let value = $(this).val();
@@ -508,11 +547,25 @@
             console.log("📌 Dữ liệu lọc gửi đi:", filters);
 
             let queryString = $.param(filters);
-            console.log("🔗 URL lọc: /Admin/SanPham/Filter?" + queryString);
+            console.log("🔗 URL lọc: /San_Pham_Chi_Tiet/Filter?" + queryString);
 
-
-            window.location.href = '/Admin/SanPham/Filter?' + queryString;
+            window.location.href = '/San_Pham_Chi_Tiet/Filter?' + queryString;
         };
+             // Lọc ngay khi chọn dropdown
+        $('select.filter-select').change(function () {
+            applyFilter();
+        });
+
+        // Giữ lại giá trị đã chọn sau khi tải trang
+        $('select.filter-select').each(function () {
+            let id = $(this).attr('id');
+            let urlParams = new URLSearchParams(window.location.search);
+            let selectedValue = urlParams.get(id.replace("filter", "").charAt(0).toLowerCase() + id.replace("filter", "").slice(1));
+
+            if (selectedValue) {
+                $(this).val(selectedValue);
+            }
+        });
             });
     </script>
 </body>

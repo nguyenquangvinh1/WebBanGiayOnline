@@ -22,66 +22,35 @@ namespace WebBanGiay.Controllers
         }
 
         // GET: San_Pham_Chi_Tiet
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 12)
         {
             var sanPham = _context.san_Phams
-                .Include(x => x.Loai_Giay)
                 .Where(sp => sp.San_Pham_Chi_Tiets.Any(ct => ct.so_luong > 0)) // Chỉ lấy sản phẩm có số lượng > 0
                 .AsQueryable();
-
 
             var result = sanPham.Select(x => new HangHoaVM
             {
                 ID = x.ID,
                 TenHH = x.ten_san_pham,
-                DonGia = _context.san_Pham_Chi_Tiets.Where(z => z.San_PhamID == x.ID).Select(x => x.gia).Min(),
+                DonGia = _context.san_Pham_Chi_Tiets
+                    .Where(z => z.San_PhamID == x.ID)
+                    .Select(x => x.gia)
+                    .Min(), // Nếu không có giá, trả về 0
                 MoTa = x.mo_ta ?? "",
-                Hinh = _context.anh_San_Phams.FirstOrDefault(z => z.San_PhamID == x.ID).anh_url,
+                Hinh = _context.anh_San_Phams.FirstOrDefault(z => z.San_PhamID == x.ID).anh_url ?? "/img/default.png",
                 TenLoai = x.Loai_Giay.ten_loai_giay
-
             });
-            return View(result);
-        }
-        [HttpGet]
-        public IActionResult Filter(string chatLieu, string coGiay, string danhMuc, string deGiay, string muiGiay, string kieuDang, string loaiGiay)
-        {
-            Console.WriteLine($"📌 Nhận giá trị lọc: chatLieu={chatLieu}, coGiay={coGiay}, danhMuc={danhMuc}, deGiay={deGiay}, muiGiay={muiGiay}, kieuDang={kieuDang}, loaiGiay={loaiGiay}");
 
-            var query = _context.san_Phams.AsQueryable();
+            // Đếm tổng số sản phẩm
+            int totalItems = await result.CountAsync();
+            var paginatedResult = await result
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
 
-            if (!string.IsNullOrEmpty(chatLieu))
-                query = query.Where(sp => sp.Chat_LieuID.ToString() == chatLieu);
-
-            if (!string.IsNullOrEmpty(coGiay))
-                query = query.Where(sp => sp.Co_GiayID.ToString() == coGiay);
-
-            if (!string.IsNullOrEmpty(danhMuc))
-                query = query.Where(sp => sp.Danh_MucID.ToString() == danhMuc);
-
-            if (!string.IsNullOrEmpty(deGiay))
-                query = query.Where(sp => sp.De_GiayID.ToString() == deGiay);
-
-            if (!string.IsNullOrEmpty(muiGiay))
-                query = query.Where(sp => sp.Mui_GiayID.ToString() == muiGiay);
-
-            if (!string.IsNullOrEmpty(kieuDang))
-                query = query.Where(sp => sp.Kieu_DangID.ToString() == kieuDang);
-
-            if (!string.IsNullOrEmpty(loaiGiay))
-                query = query.Where(sp => sp.Loai_GiayID.ToString() == loaiGiay);
-
-            var result = query
-                .Include(x => x.Chat_Lieu)
-                .Include(x => x.Co_Giay)
-                .Include(x => x.Danh_Muc)
-                .Include(x => x.De_Giay)
-                .Include(x => x.Kieu_Dang)
-                .Include(x => x.Loai_Giay)
-                .Include(x => x.Mui_Giay)
-                .AsNoTracking()
-                .ToList();
-
-            Console.WriteLine($"🔍 Tổng sản phẩm tìm thấy: {result.Count}");
+            ViewData["TotalItems"] = totalItems;
+            ViewData["PageNumber"] = pageNumber;
+            ViewData["PageSize"] = pageSize;
 
             ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu");
             ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.ToList(), "ID", "ten_loai_co_giay");
@@ -91,8 +60,89 @@ namespace WebBanGiay.Controllers
             ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.ToList(), "ID", "ten_kieu_dang");
             ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.ToList(), "ID", "ten_loai_giay");
 
-            return View("Index", result); // Trả về danh sách đã lọc
+            return View(paginatedResult);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Filter(
+    string chatLieu, string coGiay, string danhMuc, string deGiay,
+    string muiGiay, string kieuDang, string loaiGiay,
+    int pageNumber = 1, int pageSize = 12)
+        {
+            Console.WriteLine($"📌 Nhận giá trị lọc: chatLieu={chatLieu}, coGiay={coGiay}, danhMuc={danhMuc}, deGiay={deGiay}, muiGiay={muiGiay}, kieuDang={kieuDang}, loaiGiay={loaiGiay}");
+
+            var query = _context.san_Phams
+                .Where(sp => sp.San_Pham_Chi_Tiets.Any(ct => ct.so_luong > 0)) // Chỉ lấy sản phẩm có số lượng > 0
+                .AsQueryable();
+
+            // Áp dụng bộ lọc
+            if (!string.IsNullOrEmpty(chatLieu))
+                query = query.Where(sp => sp.Chat_LieuID.ToString() == chatLieu);
+            if (!string.IsNullOrEmpty(coGiay))
+                query = query.Where(sp => sp.Co_GiayID.ToString() == coGiay);
+            if (!string.IsNullOrEmpty(danhMuc))
+                query = query.Where(sp => sp.Danh_MucID.ToString() == danhMuc);
+            if (!string.IsNullOrEmpty(deGiay))
+                query = query.Where(sp => sp.De_GiayID.ToString() == deGiay);
+            if (!string.IsNullOrEmpty(muiGiay))
+                query = query.Where(sp => sp.Mui_GiayID.ToString() == muiGiay);
+            if (!string.IsNullOrEmpty(kieuDang))
+                query = query.Where(sp => sp.Kieu_DangID.ToString() == kieuDang);
+            if (!string.IsNullOrEmpty(loaiGiay))
+                query = query.Where(sp => sp.Loai_GiayID.ToString() == loaiGiay);
+
+            // Truy vấn dữ liệu sản phẩm
+            var result = query.Select(x => new HangHoaVM
+            {
+                ID = x.ID,
+                TenHH = x.ten_san_pham,
+                DonGia = _context.san_Pham_Chi_Tiets
+                    .Where(z => z.San_PhamID == x.ID)
+                    .Select(x => x.gia)
+                    .Min() , // Nếu không có giá, trả về 0
+                MoTa = x.mo_ta ?? "",
+                Hinh = _context.anh_San_Phams
+                    .Where(z => z.San_PhamID == x.ID)
+                    .Select(z => z.anh_url)
+                    .FirstOrDefault() ?? "/img/default.png",
+                TenLoai = x.Loai_Giay.ten_loai_giay
+            });
+
+            // Đếm tổng số sản phẩm và áp dụng phân trang
+            int totalItems = await result.CountAsync();
+            var paginatedResult = await result
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            Console.WriteLine($"🔍 Tổng sản phẩm tìm thấy: {totalItems}");
+
+            // Lưu thông tin phân trang
+            ViewData["TotalItems"] = totalItems;
+            ViewData["PageNumber"] = pageNumber;
+            ViewData["PageSize"] = pageSize;
+
+            // Lưu giá trị bộ lọc vào ViewData để giữ lại khi tải trang
+            ViewData["SelectedChatLieu"] = chatLieu;
+            ViewData["SelectedCoGiay"] = coGiay;
+            ViewData["SelectedDanhMuc"] = danhMuc;
+            ViewData["SelectedDeGiay"] = deGiay;
+            ViewData["SelectedMuiGiay"] = muiGiay;
+            ViewData["SelectedKieuDang"] = kieuDang;
+            ViewData["SelectedLoaiGiay"] = loaiGiay;
+
+            // Truyền dữ liệu dropdown
+            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu", chatLieu);
+            ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.ToList(), "ID", "ten_loai_co_giay", coGiay);
+            ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.ToList(), "ID", "ten_danh_muc", danhMuc);
+            ViewData["De_GiayID"] = new SelectList(_context.de_Giays.ToList(), "ID", "ten_de_giay", deGiay);
+            ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.ToList(), "ID", "ten_mui_giay", muiGiay);
+            ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.ToList(), "ID", "ten_kieu_dang", kieuDang);
+            ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.ToList(), "ID", "ten_loai_giay", loaiGiay);
+
+            return View("Index", paginatedResult); // Trả về danh sách đã lọc
+        }
+
 
         // GET: San_Pham_Chi_Tiet/Details/5
         public async Task<IActionResult> Details(Guid? id)
