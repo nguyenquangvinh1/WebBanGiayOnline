@@ -24,44 +24,23 @@ namespace WebBanGiay.Controllers
         // GET: San_Pham_Chi_Tiet
         public async Task<IActionResult> Index()
         {
-            var sanPham = await _context.san_Phams
+            var sanPham = _context.san_Phams
                 .Include(x => x.Loai_Giay)
-                .AsNoTracking().ToListAsync();
-            var ViewMod = new List<HangHoaVM>();
-            foreach (var item in sanPham)
+                .Where(sp => sp.San_Pham_Chi_Tiets.Any(ct => ct.so_luong > 0)) // Chỉ lấy sản phẩm có số lượng > 0
+                .AsQueryable();
+
+
+            var result = sanPham.Select(x => new HangHoaVM
             {
-                // Lấy ảnh sản phẩm (nếu không có, dùng ảnh mặc định)
-                var anhSanPham = _context.anh_San_Phams.FirstOrDefault(x => x.San_PhamID == item.ID);
-                string imgUrl = anhSanPham?.anh_url ?? "img/default.png";
+                ID = x.ID,
+                TenHH = x.ten_san_pham,
+                DonGia = _context.san_Pham_Chi_Tiets.Where(z => z.San_PhamID == x.ID).Select(x => x.gia).Min(),
+                MoTa = x.mo_ta ?? "",
+                Hinh = _context.anh_San_Phams.FirstOrDefault(z => z.San_PhamID == x.ID).anh_url,
+                TenLoai = x.Loai_Giay.ten_loai_giay
 
-
-
-                // Lấy giá cao nhất (nếu không có, mặc định = 0)
-                var chiTietSanPham = _context.san_Pham_Chi_Tiets
-                    .Where(z => z.San_PhamID == item.ID)
-                    .OrderByDescending(x => x.gia)
-                    .FirstOrDefault();
-
-                double gia = chiTietSanPham?.gia ?? 0;
-                HangHoaVM hang = new HangHoaVM()
-                {
-                    ID = item.ID,
-                    TenHH = item.ten_san_pham,
-                    DonGia = gia,
-                    MoTa = item.mo_ta,
-                    Hinh = imgUrl ,
-                    TenLoai = item.Loai_Giay.ten_loai_giay
-                };
-                ViewMod.Add(hang);
-            }
-            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu");
-            ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.ToList(), "ID", "ten_loai_co_giay");
-            ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.ToList(), "ID", "ten_danh_muc");
-            ViewData["De_GiayID"] = new SelectList(_context.de_Giays.ToList(), "ID", "ten_de_giay");
-            ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.ToList(), "ID", "ten_mui_giay");
-            ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.ToList(), "ID", "ten_kieu_dang");
-            ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.ToList(), "ID", "ten_loai_giay");
-            return View(ViewMod);
+            });
+            return View(result);
         }
         [HttpGet]
         public IActionResult Filter(string chatLieu, string coGiay, string danhMuc, string deGiay, string muiGiay, string kieuDang, string loaiGiay)
@@ -119,7 +98,7 @@ namespace WebBanGiay.Controllers
         public async Task<IActionResult> Details(Guid? id)
         {
             var data1 = _context.san_Phams.Include(x => x.Loai_Giay).FirstOrDefault(x => x.ID == id);
-            if(data1 == null)
+            if (data1 == null)
             {
                 TempData["Message"] = $"Không tìm thấy {id}";
                 return Redirect("/404");
@@ -131,13 +110,12 @@ namespace WebBanGiay.Controllers
                 DonGia = _context.san_Pham_Chi_Tiets.Where(z => z.San_PhamID == data1.ID).Select(x => x.gia).Min(),
                 MoTa = data1.mo_ta,
                 SoLuongTon = _context.san_Pham_Chi_Tiets.Where(z => z.San_PhamID == data1.ID).Select(x => x.so_luong).Min(),
-                TenLoai = data1.Loai_Giay.ten_loai_giay,
+               
                 ChiTiet = data1.mo_ta
 
             };
             return View(result);
         }
-
         // GET: San_Pham_Chi_Tiet/Create
         public IActionResult Create()
         {

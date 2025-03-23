@@ -11,7 +11,7 @@ namespace WebBanGiay.Data
             {
                 new Vai_Tro{ID= Guid.NewGuid(),ten_vai_tro = "Admin",trang_thai = 1,ngay_tao = DateTime.Now},
                 new Vai_Tro{ID= Guid.NewGuid(),ten_vai_tro = "Nhân Viên",trang_thai = 1,ngay_tao = DateTime.Now},
-                new Vai_Tro{ID= Guid.NewGuid(),ten_vai_tro = "Khách Hàng",trang_thai = 1,ngay_tao = DateTime.Now}
+                new Vai_Tro{ID= Guid.NewGuid(),ten_vai_tro = "Khách hàng",trang_thai = 1,ngay_tao = DateTime.Now}
             };
             builder.Entity<Vai_Tro>().HasData(vai_Tros);
         }

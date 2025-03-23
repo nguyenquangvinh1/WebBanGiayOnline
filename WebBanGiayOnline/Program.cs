@@ -47,6 +47,8 @@ builder.Services.AddSingleton<IVnPayService, VnPayService>();
 builder.Services.Configure<MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
 builder.Services.AddScoped<IMomoService, MomoService>();
 
+builder.Services.AddScoped<EmailService>();
+
 
 var app = builder.Build();
 

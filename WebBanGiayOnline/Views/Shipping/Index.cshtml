@@ -1,0 +1,104 @@
+﻿@model WebBanGiay.Models.ViewModel.Shipping
+
+@{
+    ViewData["Title"] = "Shipping";
+}
+
+<div class="col-md-9">
+  
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label>Tỉnh thành phố</label>
+            <select class="css_select" id="tinh" name="tinh " title="Chọn Tỉnh Thành">
+                <option value="0"> Tỉnh thành </option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Tỉnh thành phố</label>
+            <select class="css_select" id="huyen" name="huyen " title="Chọn Quận Huyện">
+                <option value="0"> Quận Huyện</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Tỉnh thành phố</label>
+            <select class="css_select" id="phuong" name="xa " title="Chọn Xã Phường">
+                <option value="0"> Xã Phường </option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Nhập gia</label>
+            <input  asp-for="Gia" id="price-shipping" class="form-control" />
+            
+        </div>
+
+
+        <div class="form-group">
+        <button type="button" class="btn btn-primary btn-add-shipping">Create</button>
+        </div>
+   
+</div>
+@section Scripts{
+    <script>
+        $(".btn-add-shipping").click(function(){
+            var tinh = $("#tinh").find('option:selected').text();
+            var huyen = $("#huyen").find('option:selected').text();
+            var xa = $("#phuong").find('option:selected').text();
+            var gia = $("#price-shipping").val();
+
+            if(tinh == '' || huyen == '' || xa == '' || gia == '' ){
+                Swal.fire("K ĐỂ TRỐNG");
+            }else{
+                $.ajax({
+                    type: "POST",
+                    url :"@Url.Action("StoreShipping", "Shipping")",
+                    data:{tinh:tinh,huyen:huyen ,xa:xa,gia:gia},
+                    success:function(result){
+                        if(result.success){
+                            alert("K ĐỂ TRỐNG 1");
+                        }else if(result.duplicate){
+                            alert("K ĐỂ TRỐNG 2");
+                        }
+                    }
+            });
+        }
+        })
+
+        $(document).ready(function() {
+            //Lấy tỉnh thành
+            $.getJSON('https://esgoo.net/api-tinhthanh/1/0.htm',function(data_tinh){
+                if(data_tinh.error==0){
+                   $.each(data_tinh.data, function (key_tinh,val_tinh) {
+                      $("#tinh").append('<option value="'+val_tinh.id+'">'+val_tinh.full_name+'</option>');
+                   });
+                   $("#tinh").change(function(e){
+                        var idtinh=$(this).val();
+                        //Lấy quận huyện
+                        $.getJSON('https://esgoo.net/api-tinhthanh/2/'+idtinh+'.htm',function(data_quan){
+                            if(data_quan.error==0){
+                               $("#huyen").html('<option value="0">Quận Huyện</option>');
+                               $("#phuong").html('<option value="0">Phường Xã</option>');
+                               $.each(data_quan.data, function (key_quan,val_quan) {
+                                  $("#huyen").append('<option value="'+val_quan.id+'">'+val_quan.full_name+'</option>');
+                               });
+                               //Lấy phường xã
+                               $("#huyen").change(function(e){
+                                    var idquan=$(this).val();
+                                    $.getJSON('https://esgoo.net/api-tinhthanh/3/'+idquan+'.htm',function(data_phuong){
+                                        if(data_phuong.error==0){
+                                           $("#phuong").html('<option value="0">Phường Xã</option>');
+                                           $.each(data_phuong.data, function (key_phuong,val_phuong) {
+                                              $("#phuong").append('<option value="'+val_phuong.id+'">'+val_phuong.full_name+'</option>');
+                                           });
+                                        }
+                                    });
+                               });
+
+                            }
+                        });
+                   });
+
+                }
+            });
+         });
+    </script>
+}

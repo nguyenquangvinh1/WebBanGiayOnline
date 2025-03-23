@@ -29,7 +29,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
         public IActionResult Index()
         {
             var tai_Khoans = _context.tai_Khoans
-                .Where(t => t.Vai_Tro.ten_vai_tro == "Khách Hàng")
+                .Where(t => t.Vai_Tro.ten_vai_tro == "Khách hàng")
                 .Include(tk => tk.Dia_Chi)
                 .OrderByDescending(tk => tk.ngay_tao) // Sắp xếp theo ngày tạo mới nhất
                 .ToList()
@@ -60,7 +60,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            var Khachhang = _context.vai_Tros.FirstOrDefault(x => x.ten_vai_tro == "Khách Hàng");
+            var Khachhang = _context.vai_Tros.FirstOrDefault(x => x.ten_vai_tro == "Khách hàng");
             var kh = await _context.tai_Khoans.Where(x => x.Vai_TroID == Khachhang.ID)
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (kh == null)
@@ -102,12 +102,12 @@ namespace WebBanGiay.Areas.Admin.Controllers
             if (ModelState.IsValid)
             {
 
-                // Truy vấn vai trò "Khách Hàng" trong cơ sở dữ liệu
+                // Truy vấn vai trò "Khách hàng" trong cơ sở dữ liệu
                 var vaiTro = await _context.vai_Tros.FirstOrDefaultAsync(v => v.ten_vai_tro == "Khách hàng");
 
                 if (vaiTro == null)
                 {
-                    ModelState.AddModelError("", "Vai trò Khách Hàng không tồn tại.");
+                    ModelState.AddModelError("", "Vai trò Khách hàng không tồn tại.");
                     return View(model);
                 }
 
@@ -331,7 +331,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
             if (customer == null)
                 return Json(new { success = false, message = "Khách hàng không tồn tại." });
 
-            // Kiểm tra địa chỉ có thuộc khách hàng không
+            // Kiểm tra địa chỉ có thuộc Khách hàng không
             var selectedAddress = customer.Dia_Chi.FirstOrDefault(a => a.ID == addressId);
             if (selectedAddress == null)
                 return Json(new { success = false, message = "Địa chỉ không tồn tại." });
@@ -403,7 +403,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 context.vai_Tros.Add(new Vai_Tro
                 {
                     ID = Guid.NewGuid(),
-                    ten_vai_tro = "Khách Hàng"
+                    ten_vai_tro = "Khách hàng"
                     // thêm các thuộc tính khác nếu cần
                 });
                 context.SaveChanges();
@@ -425,11 +425,11 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
             try
             {
-                //Kiểm tra vai trò "Khách Hàng"
-                var vaiTro = await _context.vai_Tros.FirstOrDefaultAsync(v => v.ten_vai_tro == "Khách Hàng");
+                //Kiểm tra vai trò "Khách hàng"
+                var vaiTro = await _context.vai_Tros.FirstOrDefaultAsync(v => v.ten_vai_tro == "Khách hàng");
                 if (vaiTro == null)
                 {
-                    return BadRequest(new { success = false, message = "Vai trò Khách Hàng không tồn tại." });
+                    return BadRequest(new { success = false, message = "Vai trò Khách hàng không tồn tại." });
                 }
 
                 if (await _context.tai_Khoans.AnyAsync(n => n.email == model.Email))
@@ -450,7 +450,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     email = model.Email,
                     ngay_tao = DateTime.Now,
                     Vai_TroID = vaiTro.ID,
-                    ma = GenerateUniqueMaKhachHang(), // Hàm tạo mã khách hàng duy nhất
+                    ma = GenerateUniqueMaKhachHang(), // Hàm tạo mã Khách hàng duy nhất
                     gioi_tinh = 0,
                     ngay_sinh = new DateTime(2000, 1, 1),
                     cccd = "",

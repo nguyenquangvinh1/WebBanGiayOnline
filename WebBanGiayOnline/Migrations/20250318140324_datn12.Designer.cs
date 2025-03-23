@@ -12,8 +12,8 @@ using WebBanGiay.Data;
 namespace WebBanGiay.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250318090845_a12")]
-    partial class a12
+    [Migration("20250318140324_datn12")]
+    partial class datn12
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -871,6 +871,29 @@ namespace WebBanGiay.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("vai_Tros");
+
+                    b.HasData(
+                        new
+                        {
+                            ID = new Guid("99cacc33-1117-4f57-90be-38b7913c26f3"),
+                            ngay_tao = new DateTime(2025, 3, 18, 21, 3, 22, 368, DateTimeKind.Local).AddTicks(914),
+                            ten_vai_tro = "Admin",
+                            trang_thai = 1
+                        },
+                        new
+                        {
+                            ID = new Guid("8369800e-9770-4a27-bc2b-c4d1bc883c63"),
+                            ngay_tao = new DateTime(2025, 3, 18, 21, 3, 22, 368, DateTimeKind.Local).AddTicks(935),
+                            ten_vai_tro = "Nhân Viên",
+                            trang_thai = 1
+                        },
+                        new
+                        {
+                            ID = new Guid("17a4f3cb-6405-4698-81bd-0b6b372466ed"),
+                            ngay_tao = new DateTime(2025, 3, 18, 21, 3, 22, 368, DateTimeKind.Local).AddTicks(937),
+                            ten_vai_tro = "Khách Hàng",
+                            trang_thai = 1
+                        });
                 });
 
             modelBuilder.Entity("ClssLib.Anh_San_Pham", b =>

@@ -318,8 +318,6 @@ namespace WebBanGiay.Migrations
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    MaSP = table.Column<int>(type: "int", nullable: true),
-                    moTa = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ten_SPCT = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     gia = table.Column<double>(type: "float", nullable: false),
                     so_luong = table.Column<int>(type: "int", nullable: false),
@@ -328,20 +326,62 @@ namespace WebBanGiay.Migrations
                     ngay_sua = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Kich_ThuocID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Mau_SacID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    San_PhamID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    San_PhamID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Kieu_DangID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Danh_MucID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Loai_GiayID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Mui_GiayID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Co_GiayID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    De_GiayID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Chat_LieuID = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_san_Pham_Chi_Tiets", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_san_Pham_Chi_Tiets_chat_Lieus_Chat_LieuID",
+                        column: x => x.Chat_LieuID,
+                        principalTable: "chat_Lieus",
+                        principalColumn: "ID");
+                    table.ForeignKey(
+                        name: "FK_san_Pham_Chi_Tiets_co_Giays_Co_GiayID",
+                        column: x => x.Co_GiayID,
+                        principalTable: "co_Giays",
+                        principalColumn: "ID");
+                    table.ForeignKey(
+                        name: "FK_san_Pham_Chi_Tiets_danh_Mucs_Danh_MucID",
+                        column: x => x.Danh_MucID,
+                        principalTable: "danh_Mucs",
+                        principalColumn: "ID");
+                    table.ForeignKey(
+                        name: "FK_san_Pham_Chi_Tiets_de_Giays_De_GiayID",
+                        column: x => x.De_GiayID,
+                        principalTable: "de_Giays",
+                        principalColumn: "ID");
                     table.ForeignKey(
                         name: "FK_san_Pham_Chi_Tiets_kich_Thuocs_Kich_ThuocID",
                         column: x => x.Kich_ThuocID,
                         principalTable: "kich_Thuocs",
                         principalColumn: "ID");
                     table.ForeignKey(
+                        name: "FK_san_Pham_Chi_Tiets_kieu_Dangs_Kieu_DangID",
+                        column: x => x.Kieu_DangID,
+                        principalTable: "kieu_Dangs",
+                        principalColumn: "ID");
+                    table.ForeignKey(
+                        name: "FK_san_Pham_Chi_Tiets_loai_Giays_Loai_GiayID",
+                        column: x => x.Loai_GiayID,
+                        principalTable: "loai_Giays",
+                        principalColumn: "ID");
+                    table.ForeignKey(
                         name: "FK_san_Pham_Chi_Tiets_mau_Sacs_Mau_SacID",
                         column: x => x.Mau_SacID,
                         principalTable: "mau_Sacs",
+                        principalColumn: "ID");
+                    table.ForeignKey(
+                        name: "FK_san_Pham_Chi_Tiets_mui_Giays_Mui_GiayID",
+                        column: x => x.Mui_GiayID,
+                        principalTable: "mui_Giays",
                         principalColumn: "ID");
                     table.ForeignKey(
                         name: "FK_san_Pham_Chi_Tiets_san_Phams_San_PhamID",
@@ -357,7 +397,7 @@ namespace WebBanGiay.Migrations
                 {
                     ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     trang_thai = table.Column<int>(type: "int", nullable: false),
-                    so_tien_thanh_toan = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    so_tien_thanh_toan = table.Column<double>(type: "float", nullable: false),
                     ngay_thanh_toan = table.Column<DateTime>(type: "datetime2", nullable: false),
                     mo_ta = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Hoa_DonID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -672,14 +712,49 @@ namespace WebBanGiay.Migrations
                 column: "Tai_KhoanID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_san_Pham_Chi_Tiets_Chat_LieuID",
+                table: "san_Pham_Chi_Tiets",
+                column: "Chat_LieuID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_san_Pham_Chi_Tiets_Co_GiayID",
+                table: "san_Pham_Chi_Tiets",
+                column: "Co_GiayID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_san_Pham_Chi_Tiets_Danh_MucID",
+                table: "san_Pham_Chi_Tiets",
+                column: "Danh_MucID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_san_Pham_Chi_Tiets_De_GiayID",
+                table: "san_Pham_Chi_Tiets",
+                column: "De_GiayID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_san_Pham_Chi_Tiets_Kich_ThuocID",
                 table: "san_Pham_Chi_Tiets",
                 column: "Kich_ThuocID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_san_Pham_Chi_Tiets_Kieu_DangID",
+                table: "san_Pham_Chi_Tiets",
+                column: "Kieu_DangID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_san_Pham_Chi_Tiets_Loai_GiayID",
+                table: "san_Pham_Chi_Tiets",
+                column: "Loai_GiayID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_san_Pham_Chi_Tiets_Mau_SacID",
                 table: "san_Pham_Chi_Tiets",
                 column: "Mau_SacID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_san_Pham_Chi_Tiets_Mui_GiayID",
+                table: "san_Pham_Chi_Tiets",
+                column: "Mui_GiayID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_san_Pham_Chi_Tiets_San_PhamID",
