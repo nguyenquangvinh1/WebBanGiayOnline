@@ -543,8 +543,8 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                         ten_SPCT = SP.ten_san_pham + " [" + item.Mau_Sac + "-" + item.Kich_Thuoc + "]",
                         gia = item.gia,
                         so_luong = item.so_luong,
-                        trang_thai = item.trang_thai,
-                        ngay_tao = item.ngay_tao,
+                        trang_thai = (int)item.trang_thai,
+                        ngay_tao = (DateTime)item.ngay_tao,
                         ngay_sua = DateTime.Now,
                         Kich_ThuocID = kichThuoc.ID,
                         Mau_SacID = mauSac.ID,
@@ -601,7 +601,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 {
                     existingSPCT.so_luong = spct.so_luong;
                     existingSPCT.gia = spct.gia;
-                    existingSPCT.trang_thai = spct.trang_thai;
+                    existingSPCT.trang_thai = (int)spct.trang_thai;
                     existingSPCT.ngay_sua = DateTime.Now;
 
                     _context.san_Pham_Chi_Tiets.Update(existingSPCT);
@@ -791,7 +791,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 {
                     existingSPCT.so_luong = spct.so_luong;
                     existingSPCT.gia = spct.gia;
-                    existingSPCT.trang_thai = spct.trang_thai;
+                    existingSPCT.trang_thai = (int)spct.trang_thai;
                     existingSPCT.ngay_sua = DateTime.Now;
                     _context.san_Pham_Chi_Tiets.Update(existingSPCT);
                     List<Anh_San_Pham> anh = new List<Anh_San_Pham>();

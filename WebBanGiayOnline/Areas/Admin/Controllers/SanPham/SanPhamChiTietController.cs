@@ -182,6 +182,47 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 
             return Json(new { success = true });
         }
+        [HttpPost]
+        public async Task<IActionResult> UpdateSpct([FromBody] San_PhamCTView model)
+        {
+            if (model == null || model.ID == null)
+            {
+                return BadRequest(new { message = "Dữ liệu không hợp lệ" });
+            }
+
+            var sanPham = await _context.san_Pham_Chi_Tiets.FindAsync(model.ID);
+            if (sanPham == null)
+            {
+                return NotFound(new { message = "Không tìm thấy sản phẩm" });
+            }
+
+            try
+            {
+                // Cập nhật dữ liệu sản phẩm
+                sanPham.gia = model.gia;
+                sanPham.so_luong = model.so_luong;
+                sanPham.trang_thai = (int)model.trang_thai;
+                sanPham.Chat_LieuID = Guid.Parse(model.Chat_Lieu);
+                sanPham.Co_GiayID = Guid.Parse(model.Co_Giay);
+                sanPham.Danh_MucID = Guid.Parse(model.Danh_Muc);
+                sanPham.De_GiayID = Guid.Parse(model.De_Giay);
+                sanPham.Mui_GiayID = Guid.Parse(model.Mui_Giay);
+                sanPham.Kieu_DangID = Guid.Parse(model.Kieu_Dang);
+                sanPham.Loai_GiayID = Guid.Parse(model.Loai_Giay);
+                sanPham.ngay_sua = DateTime.Now;
+
+                // Lưu thay đổi vào database
+                _context.san_Pham_Chi_Tiets.Update(sanPham);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Cập nhật thành công" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi server", error = ex.Message });
+            }
+        }
+
 
         // GET: KieuDangController/Details/5
         public async Task<IActionResult> Details(Guid? id)

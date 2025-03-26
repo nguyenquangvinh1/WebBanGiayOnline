@@ -147,7 +147,43 @@ namespace WebBanGiay.Controllers
         // GET: San_Pham_Chi_Tiet/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
+            List<string> defaul = new List<string>();
             var data1 = _context.san_Phams.Include(x => x.Loai_Giay).FirstOrDefault(x => x.ID == id);
+            var loai = data1.Loai_GiayID;
+            var anh1 = _context.anh_San_Phams.Where(x => x.San_PhamID == id).Select(x => x.anh_url).ToList();
+            if (anh1.Count != 0)
+            {
+                defaul = anh1;
+            }
+            else
+            {
+                string a = "/img/default.png";
+                defaul.Add(a);
+            }
+            var spct = _context.san_Pham_Chi_Tiets.Where(x => x.San_PhamID == id && x.trang_thai == 1).AsQueryable();
+            var lsSPCT =  spct.Select(x => new SanPhamCT_VM
+            {
+                ID = x.ID,
+                Gia = x.gia,
+                SoLuong = x.so_luong,
+                KichThuoc = x.Kich_ThuocID,
+                MauSac = x.Mau_SacID
+            }).ToList();
+            foreach (var item in lsSPCT)
+            {
+                var anh = _context.anh_San_Pham_San_Pham_Chi_Tiets.FirstOrDefault(x => x.San_Pham_Chi_TietID == item.ID);
+                if (anh == null)
+                {
+                    item.hinh = "/img/default.png";
+                    continue;
+                }
+                var imgUrls = _context.anh_San_Phams
+                    .Find(anh.Anh_San_PhamID);
+                
+                string url1 = imgUrls.anh_url;
+                item.hinh = url1;
+            }
+            var sp = _context.san_Phams.Where(x => x.San_Pham_Chi_Tiets.Any(ct => ct.so_luong > 0)&& x.trang_thai == 1).AsQueryable();
             if (data1 == null)
             {
                 TempData["Message"] = $"Không tìm thấy {id}";
@@ -157,13 +193,26 @@ namespace WebBanGiay.Controllers
             {
                 ID = data1.ID,
                 TenHH = data1.ten_san_pham,
-                DonGia = _context.san_Pham_Chi_Tiets.Where(z => z.San_PhamID == data1.ID).Select(x => x.gia).Min(),
                 MoTa = data1.mo_ta,
-                SoLuongTon = _context.san_Pham_Chi_Tiets.Where(z => z.San_PhamID == data1.ID).Select(x => x.so_luong).Min(),
-               
-                ChiTiet = data1.mo_ta
-
+               Hinh = defaul,
+               lstsp = sp.Select(x => new HangHoaVM
+               {
+                   ID = x.ID,
+                   TenHH = x.ten_san_pham,
+                   Hinh = _context.anh_San_Phams
+                    .Where(z => z.San_PhamID == x.ID)
+                    .Select(z => z.anh_url)
+                    .FirstOrDefault() ?? "/img/default.png",
+                   DonGia = _context.san_Pham_Chi_Tiets
+                    .Where(z => z.San_PhamID == x.ID)
+                    .Select(x => x.gia)
+                    .Min(),
+                   MoTa = x.mo_ta ?? ""
+               }).ToList(),
+               lstspct = lsSPCT
             };
+            ViewData["Kich_ThuocID"] = new SelectList(_context.kich_Thuocs, "ID", "ten_kich_thuoc");
+            ViewData["Mau_SacID"] = new SelectList(_context.mau_Sacs, "ID", "ma_mau");
             return View(result);
         }
         // GET: San_Pham_Chi_Tiet/Create
