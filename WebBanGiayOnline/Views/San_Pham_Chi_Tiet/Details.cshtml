@@ -162,9 +162,8 @@
                         </div>
                         <div class="col-lg-6">
                             <h4 class="fw-bold mb-3">@Model.TenHH</h4>
-                            <p id="productPrice" class="text-danger fw-bold">Giá: Vui lòng chọn Màu Sắc & Kích Thước</p>
 
-                            @* <h5 class="fw-bold mb-3">@Model.DonGia.ToString("#,##0 VNĐ")</h5> *@
+                            <h5 id="productPrice" class="fw-bold mb-3">Đang tải giá...</h5>
                             <div class="d-flex mb-4">
                                 <i class="fa fa-star text-secondary"></i>
                                 <i class="fa fa-star text-secondary"></i>
@@ -366,6 +365,19 @@
                     $('#productPrice').text("Giá: Vui lòng chọn Màu Sắc & Kích Thước");
                 }
             }
+
+
+            // Lấy giá thấp nhất khi mở trang
+            function setMinPriceOnLoad() {
+                if (sanPhamChiTietList.length > 0) {
+                    let minPrice = Math.min(...sanPhamChiTietList.map(spct => spct.gia));
+                    $('#productPrice').text(`Giá thấp nhất: ${minPrice.toLocaleString()} VNĐ`);
+                } else {
+                    $('#productPrice').text("Không có sản phẩm nào.");
+                }
+            }
+
+            setMinPriceOnLoad(); // Gọi khi trang tải xong
 
 
             // Khi chọn màu sắc
