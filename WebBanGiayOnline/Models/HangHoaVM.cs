@@ -7,8 +7,9 @@
         public string? Hinh { get; set; }
         public double? DonGia { get; set; }
         public string? MoTa { get; set; }
+    
 
-     
+
     }
     public class ChiTietHangHoaVM
     {

@@ -16,8 +16,8 @@ namespace WebBanGiay.Models.ViewModel
 
         public string xa { get; set; }
 
-        public string fulldiachi => $"{xa},{huyen},{tinh}";
-  
+        public string? fulldiachi { get; set; }
+
         public string?   Sdt { get; set; }
    
         public string? Email { get; set; }

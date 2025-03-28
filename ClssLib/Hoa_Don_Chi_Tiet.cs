@@ -11,7 +11,7 @@ namespace ClssLib
     public class Hoa_Don_Chi_Tiet
     {
         public Guid ID { get; set; } 
-        public string ma { get; set; }
+        public string? ma { get; set; }
         public double gia { get; set; }
         public int? trang_thai { get; set; }
         public double? thanh_tien { get; set; }

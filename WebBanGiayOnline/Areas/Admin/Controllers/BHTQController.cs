@@ -75,6 +75,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     trangThai = c.San_Pham_Chi_Tiet.trang_thai == 1 ? "Hoạt động" : "Không hoạt động"
                 })
                 .ToList();
+            
 
             return Json(new { success = true, data = products });
         }

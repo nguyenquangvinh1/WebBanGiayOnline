@@ -8,6 +8,7 @@ namespace WebBanGiay.Models.ViewModel
         public string Mahh { get; set; }
         public string TenHH { get; set; }
         public double DonGia { get; set; }
+        public string? Hinh { get; set; }
         public int SoLuong { get; set; }
         [Required(ErrorMessage = "Vui lòng nhập họ và tên.")]
         public string? TenKhachHang { get; set; }

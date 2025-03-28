@@ -61,6 +61,15 @@
             margin-top: auto; /* Đẩy phần giá và nút thêm vào giỏ hàng xuống dưới */
         }
 
+       
+        .container-fluid.page-header {
+            background-image: url(/coloshop-master/images/anhdep1.jpg);
+            background-size: cover;
+            background-position: center;
+        }
+
+   
+
 </style>
 </head>
 
@@ -76,19 +85,19 @@
         <div class="container topbar bg-primary d-none d-lg-block">
             <div class="d-flex justify-content-between">
                 <div class="top-info ps-2">
-                    <small class="me-3"><i class="fas fa-map-marker-alt me-2 text-secondary"></i> <a href="#" class="text-white">123 Street, New York</a></small>
-                    <small class="me-3"><i class="fas fa-envelope me-2 text-secondary"></i><a href="#" class="text-white">Email@Example.com</a></small>
+                    <small class="me-3"><i class="fas fa-map-marker-alt me-2 text-secondary"></i> <a href="#" class="text-white">Số 28 Trung Văn,Nam Từ Liêm ,Hà Nội</a></small>
+                    <small class="me-3"><i class="fas fa-envelope me-2 text-secondary"></i><a href="#" class="text-white">vinhnq041003@gmail.com</a></small>
                 </div>
                 <div class="top-link pe-2">
-                    <a href="#" class="text-white"><small class="text-white mx-2">Privacy Policy</small>/</a>
-                    <a href="#" class="text-white"><small class="text-white mx-2">Terms of Use</small>/</a>
-                    <a href="#" class="text-white"><small class="text-white ms-2">Sales and Refunds</small></a>
+                    <a href="#" class="text-white"><small class="text-white mx-2">Chính sách bảo mật</small>/</a>
+                    <a href="#" class="text-white"><small class="text-white mx-2">Điểu khoản sử dung</small>/</a>
+                    <a href="#" class="text-white"><small class="text-white ms-2">Bán hàng và hoàn tiền</small></a>
                 </div>
             </div>
         </div>
         <div class="container px-0">
             <nav class="navbar navbar-light bg-white navbar-expand-xl">
-                <a href="index.html" class="navbar-brand"><h1 class="text-primary display-6">Fruitables</h1></a>
+                <a asp-controller="San_Pham_Chi_Tiet" asp-action="Index" class="navbar-brand"><h1 class="text-primary display-6">Adidas Shop</h1></a>
                 <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                     <span class="fa fa-bars text-primary"></span>
                 </button>
@@ -110,10 +119,36 @@
                     </div>
                     <div class="d-flex m-3 me-0">
                         <button class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fas fa-search text-primary"></i></button>
-                        @await Component.InvokeAsync("Cart")
-                        <a href="#" class="my-auto">
-                            <i class="fas fa-user fa-2x"></i>
-                        </a>
+                        <div id="cart-container">
+                            @await Component.InvokeAsync("Cart")
+                        </div>
+
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <div class="dropdown my-auto">
+                                <a class="dropdown-toggle text-dark" data-bs-toggle="dropdown">
+                                    <i class="fas fa-user fa-2x"></i> @User.Identity.Name
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" asp-controller="TaiKhoan" asp-action="Logout">Đăng xuất</a></li>
+                                    <li><a class="dropdown-item" asp-controller="TaiKhoan" asp-action="ThongTinKhachHang">Thông tin</a></li>
+
+                                </ul>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="dropdown my-auto">
+                                <a class="dropdown-toggle text-dark" data-bs-toggle="dropdown">
+                                    <i class="fas fa-user fa-2x"></i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" asp-controller="TaiKhoan" asp-action="Login">Đăng nhập</a></li>
+                                    <li><a class="dropdown-item" asp-controller="TaiKhoan" asp-action="Register">Đăng ký</a></li>
+                                </ul>
+                            </div>
+                        }
                     </div>
                 </div>
             </nav>
@@ -152,7 +187,7 @@
     <!-- Fruits Shop Start-->
     <div class="container-fluid fruite py-5">
         <div class="container py-5">
-            <h1 class="mb-4">Fresh fruits shop</h1>
+            <h1 class="mb-4">Adidas shop</h1>
             <div class="row g-4">
                 <div class="col-lg-12">
                     <div class="row g-4">
@@ -163,17 +198,7 @@
                             </div>
                         </div>
                         <div class="col-6"></div>
-                        <div class="col-xl-3">
-                            <div class="bg-light ps-3 py-3 rounded d-flex justify-content-between mb-4">
-                                <label for="fruits">Default Sorting:</label>
-                                <select id="fruits" name="fruitlist" class="border-0 form-select-sm bg-light me-3" form="fruitform">
-                                    <option value="volvo">Nothing</option>
-                                    <option value="saab">Popularity</option>
-                                    <option value="opel">Organic</option>
-                                    <option value="audi">Fantastic</option>
-                                </select>
-                            </div>
-                        </div>
+                      
                     </div>
                     <div class="row g-4">
                         <div class="col-lg-3">
@@ -182,48 +207,96 @@
                                     <div class="mb-3">
                                         <h4>Categories</h4>
                                         <ul class="list-unstyled fruite-categorie">
+                                            <li>
+                                                <label for="filterChatLieu">Chất liệu:</label>
+                                                <select id="filterChatLieu" class="form-control filter-select">
+                                                    <option value="">Tất cả</option>
+                                                    @foreach (var item in (SelectList)ViewData["Chat_LieuID"])
+                                                    {
+                                                        <option value="@item.Value" selected="@(ViewData["SelectedChatLieu"]?.ToString() == item.Value ? "selected" : null)">
+                                                            @item.Text
+                                                        </option>
+                                                    }
+                                                </select>
 
-                                            <li>
-                                                <div class=" dropdown">
-                                                    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        Chất Liệu
-                                                        </a>
-                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                                        @foreach (var item in (SelectList)ViewData["Chat_LieuID"])
-                                                        {
-                                                            <a href="#" class="dropdown-item" data-chat-lieu="@item.Value">@item.Text</a>
-                                                            <li><a class="dropdown-item" href="#">Action</a></li>
-                                                        }
-                                                    </ul>
-                                                </div>
-                                                <div class="d-flex justify-content-between fruite-name">
-                                                    <a href="#"><i class="fas fa-apple-alt me-2"></i>Apples</a>
-                                                    <span>(3)</span>
-                                                </div>
                                             </li>
                                             <li>
-                                                <div class="d-flex justify-content-between fruite-name">
-                                                    <a href="#"><i class="fas fa-apple-alt me-2"></i>Oranges</a>
-                                                    <span>(5)</span>
-                                                </div>
+
+                                                <label for="filterCoGiay">Cổ giày:</label>
+                                                <select id="filterCoGiay" class="form-control filter-select">
+                                                    <option value="">Tất cả</option>
+                                                    @foreach (var item in (SelectList)ViewData["Co_GiayID"])
+                                                    {
+                                                        <option value="@item.Value" selected="@(ViewData["SelectedCoGiay"]?.ToString() == item.Value ? "selected" : null)">
+                                                            @item.Text
+                                                        </option>
+                                                    }
+                                                </select>
                                             </li>
                                             <li>
-                                                <div class="d-flex justify-content-between fruite-name">
-                                                    <a href="#"><i class="fas fa-apple-alt me-2"></i>Strawbery</a>
-                                                    <span>(2)</span>
-                                                </div>
+                                                <label for="filterDanhMuc">Danh mục:</label>
+                                                <select id="filterDanhMuc" class="form-control filter-select">
+                                                    <option value="">Tất cả</option>
+                                                    @foreach (var item in (SelectList)ViewData["Danh_MucID"])
+                                                    {
+                                                        <option value="@item.Value" selected="@(ViewData["SelectedDanhMuc"]?.ToString() == item.Value ? "selected" : null)">
+                                                            @item.Text
+                                                        </option>
+                                                    }
+                                                </select>
                                             </li>
                                             <li>
-                                                <div class="d-flex justify-content-between fruite-name">
-                                                    <a href="#"><i class="fas fa-apple-alt me-2"></i>Banana</a>
-                                                    <span>(8)</span>
-                                                </div>
+                                                <label for="filterDeGiay">Đế giày:</label>
+                                                <select id="filterDeGiay" class="form-control filter-select">
+                                                    <option value="">Tất cả</option>
+                                                    @foreach (var item in (SelectList)ViewData["De_GiayID"])
+                                                    {
+                                                        <option value="@item.Value" selected="@(ViewData["SelectedDeGiay"]?.ToString() == item.Value ? "selected" : null)">
+                                                            @item.Text
+                                                        </option>
+                                                    }
+                                                </select>
                                             </li>
                                             <li>
-                                                <div class="d-flex justify-content-between fruite-name">
-                                                    <a href="#"><i class="fas fa-apple-alt me-2"></i>Pumpkin</a>
-                                                    <span>(5)</span>
-                                                </div>
+
+                                                <label for="filterMuiGiay">Mũi giày:</label>
+                                                <select id="filterMuiGiay" class="form-control filter-select">
+                                                    <option value="">Tất cả</option>
+                                                    @foreach (var item in (SelectList)ViewData["Mui_GiayID"])
+                                                    {
+                                                        <option value="@item.Value" selected="@(ViewData["SelectedMuiGiay"]?.ToString() == item.Value ? "selected" : null)">
+                                                            @item.Text
+                                                        </option>
+                                                    }
+                                                </select>
+                                            </li>
+                                            <li>
+
+
+                                                <label for="filterKieuDang">Kiểu dáng:</label>
+                                                <select id="filterKieuDang" class="form-control filter-select">
+                                                    <option value="">Tất cả</option>
+                                                    @foreach (var item in (SelectList)ViewData["Kieu_DangID"])
+                                                    {
+                                                        <option value="@item.Value" selected="@(ViewData["SelectedKieuDang"]?.ToString() == item.Value ? "selected" : null)">
+                                                            @item.Text
+                                                        </option>
+                                                    }
+                                                </select>
+                                            </li>
+                                            <li>
+
+
+                                                <label for="filterLoaiGiay">Loại giày:</label>
+                                                <select id="filterLoaiGiay" class="form-control filter-select">
+                                                    <option value="">Tất cả</option>
+                                                    @foreach (var item in (SelectList)ViewData["Loai_GiayID"])
+                                                    {
+                                                        <option value="@item.Value" selected="@(ViewData["SelectedLoaiGiay"]?.ToString() == item.Value ? "selected" : null)">
+                                                            @item.Text
+                                                        </option>
+                                                    }
+                                                </select>
                                             </li>
                                         </ul>
                                     </div>
@@ -235,102 +308,7 @@
                                         <output id="amount" name="amount" min-velue="0" max-value="500" for="rangeInput">0</output>
                                     </div>
                                 </div>
-                                <div class="col-lg-12">
-                                    <div class="mb-3">
-                                        <h4>Additional</h4>
-                                        <div class="mb-2">
-                                            <input type="radio" class="me-2" id="Categories-1" name="Categories-1" value="Beverages">
-                                            <label for="Categories-1"> Organic</label>
-                                        </div>
-                                        <div class="mb-2">
-                                            <input type="radio" class="me-2" id="Categories-2" name="Categories-1" value="Beverages">
-                                            <label for="Categories-2"> Fresh</label>
-                                        </div>
-                                        <div class="mb-2">
-                                            <input type="radio" class="me-2" id="Categories-3" name="Categories-1" value="Beverages">
-                                            <label for="Categories-3"> Sales</label>
-                                        </div>
-                                        <div class="mb-2">
-                                            <input type="radio" class="me-2" id="Categories-4" name="Categories-1" value="Beverages">
-                                            <label for="Categories-4"> Discount</label>
-                                        </div>
-                                        <div class="mb-2">
-                                            <input type="radio" class="me-2" id="Categories-5" name="Categories-1" value="Beverages">
-                                            <label for="Categories-5"> Expired</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-12">
-                                    <h4 class="mb-3">Featured products</h4>
-                                    <div class="d-flex align-items-center justify-content-start">
-                                        <div class="rounded me-4" style="width: 100px; height: 100px;">
-                                            <img src="img/featur-1.jpg" class="img-fluid rounded" alt="">
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-2">Big Banana</h6>
-                                            <div class="d-flex mb-2">
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                            <div class="d-flex mb-2">
-                                                <h5 class="fw-bold me-2">2.99 $</h5>
-                                                <h5 class="text-danger text-decoration-line-through">4.11 $</h5>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-center justify-content-start">
-                                        <div class="rounded me-4" style="width: 100px; height: 100px;">
-                                            <img src="img/featur-2.jpg" class="img-fluid rounded" alt="">
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-2">Big Banana</h6>
-                                            <div class="d-flex mb-2">
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                            <div class="d-flex mb-2">
-                                                <h5 class="fw-bold me-2">2.99 $</h5>
-                                                <h5 class="text-danger text-decoration-line-through">4.11 $</h5>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-center justify-content-start">
-                                        <div class="rounded me-4" style="width: 100px; height: 100px;">
-                                            <img src="img/featur-3.jpg" class="img-fluid rounded" alt="">
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-2">Big Banana</h6>
-                                            <div class="d-flex mb-2">
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                            <div class="d-flex mb-2">
-                                                <h5 class="fw-bold me-2">2.99 $</h5>
-                                                <h5 class="text-danger text-decoration-line-through">4.11 $</h5>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex justify-content-center my-4">
-                                        <a href="#" class="btn border border-secondary px-4 py-3 rounded-pill text-primary w-100">Vew More</a>
-                                    </div>
-                                </div>
-                                <div class="col-lg-12">
-                                    <div class="position-relative">
-                                        <img src="img/banner-fruits.jpg" class="img-fluid w-100 rounded" alt="">
-                                        <div class="position-absolute" style="top: 50%; right: 10px; transform: translateY(-50%);">
-                                            <h3 class="text-secondary fw-bold">Fresh <br> Fruits <br> Banner</h3>
-                                        </div>
-                                    </div>
-                                </div>
+                             
                             </div>
                         </div>
                         <div class="col-lg-9">
@@ -350,7 +328,10 @@
                                                 <p>@item.MoTa</p>
                                                 <div class="d-flex justify-content-between flex-lg-wrap">
                                                     <p class="text-dark fs-5 fw-bold mb-0">@item.DonGia?.ToString("#,##0 VNĐ")</p>
-                                                    <a asp-controller="Cart" asp-action="AddCart" asp-route-id="@item.ID"  class="btn border border-secondary rounded-pill px-3 text-primary"><i class="fa fa-shopping-bag me-2 text-primary"></i> Thêm vào giỏ hàng</a>
+                                                    <a href="javascript:void(0);" class="btn border border-secondary rounded-pill px-3 text-primary add-to-cart"
+                                                       data-id="@item.ID">
+                                                        <i class="fa fa-shopping-bag me-2 text-primary"></i> Thêm vào giỏ hàng
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -359,14 +340,37 @@
 
                                 <div class="col-12">
                                     <div class="pagination d-flex justify-content-center mt-5">
-                                        <a href="#" class="rounded">&laquo;</a>
-                                        <a href="#" class="active rounded">1</a>
-                                        <a href="#" class="rounded">2</a>
-                                        <a href="#" class="rounded">3</a>
-                                        <a href="#" class="rounded">4</a>
-                                        <a href="#" class="rounded">5</a>
-                                        <a href="#" class="rounded">6</a>
-                                        <a href="#" class="rounded">&raquo;</a>
+                                        <nav>
+                                            <ul class="pagination d-flex justify-content-center mt-5">
+                                                @{
+                                                    int totalItems = (int)ViewData["TotalItems"];
+                                                    int pageNumber = (int)ViewData["PageNumber"];
+                                                    int pageSize = (int)ViewData["PageSize"];
+                                                    int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+                                                }
+
+                                                @if (pageNumber > 1)
+                                                {
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="?pageNumber=@(pageNumber - 1)&pageSize=12">Trước</a>
+                                                    </li>
+                                                }
+
+                                                @for (int i = 1; i <= totalPages; i++)
+                                                {
+                                                    <li class="page-item @(i == pageNumber ? "active" : "")">
+                                                        <a class="page-link" href="?pageNumber=@i&pageSize=12">@i</a>
+                                                    </li>
+                                                }
+
+                                                @if (pageNumber < totalPages)
+                                                {
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="?pageNumber=@(pageNumber + 1)&pageSize=12">Sau</a>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </nav>
                                     </div>
                                 </div>
                             </div>
@@ -483,6 +487,83 @@
 
     <!-- Template Javascript -->
     <script src="~/js/main.js"></script>
+    <script>
+        $(document).ready(function () {
+                 // Hàm lọc sản phẩm
+        window.applyFilter = function () {
+            console.log("📌 Hàm applyFilter đã chạy!");
+
+            let filters = {};
+
+            // Lấy dữ liệu từ tất cả select box
+            $('select.filter-select').each(function () {
+                let id = $(this).attr('id');
+                let value = $(this).val();
+                console.log(`🎯 Lọc ID: ${id}, Giá trị: ${value}`);
+
+                if (value && value !== '') {
+                    let paramName = id.replace("filter", "").charAt(0).toLowerCase() + id.replace("filter", "").slice(1);
+                    filters[paramName] = value;
+                }
+            });
+
+            console.log("📌 Dữ liệu lọc gửi đi:", filters);
+
+            let queryString = $.param(filters);
+            console.log("🔗 URL lọc: /San_Pham_Chi_Tiet/Filter?" + queryString);
+
+            window.location.href = '/San_Pham_Chi_Tiet/Filter?' + queryString;
+        };
+             // Lọc ngay khi chọn dropdown
+        $('select.filter-select').change(function () {
+            applyFilter();
+        });
+
+        // Giữ lại giá trị đã chọn sau khi tải trang
+        $('select.filter-select').each(function () {
+            let id = $(this).attr('id');
+            let urlParams = new URLSearchParams(window.location.search);
+            let selectedValue = urlParams.get(id.replace("filter", "").charAt(0).toLowerCase() + id.replace("filter", "").slice(1));
+
+            if (selectedValue) {    b  
+                $(this).val(selectedValue);
+            }
+        });
+            });
+                   $(document).ready(function () {
+            $(".add-to-cart").click(function () {
+                var productId = $(this).data("id");
+
+                $.ajax({
+                    url: "/Cart/AddCart",
+                    type: "POST",
+                    data: { id: productId, quantity: 1 },
+                    success: function (response) {
+                        if (response.success) {
+                            alert(response.message);
+                            updateCart();
+                        } else {
+                            alert("Lỗi: " + response.message);
+                        }
+                    },
+                    error: function () {
+                        alert("Có lỗi xảy ra, vui lòng thử lại!");
+                    }
+                });
+            });
+
+                   function updateCart() {
+            $.ajax({
+                url: "/Cart/RefreshCart",
+                type: "GET",
+                success: function (data) {
+                    $("#cart-container").html(data);
+                }
+            });
+        }
+
+        });
+    </script>
 </body>
 
 </html>

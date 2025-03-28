@@ -711,32 +711,29 @@
 
 
 
-        // Xử lý khi nhấn nút "Chọn" khách hàng để cập nhật thông tin ở phần hóa đơn
-
-
-        $(document).on('click', '.choose-customer', function () {
+      
+        $(document).on('click' , '.choose-customer', function () {
             let customerId = $(this).data('id');
-            let name = $(this).data('name');
+            let name  =  $(this).data('name');
             let phone = $(this).data('phone');
             let email = $(this).data('email');
 
-            // Kiểm tra xem currentInvoiceId có giá trị hợp lệ không
+           
             if (!currentInvoiceId) {
                 console.error("currentInvoiceId không hợp lệ.");
                 return;
             }
 
-            // Xác định container hóa đơn hiện tại
+          
             let container = $('#' + currentInvoiceId);
             if (container.length === 0) {
                 console.error("Không tìm thấy container hóa đơn.");
                 return;
             }
 
-            // Cập nhật customerId trong container
+           
             container.attr('data-customer-id', customerId);
 
-            // Ẩn khối khách lẻ và hiển thị thông tin khách hàng
             let khachLe = container.find('.khachLe');
             let customerForm = container.find('.customerForm');
 
@@ -750,7 +747,7 @@
                 customerForm.find('.customerEmail').val(email);
             }
 
-            // Gửi request liên kết khách hàng với hóa đơn
+
             let invoiceId = container.attr('data-db-invoice-id');
             if (invoiceId) {
                 $.ajax({

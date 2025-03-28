@@ -306,12 +306,12 @@
     <div class="row payment-summary">
         <div class="col-md-6">
             <p><strong>Tổng tiền hàng:</strong> @Model.tong_tien.ToString("N0") đ</p>
-            <p><strong>Phí vận chuyển:</strong> 40.000 đ</p>
+            <p><strong>Phí vận chuyển:</strong> </p>
             <p><strong>Mã giảm giá:</strong> Không có</p>
         </div>
         <div class="col-md-6 text-right total-price">
             <h4>
-                <strong>Tổng thanh toán: @((Model.tong_tien + 40000).ToString("N0")) đ</strong>
+                <strong>Tổng thanh toán: @Model.tong_tien.ToString("N0")) đ</strong>
             </h4>
         </div>
     </div>
