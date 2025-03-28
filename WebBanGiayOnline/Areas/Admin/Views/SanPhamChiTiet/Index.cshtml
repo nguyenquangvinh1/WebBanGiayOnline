@@ -504,10 +504,17 @@
                 gia: $('#editGia').val(),
                 so_luong: $('#editSoLuong').val(),
                 trang_thai: $('#editTrangThai').val(),
+                Chat_Lieu: $('#editChatLieu').val(),
+                Co_Giay: $('#editCoGiay').val(),
+                Danh_Muc: $('#editDanhMuc').val(),
+                De_Giay: $('#editDeGiay').val(),
+                Mui_Giay: $('#editMuiGiay').val(),
+                Kieu_Dang: $('#editKieuDang').val(),
+                Loai_Giay: $('#editLoaiGiay').val()
             };
 
             $.ajax({
-                url: '/Admin/SanPhamChiTiet/Edit',
+                url: '/Admin/SanPhamChiTiet/UpdateSpct',
                 type: 'POST',
                 contentType: "application/json",
                 data: JSON.stringify(data),

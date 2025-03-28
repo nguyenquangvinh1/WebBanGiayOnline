@@ -14,16 +14,24 @@ namespace ClssLib
     {
         public Guid ID { get; set; }
 
+        [Display(Name = "Tên Sản Phẩm :")]
         public string ten_SPCT { get; set; }
+        [Display(Name = "Giá :")]
         public double gia { get; set; }
+        [Display(Name = "Số Lượng :")]
         public int so_luong { get; set; }
+        [Display(Name = "Trạng Thái :")]
         public int trang_thai { get; set; }
         public DateTime ngay_tao { get; set; }
         public DateTime? ngay_sua { get; set; }
         [ForeignKey("Kich_Thuoc")]
-        public Guid? Kich_ThuocID { get; set; }
+        [Display(Name = "Kích Thước :")]
+        public Guid Kich_ThuocID { get; set; }
         [ForeignKey("Mau_Sac")]
-        public Guid? Mau_SacID { get; set; }
+
+        [Display(Name = "Màu Sắc :")]
+        public Guid Mau_SacID { get; set; }
+
         [ForeignKey("San_Pham")]
         public Guid San_PhamID { get; set; }
         [Display(Name = "Kiểu Dáng :")]
@@ -33,7 +41,8 @@ namespace ClssLib
         public Guid? Danh_MucID { get; set; }
         [ForeignKey("Loai_Giay")]
         [Display(Name = "Loại Giày :")]
-        public Guid? Loai_GiayID { get; set; }
+        [Required]
+        public Guid Loai_GiayID { get; set; }
         [ForeignKey("Mui_Giay")]
         [Display(Name = "Mũi Giày :")]
         public Guid? Mui_GiayID { get; set; }
@@ -45,7 +54,8 @@ namespace ClssLib
         public Guid? De_GiayID { get; set; }
         [ForeignKey("Chat_Lieu")]
         [Display(Name = "Chất Liệu :")]
-        public Guid? Chat_LieuID { get; set; }
+        [Required]
+        public Guid Chat_LieuID { get; set; }
         [JsonIgnore]
         public virtual Kieu_Dang? Kieu_Dang { get; set; }
         [JsonIgnore]

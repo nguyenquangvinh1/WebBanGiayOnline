@@ -32,7 +32,7 @@ namespace ClssLib
         public Guid? Danh_MucID { get; set; }
         [ForeignKey("Loai_Giay")]
         [Display(Name = "Loại Giày :")]
-        public Guid? Loai_GiayID { get; set; }
+        public Guid Loai_GiayID { get; set; }
         [ForeignKey("Mui_Giay")]
         [Display(Name = "Mũi Giày :")]
         public Guid? Mui_GiayID { get; set; }
@@ -44,7 +44,7 @@ namespace ClssLib
         public Guid? De_GiayID { get; set; }
         [ForeignKey("Chat_Lieu")]
         [Display(Name = "Chất Liệu :")]
-        public Guid? Chat_LieuID { get; set; }
+        public Guid Chat_LieuID { get; set; }
         [JsonIgnore]
         public virtual Kieu_Dang? Kieu_Dang { get; set; }
         [JsonIgnore]
