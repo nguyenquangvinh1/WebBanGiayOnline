@@ -86,6 +86,7 @@ namespace WebBanGiay.Controllers
         {
             var Cart1 = Cart;
             var item = Cart1.SingleOrDefault(x => x.id == id);
+
             if (item == null)
             {
                 var hanghoa = db.san_Phams.SingleOrDefault(x => x.ID == id);
@@ -94,6 +95,7 @@ namespace WebBanGiay.Controllers
                     TempData["Message"] = $"Không tìm thấy {id}";
                     return Redirect("/404");
                 }
+              
 
                 item = new CartItem
                 {
