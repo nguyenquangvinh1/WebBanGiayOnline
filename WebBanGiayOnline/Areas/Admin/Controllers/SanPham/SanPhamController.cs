@@ -36,6 +36,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 .Include(x => x.Loai_Giay)
                 .Include(x => x.Mui_Giay)
                 .AsNoTracking()
+                .OrderByDescending(x => x.ngay_sua)
                 .ToListAsync();
 
             ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu");
@@ -56,7 +57,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 return Json(new { success = false, message = "⚠️ Không có file nào được tải lên!" });
 
             // Danh sách định dạng ảnh hợp lệ
-            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif",".jfif" };
             var fileExtension = Path.GetExtension(file.FileName).ToLower();
 
             if (!allowedExtensions.Contains(fileExtension))
@@ -91,11 +92,21 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 
 
         [HttpGet]
-        public IActionResult Filter(string chatLieu, string coGiay, string danhMuc, string deGiay, string muiGiay, string kieuDang, string loaiGiay)
+        public IActionResult Filter(string tenSanPham, string chatLieu, string coGiay, string danhMuc, string deGiay, string muiGiay, string kieuDang, string loaiGiay,int? trangThai)
         {
             Console.WriteLine($"📌 Nhận giá trị lọc: chatLieu={chatLieu}, coGiay={coGiay}, danhMuc={danhMuc}, deGiay={deGiay}, muiGiay={muiGiay}, kieuDang={kieuDang}, loaiGiay={loaiGiay}");
 
             var query = _context.san_Phams.AsQueryable();
+
+
+            // Lọc theo tên sản phẩm (không phân biệt chữ hoa/thường)
+            if (!string.IsNullOrEmpty(tenSanPham))
+                query = query.Where(sp => sp.ten_san_pham.Contains(tenSanPham));
+
+            // Lọc theo trạng thái nếu có giá trị
+            if (trangThai.HasValue)
+                query = query.Where(sp => sp.trang_thai == trangThai.Value);
+
 
             if (!string.IsNullOrEmpty(chatLieu))
                 query = query.Where(sp => sp.Chat_LieuID.ToString() == chatLieu);
@@ -126,6 +137,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 .Include(x => x.Kieu_Dang)
                 .Include(x => x.Loai_Giay)
                 .Include(x => x.Mui_Giay)
+                .OrderByDescending(x => x.ngay_sua)
                 .AsNoTracking()
                 .ToList();
 
@@ -138,6 +150,9 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.ToList(), "ID", "ten_mui_giay");
             ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.ToList(), "ID", "ten_kieu_dang");
             ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.ToList(), "ID", "ten_loai_giay");
+
+            ViewData["SearchTerm"] = tenSanPham;
+            ViewData["SelectedTrangThai"] = trangThai;
 
             return View("Index", result); // Trả về danh sách đã lọc
         }
@@ -481,6 +496,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             SP.mo_ta = san_Pham.mo_ta;
             SP.trang_thai = 1;
             SP.ngay_tao = DateTime.Now;
+            SP.ngay_sua = DateTime.Now;
             SP.Kieu_DangID = san_Pham.Kieu_DangID;
             SP.Danh_MucID = san_Pham.Danh_MucID;
             SP.Loai_GiayID = san_Pham.Loai_GiayID;
@@ -527,11 +543,19 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                         ten_SPCT = SP.ten_san_pham + " [" + item.Mau_Sac + "-" + item.Kich_Thuoc + "]",
                         gia = item.gia,
                         so_luong = item.so_luong,
-                        trang_thai = item.trang_thai,
-                        ngay_tao = item.ngay_tao,
+                        trang_thai = (int)item.trang_thai,
+                        ngay_tao = (DateTime)item.ngay_tao,
+                        ngay_sua = DateTime.Now,
                         Kich_ThuocID = kichThuoc.ID,
                         Mau_SacID = mauSac.ID,
-                        San_PhamID = SP.ID
+                        San_PhamID = SP.ID,
+                        Kieu_DangID = SP.Kieu_DangID,
+                        Danh_MucID = SP.Danh_MucID,
+                        Loai_GiayID = SP.Loai_GiayID,
+                        Mui_GiayID = SP.Mui_GiayID,
+                        Co_GiayID = SP.Co_GiayID,
+                        De_GiayID = SP.De_GiayID,
+                        Chat_LieuID = SP.Chat_LieuID
                     };
 
                     _context.san_Pham_Chi_Tiets.Add(sp);
@@ -577,8 +601,10 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 {
                     existingSPCT.so_luong = spct.so_luong;
                     existingSPCT.gia = spct.gia;
-                    existingSPCT.trang_thai = spct.trang_thai;
+                    existingSPCT.trang_thai = (int)spct.trang_thai;
                     existingSPCT.ngay_sua = DateTime.Now;
+
+                    _context.san_Pham_Chi_Tiets.Update(existingSPCT);
                     List<Anh_San_Pham> anh = new List<Anh_San_Pham>();
                     List<string> lis = JsonConvert.DeserializeObject<List<string>>(spct.imgUrl);
                     if (lis == null)
@@ -623,7 +649,6 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                         _context.anh_San_Pham_San_Pham_Chi_Tiets.Add(link);
                     }
 
-                    _context.san_Pham_Chi_Tiets.Update(existingSPCT);
 
 
                 }
@@ -766,7 +791,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 {
                     existingSPCT.so_luong = spct.so_luong;
                     existingSPCT.gia = spct.gia;
-                    existingSPCT.trang_thai = spct.trang_thai;
+                    existingSPCT.trang_thai = (int)spct.trang_thai;
                     existingSPCT.ngay_sua = DateTime.Now;
                     _context.san_Pham_Chi_Tiets.Update(existingSPCT);
                     List<Anh_San_Pham> anh = new List<Anh_San_Pham>();

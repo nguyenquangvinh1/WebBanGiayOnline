@@ -1,0 +1,63 @@
+﻿@model WebBanGiay.Models.ViewModel.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h1>Đăng Kí</h1>
+<style>
+    label {
+        display: block;
+        text-align: left;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+</style>
+
+<hr />
+<div class="d-flex justify-content-center align-items-center vh-100" style="background: url(/coloshop-master/images/anhdep.jpg) center/cover no-repeat; filter: brightness(0.8);">
+    <div class="p-5 bg-white shadow-lg rounded text-center" style="width: 450px; padding: 60px;">
+        <h2 class="fw-bold text-primary">Đăng kí</h2>
+        <form asp-action="Register" method="post">
+            <div class="mb-3">
+                <label asp-for="Username" class="form-label fw-bold">Tên đăng nhập</label>
+                <input asp-for="Username" class="form-control form-control-lg" required placeholder="Tên đăng nhập" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label " style="text-align:left">Email</label>
+                <input asp-for="Email" class="form-control form-control-lg" required placeholder="Email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="mb-3 position-relative">
+                <label asp-for="Password" class="form-label fw-bold">Mật khẩu</label>
+                <input asp-for="Password" class="form-control form-control-lg" required placeholder="Mật khẩu" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+                
+            </div>
+            <div class="mb-3 position-relative">
+                <label asp-for="ConfirmPassword" class="form-label fw-bold">Nhập lại mật khẩu</label>
+                <input asp-for="ConfirmPassword" class="form-control form-control-lg" required placeholder="Nhập lại mật khẩu" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+              
+            </div>
+            <button type="submit" class="btn btn-primary w-100 rounded-pill btn-lg">Đăng kí</button>
+            <div class="mt-4">
+                <a asp-controller="Taikhoan" asp-action="Login" class="text-decoration-none">Already have an account? <span class="text-primary">Login</span></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

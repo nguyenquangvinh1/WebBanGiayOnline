@@ -3,6 +3,7 @@
 
 @{
     ViewData["Title"] = "Giỏ Hàng 123";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -33,31 +34,39 @@
 
     <!-- Template Stylesheet -->
     <link href="~/css/style.css" rel="stylesheet">
+    <style>
+        .container-fluid.page-header {
+        background-image: url(/coloshop-master/images/anhdep1.jpg);
+        background-size: cover;
+        background-position: center;
+        }
+
+    </style>
 </head>
 
 <body>
 
     <!-- Spinner Start -->
-  
+
     <!-- Spinner End -->
     <!-- Navbar start -->
     <div class="container-fluid fixed-top">
         <div class="container topbar bg-primary d-none d-lg-block">
             <div class="d-flex justify-content-between">
                 <div class="top-info ps-2">
-                    <small class="me-3"><i class="fas fa-map-marker-alt me-2 text-secondary"></i> <a href="#" class="text-white">123 Street, New York</a></small>
-                    <small class="me-3"><i class="fas fa-envelope me-2 text-secondary"></i><a href="#" class="text-white">Email@Example.com</a></small>
+                    <small class="me-3"><i class="fas fa-map-marker-alt me-2 text-secondary"></i> <a href="#" class="text-white">Số 28 Trung Văn,Nam Từ Liêm ,Hà Nội</a></small>
+                    <small class="me-3"><i class="fas fa-envelope me-2 text-secondary"></i><a href="#" class="text-white">vinhnq041003@gmail.com</a></small>
                 </div>
                 <div class="top-link pe-2">
-                    <a href="#" class="text-white"><small class="text-white mx-2">Privacy Policy</small>/</a>
-                    <a href="#" class="text-white"><small class="text-white mx-2">Terms of Use</small>/</a>
-                    <a href="#" class="text-white"><small class="text-white ms-2">Sales and Refunds</small></a>
+                    <a href="#" class="text-white"><small class="text-white mx-2">Chính sách bảo mật</small>/</a>
+                    <a href="#" class="text-white"><small class="text-white mx-2">Điểu khoản sử dung</small>/</a>
+                    <a href="#" class="text-white"><small class="text-white ms-2">Bán hàng và hoàn tiền</small></a>
                 </div>
             </div>
         </div>
         <div class="container px-0">
             <nav class="navbar navbar-light bg-white navbar-expand-xl">
-                <a href="index.html" class="navbar-brand"><h1 class="text-primary display-6">Fruitables</h1></a>
+                <a asp-controller="San_Pham_Chi_Tiet" asp-action="Index" class="navbar-brand"><h1 class="text-primary display-6">Adidas Shop</h1></a>
                 <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                     <span class="fa fa-bars text-primary"></span>
                 </button>
@@ -79,10 +88,33 @@
                     </div>
                     <div class="d-flex m-3 me-0">
                         <button class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fas fa-search text-primary"></i></button>
-                        @await Component.InvokeAsync("Cart")
-                        <a href="#" class="my-auto">
-                            <i class="fas fa-user fa-2x"></i>
-                        </a>
+                       
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <div class="dropdown my-auto">
+                                <a class="dropdown-toggle text-dark" data-bs-toggle="dropdown">
+                                    <i class="fas fa-user fa-2x"></i> @User.Identity.Name
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" asp-controller="TaiKhoan" asp-action="Logout">Đăng xuất</a></li>
+                                    <li><a class="dropdown-item" asp-controller="TaiKhoan" asp-action="ThongTinKhachHang">Thông tin</a></li>
+
+                                </ul>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="dropdown my-auto">
+                                <a class="dropdown-toggle text-dark" data-bs-toggle="dropdown">
+                                    <i class="fas fa-user fa-2x"></i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" asp-controller="TaiKhoan" asp-action="Login">Đăng nhập</a></li>
+                                    <li><a class="dropdown-item" asp-controller="TaiKhoan" asp-action="Register">Đăng ký</a></li>
+                                </ul>
+                            </div>
+                        }
                     </div>
                 </div>
             </nav>
@@ -133,54 +165,74 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in Model)
+
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <th scope="row">
+                                        <div class="d-flex align-items-center">
+                                            <img src="@item.Hinh" class="img-fluid me-5 rounded-circle" style="width: 80px; height: 80px;" alt="">
+                                        </div>
+                                    </th>
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.TenHH</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.DonGia.ToString("#,##0 VNĐ")</p>
+                                    </td>
+                                    <td>
+                                        <div class="input-group quantity mt-4" style="width: 100px;">
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-sm btn-minus rounded-circle bg-light border" type="button">
+                                                    <i class="fa fa-minus"></i>
+                                                </button>
+                                            </div>
+                                            <input type="text" class="form-control form-control-sm text-center border-0" value="@item.SoLuong">
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-sm btn-plus rounded-circle bg-light border" type="button">
+                                                    <i class="fa fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.ThanhTien.ToString("#,##0 VNĐ")</p>
+                                    </td>
+                                    <td>
+                                        <a asp-action="RemoveCart" asp-controller="Cart" asp-route-id="@item.id" class="btn btn-md rounded-circle bg-light border mt-4">
+                                            <i class="fa fa-times text-danger"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
                         {
                             <tr>
-                                <th scope="row">
-                                    <div class="d-flex align-items-center">
-                                        <img src="~/coloshop-master/images/anhdep.jpg" class="img-fluid me-5 rounded-circle" style="width: 80px; height: 80px;" alt="">
-                                    </div>
-                                </th>
-                                <td>
-                                    <p class="mb-0 mt-4">@item.TenHH</p>
+                                <td colspan="6" class="text-center" >
+                                    <p  class="mt-4 text-muted fas fa-shopping-cart ">Không có sản phẩm trong giỏ hàng</p>
+                                    
+                                        
+                                        
+                                  
                                 </td>
-                                <td>
-                                    <p class="mb-0 mt-4">@item.DonGia</p>
-                                </td>
-                                <td>
-                                    <div class="input-group quantity mt-4" style="width: 100px;">
-                                        <div class="input-group-btn">
-                                            <button class="btn btn-sm btn-minus rounded-circle bg-light border" type="button">
-                                                <i class="fa fa-minus"></i>
-                                            </button>
-                                        </div>
-                                        <input type="text" class="form-control form-control-sm text-center border-0" value="@item.SoLuong">
-                                        <div class="input-group-btn">
-                                            <button class="btn btn-sm btn-plus rounded-circle bg-light border" type="button">
-                                                <i class="fa fa-plus"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <p class="mb-0 mt-4">@item.ThanhTien VNĐ</p>
-                                </td>
-                                <td>
-                                    <a asp-action="RemoveCart" asp-controller="Cart" asp-route-id="@item.id" class="btn btn-md rounded-circle bg-light border mt-4">
-                                        <i class="fa fa-times text-danger"></i>
-                                    </a>
-                                </td>
-
                             </tr>
                         }
+
+
 
                     </tbody>
                 </table>
             </div>
-            <div class="mt-5">
-                <input type="text" class="border-0 border-bottom rounded me-5 py-3 mb-4" placeholder="Coupon Code">
-                <button class="btn border-secondary rounded-pill px-4 py-3 text-primary" type="button">Apply Coupon</button>
-            </div>
+                              <div class="mb-3">
+                        <label class="form-label">Mã giảm giá</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control discountCodeInput" placeholder="Mã giảm giá tốt nhất" readonly>
+                            <button class="btn btn-outline-secondary selectDiscount" type="button" data-id="INVOICE_ID">Chọn mã giảm giá</button>
+                        </div>
+                    </div>
             <div class="row g-4 justify-content-end">
                 <div class="col-8"></div>
                 <div class="col-sm-8 col-md-7 col-lg-6 col-xl-4">
@@ -189,27 +241,21 @@
                             <h1 class="display-6 mb-4">Cart <span class="fw-normal">Total</span></h1>
                             <div class="d-flex justify-content-between mb-4">
                                 <h5 class="mb-0 me-4">Subtotal:</h5>
-                                <p class="mb-0">@Model.Sum(x =>x.ThanhTien)</p>
+                                <p class="mb-0">@Model.Sum(x => x.ThanhTien).ToString("#,##0 VNĐ")</p>
                             </div>
-                            <div class="d-flex justify-content-between">
-                                <h5 class="mb-0 me-4">Shipping</h5>
-                                <div class="">
-                                    <p class="mb-0">Flat rate: $3.00</p>
-                                </div>
-                            </div>
-                            <p class="mb-0 text-end">Shipping to Ukraine.</p>
+                           
+                            
                         </div>
                         <div class="py-4 mb-4 border-top border-bottom d-flex justify-content-between">
-                            <h5 class="mb-0 ps-4 me-4">Total</h5>
-                            <p class="mb-0 pe-4">@Model.Sum(x => x.ThanhTien)</p>
+                            <h5 class="mb-0 ps-4 me-4">Tổng tiền</h5>
+                            <p class="mb-0 pe-4">@Model.Sum(x => x.ThanhTien).ToString("#,##0 VNĐ")</p>
                         </div>
-                        <a asp-controller="Cart" asp-action="CheckOut"  class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4" >Proceed Checkout</a>
+                        <a asp-controller="Cart" asp-action="CheckOut"  class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4" >Đặt Hàng</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Cart Page End -->
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
         <div class="container py-5">
@@ -300,8 +346,7 @@
             </div>
         </div>
     </div>
-    <!-- Copyright End -->
-    <!-- Back to Top -->
+  
     <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i class="fa fa-arrow-up"></i></a>
 
 

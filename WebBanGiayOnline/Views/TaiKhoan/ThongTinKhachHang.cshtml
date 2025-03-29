@@ -1,0 +1,137 @@
+﻿@model WebBanGiay.Models.ViewModel.InforKhachhangViewmodel
+
+@{
+    ViewData["Title"] = "ThongTinKhachHang";
+}
+
+<h1>ThongTinKhachHang</h1>
+
+<h4>Tai_Khoan</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form id="updateCustomerForm">
+            <input hidden id="UserId" value="@Model.UserId" />
+
+            <div class="mb-3">
+                <label>Họ và Tên</label>
+                <input type="text" id="ho_ten" class="form-control" value="@Model.UserName" required />
+            </div>
+            <div class="mb-3">
+                <label>Email</label>
+                <input type="email" id="email" class="form-control" value="@Model.Email" required />
+            </div>
+            <div class="mb-3">
+                <label>Số điện thoại</label>
+                <input type="text" id="sdt" class="form-control" value="@Model.Phone" required />
+            </div>
+            <div class="mb-3">
+                <label>Tỉnh/Thành:</label>
+                <select id="thanhPho" name="ThanhPho"></select><br />
+
+                <label>Quận/Huyện:</label>
+                <select id="quanHuyen" name="QuanHuyen"></select><br />
+
+                <label>Phường/Xã:</label>
+                <select id="phuongXa" name="PhuongXa"></select><br />
+            </div>
+            @*             <div class="mb-3">
+                <label>Địa chỉ chi tiết:</label>
+                <input type="text" id="dia_chi" class="form-control" value="@Model." required />
+
+            </div> *@
+            <button type="submit" id="updateinforBtn" class="btn btn-secondary">Cập nhật</button>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            // Load Tỉnh/Thành
+            $.get("https://esgoo.net/api-tinhthanh/tinh_tp", function (data) {
+                let thanhPhoSelect = $("#thanhPho");
+                thanhPhoSelect.append('<option value="">Chọn tỉnh/thành</option>');
+                data.forEach(tp => {
+                    thanhPhoSelect.append(`<option value="${tp.name}">${tp.name}</option>`);
+                });
+            });
+
+            // Load Quận/Huyện khi chọn Tỉnh/Thành
+            $("#thanhPho").on("change", function () {
+                let selectedTinh = $(this).val();
+                $.get(`https://esgoo.net/api-tinhthanh/quan_huyen/${selectedTinh}`, function (data) {
+                    let quanHuyenSelect = $("#quanHuyen");
+                    quanHuyenSelect.empty().append('<option value="">Chọn quận/huyện</option>');
+                    data.forEach(qh => {
+                        quanHuyenSelect.append(`<option value="${qh.name}">${qh.name}</option>`);
+                    });
+                    $("#phuongXa").empty().append('<option value="">Chọn phường/xã</option>'); // Xóa phường/xã khi đổi tỉnh
+                });
+            });
+
+            // Load Phường/Xã khi chọn Quận/Huyện
+            $("#quanHuyen").on("change", function () {
+                let selectedHuyen = $(this).val();
+                $.get(`https://esgoo.net/api-tinhthanh/phuong_xa/${selectedHuyen}`, function (data) {
+                    let phuongXaSelect = $("#phuongXa");
+                    phuongXaSelect.empty().append('<option value="">Chọn phường/xã</option>');
+                    data.forEach(px => {
+                        phuongXaSelect.append(`<option value="${px.name}">${px.name}</option>`);
+                    });
+                });
+            });
+        });
+        $document.getElementById("updateCustomerForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+            Swal.fire({
+                title: "Xác nhận",
+                text: "Bạn có chắc chắn muốn cập nhật thông tin không?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Có, cập nhật!",
+                cancelButtonText: "Hủy"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    event.target.submit();
+                }
+            });
+        });
+        // Cập nhật khách hàng
+        $("#updateinforBtn").click(function () {
+            let customer = {
+                Id: $("#UserId").val(),
+                ho_ten: $("#ho_ten").val(),
+                email: $("#email").val(),
+                sdt: $("#sdt").val()
+            };
+
+            $.ajax({
+                url: "TaiKhoan/ThongTinKhachHang",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(customer),
+                success: function (response) {
+                    if (response.success) {
+                        alert("Cập nhật thành công!");
+                        window.location.href = "TaiKhoan/ThongTinKhachHang"; // Chuyển hướng về Index
+                    } else {
+                        alert("Cập nhật thất bại!");
+                    }
+                },
+                error: function (xhr) {
+                    alert("Lỗi khi cập nhật: " + xhr.status);
+                }
+            });
+    </script>
+}
+

@@ -22,7 +22,7 @@
             <div class="modal-footer">
                 <button type="button" id="selectImages" class="btn btn-success">Chọn Ảnh</button>
             </div>
-            
+
         </div>
     </div>
 </div>
@@ -35,8 +35,8 @@
 
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            
-            
+
+
             <input class="form-control" type="hidden" id="lstSPCT" required="" name="lstSPCT" />
 
             <input class="form-control" type="hidden" id="productImages" name="productImages" />
@@ -112,7 +112,7 @@
                         </select>
                     </div>
                 </div>
-                
+
             </div>
             <div class="row">
                 <div class="col-sm-4">
@@ -134,11 +134,11 @@
                         <label asp-for="Mui_GiayID" class="control-label"></label>
 
                         <select id="Mui_GiayID" name="Mui_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddMuiGiay">
-                        <option value="">-- Nhập hoặc chọn Mũi Giày --</option>
-                        @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Mui_GiayID)
-                        {
-                            <option value="@item.Value">@item.Text</option>
-                        }
+                            <option value="">-- Nhập hoặc chọn Mũi Giày --</option>
+                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Mui_GiayID)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
                         </select>
                     </div>
                 </div>
@@ -156,9 +156,9 @@
                         </select>
                     </div>
                 </div>
-                
+
             </div>
-            
+
             <div class="form-group">
                 <label asp-for="mo_ta" class="control-label">Mô Tả Sản Phẩm</label>
                 <textarea asp-for="mo_ta" class="form-control"></textarea>
@@ -199,7 +199,7 @@
                 </button>
             </div>
             <div id="selectedSize" class="mb-3"></div>
-            
+
         </form>
     </div>
 </div>
@@ -244,7 +244,7 @@
                             <span class="input-group-text"><i class="fas fa-square"></i></span>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="modal-footer">
@@ -281,7 +281,7 @@
                     <label>Size picker:</label>
                     <div class="input-group">
                         <input type="text" class="form-control" id="newSize">
-                        
+
                     </div>
 
                 </div>
@@ -297,7 +297,6 @@
 <div class="row">
     <div class="col-12">
         <div id="productTables" class="card">
-
         </div>
     </div>
 </div>
@@ -539,6 +538,7 @@
         } else {
             khoiTaoSelect2();
         }
+        //tim
         console.log("🔍 jQuery version:", $.fn.jquery);
         console.log("🔍 Select2 exists:", typeof $.fn.select2 !== "undefined");
 
