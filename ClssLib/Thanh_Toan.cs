@@ -12,7 +12,7 @@ namespace ClssLib
     {
         public Guid ID { get; set; }
         public int trang_thai { get; set; }
-        public decimal so_tien_thanh_toan { get; set; }
+        public double so_tien_thanh_toan { get; set; }
         public DateTime ngay_thanh_toan { get; set; }
         public string mo_ta { get; set; }
         [ForeignKey("Hoa_Don")]

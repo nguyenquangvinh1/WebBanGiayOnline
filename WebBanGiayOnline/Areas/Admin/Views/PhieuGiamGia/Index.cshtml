@@ -1,5 +1,5 @@
-﻿@model IEnumerable<ClssLib.Phieu_Giam_Gia>
-
+﻿@using X.PagedList.Mvc.Core;
+@model X.PagedList.IPagedList<ClssLib.Phieu_Giam_Gia>
 
 <div class="page-content-wrapper">
     <div class="container-fluid">
@@ -26,7 +26,7 @@
 
 
     @{
-        ViewData["Title"] = "Index";
+        ViewData["Title"] = "Phiếu giảm giá";
     }
     @if (TempData["SuccessMessage"] != null)
     {
@@ -48,6 +48,7 @@
                 margin: 20px;
                 background-color: #f4f4f4;
             }
+
 
             .container {
                 background: white;
@@ -230,6 +231,16 @@
                 white-space: nowrap; /* Giữ text trên 1 dòng */
             }
 
+            .pagination-container1 {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 15px;
+                background-color: #fff;
+                border-radius: 10px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+
             .trang-thai-het-han {
                 color: #FF0000; /* Chữ đỏ */
                 background-color: #fff;
@@ -328,58 +339,24 @@
 
                 </div>
                 <div class="input-group me-2">
-                    <select class="form-select" name="type">
-                        <option value="">Chọn kiểu</option>
-
-                        @if (ViewData["CurrentType"]?.ToString() == "Công khai")
-                        {
-                            <option value="Công khai" selected>Công khai</option>
-                        }
-                        else
-                        {
-                            <option value="Công khai">Công khai</option>
-                        }
-
-                        @if (ViewData["CurrentType"]?.ToString() == "Cá nhân")
-                        {
-                            <option value="Cá nhân" selected>Cá nhân</option>
-                        }
-                        else
-                        {
-                            <option value="Cá nhân">Cá nhân</option>
-                        }
-                    </select>
-
                 </div>
-                <select>
-                    <option value="">Loại</option>
-                    <option value="giam_gia">Giảm giá</option>
-                    <option value="khuyen_mai">Khuyến mãi</option>
-                </select>
 
+                <!-- Bộ lọc danh mục -->
                 <div class="input-group me-2">
-                    <select class="form-select" name="status">
-                        <option value="">Chọn trạng thái</option>
-
-                        @if (ViewData["CurrentStatus"]?.ToString() == "true")
-                        {
-                            <option value="true" selected>Còn hiệu lực</option>
-                        }
-                        else
-                        {
-                            <option value="true">Còn hiệu lực</option>
-                        }
-
-                        @if (ViewData["CurrentStatus"]?.ToString() == "false")
-                        {
-                            <option value="false" selected>Hết hiệu lực</option>
-                        }
-                        else
-                        {
-                            <option value="false">Hết hiệu lực</option>
-                        }
-                    </select>
+                    <form id="filterForm" action="@Url.Action("Index", "PhieuGiamGia")" method="get">
+                        <label for="Category" class="fw-bold">Trạng thái:</label>
+                        <select name="Category" id="Category" class="form-select" onchange="document.getElementById('filterForm').submit()">
+                            <option value="">-- Chọn trạng thái --</option>
+                            @foreach (var item in ViewBag.TrangThaiList)
+                            {
+                                <option value="@item.Value" selected="@(item.Value == Context.Request.Query["Category"] ? "selected" : null)">
+                                    @item.Text
+                                </option>
+                            }
+                        </select>
+                    </form>
                 </div>
+
                 <!-- Xuất Excel -->
                 <form asp-action="ExportExcel" method="get" class="d-inline">
                     <button type="submit" class="btn btn-outline-success">
@@ -463,20 +440,16 @@
                                 }
                                 else
                                 {
-                                    <span class="trang-thai-het-han">Hết hạn</span>
+                                    <span class="trang-thai-het-han">Hết hiệu lực</span>
                                 }
                             </td>
-
 
                             <td>
                                 <div class="btn-group btn-group-xs">
                                     <a asp-area="Admin" asp-action="Edit" asp-route-id="@item.ID" class="btn btn-warning">
                                         <i class="fa fa-xs fa-pen"></i>
                                     </a>
-                                    <button type="button" class="btn btn-sm btn-secondary"
-                                            onclick="changeStatus('@item.ID')">
-                                        <i class="fa fa-sync"></i>
-                                    </button>
+
                                 </div>
 
 
@@ -488,27 +461,34 @@
                 </tbody>
             </table>
 
-            <div class="pagination">
-                <div>
-                    <label for="itemsPerPage">Hiển thị:</label>
-                    <select id="itemsPerPage">
-                        <option value="5">5</option>
-                        <option value="10" selected>10</option>
-                        <option value="20">20</option>
-                    </select>
-                    <span>sản phẩm trên trang</span>
-                </div>
-                <div>
-                    <button>&laquo; Trước</button>
-                    <button>1</button>
-                    <button>2</button>
-                    <button>3</button>
-                    <button>Tiếp &raquo;</button>
-                </div>
-            </div>
-        </div>
+
 
     </body1>
+    <div class="pagination-container1">
+
+        <span class="pagination-info">
+            Tổng số hóa đơn: <strong>@Model.TotalItemCount</strong> |
+            Hiển thị: <strong>@Model.PageSize</strong> mục/trang
+        </span>
+        <div>
+            @Html.PagedListPager(Model, page => Url.Action("Index", new
+                {
+                    page,
+                    searchString = Context.Request.Query["searchString"],
+                    Category = Context.Request.Query["Category"]
+                }),
+                     new PagedListRenderOptions
+            {
+                LiElementClasses = new[] { "page-item" },
+                PageClasses = new[] { "page-link" },
+                DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+                DisplayLinkToLastPage = PagedListDisplayMode.Always,
+                DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+                DisplayLinkToNextPage = PagedListDisplayMode.Always,
+                MaximumPageNumbersToDisplay = 5
+            })
+        </div>
+    </div>
 </html>
 
 
@@ -525,6 +505,6 @@
     <script>
 
     </script>
-    }
+}
 
 
