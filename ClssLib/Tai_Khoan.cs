@@ -43,6 +43,8 @@ namespace ClssLib
         public string? ResetToken { get; set; }  // Token reset mật khẩu (có thể null)
         public DateTime? TokenExpiry { get; set; }  // Thời gian hết hạn token (có thể null)
 
+        public string? ResetToken { get; set; }  // Token reset mật khẩu (có thể null)
+        public DateTime? TokenExpiry { get; set; }  // Thời gian hết hạn token (có thể null)
 
 
     }
