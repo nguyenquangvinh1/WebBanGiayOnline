@@ -3,12 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using WebBanGiay.Areas.Admin.config;
 using WebBanGiay.Data;
 using WebBanGiay.Helpers;
 using WebBanGiay.ViewModel;
-using WebBanGiay.Areas.Admin.comon;
-using WebBanGiay.Areas.Admin.config;
+
 using System.Configuration;
 
 namespace WebBanGiay.Areas.Admin.Controllers
@@ -19,12 +17,15 @@ namespace WebBanGiay.Areas.Admin.Controllers
 	public class BHTQController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly IConfiguration _configuration;
+
+        public BHTQController(AppDbContext context, IConfiguration configuration)
         {
             _context = context;
-			_configuration = configuration;
+            _configuration = configuration;
 
-		}
-		public IActionResult Index()
+        }
+        public IActionResult Index()
         {
             ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu");
             ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.ToList(), "ID", "ten_loai_co_giay");
