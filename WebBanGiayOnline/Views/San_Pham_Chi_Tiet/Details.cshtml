@@ -205,7 +205,10 @@
                                     </button>
                                 </div>
                             </div>
-                                <button asp-controller="Cart" asp-action="AddCart" asp-route-id="@Model.ID" class="btn border border-secondary rounded-pill px-4 py-2 mb-4 text-primary"><i class="fa fa-shopping-bag me-2 text-primary"></i> Mua Hàng</button>
+                                <button id="btnMuaHang" class="btn border border-secondary rounded-pill px-3 py-1 mb-4 text-primary"  disabled>
+                                    <i class="fa fa-shopping-bag me-2 text-primary"></i>
+                                    Mua Hàng
+                                </button>
                             </form>
                         </div>
                     </div>
@@ -229,10 +232,7 @@
                             <div class="d-flex justify-content-between flex-lg-wrap">
                                 @* <p class="text-dark fs-5 fw-bold">@Model.DonGia.ToString("#,##0 VNĐ")</p> *@
                                 <a id="btnMuaHang" asp-controller="Cart" asp-action="AddCart" asp-route-id="" class="btn border border-secondary rounded-pill px-3 py-1 mb-4 text-primary" disabled><i class="fa fa-shopping-bag me-2 text-primary"></i> Mua Hàng</a>
-                                <button id="btnMuaHang" class="btn border border-secondary rounded-pill px-3 py-1 mb-4 text-primary" asp-controller="Cart" asp-action="AddCart" asp-route-id="" disabled>
-                                    <i class="fa fa-shopping-bag me-2 text-primary"></i>
-                                    Mua Hàng
-                                </button>
+                                
 
                             </div>
                         </div>
@@ -358,10 +358,10 @@
                     spct.mauSac === selectedMauSac && spct.kichThuoc === selectedKichThuoc);
 
                 if (matchedProduct) {
-                    $('#btnMuaHang').prop('disabled', false).attr('asp-route-id', matchedProduct.id);
+                    $('#btnMuaHang').prop('disabled', false).data('id', matchedProduct.id);
                     $('#productPrice').text(`Giá: ${matchedProduct.gia.toLocaleString()} VNĐ`);
                 } else {
-                    $('#btnMuaHang').prop('disabled', true).attr('asp-route-id', '');
+                    $('#btnMuaHang').prop('disabled', true).data('id', '');
                     $('#productPrice').text("Giá: Vui lòng chọn Màu Sắc & Kích Thước");
                 }
             }
@@ -421,6 +421,21 @@
                     e.preventDefault(); // Ngăn chặn điều hướng
                     alert("Vui lòng chọn đầy đủ Màu Sắc và Kích Thước trước khi mua hàng!");
                 }
+                var productId = $(this).data("id");
+                $.ajax({
+                    url: "/Cart/AddCart1",
+                    type: "POST",
+                    data: { id: productId },
+                    success: function (response) {
+                        alert("Thêm vào giỏ hàng thành công!");
+                    },
+                    error: function () {
+                        alert("Có lỗi xảy ra, vui lòng thử lại.");
+                    }
+                });
+                console.log("Trước khi dừng");
+                debugger;  // Trình duyệt sẽ tạm dừng tại đây
+                console.log("Sau khi dừng");
             });
         });
     </script>
