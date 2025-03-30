@@ -28,6 +28,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 .Include(x => x.Kieu_Dang)
                 .Include(x => x.Loai_Giay)
                 .Include(x => x.Mui_Giay)
+                .OrderByDescending(x => x.ngay_sua)
                 .AsNoTracking()
                 .Select(x => new San_PhamCTView
                 {

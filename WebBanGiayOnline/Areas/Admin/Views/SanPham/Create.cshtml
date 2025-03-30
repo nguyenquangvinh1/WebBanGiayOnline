@@ -35,7 +35,7 @@
 
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
+            @Html.AntiForgeryToken()
 
             <input class="form-control" type="hidden" id="lstSPCT" required="" name="lstSPCT" />
 
