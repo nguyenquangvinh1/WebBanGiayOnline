@@ -1,6 +1,7 @@
 ﻿using ClssLib;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using WebBanGiay.Data;
 using WebBanGiay.ViewModel;
 
@@ -30,7 +31,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     MaHoaDon = GenerateNewHoaDonID(),
                     tong_tien = 0,
                     ghi_chu = "",
-              
+
                     trang_thai = 0,
                     dia_chi = "",
                     sdt_nguoi_nhan = "",
@@ -45,14 +46,36 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 _context.hoa_Dons.Add(newInvoice);
                 _context.SaveChanges();
 
-                return Json(new { success = true, invoiceId = newInvoice.ID, message = "Tạo hóa đơn mới thành công!" });
+                return Json(new { success = true, invoiceId = newInvoice.ID,data = newInvoice, message = "Tạo hóa đơn mới thành công!" });
             }
             catch (Exception ex)
             {
                 return Json(new { success = false, message = "Lỗi khi tạo hóa đơn: " + ex.Message });
             }
         }
-   //hien thi danh sach san pham trong hoa don
+
+
+        [HttpPost]
+        public IActionResult GetInvoicesByIDs([FromBody] GetInvoicesParam param)
+        {
+            try
+            {
+                var data = _context.hoa_Dons
+                        .Where(hd => param.invoiceIds.Contains(hd.ID))
+                        .Select(hd => new {
+                            hd.ID,
+                            hd.MaHoaDon
+                        }
+                        ).ToList();
+                return Json(new { success = true, data = data });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, data = ex });
+            }
+        }
+
+        //hien thi danh sach san pham trong hoa don
 
         [HttpGet]
         public IActionResult GetInvoiceDetails(Guid invoiceId)
@@ -264,6 +287,12 @@ namespace WebBanGiay.Areas.Admin.Controllers
         {
             public Guid chiTietId { get; set; }
             public int delta { get; set; } // +1 để tăng, -1 để giảm
+        }
+
+        // Model cho request cập nhật số lượng
+        public class GetInvoicesParam
+        {
+            public List<Guid> invoiceIds { get; set; }
         }
 
        
@@ -594,6 +623,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 }
             });
         }
+
         [HttpPost]
         public IActionResult FinalizePayment([FromBody] FinalizePaymentRequest model)
         {
@@ -615,37 +645,62 @@ namespace WebBanGiay.Areas.Admin.Controllers
                         Hoa_DonID = model.InvoiceId,
                         ngay_thanh_toan = DateTime.Now,
                         trang_thai = 0,
-                        mo_ta = "Thanh toán tự động"
+                        mo_ta = "Thanh toán"
                     };
                     _context.thanh_Toans.Add(payment);
                 }
                 _context.SaveChanges();
             }
 
-            // 3. Nếu có Voucher => giảm số lượng voucher
-            if (model.VoucherId.HasValue)
+            // 3. Nếu có Voucher (dựa vào VoucherCodeString)
+            if (!string.IsNullOrWhiteSpace(model.VoucherCodeString))
             {
-                var voucher = _context.phieu_Giam_Gias.FirstOrDefault(v => v.ID == model.VoucherId.Value);
+                // Tìm voucher theo mã (trường ma trong bảng phieu_Giam_Gias)
+                var voucher = _context.phieu_Giam_Gias.FirstOrDefault(v => v.ma == model.VoucherCodeString);
                 if (voucher == null)
-                    return Json(new { success = false, message = "Không tìm thấy phiếu giảm giá" });
+                    return Json(new { success = false, message = "Không tìm thấy phiếu giảm giá!" });
                 if (voucher.so_luong <= 0)
                     return Json(new { success = false, message = "Phiếu giảm giá đã hết!" });
 
+                double discountAmount = 0;
+                // Nếu loại phiếu giảm giá là 1 => Giảm %
+                if (voucher.loai_phieu_giam_gia == 1)
+                {
+                    discountAmount = invoice.tong_tien * (voucher.gia_tri_giam / 100.0);
+                    if (voucher.so_tien_giam_toi_da.HasValue && discountAmount > voucher.so_tien_giam_toi_da.Value)
+                        discountAmount = voucher.so_tien_giam_toi_da.Value;
+                }
+                // Nếu loại phiếu giảm giá là 0 => Giảm VND
+                else if (voucher.loai_phieu_giam_gia == 0)
+                {
+                    discountAmount = voucher.gia_tri_giam;
+                }
+
+                // Giảm số lượng voucher
                 voucher.so_luong -= 1;
                 _context.phieu_Giam_Gias.Update(voucher);
 
-                // Lưu voucher vào hóa đơn nếu cần (thêm cột VoucherID trong bảng hoa_Dons)
-                invoice.Giam_Gia.ID = model.VoucherId.Value;
+                // Lưu voucher vào hóa đơn
+                invoice.Giam_GiaID = voucher.ID;
+                _context.hoa_Dons.Update(invoice);
+                _context.SaveChanges();
+                // Cập nhật tổng tiền hóa đơn (trừ số tiền giảm)
+                double newTotal = invoice.tong_tien - discountAmount;
+                if (newTotal < 0)
+                    newTotal = 0;
+                invoice.tong_tien = newTotal;
             }
 
-            // 4. Update trạng thái hóa đơn thành 3 (Hoàn thành)
-            invoice.loai_hoa_don = 1;
+            // 4. Đổi trạng thái hóa đơn thành 3 (Hoàn thành)
             invoice.trang_thai = 3;
             _context.hoa_Dons.Update(invoice);
             _context.SaveChanges();
 
             return Json(new { success = true, message = "Thanh toán thành công!" });
         }
+
+
+
 
         // Ví dụ hàm map Method -> ID
         private Guid GetPaymentMethodIdByCode(string method)

@@ -103,7 +103,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
             {
 
                 // Truy vấn vai trò "Khách hàng" trong cơ sở dữ liệu
-                var vaiTro = await _context.vai_Tros.FirstOrDefaultAsync(v => v.ten_vai_tro == "Khách hàng");
+                var vaiTro = _context.vai_Tros.FirstOrDefault(v => v.ten_vai_tro == "Khách hàng");
 
                 if (vaiTro == null)
                 {

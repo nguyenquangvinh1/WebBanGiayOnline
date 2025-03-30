@@ -48,6 +48,8 @@ builder.Services.Configure<MomoOptionModel>(builder.Configuration.GetSection("Mo
 builder.Services.AddScoped<IMomoService, MomoService>();
 
 builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<IGhnService, GhnService>();
+
 
 
 var app = builder.Build();

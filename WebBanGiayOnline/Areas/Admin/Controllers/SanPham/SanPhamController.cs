@@ -57,7 +57,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 return Json(new { success = false, message = "⚠️ Không có file nào được tải lên!" });
 
             // Danh sách định dạng ảnh hợp lệ
-            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif",".jfif" };
             var fileExtension = Path.GetExtension(file.FileName).ToLower();
 
             if (!allowedExtensions.Contains(fileExtension))
