@@ -28,6 +28,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 .Include(x => x.Kieu_Dang)
                 .Include(x => x.Loai_Giay)
                 .Include(x => x.Mui_Giay)
+                .OrderByDescending(x => x.ngay_sua)
                 .AsNoTracking()
                 .Select(x => new San_PhamCTView
                 {
@@ -221,6 +222,24 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             {
                 return StatusCode(500, new { message = "Lỗi server", error = ex.Message });
             }
+        }
+
+        [HttpGet("GetProductImages")]
+        public IActionResult GetProductImages(Guid id)
+        {
+            var product = _context.san_Pham_Chi_Tiets.Find(id);
+
+            if (product == null)
+            {
+                return Json(new string[] { }); // Trả về mảng rỗng nếu không tìm thấy sản phẩm
+            }
+
+            var imageUrls = _context.anh_San_Phams
+                .Where(x => x.San_PhamID == product.San_PhamID)
+                .Select(x => x.anh_url)
+                .ToList();
+
+            return Json(imageUrls); // Trả về danh sách URL ảnh
         }
 
 

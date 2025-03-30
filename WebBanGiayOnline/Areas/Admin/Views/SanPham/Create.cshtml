@@ -35,7 +35,7 @@
 
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
+            @Html.AntiForgeryToken()
 
             <input class="form-control" type="hidden" id="lstSPCT" required="" name="lstSPCT" />
 
@@ -221,14 +221,7 @@
                     <div class="form-check d-flex align-items-center">
                         <!-- Checkbox chọn màu -->
                         <input class="form-check-input color-checkbox me-2" type="checkbox" value="@item.Text">
-                        <!-- Nút hiển thị màu -->
-                        <button class="btn text-white d-flex align-items-center justify-content-center"
-                                style="background-color: @item.Text;
-                       border: 1px solid #ccc;
-                       width: 50px; height: 50px;
-                       border-radius: 8px;">
-                            @item.Text
-                        </button>
+                        @item.Text
                     </div>
                 }
 
@@ -238,7 +231,7 @@
                 <!-- Chọn màu mới -->
                 <div id="colorPickerContainer" class="mt-3" style="display: none;">
                     <label>Color picker:</label>
-                    <div class="input-group ChonMau">
+                    <div class="input-group ">
                         <input type="text" class="form-control" id="newColor">
                         <div class="input-group-append">
                             <span class="input-group-text"><i class="fas fa-square"></i></span>
@@ -292,6 +285,30 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="quickEditModal" tabindex="-1" aria-labelledby="quickEditModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm Nhanh Số Lượng & Giá</h5>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="quickEditForm">
+                    <div class="mb-3">
+                        <label for="modalQuantity" class="form-label">Số Lượng</label>
+                        <input type="number" class="form-control" id="modalQuantity" min="0" value="0">
+                    </div>
+                    <div class="mb-3">
+                        <label for="modalPrice" class="form-label">Giá</label>
+                        <input type="number" class="form-control" id="modalPrice" min="0" value="0">
+                    </div>
+                    <button type="submit" class="btn btn-success">Lưu</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 <div class="row">
@@ -356,12 +373,7 @@
             }
         });
 
-        $('.ChonMau').colorpicker()
-
-        $('.ChonMau').on('colorpickerChange', function (event) {
-            $('.ChonMau .fa-square').css('color', event.color.toString());
-        })
-
+        
         $('#showColorPicker').click(function () {
             $('#colorPickerContainer').show();
             $('#newColor').focus();
@@ -629,6 +641,8 @@
             });
         }
 
+        
+
         // 🔹 Xử lý sự kiện kiểm tra tên sản phẩm
         function kiemTraTenSanPham() {
             let danhSachTenGiay = @Html.Raw(Json.Serialize(ViewBag.TenGiay));
@@ -701,7 +715,11 @@
                                         <div class="card col-md-6" id="table-${color}">
                                         <div class="card-header">
                                             <h3 class="card-title">Sản phẩm màu ${color}</h3>
-                                            <div class="card-tools"></div>
+                                            <div class="card-tools">
+                                                                <button type="button" class="btn btn-primary btn-sm open-modal" data-color="${color}" data-toggle="modal" data-target="#quickEditModal">
+                                                            Thêm Nhanh
+                                                        </button>
+                                            </div>
                                         </div>
                                         <div class="card-body table-responsive p-0">
                                             <table class="table table-hover text-nowrap">
@@ -749,7 +767,6 @@
                     $(this).remove();
                 });
                 $('body').removeClass('modal-open'); // Loại bỏ lớp giữ nền bị tối
-                initPerfectScrollbar();
             }, 300); // Đợi 300ms để hiệu ứng fade chạy
         });
 
@@ -793,10 +810,9 @@
                     $(this).remove();
                 });
                 $('body').removeClass('modal-open'); // Loại bỏ lớp giữ nền bị tối
-                initPerfectScrollbar();
             }, 300);
         });
-
+        
 
 
         function initPerfectScrollbar() {
@@ -817,50 +833,110 @@
             }
         }
 
-        $('#saveProduct').click(function () {
+        $('#saveProduct').click(function (e) {
+            e.preventDefault(); // Ngăn form gửi đi ban đầu
+
             let sanPhamCTList = [];
-            console.log("đã chạy save");
+            let hasError = false; // Biến kiểm tra lỗi
+
+            console.log("🔹 Đã chạy save");
 
             $("[id^='table-']").each(function () {
-                let color = $(this).attr('id').replace('table-', ''); // Lấy màu
-
-                console.log(`🟢 Đang kiểm tra bảng: #table-${color}`);
+                let color = $(this).attr('id').replace('table-', '');
                 let table = $(this);
                 let rows = table.find("tbody tr");
 
                 if (rows.length === 0) {
                     console.warn(`⚠️ Không có hàng sản phẩm nào trong #table-${color}`);
+                    return; // Dừng gửi form nếu có lỗi
                 }
 
                 rows.each(function () {
-                    let size = $(this).find("td:nth-child(2)").text(); // Lấy kích cỡ
-                    let quantity = $(this).find(".quantity").val(); // Lấy số lượng
-                    let price = $(this).find(".price").val(); // Lấy giá
-                    let imgUrl = $(this).find(".lst_img").val(); // Lấy danh sách ảnh từ ô ẩn
+                    let size = $(this).find("td:nth-child(2)").text();
+                    let quantity = parseInt($(this).find(".quantity").val()) || 0;
+                    let price = parseInt($(this).find(".price").val()) || 0;
+                    let imgUrl = $(this).find(".lst_img").val();
 
-                    if (quantity > 0) {
+                    if (quantity <= 0 || price <= 0) {
+                        hasError = true; // Đánh dấu có lỗi
+                        console.error(`❌ Lỗi: Màu: ${color}, Size: ${size}, SL: ${quantity}, Giá: ${price}`);
+                    } else {
                         sanPhamCTList.push({
-                            Mau_Sac: "#" + color,
+                            Mau_Sac:  color,
                             Kich_Thuoc: size,
-                            so_luong: parseInt(quantity),
-                            gia: parseInt(price),
-                            imgUrl: imgUrl, // Lưu link ảnh vào object
+                            so_luong: quantity,
+                            gia: price,
+                            imgUrl: imgUrl,
                             trang_thai: 1,
                             ngay_tao: new Date().toISOString()
                         });
                     }
                 });
             });
+
+            if (hasError) {
+                alert("⚠️ Vui lòng nhập số lượng và giá hợp lệ (> 0) cho tất cả sản phẩm.");
+                return; // Dừng gửi form nếu có lỗi
+            }
+            if (sanPhamCTList.length === 0) {
+                alert("⚠️ Bạn chưa chọn màu sắc và kích thước hợp lệ! Vui lòng kiểm tra lại.");
+                e.preventDefault(); // Ngăn không gửi form
+                return;
+            }
+
             // Chuyển dữ liệu thành JSON và gán vào input ẩn
             $('#lstSPCT').val(JSON.stringify(sanPhamCTList));
+
+            
+
+            let danhSachTenGiay = @Html.Raw(Json.Serialize(ViewBag.TenGiay));
+            function kiemTraTrungLap(tenSanPham) {
+                return danhSachTenGiay.some(item => item.toLowerCase() === tenSanPham.trim().toLowerCase());
+            }
 
             let tenSanPham = $("#ten_san_pham").val();
             if (kiemTraTrungLap(tenSanPham)) {
                 alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
-                e.preventDefault();
+                return;
             }
-            // Gửi form
+            debugger;
+
+            console.log("✅ Không có lỗi, gửi form...");
             $('form').submit();
+        });
+        let currentTable = null;
+
+        // Mở modal và xác định bảng cần cập nhật
+        $(document).off("click", ".open-modal").on("click", ".open-modal", function () {
+            let color = $(this).data("color");
+            currentTable = $(`#table-${color}`);
+            $("#modalQuantity").val(""); // Reset input
+            $("#modalPrice").val("");
+            $("#quickEditModal").modal("show");
+        });
+
+        // Khi nhấn "Lưu", cập nhật tất cả sản phẩm trong bảng tương ứng
+        $(document).off("submit", "#quickEditForm").on("submit", "#quickEditForm", function (e) {
+            e.preventDefault();
+
+            if (!currentTable) {
+                alert("⚠️ Không tìm thấy bảng sản phẩm!");
+                return;
+            }
+
+            let quantity = $("#modalQuantity").val();
+            let price = $("#modalPrice").val();
+
+            if (quantity === "" || price === "" || quantity < 0 || price < 0) {
+                alert("⚠️ Vui lòng nhập số lượng và giá hợp lệ!");
+                return;
+            }
+
+            // Cập nhật tất cả hàng trong bảng
+            currentTable.find(".quantity").val(quantity);
+            currentTable.find(".price").val(price);
+
+            $("#quickEditModal").modal("hide");
         });
     });
 </script>
