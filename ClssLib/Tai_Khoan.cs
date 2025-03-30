@@ -42,6 +42,8 @@ namespace ClssLib
         [JsonIgnore]
         public virtual ICollection<Phieu_Giam_Gia_Tai_Khoan>? Phieu_Giam_Gia_Tai_Khoans { get; set; }
 
+        public string? ResetToken { get; set; }  // Token reset mật khẩu (có thể null)
+        public DateTime? TokenExpiry { get; set; }  // Thời gian hết hạn token (có thể null)
 
 
     }

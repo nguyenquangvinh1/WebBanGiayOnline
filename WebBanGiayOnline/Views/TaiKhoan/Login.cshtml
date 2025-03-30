@@ -1,0 +1,35 @@
+﻿@model WebBanGiay.ViewModel.LoginViewmodel
+
+@{
+    ViewBag.Title = "Đăng nhập";
+    Layout = null; 
+}
+
+<div style="display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f9;">
+    <div style="padding: 40px; background-color: white; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); border-radius: 8px;">
+        <h2>Đăng nhập</h2>
+        <form asp-action="LoginAdmin" method="post">
+            <div class="form-group">
+                <label for="Username">Tên đăng nhập</label>
+                <input type="text" class="form-control" id="Username" name="Username" required />
+            </div>
+            <div class="form-group">
+                <label for="Password">Mật khẩu</label>
+                <input type="password" class="form-control" id="Password" name="Password" required />
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">Đăng nhập</button>
+
+            @if (ViewData.ModelState.ErrorCount > 0)
+            {
+                <div class="alert alert-danger mt-3">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <p>@error.ErrorMessage</p>
+                    }
+                </div>
+            }
+        </form>
+    </div>
+</div>
+
+
