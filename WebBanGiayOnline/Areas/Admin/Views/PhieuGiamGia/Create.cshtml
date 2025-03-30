@@ -34,13 +34,9 @@
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
         <style>
-            body1 {
-                font-family: Arial, sans-serif;
-                margin: 10px;
-                background-color: #f4f4f4;
-            }
 
-            .container {
+
+            .card {
                 background: white;
                 padding: 10px;
                 border-radius: 5px;
@@ -59,10 +55,10 @@
         </style>
     </head>
     <body1>
-        <div class="container">
+        <div class="card mb-3">
             <div class="row">
                 <div class="col-md-12">
-                    <form asp-action="Create">
+                    <form asp-action="Create" asp-controller="PhieuGiamGia" method="post" id="PhieuGiamGia">
                         @Html.AntiForgeryToken()
 
                         <!-- Bắt đầu chia hàng để có 2 cột: bên trái và bên phải -->
@@ -145,12 +141,12 @@
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
                                         <label asp-for="ngay_bat_dau">Từ ngày</label>
-                                        <input asp-for="ngay_bat_dau" type="date" class="form-control" />
+                                        <input asp-for="ngay_bat_dau" type="datetime-local" class="form-control" />
                                         <span asp-validation-for="ngay_bat_dau" class="text-danger"></span>
                                     </div>
                                     <div class="form-group col-md-6">
                                         <label asp-for="ngay_ket_thuc">Đến ngày</label>
-                                        <input asp-for="ngay_ket_thuc" type="date" class="form-control" />
+                                        <input asp-for="ngay_ket_thuc" type="datetime-local" class="form-control" />
                                         <span asp-validation-for="ngay_ket_thuc" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -172,9 +168,12 @@
 
                             <!-- CỘT BÊN PHẢI: Tìm kiếm & chọn khách hàng (ẩn khi chưa chọn “Cá nhân”) -->
                             <div class="col-md-7" id="personalForm" style="display:none;">
-                                <input type="text" class="form-control mb-3" id="search"
-                                       placeholder="Tìm kiếm khách hàng" onkeyup="searchCustomers()" />
-
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-search text-orange"></i>
+                                    </span>
+                                    <input type="text" id="searchInput" class="form-control" placeholder="Tên, SĐT hoặc Email">
+                                </div>
                                 <table class="table table-bordered table-hover">
                                     <thead>
                                         <tr>
@@ -184,7 +183,7 @@
                                             <th>Tên</th>
                                             <th>Số điện thoại</th>
                                             <th>Email</th>
-                                            <th>Ngày sinh</th>
+
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -192,7 +191,7 @@
                                         {
                                             foreach (var tai_khoan in ViewBag.tai_khoans)
                                             {
-                                                if (tai_khoan.Vai_TroID == new Guid("7EFA3D43-BD5E-4F1A-AF4C-9C9A7AC41D3F"))
+                                                if (tai_khoan.Vai_TroID == new Guid("480C8612-4CE1-4473-9569-2E3FFC5BEC71"))
                                                 {
                                                     <tr>
                                                         <td>
@@ -201,7 +200,7 @@
                                                         <td>@tai_khoan.ho_ten</td>
                                                         <td>@tai_khoan.sdt</td>
                                                         <td>@tai_khoan.email</td>
-                                                        <td>@tai_khoan.ngay_sinh</td>
+
                                                     </tr>
                                                 }
                                             }
@@ -236,6 +235,31 @@
             }
 
 
+            // tự động cập nhật số lượng
+
+                         document.addEventListener("DOMContentLoaded", function () {
+                const selectAllCheckbox = document.getElementById("selectAll"); // Checkbox chọn tất cả
+                const checkboxes = document.querySelectorAll(".customer-checkbox");
+                const soLuongInput = document.querySelector("input[name='so_luong']");
+
+                // Gán sự kiện khi chọn tất cả
+                selectAllCheckbox.addEventListener("change", function () {
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = selectAllCheckbox.checked;
+                    });
+                    updateQuantity();
+                });
+
+                // Gán sự kiện cho từng checkbox khách hàng
+                checkboxes.forEach(checkbox => {
+                    checkbox.addEventListener("change", updateQuantity);
+                });
+
+                function updateQuantity() {
+                    const checkedCount = document.querySelectorAll(".customer-checkbox:checked").length;
+                    soLuongInput.value = checkedCount; // Cập nhật số lượng
+                }
+            });
                       // Hàm gán giá trị và đổi màu nút được chọn
             function setDiscountType(value) {
                 // Gán vào input ẩn để khi submit form sẽ gửi giá trị này
@@ -309,22 +333,20 @@
                     checkbox.checked = selectAllCheckbox.checked;
                 });
             }
-                         function toggleForm() {
-                var personalForm = document.getElementById('personalForm');
-                var ca_nhan = document.getElementById('ca_nhan');
-                var kieuGiamGiaInput = document.querySelector('input[name="kieu_giam_gia"]');
+                     function toggleForm() {
+                    var personalForm = document.getElementById('personalForm');
+                    var ca_nhan = document.getElementById('ca_nhan');
 
-                // Hiển thị form nếu "Cá nhân" được chọn, ngược lại ẩn đi
-                if (ca_nhan.checked) {
-                    personalForm.style.display = 'block';
-                    kieuGiamGiaInput.value = "1"; // Đặt giá trị thành 1 khi chọn "Cá nhân"
-                } else {
-                    personalForm.style.display = 'none';
-                    kieuGiamGiaInput.value = "0"; // Đặt giá trị thành 0 khi không chọn "Cá nhân"
+                    // Hiển thị form nếu "Cá nhân" được chọn, ngược lại ẩn đi
+                    if (ca_nhan.checked) {
+                        personalForm.style.display = 'block';
+                    } else {
+                        personalForm.style.display = 'none';
+                    }
                 }
-            }
 
         </script>
+
 
     </body1>
 </html>
@@ -333,11 +355,34 @@
     @section Scripts {
         @{
             await Html.RenderPartialAsync("_ValidationScriptsPartial");
-
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation/1.19.3/jquery.validate.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
-
         }
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#PhieuGiamGia").on("submit", function (event) {
+                event.preventDefault();
+                Swal.fire({
+                    title: "Xác nhận",
+                    text: "Bạn có chắc chắn muốn thêm phiếu giảm gi này?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Có",
+                    cancelButtonText: "Hủy"
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        event.target.submit();
+                    }
+                });
+            });
+        });
+
+    </script>
+
+
     }
 

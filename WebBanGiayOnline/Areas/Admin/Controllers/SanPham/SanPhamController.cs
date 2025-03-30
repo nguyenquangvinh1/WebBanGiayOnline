@@ -11,6 +11,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using DocumentFormat.OpenXml.InkML;
 using System.Linq;
+using System.Diagnostics;
 
 namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 {
@@ -53,6 +54,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         [HttpPost]
         public async Task<IActionResult> UploadImage(IFormFile file)
         {
+            
             if (file == null || file.Length == 0)
                 return Json(new { success = false, message = "⚠️ Không có file nào được tải lên!" });
 

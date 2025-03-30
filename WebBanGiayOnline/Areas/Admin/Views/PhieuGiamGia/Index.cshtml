@@ -1,6 +1,259 @@
 ﻿@using X.PagedList.Mvc.Core;
 @model X.PagedList.IPagedList<ClssLib.Phieu_Giam_Gia>
 
+
+@{
+    ViewData["Title"] = "Phiếu giảm giá";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        body1 {
+            font-family: Arial, sans-serif;
+            margin: 70px;
+            background-color: #f4f4f4;
+        }
+
+
+        .card {
+            background: white;
+            padding: 20px;
+        }
+
+        .page-header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: black;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+            .search-bar input {
+                padding: 10px;
+                flex-grow: 1;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                margin-right: 10px;
+            }
+
+
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+            .filter input[type="date"], .filter select {
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+            .status.active {
+                background-color: #28a745;
+                color: white;
+            }
+
+            .status.inactive {
+                background-color: #dc3545;
+                color: white;
+            }
+
+        .action-icon {
+            cursor: pointer;
+            color: #ff8c00; /* Màu cam */
+            font-size: 20px;
+        }
+
+            .action-icon:hover {
+                color: #ff5722; /* Màu đỏ cam khi hover */
+            }
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            z-index: 1;
+        }
+
+            .dropdown button {
+                display: block;
+                padding: 10px;
+                width: 100%;
+                text-align: left;
+                border: none;
+                background: none;
+                cursor: pointer;
+            }
+
+                .dropdown button:hover {
+                    background-color: #f1f1f1;
+                }
+
+        .icon-container1 {
+            position: relative;
+        }
+
+        .eye-icon1 {
+            cursor: pointer;
+            color: #000; /* Màu của biểu tượng con mắt */
+        }
+
+        .action-icons1 {
+            display: none; /* Ẩn các biểu tượng hành động */
+            margin-top: 5px;
+        }
+
+            .action-icons1 a {
+                margin-right: 5px; /* Khoảng cách giữa các biểu tượng */
+                color: #000; /* Màu của các biểu tượng hành động */
+                text-decoration: none; /* Hủy bỏ gạch chân */
+            }
+
+                .action-icons1 a:hover {
+                    color: #007bff; /* Thay đổi màu khi di chuột vào */
+                }
+
+        .pagination {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .pagination button, .pagination select {
+                margin: 0 5px;
+                padding: 10px 15px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                background-color: #fff;
+                cursor: pointer;
+            }
+
+        .badge-cong-khai {
+            color: #CC33CC;
+            background-color: #fff;
+            border: 1px solid #CC33CC;
+            border-radius: 20px;
+            padding: 4px 10px;
+            white-space: nowrap; /* Không cho xuống dòng */
+        }
+
+        .badge-ca-nhan {
+            color: #2196F3;
+            background-color: #fff;
+            border: 1px solid #2196F3;
+            border-radius: 20px;
+            padding: 4px 10px;
+            white-space: nowrap; /* Không cho xuống dòng */
+        }
+
+        .trang-thai-dang-dien-ra {
+            color: #4CAF50; /* Chữ xanh lá */
+            background-color: #fff; /* Nền trắng */
+            border: 1px solid #4CAF50; /* Viền xanh lá */
+            border-radius: 20px; /* Bo tròn kiểu pill */
+            padding: 4px 10px; /* Khoảng cách trong */
+            white-space: nowrap; /* Giữ text trên 1 dòng */
+        }
+
+        .pagination-container1 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .trang-thai-het-han {
+            color: #FF0000; /* Chữ đỏ */
+            background-color: #fff;
+            border: 1px solid #FF0000; /* Viền đỏ (nếu muốn) */
+            border-radius: 20px;
+            padding: 4px 10px;
+            white-space: nowrap;
+        }
+
+        .pagination button:hover {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+    <script>
+
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.eye-icon').on('click', function (e) {
+                e.preventDefault(); // Ngăn chặn hành động mặc định
+                $(this).siblings('.action-icons').toggle(); // Hiển thị hoặc ẩn các biểu tượng hành động
+            });
+        });
+                $("#searchInput").on("input", function () {
+            let keyword = $(this).val().trim();
+            fetch(`/Admin/NhanVien/Search?keyword=${encodeURIComponent(keyword)}`)
+                .then(response => response.json())
+                .then(data => {
+                    let tableBody = $("#nhanVienTableBody");
+                    tableBody.empty();
+
+                    data.forEach((item, index) => {
+                        // Badge hiển thị trạng thái
+                        let statusBadge = "";
+                        if (item.trang_thai == 0) {
+                            statusBadge = '<span class="badge bg-success">Hoạt động</span>';
+                        } else {
+                            statusBadge = '<span class="badge bg-danger">Không hoạt động</span>';
+                        }
+    </script>
+</head>
 <div class="page-content-wrapper">
     <div class="container-fluid">
         <!-- Tiêu đề trang -->
@@ -25,346 +278,82 @@
     </div>
 
 
-    @{
-        ViewData["Title"] = "Phiếu giảm giá";
-    }
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success">
-            @TempData["SuccessMessage"]
-        </div>
-    }
-    <!DOCTYPE html>
-    <html lang="vi">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-        <style>
-            body1 {
-                font-family: Arial, sans-serif;
-                margin: 20px;
-                background-color: #f4f4f4;
-            }
 
 
-            .container {
-                background: white;
-                padding: 20px;
-                border-radius: 5px;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            }
-
-            .page-header {
-                font-size: 24px;
-                font-weight: bold;
-                margin-bottom: 20px;
-                color: black;
-            }
-
-            .search-bar {
-                display: flex;
-                align-items: center;
-                margin-bottom: 20px;
-            }
-
-                .search-bar input {
-                    padding: 10px;
-                    flex-grow: 1;
-                    border: 1px solid #ddd;
-                    border-radius: 5px;
-                    margin-right: 10px;
-                }
-
-
-
-            .btn:hover {
-                background-color: #0056b3;
-            }
-
-            .filter {
-                display: flex;
-                gap: 10px;
-                margin-bottom: 20px;
-                align-items: center;
-            }
-
-                .filter input[type="date"], .filter select {
-                    padding: 10px;
-                    border: 1px solid #ddd;
-                    border-radius: 5px;
-                }
-
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 20px;
-            }
-
-            table, th, td {
-                border: 1px solid #ddd;
-            }
-
-            th, td {
-                padding: 10px;
-                text-align: left;
-            }
-
-            th {
-                background-color: #f2f2f2;
-            }
-
-            .status {
-                padding: 5px 10px;
-                border-radius: 5px;
-            }
-
-                .status.active {
-                    background-color: #28a745;
-                    color: white;
-                }
-
-                .status.inactive {
-                    background-color: #dc3545;
-                    color: white;
-                }
-
-            .action-icon {
-                cursor: pointer;
-                color: #ff8c00; /* Màu cam */
-                font-size: 20px;
-            }
-
-                .action-icon:hover {
-                    color: #ff5722; /* Màu đỏ cam khi hover */
-                }
-
-            .dropdown {
-                display: none;
-                position: absolute;
-                background-color: white;
-                border: 1px solid #ddd;
-                border-radius: 5px;
-                z-index: 1;
-            }
-
-                .dropdown button {
-                    display: block;
-                    padding: 10px;
-                    width: 100%;
-                    text-align: left;
-                    border: none;
-                    background: none;
-                    cursor: pointer;
-                }
-
-                    .dropdown button:hover {
-                        background-color: #f1f1f1;
-                    }
-
-            .icon-container1 {
-                position: relative;
-            }
-
-            .eye-icon1 {
-                cursor: pointer;
-                color: #000; /* Màu của biểu tượng con mắt */
-            }
-
-            .action-icons1 {
-                display: none; /* Ẩn các biểu tượng hành động */
-                margin-top: 5px;
-            }
-
-                .action-icons1 a {
-                    margin-right: 5px; /* Khoảng cách giữa các biểu tượng */
-                    color: #000; /* Màu của các biểu tượng hành động */
-                    text-decoration: none; /* Hủy bỏ gạch chân */
-                }
-
-                    .action-icons1 a:hover {
-                        color: #007bff; /* Thay đổi màu khi di chuột vào */
-                    }
-
-            .pagination {
-                margin-top: 20px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-                .pagination button, .pagination select {
-                    margin: 0 5px;
-                    padding: 10px 15px;
-                    border: 1px solid #ddd;
-                    border-radius: 5px;
-                    background-color: #fff;
-                    cursor: pointer;
-                }
-
-            .badge-cong-khai {
-                color: #CC33CC;
-                background-color: #fff;
-                border: 1px solid #CC33CC;
-                border-radius: 20px;
-                padding: 4px 10px;
-                white-space: nowrap; /* Không cho xuống dòng */
-            }
-
-            .badge-ca-nhan {
-                color: #2196F3;
-                background-color: #fff;
-                border: 1px solid #2196F3;
-                border-radius: 20px;
-                padding: 4px 10px;
-                white-space: nowrap; /* Không cho xuống dòng */
-            }
-
-            .trang-thai-dang-dien-ra {
-                color: #4CAF50; /* Chữ xanh lá */
-                background-color: #fff; /* Nền trắng */
-                border: 1px solid #4CAF50; /* Viền xanh lá */
-                border-radius: 20px; /* Bo tròn kiểu pill */
-                padding: 4px 10px; /* Khoảng cách trong */
-                white-space: nowrap; /* Giữ text trên 1 dòng */
-            }
-
-            .pagination-container1 {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 10px 15px;
-                background-color: #fff;
-                border-radius: 10px;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            }
-
-            .trang-thai-het-han {
-                color: #FF0000; /* Chữ đỏ */
-                background-color: #fff;
-                border: 1px solid #FF0000; /* Viền đỏ (nếu muốn) */
-                border-radius: 20px;
-                padding: 4px 10px;
-                white-space: nowrap;
-            }
-
-            .pagination button:hover {
-                background-color: #007bff;
-                color: white;
-            }
-        </style>
-        <script>
-
-        </script>
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script>
-            $(document).ready(function () {
-                $('.eye-icon').on('click', function (e) {
-                    e.preventDefault(); // Ngăn chặn hành động mặc định
-                    $(this).siblings('.action-icons').toggle(); // Hiển thị hoặc ẩn các biểu tượng hành động
-                });
-            });
-                    $("#searchInput").on("input", function () {
-                let keyword = $(this).val().trim();
-                fetch(`/Admin/NhanVien/Search?keyword=${encodeURIComponent(keyword)}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        let tableBody = $("#nhanVienTableBody");
-                        tableBody.empty();
-
-                        data.forEach((item, index) => {
-                            // Badge hiển thị trạng thái
-                            let statusBadge = "";
-                            if (item.trang_thai == 0) {
-                                statusBadge = '<span class="badge bg-success">Hoạt động</span>';
-                            } else {
-                                statusBadge = '<span class="badge bg-danger">Không hoạt động</span>';
-                            }
-        </script>
-    </head>
-    <body1>
-
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <!-- Ô tìm kiếm bên trái -->
-                <div class="col-md-4">
-                    <form action="@Url.Action("Index", "PhieuGiamGia")" method="get" class="d-flex">
-                        <div class="input-group">
-                            <button type="submit" class="input-group-text">
-                                <i class="fa fa-search text-orange"></i>
-                            </button>
-                            <input type="text" name="searchString" class="form-control" placeholder="Nhập mã hoặc tên phiếu giảm giá ..." />
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Nút Tạo Phiếu giảm giá bên phải -->
-                <a asp-action="Create" class="btn btn-outline-secondary">
-                    <i class="fas fa-plus"></i> Tạo Phiếu giảm giá
-                </a>
-            </div>
-
-
-            <div class="filter">
-                <div class="col-md-6">
-
-                    <form method="get" action="@Url.Action("Index")" class="row g-3 d-flex align-items-end">
-                        <div class="">
-                            <label for="fromDate" class="form-label fw-bold">Từ ngày:</label>
-                            <input type="date" id="fromDate" name="fromDate" class="form-control" value="Request.Query[fromDate]">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="toDate" class="form-label fw-bold">Đến ngày:</label>
-                            <input type="date" id="toDate" name="toDate" class="form-control" value="Request.Query[toDate]">
-                        </div>
-                        <div class="col-md-3 d-flex align-items-end">
-                            <button type="submit" class=" input-group-text">
-                                <!-- Thay "fas fa-filter" bằng "fa fa-search text-orange" -->
-                                <i class="fa fa-filter text-orange"></i> Lọc
-                            </button>
-                        </div>
-
-
-
-                        <asp:Label ID="lblMessage" runat="server" ForeColor="Red"></asp:Label>
-
-                    </form>
-                    @if (!string.IsNullOrEmpty(ViewBag.ThongBao))
-                    {
-                        <p style="color: red;">@ViewBag.ThongBao</p>
-                    }
-
-
-                </div>
-                <div class="input-group me-2">
-                </div>
-
-                <!-- Bộ lọc danh mục -->
-                <div class="input-group me-2">
-                    <form id="filterForm" action="@Url.Action("Index", "PhieuGiamGia")" method="get">
-                        <label for="Category" class="fw-bold">Trạng thái:</label>
-                        <select name="Category" id="Category" class="form-select" onchange="document.getElementById('filterForm').submit()">
-                            <option value="">-- Chọn trạng thái --</option>
-                            @foreach (var item in ViewBag.TrangThaiList)
-                            {
-                                <option value="@item.Value" selected="@(item.Value == Context.Request.Query["Category"] ? "selected" : null)">
-                                    @item.Text
-                                </option>
-                            }
-                        </select>
-                    </form>
-                </div>
-
-                <!-- Xuất Excel -->
-                <form asp-action="ExportExcel" method="get" class="d-inline">
-                    <button type="submit" class="btn btn-outline-success">
-                        <i class="fas fa-file-excel"></i>
-                    </button>
+    <div class="card mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <!-- Ô tìm kiếm bên trái -->
+            <div class="col-md-4">
+                <form action="@Url.Action("Index", "PhieuGiamGia")" method="get" class="d-flex">
+                    <div class="input-group">
+                        <button type="submit" class="input-group-text">
+                            <i class="fa fa-search text-orange"></i>
+                        </button>
+                        <input type="text" name="searchString" class="form-control" placeholder="Nhập mã hoặc tên phiếu giảm giá ..." />
+                    </div>
                 </form>
             </div>
 
+            <!-- Nút Tạo Phiếu giảm giá bên phải -->
+            <a asp-action="Create" class="btn btn-outline-secondary">
+                <i class="fas fa-plus"></i> Tạo Phiếu giảm giá
+            </a>
+        </div>
+
+
+        <div class="filter">
+            <div class="col-md-6">
+
+                <form method="get" action="@Url.Action("Index")" class="row g-3 d-flex align-items-end">
+                    <div class="">
+                        <label for="fromDate" class="form-label fw-bold">Từ ngày:</label>
+                        <input type="date" id="fromDate" name="fromDate" class="form-control" value="Request.Query[fromDate]">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="toDate" class="form-label fw-bold">Đến ngày:</label>
+                        <input type="date" id="toDate" name="toDate" class="form-control" value="Request.Query[toDate]">
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class=" input-group-text">
+                            <!-- Thay "fas fa-filter" bằng "fa fa-search text-orange" -->
+                            <i class="fa fa-filter text-orange"></i> Lọc
+                        </button>
+                    </div>
+
+
+
+                    <asp:Label ID="lblMessage" runat="server" ForeColor="Red"></asp:Label>
+
+                </form>
+                @if (!string.IsNullOrEmpty(ViewBag.ThongBao))
+                {
+                    <p style="color: red;">@ViewBag.ThongBao</p>
+                }
+
+
+            </div>
+            <div class="input-group me-2">
+            </div>
+
+            <!-- Bộ lọc danh mục -->
+            <div class="input-group me-2">
+                <form id="filterForm" action="@Url.Action("Index", "PhieuGiamGia")" method="get">
+                    <label for="Category" class="fw-bold">Trạng thái:</label>
+                    <select name="Category" id="Category" class="form-select" onchange="document.getElementById('filterForm').submit()">
+                        <option value="">-- Chọn trạng thái --</option>
+                        @foreach (var item in ViewBag.TrangThaiList)
+                        {
+                            <option value="@item.Value" selected="@(item.Value == Context.Request.Query["Category"] ? "selected" : null)">
+                                @item.Text
+                            </option>
+                        }
+                    </select>
+                </form>
+            </div>
+
+
+        </div>
+        <form id="filterForm" action="@Url.Action("Index", "PhieuGiamGia")" method="get">
             <table>
                 <thead>
                     <tr>
@@ -382,9 +371,10 @@
                 </thead>
                 <tbody>
                     @{
-                        int stt = 1; // Khởi tạo biến STT
+                        int stt = (Model.PageNumber - 1) * Model.PageSize + 1;
+                        var danhSachGiamGia = Model.OrderByDescending(x => x.ngay_tao);
                     }
-                    @foreach (var item in Model)
+                    @foreach (var item in danhSachGiamGia)
                     {
 
                         <tr>
@@ -427,12 +417,10 @@
                                 @Html.DisplayFor(modelItem => item.so_luong)
                             </td>
 
-                            <td>
-                                @Html.DisplayFor(modelItem => item.ngay_bat_dau)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.ngay_ket_thuc)
-                            </td>
+                            <td>@item.ngay_bat_dau.ToString("yyyy-MM-dd HH:mm")</td>
+
+                            <td>@item.ngay_ket_thuc.GetValueOrDefault().ToString("yyyy-MM-dd HH:mm")</td>
+
                             <td>
                                 @if (item.trang_thai == 1)
                                 {
@@ -453,6 +441,8 @@
                                 </div>
 
 
+
+
                             </td>
 
                         </tr>
@@ -460,36 +450,38 @@
                     }
                 </tbody>
             </table>
+        </form>
 
+        <div class="pagination-container1">
 
-
-    </body1>
-    <div class="pagination-container1">
-
-        <span class="pagination-info">
-            Tổng số hóa đơn: <strong>@Model.TotalItemCount</strong> |
-            Hiển thị: <strong>@Model.PageSize</strong> mục/trang
-        </span>
-        <div>
-            @Html.PagedListPager(Model, page => Url.Action("Index", new
+            <span class="pagination-info">
+                Tổng số phiếu giảm giá: <strong>@Model.TotalItemCount</strong> |
+                Hiển thị: <strong>@Model.PageSize</strong> mục/trang
+            </span>
+            <div>
+                @Html.PagedListPager(Model, page => Url.Action("Index", new
+                    {
+                        page,
+                        searchString = Context.Request.Query["searchString"],
+                        Category = Context.Request.Query["Category"]
+                    }),
+                         new PagedListRenderOptions
                 {
-                    page,
-                    searchString = Context.Request.Query["searchString"],
-                    Category = Context.Request.Query["Category"]
-                }),
-                     new PagedListRenderOptions
-            {
-                LiElementClasses = new[] { "page-item" },
-                PageClasses = new[] { "page-link" },
-                DisplayLinkToFirstPage = PagedListDisplayMode.Always,
-                DisplayLinkToLastPage = PagedListDisplayMode.Always,
-                DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
-                DisplayLinkToNextPage = PagedListDisplayMode.Always,
-                MaximumPageNumbersToDisplay = 5
-            })
+                    LiElementClasses = new[] { "page-item" },
+                    PageClasses = new[] { "page-link" },
+                    DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+                    DisplayLinkToLastPage = PagedListDisplayMode.Always,
+                    DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+                    DisplayLinkToNextPage = PagedListDisplayMode.Always,
+                    MaximumPageNumbersToDisplay = 5
+                })
+            </div>
         </div>
-    </div>
 </html>
+
+</div>
+
+
 
 
 
@@ -501,10 +493,21 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
-    @section Scripts {
-    <script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            Swal.fire({
+                toast: true,
+                position: "top-end",
+                icon: "success",
+                title: "@TempData["SuccessMessage"]",
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true
+            });
+        });
     </script>
 }
-
-

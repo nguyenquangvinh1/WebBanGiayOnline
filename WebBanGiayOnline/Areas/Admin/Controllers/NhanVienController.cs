@@ -18,6 +18,7 @@ using X.PagedList.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using ClosedXML.Excel;
 using System.IO;
+using DocumentFormat.OpenXml.ExtendedProperties;
 
 
 
@@ -53,6 +54,16 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
             ViewBag.SelectedPageSize = pageSize;
             int currentPage = pageNumber ?? 1;
+
+            // Thiết lập header để tránh cache (nếu cần)
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "0";
+
+
+            //xoas thong bao k tieu thu them sau khi them nv ok 
+            var successMessage= TempData["SuccessMessage"] as string;
+            TempData.Remove("SuccessMessage");
 
             var nhanVienRole = await _context.vai_Tros.FirstOrDefaultAsync(x => x.ten_vai_tro == "Nhân Viên");
             if (nhanVienRole == null)
@@ -98,7 +109,8 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 CurrentPage = paginatedList.PageNumber,
                 TotalPages = paginatedList.PageCount,
                 PageSize = paginatedList.PageSize,
-                TotalCount = paginatedList.TotalItemCount
+                TotalCount = paginatedList.TotalItemCount,
+                SuccessMessage = successMessage
             };
 
             return View(viewModel);
@@ -454,10 +466,149 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
         public IActionResult Create()
         {
+            TempData.Remove("SuccessMessage");
             var model = new NhanVien_Model(); // Đảm bảo model không null
-
+            
             ViewData["Vai_TroID"] = new SelectList(_context.vai_Tros.ToList(), "ID", "ten_vai_tro");
             return View(model);
+        }
+        [HttpPost]
+
+        public IActionResult Create(NhanVien_Model nv, IFormFile HinhAnh)
+        {
+            var nhanVienRole = _context.vai_Tros.FirstOrDefault(x => x.ten_vai_tro == "Nhân Viên");
+
+            if (_context.tai_Khoans.Any(n => n.email == nv.email && n.Vai_TroID == nhanVienRole.ID))
+            {
+                ModelState.AddModelError("email", "Email đã tồn tại!");
+            }
+            if (_context.tai_Khoans.Any(n => n.cccd == nv.cccd))
+            {
+                ModelState.AddModelError("cccd", "Số CCCD đã tồn tại!");
+            }
+            if (_context.tai_Khoans.Any(n => n.sdt == nv.sdt))
+            {
+                ModelState.AddModelError("sdt", "Số điện thoại đã tồn tại!");
+            }
+
+            if (string.IsNullOrEmpty(nv.pass_word))
+            {
+                nv.pass_word = GenerateRandomPassword();
+            }
+            if (!ModelState.IsValid)
+            {
+                foreach (var kvp in ModelState)
+                {
+                    foreach (var error in kvp.Value.Errors)
+                    {
+                        Console.WriteLine($"Key: {kvp.Key}, Error: {error.ErrorMessage}");
+                    }
+                }
+                ViewData["Vai_TroID"] = new SelectList(_context.vai_Tros.ToList(), "ID", "ten_vai_tro");
+                return View(nv);
+            }
+
+            // Nếu không có file được upload, uniqueFileName sẽ là null
+            string uniqueFileName = "default-avatar.jpg";
+            if (HinhAnh != null && HinhAnh.Length > 0)
+            {
+                string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/nhanvien");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(HinhAnh.FileName);
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    HinhAnh.CopyTo(fileStream);
+                }
+            }
+
+            int newNumber = 1;
+            try
+            {
+                var maList = _context.tai_Khoans
+                    .Where(x => x.ma != null && x.ma.StartsWith("nv"))
+                    .Select(x => x.ma)
+                    .ToList();
+
+                int lastNumber = 0;
+                foreach (var m in maList)
+                {
+                    if (m.Length > 2 && int.TryParse(m.Substring(2), out int num))
+                    {
+                        if (num > lastNumber)
+                            lastNumber = num;
+                    }
+                }
+                newNumber = lastNumber + 1;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error generating newMa: " + ex.Message);
+                newNumber = 1;
+            }
+            string newMa = "nv" + newNumber.ToString("D2");
+
+            Guid newID = Guid.NewGuid();
+            if (nhanVienRole == null)
+            {
+                return BadRequest("Vai trò Nhân Viên không tồn tại!");
+            }
+
+            if (string.IsNullOrWhiteSpace(nv.pass_word))
+            {
+                nv.pass_word = GenerateRandomPassword();
+            }
+            string generatedPassword = nv.pass_word;
+
+            var taikhoan = new Tai_Khoan()
+            {
+                ID = newID,
+                ma = newMa,
+                user_name = nv.user_name,
+                pass_word = generatedPassword,
+                cccd = nv.cccd,
+                ho_ten = nv.ho_ten,
+                ngay_sinh = nv.ngay_sinh,
+                email = nv.email,
+                sdt = nv.sdt,
+                gioi_tinh = nv.gioi_tinh,
+                ngay_tao = DateTime.Now,
+                Vai_TroID = nhanVienRole.ID,
+                hinh_anh = uniqueFileName // Nếu không có file upload thì sẽ là null
+            };
+
+            _context.tai_Khoans.Add(taikhoan);
+
+            Dia_Chi dc = new Dia_Chi()
+            {
+                ID = Guid.NewGuid(),
+                loai_dia_chi = 1,
+                tinh = nv.tinh,
+                huyen = nv.huyen,
+                xa = nv.xa,
+                dia_chi_chi_tiet = nv.dia_chi_chi_tiet,
+                ngay_tao = DateTime.Now,
+                Tai_KhoanID = newID
+            };
+
+            _context.dia_Chis.Add(dc);
+            _context.SaveChanges();
+
+            try
+            {
+                SendEmail(nv.email, nv.user_name, nv.pass_word);
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi nếu cần, nhưng record đã được lưu.
+            }
+            TempData["SuccessMessage"] = "Thêm nhân viên thành công!";
+            Console.WriteLine(TempData["SuccessMessage"]); // Kiểm tra trong console
+
+            return RedirectToAction("Index", "NhanVien", new { pageNumber = 1 });
         }
 
         private void SendEmail(string toEmail, string username, string password)
@@ -635,142 +786,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
         //}
 
-        [HttpPost]
-
-        public IActionResult Create(NhanVien_Model nv, IFormFile HinhAnh)
-        {
-            var nhanVienRole = _context.vai_Tros.FirstOrDefault(x => x.ten_vai_tro == "Nhân Viên");
-
-            if (_context.tai_Khoans.Any(n => n.email == nv.email && n.Vai_TroID == nhanVienRole.ID))
-            {
-                ModelState.AddModelError("email", "Email đã tồn tại!");
-            }
-            if (_context.tai_Khoans.Any(n => n.cccd == nv.cccd))
-            {
-                ModelState.AddModelError("cccd", "Số CCCD đã tồn tại!");
-            }
-            if (_context.tai_Khoans.Any(n => n.sdt == nv.sdt))
-            {
-                ModelState.AddModelError("sdt", "Số điện thoại đã tồn tại!");
-            }
-
-            if (string.IsNullOrEmpty(nv.pass_word))
-            {
-                nv.pass_word = GenerateRandomPassword();
-            }
-            if (!ModelState.IsValid)
-            {
-                foreach (var kvp in ModelState)
-                {
-                    foreach (var error in kvp.Value.Errors)
-                    {
-                        Console.WriteLine($"Key: {kvp.Key}, Error: {error.ErrorMessage}");
-                    }
-                }
-                ViewData["Vai_TroID"] = new SelectList(_context.vai_Tros.ToList(), "ID", "ten_vai_tro");
-                return View(nv);
-            }
-
-            // Nếu không có file được upload, uniqueFileName sẽ là null
-            string uniqueFileName = "default-avatar.jpg";
-            if (HinhAnh != null && HinhAnh.Length > 0)
-            {
-                string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/nhanvien");
-                if (!Directory.Exists(uploadsFolder))
-                {
-                    Directory.CreateDirectory(uploadsFolder);
-                }
-                uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(HinhAnh.FileName);
-                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    HinhAnh.CopyTo(fileStream);
-                }
-            }
-
-            int newNumber = 1;
-            try
-            {
-                var maList = _context.tai_Khoans
-                    .Where(x => x.ma != null && x.ma.StartsWith("nv"))
-                    .Select(x => x.ma)
-                    .ToList();
-
-                int lastNumber = 0;
-                foreach (var m in maList)
-                {
-                    if (m.Length > 2 && int.TryParse(m.Substring(2), out int num))
-                    {
-                        if (num > lastNumber)
-                            lastNumber = num;
-                    }
-                }
-                newNumber = lastNumber + 1;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error generating newMa: " + ex.Message);
-                newNumber = 1;
-            }
-            string newMa = "nv" + newNumber.ToString("D2");
-
-            Guid newID = Guid.NewGuid();
-            if (nhanVienRole == null)
-            {
-                return BadRequest("Vai trò Nhân Viên không tồn tại!");
-            }
-
-            if (string.IsNullOrWhiteSpace(nv.pass_word))
-            {
-                nv.pass_word = GenerateRandomPassword();
-            }
-            string generatedPassword = nv.pass_word;
-
-            var taikhoan = new Tai_Khoan()
-            {
-                ID = newID,
-                ma = newMa,
-                user_name = nv.user_name,
-                pass_word = generatedPassword,
-                cccd = nv.cccd,
-                ho_ten = nv.ho_ten,
-                ngay_sinh = nv.ngay_sinh,
-                email = nv.email,
-                sdt = nv.sdt,
-                gioi_tinh = nv.gioi_tinh,
-                ngay_tao = DateTime.Now,
-                Vai_TroID = nhanVienRole.ID,
-                hinh_anh = uniqueFileName // Nếu không có file upload thì sẽ là null
-            };
-
-            _context.tai_Khoans.Add(taikhoan);
-
-            Dia_Chi dc = new Dia_Chi()
-            {
-                ID = Guid.NewGuid(),
-                loai_dia_chi = 1,
-                tinh = nv.tinh,
-                huyen = nv.huyen,
-                xa = nv.xa,
-                dia_chi_chi_tiet = nv.dia_chi_chi_tiet,
-                ngay_tao = DateTime.Now,
-                Tai_KhoanID = newID
-            };
-
-            _context.dia_Chis.Add(dc);
-            _context.SaveChanges();
-
-            try
-            {
-                SendEmail(nv.email, nv.user_name, nv.pass_word);
-            }
-            catch (Exception ex)
-            {
-                // Log lỗi nếu cần, nhưng record đã được lưu.
-            }
-
-            return RedirectToAction("Index", "NhanVien", new { pageNumber = 1 });
-        }
+      
 
 
         public string GenerateRandomPassword(int length = 8)
@@ -915,7 +931,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
 
             _context.SaveChanges();
-
+            TempData["SuccessMessage"] = "Cập nhật nhân viên thành công!";
             // Sau khi update, chuyển hướng đến trang Details (hoặc Index nếu bạn muốn)
             return RedirectToAction("Index", new { id = nhanVien.ID });
         }

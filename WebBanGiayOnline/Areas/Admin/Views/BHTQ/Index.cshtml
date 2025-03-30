@@ -13,6 +13,11 @@
 		display: block; /* Hiển thị Khách lẻ */
 	}
 
+	.invoice-count-badge {
+		background-color: #eee;
+		color: #000;
+	}
+
 </style>
 <div style="background-color:#fff">
 	<div class="container p-4">
@@ -52,7 +57,7 @@
 				</tbody>
 			</table>
 			<!-- Danh sách sản phẩm của hóa đơn -->
-			<p>[Danh sách sản phẩm của hóa đơn]</p>
+			@* <p>[Danh sách sản phẩm của hóa đơn]</p> *@
 			<h5 class="text-end">
 				Tổng tiền tạm tính: <span class="totalPrice" id="totalPrice-INVOICE_ID">0</span> VND
 				<button class="btn btn-primary ms-3 selectCustomer" data-id="INVOICE_ID">Tài khoản</button>
@@ -84,7 +89,7 @@
 					<div class="mb-3">
 						<label class="form-label">Khách thanh toán</label>
 						<button type="button" class="btn btn-outline-primary openPayment" data-id="INVOICE_ID">
-							0 VND
+							<i class="fa fa-credit-card"></i>
 						</button>
 					</div>
 					<div class="mb-3">
@@ -92,6 +97,10 @@
 						<div class="input-group">
 							<input type="text" class="form-control discountCodeInput" placeholder="Mã giảm giá tốt nhất" id="discountCodeInput" readonly>
 							<button class="btn btn-outline-secondary selectDiscount" type="button" data-id="INVOICE_ID">Chọn mã giảm giá</button>
+						</div>
+						<!-- Dòng thông báo -->
+						<div id="bestVoucherMessage" style="display:none; color: green; font-weight: 600;">
+							Hiện tại đây là phiếu giảm giá tốt nhất
 						</div>
 					</div>
 					<div class="mb-3">
@@ -188,6 +197,106 @@
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
 				</div>
 				<div class="modal-body">
+					<div class="row">
+						<div class="col-12">
+							<label for="searchProduct">Tìm kiếm sản phẩm:</label>
+							<input type="text" id="searchProduct" class="form-control" placeholder="Nhập tên sản phẩm...">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-3">
+							<label for="filterChatLieu">Chất liệu:</label>
+							<select id="filterChatLieu" class="form-control filter-select">
+								<option value="">Tất cả</option>
+								@foreach (var item in (SelectList)ViewData["Chat_LieuID"])
+								{
+									<option value="@item.Value" selected="@(ViewData["SelectedChatLieu"]?.ToString() == item.Value ? "selected" : null)">
+										@item.Text
+									</option>
+								}
+							</select>
+						</div>
+						<div class="col-md-3">
+
+							<label for="filterCoGiay">Cổ giày:</label>
+							<select id="filterCoGiay" class="form-control filter-select">
+								<option value="">Tất cả</option>
+								@foreach (var item in (SelectList)ViewData["Co_GiayID"])
+								{
+									<option value="@item.Value" selected="@(ViewData["SelectedCoGiay"]?.ToString() == item.Value ? "selected" : null)">
+										@item.Text
+									</option>
+								}
+							</select>
+						</div>
+						<div class="col-md-3">
+
+							<label for="filterDanhMuc">Danh mục:</label>
+							<select id="filterDanhMuc" class="form-control filter-select">
+								<option value="">Tất cả</option>
+								@foreach (var item in (SelectList)ViewData["Danh_MucID"])
+								{
+									<option value="@item.Value" selected="@(ViewData["SelectedDanhMuc"]?.ToString() == item.Value ? "selected" : null)">
+										@item.Text
+									</option>
+								}
+							</select>
+						</div>
+						<div class="col-md-3">
+
+
+							<label for="filterDeGiay">Đế giày:</label>
+							<select id="filterDeGiay" class="form-control filter-select">
+								<option value="">Tất cả</option>
+								@foreach (var item in (SelectList)ViewData["De_GiayID"])
+								{
+									<option value="@item.Value" selected="@(ViewData["SelectedDeGiay"]?.ToString() == item.Value ? "selected" : null)">
+										@item.Text
+									</option>
+								}
+							</select>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-4">
+							<label for="filterMuiGiay">Mũi giày:</label>
+							<select id="filterMuiGiay" class="form-control filter-select">
+								<option value="">Tất cả</option>
+								@foreach (var item in (SelectList)ViewData["Mui_GiayID"])
+								{
+									<option value="@item.Value" selected="@(ViewData["SelectedMuiGiay"]?.ToString() == item.Value ? "selected" : null)">
+										@item.Text
+									</option>
+								}
+							</select>
+						</div>
+						<div class="col-md-4">
+
+							<label for="filterKieuDang">Kiểu dáng:</label>
+							<select id="filterKieuDang" class="form-control filter-select">
+								<option value="">Tất cả</option>
+								@foreach (var item in (SelectList)ViewData["Kieu_DangID"])
+								{
+									<option value="@item.Value" selected="@(ViewData["SelectedKieuDang"]?.ToString() == item.Value ? "selected" : null)">
+										@item.Text
+									</option>
+								}
+							</select>
+						</div>
+						<div class="col-md-4">
+							<label for="filterLoaiGiay">Loại giày:</label>
+							<select id="filterLoaiGiay" class="form-control filter-select">
+								<option value="">Tất cả</option>
+								@foreach (var item in (SelectList)ViewData["Loai_GiayID"])
+								{
+									<option value="@item.Value" selected="@(ViewData["SelectedLoaiGiay"]?.ToString() == item.Value ? "selected" : null)">
+										@item.Text
+									</option>
+								}
+							</select>
+						</div>
+
+					</div>
 					<table class="table table-bordered" id="detailedProductTable">
 						<thead>
 							<tr>
@@ -321,12 +430,91 @@
 
 	<script>
 
+
 			 const MAX_INVOICE = 6;
 
 		 let invoiceCount = 0;
 		 let currentInvoiceId = null;
 		 let data = []; // mảng 2 chiều. 1 chiều lưu id hóa đơn, 1 chiều lưu các giá trị detail của hóa đơn đó
 		 let dataMaster = [];
+
+		 
+
+						$(document).ready(function () {
+			$(".filter-select, #searchProduct").on("change keyup", function () {
+				filterProducts(); // Gọi hàm lọc sản phẩm
+			});
+		});
+
+				function filterProducts() {
+			let searchQuery = $("#searchProduct").val().toLowerCase();
+			let selectedChatLieu = $("#filterChatLieu").val();
+			let selectedCoGiay = $("#filterCoGiay").val();
+			let selectedDanhMuc = $("#filterDanhMuc").val();
+			let selectedDeGiay = $("#filterDeGiay").val();
+			let selectedMuiGiay = $("#filterMuiGiay").val();
+			let selectedKieuDang = $("#filterKieuDang").val();
+			let selectedLoaiGiay = $("#filterLoaiGiay").val();
+
+			// Tạo object filters để gửi lên server
+			let filters = {
+				chatLieu: selectedChatLieu,
+				coGiay: selectedCoGiay,
+				danhMuc: selectedDanhMuc,
+				deGiay: selectedDeGiay,
+				muiGiay: selectedMuiGiay,
+				kieuDang: selectedKieuDang,
+				loaiGiay: selectedLoaiGiay,
+				tenSanPham: searchQuery // Lưu ý: tuỳ logic, có thể gọi searchQuery
+			};
+
+			$.ajax({
+				url: '/Admin/SanPhamChiTiet/bhtqFilter',  // endpoint Filter
+				type: 'GET',
+				data: filters,  // Gửi object filters
+				success: function (result) {
+					let tbody = $('#detailedProductTable tbody');
+					tbody.empty();
+
+					if (result && result.length > 0) {
+						$.each(result, function (index, product) {
+							let imgUrl = product.imageUrl || "/img/default.jpg";
+							let rowHtml = `
+								<tr>
+									<td>${index + 1}</td>
+									<td><img src="${imgUrl}" alt="${product.ten_SPCT}" width="50"></td>
+									<td>${product.ten_SPCT}</td>
+									<td>${parseFloat(product.price).toLocaleString()} VND</td>
+									<td>${product.dbQuantity}</td>
+									<td>${product.size}</td>
+									<td>${product.color}</td>
+									<td>${product.status}</td>
+									<td>
+										<button class="btn btn-success btn-sm add-product"
+											data-id="${product.id}"
+											data-name="${product.ten_SPCT}"
+											data-price="${product.price}"
+											data-size="${product.size}"
+											data-color="${product.color}"
+											data-status="${product.status}"
+											data-img="${imgUrl}">
+											Thêm
+										</button>
+									</td>
+								</tr>
+							`;
+							tbody.append(rowHtml);
+						});
+					} else {
+						tbody.append('<tr><td colspan="9" class="text-center">Không có sản phẩm</td></tr>');
+					}
+				},
+				error: function (err) {
+					console.error("Lỗi khi lọc sản phẩm:", err);
+				}
+			});
+		}
+
 
 		 // comment lại do chưa làm mịn code
 		 this.initEvent();
@@ -357,6 +545,8 @@
 										<li class="nav-item">
 											<a class="nav-link" id="tab-${newInvoiceDomId}" data-bs-toggle="tab" href="#${newInvoiceDomId}">
 												${(item && item.maHoaDon) ? item.maHoaDon : ''}
+														 <!-- Thêm vòng tròn/badge hiển thị số lượng: -->
+										  <span class="badge invoice-count-badge" id="badge-${newInvoiceDomId}">0</span>
 												<span class="close-tab" data-id="${newInvoiceDomId}">✖</span>
 											</a>
 										</li>
@@ -493,7 +683,10 @@
 						 $('#invoiceTabs').append(`
 							 <li class="nav-item">
 								 <a class="nav-link" id="tab-${newInvoiceDomId}" data-bs-toggle="tab" href="#${newInvoiceDomId}">
-									 ${invoiceCode} <span class="close-tab" data-id="${newInvoiceDomId}">✖</span>
+									 ${invoiceCode}
+											 <!-- Thêm vòng tròn/badge hiển thị số lượng: -->
+								  <span class="badge invoice-count-badge" id="badge-${newInvoiceDomId}">0</span>
+									 <span class="close-tab" data-id="${newInvoiceDomId}">✖</span>
 								 </a>
 							 </li>`);
 						 $('#invoiceContent').append(newInvoiceHtml);
@@ -530,22 +723,7 @@
 			 let me = this,
 				dbInvoiceId = $(`#${currentInvoiceId}`).attr('data-db-invoice-id');
 
-			// 🔥 Kiểm tra xem có thông tin khách hàng trong sessionStorage không
-			let customerData = sessionStorage.getItem(`customer_info_${currentInvoiceId}`);
-			if (customerData) {
-				let customer = JSON.parse(customerData);
-				let container = $('#' + currentInvoiceId);
-				if (container.length > 0) {
-					container.attr('data-customer-id', customer.customerId);
-					let customerForm = container.find('.customerForm');
-					if (customerForm.length > 0) {
-						customerForm.show();
-						customerForm.find('.customerName').val(customer.name);
-						customerForm.find('.customerPhone').val(customer.phone);
-						customerForm.find('.customerEmail').val(customer.email);
-					}
-				}
-			}
+			
 			 $.getJSON('/Admin/BHTQ/GetInvoiceDetails', { invoiceId: dbInvoiceId }, function(res) {
 				 if (res && res.success) {
 
@@ -630,10 +808,10 @@
 						row.find('.row-total').text(res.newTotal);
 						debugger;
 						// cập nhật tổng tiền của hóa đơn
-						saveInvoicesDetailsState();
-
-						setSession("item_"+ chiTietId,res.newQty,1);
-												recalcInvoiceTotal();
+						
+					recalcInvoiceTotal(); // cập nhật tổng tiền của hóa đơn
+						// setSession("item_"+ chiTietId,res.newQty,1);
+						// 						recalcInvoiceTotal();
 
 					} else {
 						alert(res.message);
@@ -641,58 +819,7 @@
 				}
 			});
 		});
-		// 	$(document).on('click', '.plus', function() {
-
-		// 	let row = $(this).closest('tr');
-		// 	debugger;
-		// 	let chiTietId = row.data('id');
-		// 	debugger;
-
-		// 	$.ajax({
-		// 		url: '/Admin/BHTQ/UpdateInvoiceItemQuantity',
-		// 		type: 'POST',
-		// 		contentType: 'application/json;charset=utf-8',
-		// 		data: JSON.stringify({ chiTietId: chiTietId, delta: 1 }),
-		// 				Sau khi Ajax thành công
-		// success: function(res) {
-			
-		//   if (res.success) {
-		// 	row.find('.quantity').text(res.newQty);
-		// 	row.find('.row-total').text(res.newTotal);
-			
-		// 	1) Cập nhật key item_ cho chiTietId
-		// 	setSession("item_" + chiTietId, res.newQty, 1);
-			
-		// 	2) Lấy key "info_invoice_idEmployee_{invoiceId}" rồi cập nhật
-		// 	let idEmployee = 'idEmployee';
-		// 	let dbInvoiceId = $(`#${currentInvoiceId}`).attr('data-db-invoice-id');
-			
-		// 	let storageKey = 'info_invoice_' + idEmployee + '_' + dbInvoiceId;
-			
-
-		// 	let storedData = localStorage.getItem(storageKey);
-		// 	if (storedData) {
-		// 	  let sessionData = JSON.parse(storedData);
-		// 	  let invoiceDetails = JSON.parse(sessionData.value);
-
-		// 	  Tìm sản phẩm có id = chiTietId
-		// 	  let idx = invoiceDetails.findIndex(x => x.id === chiTietId);
-		// 	  if (idx >= 0) {
-		// 		invoiceDetails[idx].soLuong = res.newQty;
-		// 		invoiceDetails[idx].thanhTien = res.newTotal;
-		// 		debugger;
-		// 	  }
-
-		// 	  Lưu lại key tổng thể
-		// 	  setSession(storageKey, JSON.stringify(invoiceDetails), 2);
-		// 	}
-
-		// 	recalcInvoiceTotal();
-		//   }
-		// }
-
-		// 	});
-		// });
+	
 
 
 		 //xu li nut giam so luong
@@ -722,21 +849,57 @@
 			});
 		});
 
+		//update tong so luong cua san pham trong hoa don khi tang hoac giam so luong sp de hien thi len ma hoa don
+						function updateInvoiceBadgeCount(invoiceDomId) {
+						let sumQty = 0;
+						$(`#invoiceTable-${invoiceDomId} .quantity`).each(function () {
+							let qty = parseInt($(this).text()) || 0;
+							sumQty += qty;
+						});
+						// Cập nhật badge
+						$(`#badge-${invoiceDomId}`).text(sumQty);
+		}
+
 
 		// Hàm tính tổng tiền hóa đơn dựa trên các giá trị thanhTien của từng dòng
-		function recalcInvoiceTotal() {
+		// function recalcInvoiceTotal() {
+		// 	let total = 0;
+		// 	$(`#invoiceTable-${currentInvoiceId} tbody tr`).each(function () {
+		// 		let rowTotal = parseFloat($(this).find('.row-total').text()) || 0;
+		// 		total += rowTotal;
+		// 	});
+		// 	Cập nhật hiển thị tổng tiền tạm tính (span)
+		// 	$(`#totalPrice-${currentInvoiceId}`).text(total);
+
+		// 	Giả sử bạn có các input với class hoặc ID riêng cho phần thanh toán:
+		// 	$('.basePrice').val(total);       Hiển thị giá gốc (có thể là tổng tiền chưa giảm giá)
+		// 	$('.discountAmount').val(0);        Nếu chưa có mã giảm giá, giá trị mặc định là 0
+		// 	$('.finalTotal').val(total);   
+		// 	Tổng tiền cuối cùng (có thể sau khi trừ giảm giá)
+		// 			 updateInvoiceBadgeCount(currentInvoiceId);
+		// }
+
+						function recalcInvoiceTotal() {
 			let total = 0;
 			$(`#invoiceTable-${currentInvoiceId} tbody tr`).each(function () {
 				let rowTotal = parseFloat($(this).find('.row-total').text()) || 0;
 				total += rowTotal;
 			});
-			// Cập nhật hiển thị tổng tiền tạm tính (span)
+
+			// Cập nhật hiển thị tổng tiền tạm tính
 			$(`#totalPrice-${currentInvoiceId}`).text(total);
 
-			// Giả sử bạn có các input với class hoặc ID riêng cho phần thanh toán:
-			$('.basePrice').val(total);       // Hiển thị giá gốc (có thể là tổng tiền chưa giảm giá)
-			$('.discountAmount').val(0);        // Nếu chưa có mã giảm giá, giá trị mặc định là 0
-			$('.finalTotal').val(total);        // Tổng tiền cuối cùng (có thể sau khi trừ giảm giá)
+			// Cập nhật các input cho phần thanh toán
+			let container = $('#' + currentInvoiceId);
+			container.find('.basePrice').val(total);
+			container.find('.discountAmount').val(0);
+			container.find('.finalTotal').val(total);
+
+					// Gọi hàm cập nhật badge
+			updateInvoiceBadgeCount(currentInvoiceId);
+
+			// Nếu cần autoSelectDiscountCode
+			autoSelectDiscountCode(currentInvoiceId);
 		}
 
 
@@ -967,170 +1130,84 @@
 
 
 
-		// Xử lý khi nhấn nút "Chọn" khách hàng để cập nhật thông tin ở phần hóa đơn
+		
+			$(document).on('click', '.choose-customer', function () {
+			let customerId = $(this).data('id');
+			let name = $(this).data('name');
+			let phone = $(this).data('phone');
+			let email = $(this).data('email');
 
+			// Kiểm tra xem currentInvoiceId có giá trị hợp lệ không
+			if (!currentInvoiceId) {
+				console.error("currentInvoiceId không hợp lệ.");
+				return;
+			}
 
-		// $(document).on('click', '.choose-customer', function () {
-		// 	let customerId = $(this).data('id');
-		// 	let name = $(this).data('name');
-		// 	let phone = $(this).data('phone');
-		// 	let email = $(this).data('email');
-
-		// 	Kiểm tra xem currentInvoiceId có giá trị hợp lệ không
-		// 	if (!currentInvoiceId) {
-		// 		console.error("currentInvoiceId không hợp lệ.");
-		// 		return;
-		// 	}
-
-		// 	Xác định container hóa đơn hiện tại
-		// 	let container = $('#' + currentInvoiceId);
-		// 	if (container.length === 0) {
-		// 		console.error("Không tìm thấy container hóa đơn.");
-		// 		return;
-		// 	}
-
-		// 	Cập nhật customerId trong container
-		// 	container.attr('data-customer-id', customerId);
-
-		// 	Ẩn khối khách lẻ và hiển thị thông tin khách hàng
-		// 	let khachLe = container.find('.khachLe');
-		// 	let customerForm = container.find('.customerForm');
-
-		// 	if (khachLe.length > 0) {
-		// 		khachLe.hide();
-		// 	}
-		// 	if (customerForm.length > 0) {
-		// 		customerForm.show();
-		// 		customerForm.find('.customerName').val(name);
-		// 		customerForm.find('.customerPhone').val(phone);
-		// 		customerForm.find('.customerEmail').val(email);
-		// 	}
-
-		// 	Gửi request liên kết khách hàng với hóa đơn
-		// 	let invoiceId = container.attr('data-db-invoice-id');
-		// 	if (invoiceId) {
-		// 		$.ajax({
-		// 			url: '/Admin/BHTQ/LinkCustomerToInvoice',
-		// 			type: 'POST',
-		// 			data: {
-		// 				invoiceId: invoiceId,
-		// 				customerId: customerId
-		// 			},
-		// 			success: function (res) {
-		// 				if (res.success) {
-		// 					console.log("Đã liên kết khách hàng vào hóa đơn.");
-		// 					autoSelectDiscountCode(currentInvoiceId);
-		// 				} else {
-		// 					alert("Lỗi: " + res.message);
-		// 				}
-		// 			},
-		// 			error: function (err) {
-		// 				console.error("Lỗi khi liên kết khách hàng:", err);
-		// 				alert("Có lỗi xảy ra, vui lòng thử lại!");
-		// 			}
-		// 		});
-		// 	} else {
-		// 		console.warn("Không tìm thấy invoiceId.");
-		// 	}
-
-		// 	Đóng modal khách hàng (Bootstrap 5+)
-		// 	let modalElement = document.getElementById('customerModal');
-		// 	let modalInstance = bootstrap.Modal.getInstance(modalElement);
-		// 	if (modalInstance) {
-		// 		modalInstance.hide();
-		// 	}
-		// });
-
-		$(document).on('click', '.choose-customer', function () {
-	let invoiceDomId = currentInvoiceId; // Lấy invoiceId hiện hành
-	let dbInvoiceId = $(`#${invoiceDomId}`).attr('data-db-invoice-id');
-
-	 console.log("Invoice DOM id:", invoiceDomId, "-> dbInvoiceId:", dbInvoiceId);
-
-	if (!dbInvoiceId) {
-	 alert("Không tìm thấy hóa đơn!");
-			 return;}
-						
-    let customerId = $(this).data('id');
-    let name = $(this).data('name');
-    let phone = $(this).data('phone');
-    let email = $(this).data('email');
-
-    if (!currentInvoiceId) {
-        console.error("currentInvoiceId không hợp lệ.");
-        return;
-    }
-
-    let container = $('#' + currentInvoiceId);
-    if (container.length === 0) {
-        console.error("Không tìm thấy container hóa đơn.");
-        return;
-    }
-
-    // Lưu thông tin khách hàng vào sessionStorage để không bị mất khi chuyển trang
-    let customerData = { customerId, name, phone, email };
-    sessionStorage.setItem(`customer_info_${currentInvoiceId}`, JSON.stringify(customerData));
-
-    // Hiển thị thông tin khách hàng
-    container.attr('data-customer-id', customerId);
-    let khachLe = container.find('.khachLe');
-    let customerForm = container.find('.customerForm');
-
-    if (khachLe.length > 0) khachLe.hide();
-    if (customerForm.length > 0) {
-        customerForm.show();
-        customerForm.find('.customerName').val(name);
-        customerForm.find('.customerPhone').val(phone);
-        customerForm.find('.customerEmail').val(email);
-    }
-
-    // Gửi request liên kết khách hàng với hóa đơn
-    let invoiceId = container.attr('data-db-invoice-id');
-    if (invoiceId) {
-        $.post('/Admin/BHTQ/LinkCustomerToInvoice', { invoiceId, customerId }, function (res) {
-            if (res.success) {
-                console.log("Đã liên kết khách hàng vào hóa đơn.");
-                autoSelectDiscountCode(currentInvoiceId);
-            } else {
-                alert("Lỗi: " + res.message);
-            }
-        }).fail(function (err) {
-            console.error("Lỗi khi liên kết khách hàng:", err);
-            alert("Có lỗi xảy ra, vui lòng thử lại!");
-        });
-    } else {
-        console.warn("Không tìm thấy invoiceId.");
-    }
-
-    // Đóng modal khách hàng
-    let modalElement = document.getElementById('customerModal');
-    let modalInstance = bootstrap.Modal.getInstance(modalElement);
-    if (modalInstance) modalInstance.hide();
-});
-
-
-
-		//tu dong chon phieu giam gia tot nhat
-				function recalcInvoiceTotal() {
-			let total = 0;
-			$(`#invoiceTable-${currentInvoiceId} tbody tr`).each(function () {
-				let rowTotal = parseFloat($(this).find('.row-total').text()) || 0;
-				total += rowTotal;
-			});
-			// Cập nhật hiển thị tổng tiền tạm tính
-			$(`#totalPrice-${currentInvoiceId}`).text(total);
-
-			// Tính các ô basePrice, discountAmount, finalTotal ban đầu
+			// Xác định container hóa đơn hiện tại
 			let container = $('#' + currentInvoiceId);
-			container.find('.basePrice').val(total);
-			container.find('.discountAmount').val(0);
-			container.find('.finalTotal').val(total);
+			if (container.length === 0) {
+				console.error("Không tìm thấy container hóa đơn.");
+				return;
+			}
 
-			// Sau khi cập nhật tổng tiền xong, tự động chọn mã giảm giá tốt nhất (nếu có)
-			autoSelectDiscountCode(currentInvoiceId);
-		}
+			// Cập nhật customerId trong container
+			container.attr('data-customer-id', customerId);
+
+			// Ẩn khối khách lẻ và hiển thị thông tin khách hàng
+			let khachLe = container.find('.khachLe');
+			let customerForm = container.find('.customerForm');
+
+			if (khachLe.length > 0) {
+				khachLe.hide();
+			}
+			if (customerForm.length > 0) {
+				customerForm.show();
+				customerForm.find('.customerName').val(name);
+				customerForm.find('.customerPhone').val(phone);
+				customerForm.find('.customerEmail').val(email);
+			}
+
+			// Gửi request liên kết khách hàng với hóa đơn
+			let invoiceId = container.attr('data-db-invoice-id');
+			if (invoiceId) {
+				$.ajax({
+					url: '/Admin/BHTQ/LinkCustomerToInvoice',
+					type: 'POST',
+					data: {
+						invoiceId: invoiceId,
+						customerId: customerId
+					},
+					success: function (res) {
+						if (res.success) {
+							console.log("Đã liên kết khách hàng vào hóa đơn.");
+							autoSelectDiscountCode(currentInvoiceId);
+						} else {
+							alert("Lỗi: " + res.message);
+						}
+					},
+					error: function (err) {
+						console.error("Lỗi khi liên kết khách hàng:", err);
+						alert("Có lỗi xảy ra, vui lòng thử lại!");
+					}
+				});
+			} else {
+				console.warn("Không tìm thấy invoiceId.");
+			}
+
+			// Đóng modal khách hàng (Bootstrap 5+)
+			let modalElement = document.getElementById('customerModal');
+			let modalInstance = bootstrap.Modal.getInstance(modalElement);
+			if (modalInstance) {
+				modalInstance.hide();
+			}
+		});
+
+
+
 
 		//API GetAvailableDiscounts để lấy danh sách voucher
+				let bestDiscountAmount = 0;
+		// let bestVoucherCode = null; ban đầu là null
 					 function autoSelectDiscountCode(invoiceDomId) {
 			let container = $('#' + invoiceDomId);
 			// Lấy orderTotal từ span
@@ -1165,13 +1242,25 @@
 						}
 					});
 					if(bestVoucher){
+					bestDiscountAmount=maxDiscount;
+					// bestVoucherCode=bestVoucher.ma;
 						container.find('.discountCodeInput').val(bestVoucher.ma);
 						container.find('.discountAmount').val(maxDiscount);
 						container.find('.finalTotal').val(orderTotal - maxDiscount);
+						//hien thi thong bao ma giam gia toot nhat
+								container.find('#bestVoucherMessage').show();	
+							} else {
+						// Không tìm được voucher tốt nhất
+						container.find('#bestVoucherMessage').hide();
+						// bestVoucherCode=null;
+						bestDiscountAmount=0;
 					}
 				},
 				error: function(err) {
 					console.error("Lỗi autoSelectDiscountCode:", err);
+							 container.find('#bestVoucherMessage').hide();
+							 // bestVoucherCode=null;
+								bestDiscountAmount=0;
 				}
 			});
 		}
@@ -1256,6 +1345,13 @@
 			container.find('.basePrice').val(orderTotal);
 			container.find('.discountAmount').val(discount);
 			container.find('.finalTotal').val(orderTotal - discount);
+
+			//kiem tra xem co ma gg nay co trung voi ma gg cua voucher code hay khong
+			if(Math.abs(discount - bestDiscountAmount) < 0.01){
+						container.find('#bestVoucherMessage').show();
+			}else{
+						container.find('#bestVoucherMessage').hide();
+			}
 
 			// Đóng modal voucher
 			let modal = bootstrap.Modal.getInstance(document.getElementById('discountModal'));
@@ -1429,7 +1525,7 @@
 		});
 
 
-		// xác nhận" trong modal
+		//thêm phương thức thanh toán 
 		$('#confirmPaymentBtn').on('click', function(){
 			let amount = parseFloat($('#paymentAmount').val().replace(/\D/g,'')) || 0;
 			let methodId = $('#paymentMethodSelect').val();

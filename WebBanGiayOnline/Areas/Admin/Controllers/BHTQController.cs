@@ -1,5 +1,6 @@
 ﻿using ClssLib;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using WebBanGiay.Data;
@@ -17,6 +18,13 @@ namespace WebBanGiay.Areas.Admin.Controllers
         }
         public IActionResult Index()
         {
+            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu");
+            ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.ToList(), "ID", "ten_loai_co_giay");
+            ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.ToList(), "ID", "ten_danh_muc");
+            ViewData["De_GiayID"] = new SelectList(_context.de_Giays.ToList(), "ID", "ten_de_giay");
+            ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.ToList(), "ID", "ten_mui_giay");
+            ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.ToList(), "ID", "ten_kieu_dang");
+            ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.ToList(), "ID", "ten_loai_giay");
             return View();
         }
 
@@ -33,7 +41,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     ghi_chu = "",
 
                     trang_thai = 0,
-                    dia_chi = "",
+                    dia_chi = "Tại quầy",
                     sdt_nguoi_nhan = "",
                     email_nguoi_nhan = "",
                     loai_hoa_don = 1,

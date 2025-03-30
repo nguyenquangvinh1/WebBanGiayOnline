@@ -5,7 +5,9 @@
     ViewData["Title"] = "Người dùng";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
-
+@{
+    var successMessage = Model.SuccessMessage ?? "";
+}
 <div class="page-content-wrapper">
     <div class="container-fluid">
         <!-- Tiêu đề trang -->
@@ -231,13 +233,26 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
+
 @section Scripts {
     <script>
+        var msg = "@(successMessage.Replace("\"", "\\\""))";
+            if (msg.trim() !== "") {
+                Swal.fire({
+                    icon: 'success',
+                    title: msg,
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            }
         // 1. Tìm kiếm
         $("#searchInput").on("input", function () {
             let keyword = $(this).val().trim();
             fetch(`/Admin/NhanVien/Search?keyword=${encodeURIComponent(keyword)}`)
-                .then(response => response.json())
+                .then(response => response.json())  
                 .then(data => {
                     let tableBody = $("#nhanVienTableBody");
                     tableBody.empty();
@@ -334,45 +349,48 @@
                 .catch(error => console.error("Lỗi lọc trạng thái:", error));
         });
 
-                 function changeStatus(id, newStatus) {
-            $.ajax({
-                type: "POST",
-                url: "/Admin/NhanVien/ChangeStatus",
-                data: { id: id, trang_thai: newStatus },
-                success: function (response) {
-                    if (response.success) {
-                        // Tìm tới hàng (row) chứa nhân viên này
-                        // Giả sử bạn gán ID của tr cho tiện
-                        // Hoặc tìm theo attribute data-id
+                        function changeStatus(id, newStatus) {
+            Swal.fire({
+                title: "Xác nhận thay đổi trạng thái",
+                text: "Bạn có chắc chắn muốn thay đổi trạng thái nhân viên này?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Có, đổi trạng thái",
+                cancelButtonText: "Hủy"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Nếu người dùng xác nhận, gọi AJAX để thay đổi trạng thái
+                    $.ajax({
+                        type: "POST",
+                        url: "/Admin/NhanVien/ChangeStatus",
+                        data: { id: id, trang_thai: newStatus },
+                        success: function(response) {
+                            if (response.success) {
+                                
+                                  // Tìm hàng có data-id bằng id của nhân viên
+                            let row = $("tr[data-id='" + id + "']");
+                            let newBadge = response.newStatus == 0
+                                ? '<span class="badge bg-success">Hoạt động</span>'
+                                : '<span class="badge bg-danger">Không hoạt động</span>';
+                            row.find("td.status-badge").html(newBadge);
 
-                        let rowSelector = `tr[data-id='${id}']`;
-                        let $row = $(rowSelector);
-
-                        // Cập nhật badge trạng thái
-                        let badgeCell = $row.find(".status-badge");
-                        if (response.newStatus === 0) {
-                            badgeCell.html('<span class="badge bg-success">Hoạt động</span>');
-                        } else {
-                            badgeCell.html('<span class="badge bg-danger">Không hoạt động</span>');
+                            let newStatusVal = response.newStatus == 0 ? 1 : 0;
+                            row.find(".changeStatusBtn").attr("onclick", "changeStatus('" + id + "', '" + newStatusVal + "')");
+                                                } else {
+                                Swal.fire("Lỗi", response.message, "error");
+                            }
+                        },
+                        error: function() {
+                            Swal.fire("Lỗi", "Đã xảy ra lỗi khi thay đổi trạng thái.", "error");
                         }
-
-                        // Ngoài ra, cập nhật luôn onclick của nút,
-                        // để nếu đang hoạt động thì bấm lần sau chuyển thành không hoạt động, và ngược lại
-                        let newStatusVal = (response.newStatus === 0) ? 1 : 0;
-                        let $button = $row.find(".changeStatusBtn");
-                        $button.attr("onclick", `changeStatus('${id}', ${newStatusVal})`);
-
-                    } else {
-                        alert("Lỗi: " + response.message);
-                    }
-                },
-                error: function () {
-                    alert("Đã xảy ra lỗi khi cập nhật trạng thái.");
+                    });
                 }
             });
         }
 
-
+           // Sử dụng Razor để chèn chuỗi thành giá trị JavaScript an toàn
+       
+           
         // doi trang thai
         //         function changeStatus(id, newStatus) {
         //     $.ajax({
