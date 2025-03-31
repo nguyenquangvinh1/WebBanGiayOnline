@@ -4,17 +4,26 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using WebBanGiay.Data;
+using WebBanGiay.Helpers;
 using WebBanGiay.ViewModel;
+
+using System.Configuration;
 
 namespace WebBanGiay.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class BHTQController : Controller
+	[Route("Admin/[controller]/[action]")]
+
+	public class BHTQController : Controller
     {
         private readonly AppDbContext _context;
-        public BHTQController(AppDbContext context)
+        private readonly IConfiguration _configuration;
+
+        public BHTQController(AppDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
+
         }
         public IActionResult Index()
         {
@@ -41,7 +50,6 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     ghi_chu = "",
 
                     trang_thai = 0,
-                    dia_chi = "Tại quầy",
                     sdt_nguoi_nhan = "",
                     email_nguoi_nhan = "",
                     loai_hoa_don = 1,
@@ -738,6 +746,70 @@ namespace WebBanGiay.Areas.Admin.Controllers
             return Guid.Empty;
         }
 
+		//string vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+		//string vnp_Returnurl = "http://localhost:5089/BHTQ/PaymentReturn";
+		//string vnp_TmnCode = "NJJ0R8FS"; // DEMO
+		//string vnp_HashSecret = "BYKJBHPPZKQMKBIBGGXIYKWYFAYSJXCW"; // DEMO
 
-    }
+		//var pay = new VnPayLibrary();
+		//pay.AddRequestData("vnp_Version", "2.1.0");
+		//pay.AddRequestData("vnp_Command", "pay");
+		//pay.AddRequestData("vnp_TmnCode", vnp_TmnCode);
+		//pay.AddRequestData("vnp_Amount", ((long)(TotalAmount * 100)).ToString());
+		//pay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
+		//pay.AddRequestData("vnp_CurrCode", "VND");
+		//pay.AddRequestData("vnp_IpAddr", HttpContext.Connection.RemoteIpAddress?.ToString());
+		//pay.AddRequestData("vnp_Locale", "vn");
+		//pay.AddRequestData("vnp_OrderInfo", orderDescription);
+		//pay.AddRequestData("vnp_OrderType", "other");
+		//pay.AddRequestData("vnp_ReturnUrl", vnp_Returnurl);
+		//pay.AddRequestData("vnp_TxnRef", DateTime.Now.Ticks.ToString());
+
+		//string paymentUrl = pay.CreateRequestUrl(vnp_Url, vnp_HashSecret);
+		//return Redirect(paymentUrl);
+
+		[HttpPost]
+
+		public IActionResult PaymentReques(double TotalAmount, string orderDescription)
+		{
+			string vnp_Url = _configuration["VNPay:Url"];
+			string vnp_Returnurl = _configuration["VNPay:ReturnUrl"];
+			string vnp_TmnCode = _configuration["VNPay:TmnCode"];
+			string vnp_HashSecret = _configuration["VNPay:HashSecret"];
+
+			var pay = new VnPayLibrary();
+			pay.AddRequestData("vnp_Version", "2.1.0");
+			pay.AddRequestData("vnp_Command", "pay");
+			pay.AddRequestData("vnp_TmnCode", vnp_TmnCode);
+			pay.AddRequestData("vnp_Amount", ((long)(TotalAmount * 100)).ToString());
+			pay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
+			pay.AddRequestData("vnp_CurrCode", "VND");
+			pay.AddRequestData("vnp_IpAddr", HttpContext.Connection.RemoteIpAddress?.ToString());
+			pay.AddRequestData("vnp_Locale", "vn");
+			pay.AddRequestData("vnp_OrderInfo", orderDescription);
+			pay.AddRequestData("vnp_OrderType", "other");
+			pay.AddRequestData("vnp_ReturnUrl", vnp_Returnurl);
+			pay.AddRequestData("vnp_TxnRef", DateTime.Now.Ticks.ToString());
+
+			string paymentUrl = pay.CreateRequestUrl(vnp_Url, vnp_HashSecret);
+			return Redirect(paymentUrl);
+
+		}
+
+		[HttpGet]
+		public IActionResult PaymentReturn()
+		{
+			// Bạn có thể xử lý kết quả thanh toán tại đây
+			var vnp_ResponseCode = Request.Query["vnp_ResponseCode"];
+			if (vnp_ResponseCode == "00")
+			{
+				return Content("Thanh toán thành công!");
+			}
+			else
+			{
+				return Content("Thanh toán thất bại hoặc bị huỷ!");
+			}
+		}
+
+	}
 }
