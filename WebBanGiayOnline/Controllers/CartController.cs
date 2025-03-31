@@ -89,21 +89,32 @@ namespace WebBanGiay.Controllers
 
             if (item == null)
             {
-                var hanghoa = db.san_Phams.SingleOrDefault(x => x.ID == id);
+                var hanghoa = db.san_Pham_Chi_Tiets.SingleOrDefault(x => x.ID == id);
                 if (hanghoa == null)
                 {
-                    TempData["Message"] = $"Không tìm thấy {id}";
-                    return Redirect("/404");
+                    return Json(new { success = false, message = "Sản phẩm không tồn tại!" });
                 }
-              
+
+                var anh = db.anh_San_Pham_San_Pham_Chi_Tiets.FirstOrDefault(x => x.San_Pham_Chi_TietID == id);
+
+                string hinhUrl = "/img/default.png"; // Giá trị mặc định nếu không tìm thấy ảnh
+                if (anh != null)
+                {
+                    var anhSanPham = db.anh_San_Phams.FirstOrDefault(z => z.ID == anh.Anh_San_PhamID);
+                    if (anhSanPham != null)
+                    {
+                        hinhUrl = anhSanPham.anh_url ?? "/img/default.png";
+                    }
+                }
+
 
                 item = new CartItem
                 {
                     id = hanghoa.ID,
-                    TenHH = hanghoa.ten_san_pham,
-                    DonGia = db.san_Pham_Chi_Tiets.Where(z => z.San_PhamID == hanghoa.ID).Select(x => x.gia).Min(),
+                    TenHH = hanghoa.ten_SPCT,
+                    DonGia = hanghoa.gia,
                     SoLuong = quantity,
-                    Hinh = db.anh_San_Phams.FirstOrDefault(z => z.San_PhamID == hanghoa.ID).anh_url ?? "/img/default.png",
+                    Hinh = hinhUrl
                 };
                 Cart1.Add(item);
             }
@@ -113,6 +124,7 @@ namespace WebBanGiay.Controllers
 
 
             }
+
             HttpContext.Session.Set(MySetting.CART_KEY, Cart1);
             return RedirectToAction("Index");
         }

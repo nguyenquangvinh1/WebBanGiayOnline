@@ -278,11 +278,12 @@
                                     </button>
                                 </div>
                             </div >
-                                    <button asp-controller="Cart" asp-action="AddCart1" asp-route-id="@Model.ID" id="btnMuaHang" class="btn border border-warning rounded-pill px-4 py-2 text-primary button1">
-                                        <i class="fa fa-shopping-bag me-2 text-primary"></i> Mua Hàng
+                                <button id="btnMuaHang" class="btn border border-secondary rounded-pill px-3 py-1 mb-4 text-primary" disabled>
+                                        <i class="fa fa-shopping-bag me-2 text-primary"></i>
+                                        Mua Hàng
                                 </button>
 
-                                    <a href="javascript:void(0);"  class="btn border border-secondary rounded-pill px-3 text-primary add-to-cart"
+                                <a href="javascript:void(0);"  class="btn border border-secondary rounded-pill px-3 text-primary add-to-cart"
                                             data-id="@Model.ID">
                                     <i class="fa fa-shopping-bag me-2 text-primary"></i> Thêm vào giỏ hàng
                                 </a>
@@ -387,7 +388,7 @@
                         <p>Email: Example@gmail.com</p>
                         <p>Phone: +0123 4567 8910</p>
                         <p>Payment Accepted</p>
-                        <img src="img/payment.png" class="img-fluid" alt="">
+                        <img src="/img/payment.png" class="img-fluid" alt="">
                     </div>
                 </div>
             </div>
@@ -468,17 +469,16 @@
             let sanPhamChiTietList = @Html.Raw(Json.Serialize(Model.lstspct));
             let selectedMauSac = null;
             let selectedKichThuoc = null;
-            
 
             function updateMuaHangButton() {
                 let matchedProduct = sanPhamChiTietList.find(spct =>
                     spct.mauSac === selectedMauSac && spct.kichThuoc === selectedKichThuoc);
 
                 if (matchedProduct) {
-                    $('#btnMuaHang').prop('disabled', false).attr('asp-route-id', matchedProduct.id);
+                    $('#btnMuaHang').prop('disabled', false).data('id', matchedProduct.id);
                     $('#productPrice').text(`Giá: ${matchedProduct.gia.toLocaleString()} VNĐ`);
                 } else {
-                    $('#btnMuaHang').prop('disabled', true).attr('asp-route-id', '');
+                    $('#btnMuaHang').prop('disabled', true).data('id', '');
                     $('#productPrice').text("Giá: Vui lòng chọn Màu Sắc & Kích Thước");
                 }
             }
@@ -488,15 +488,13 @@
             function setMinPriceOnLoad() {
                 if (sanPhamChiTietList.length > 0) {
                     let minPrice = Math.min(...sanPhamChiTietList.map(spct => spct.gia));
-                    let maxPrice = Math.max(...sanPhamChiTietList.map(spct => spct.gia));
-                    if(minPrice == maxPrice){$('#productPrice').text(`${maxPrice.toLocaleString()} VNĐ`);}else{$('#productPrice').text(`${minPrice.toLocaleString()} ~ ${maxPrice.toLocaleString()} VNĐ`);}
-                    
+                    $('#productPrice').text(`Giá thấp nhất: ${minPrice.toLocaleString()} VNĐ`);
                 } else {
                     $('#productPrice').text("Không có sản phẩm nào.");
                 }
             }
 
-            setMinPriceOnLoad(); 
+            setMinPriceOnLoad(); // Gọi khi trang tải xong
 
 
             // Khi chọn màu sắc
@@ -533,37 +531,30 @@
                 updateMuaHangButton();
             });
 
-
             // Cảnh báo khi nhấn nút Mua Hàng nhưng chưa chọn đủ
             $('#btnMuaHang').click(function (e) {
                 if (!selectedMauSac || !selectedKichThuoc) {
                     e.preventDefault(); // Ngăn chặn điều hướng
                     alert("Vui lòng chọn đầy đủ Màu Sắc và Kích Thước trước khi mua hàng!");
                 }
-            });
-                        $.ajax({
-            type: "POST",
-            url: "/Cart/AddCart1",
-            data: {
-                id: $(this).data("id"),
-                quantity: quantity,
-                selectedMauSac: selectedMauSac,
-                selectedKichThuoc: selectedKichThuoc
-            },
-            success: function (response) {
-                console.log("Dữ liệu gửi lên server:", {
-                    id: productId,
-                    quantity: quantity,
-                    selectedMauSac: selectedMauSac,
-                    selectedKichThuoc: selectedKichThuoc
-                });
-                alert(response.message);
-            },
-            error: function () {
-                alert("Có lỗi xảy ra khi thêm vào giỏ hàng!");
-            }
-        });
+                var productId = $(this).data("id");
 
+                console.log(productId);
+                $.ajax({
+                    url: "/Cart/AddCart1",
+                    type: "POST",
+                    data: { id: productId },
+                    success: function (response) {
+                        alert("Thêm vào giỏ hàng thành công!");
+                    },
+                    error: function () {
+                        alert("Có lỗi xảy ra, vui lòng thử lại.");
+                    }
+                });
+                console.log("Trước khi dừng");
+                debugger;  // Trình duyệt sẽ tạm dừng tại đây
+                console.log("Sau khi dừng");
+            });
         });
     </script>
 }
