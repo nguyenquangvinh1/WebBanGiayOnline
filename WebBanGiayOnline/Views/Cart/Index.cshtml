@@ -416,26 +416,28 @@
                 let subtotal = @Model.Sum(x => x.ThanhTien);
                 let discountAmount = subtotal * (discountValue / 100);
                 let newTotal = subtotal - discountAmount;
-               
+
+
+                $.ajax({
+                    url: "/Cart/ApplyDiscount",
+                    type: "POST",
+                    data: { totalPrice: newTotal },
+                    success: function (response) {
+                        if (response.success) {
+                            console.log("Giảm giá áp dụng thành công!");
+                        } else {
+                            alert("Lỗi: " + response.message);
+                        }
+                    },
+                    error: function () {
+                        alert("Có lỗi xảy ra!");
+                    }
+                });
 
                 $('#totalPrice').text(newTotal.toLocaleString() + " VNĐ");
-        $('#discountModal').modal('hide');
+                $('#discountModal').modal('hide');
+                 
             });
-                 $.ajax({
-            url: "/Cart/ApplyDiscount",
-            type: "POST",
-            data: { totalPrice: newTotal },
-            success: function (response) {
-                if (response.success) {
-                    console.log("Giảm giá áp dụng thành công!");
-                } else {
-                    alert("Lỗi: " + response.message);
-                }
-            },
-            error: function () {
-                alert("Có lỗi xảy ra!");
-            }
-        });
 
         });
     </script>
