@@ -103,7 +103,7 @@
                 </button>
                 <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
                     <div class="navbar-nav mx-auto">
-                        <a href="index.html" class="nav-item nav-link">Home</a>
+                        <a href="https://localhost:7243" class="nav-item nav-link">Home</a>
                         <a asp-controller="San_Pham_Chi_Tiet" asp-action="Index" class="nav-item nav-link active">Shop</a>
                         <a asp-controller="San_Pham_Chi_Tiet" asp-action="Details" class="nav-item nav-link">Shop Detail</a>
                         <div class="nav-item dropdown">
@@ -328,9 +328,9 @@
                                                 <p>@item.MoTa</p>
                                                 <div class="d-flex justify-content-between flex-lg-wrap">
                                                     <p class="text-dark fs-5 fw-bold mb-0">@item.DonGia?.ToString("#,##0 VNĐ")</p>
-                                                    <a href="javascript:void(0);" class="btn border border-secondary rounded-pill px-3 text-primary add-to-cart"
-                                                       data-id="@item.ID">
-                                                        <i class="fa fa-shopping-bag me-2 text-primary"></i> Thêm vào giỏ hàng
+                                                    <a asp-controller="San_Pham_Chi_Tiet" asp-action="Details" asp-route-id="@item.ID" class="btn border border-secondary rounded-pill px-3 text-primary add-to-cart">
+                                                       
+                                                        <i class="fa fa-shopping-bag me-2 text-primary"></i> Xem chi tiết
                                                     </a>
                                                 </div>
                                             </div>
@@ -530,39 +530,8 @@
             }
         });
             });
-                   $(document).ready(function () {
-            $(".add-to-cart").click(function () {
-                var productId = $(this).data("id");
-
-                $.ajax({
-                    url: "/Cart/AddCart",
-                    type: "POST",
-                    data: { id: productId, quantity: 1 },
-                    success: function (response) {
-                        if (response.success) {
-                            alert(response.message);
-                            updateCart();
-                        } else {
-                            alert("Lỗi: " + response.message);
-                        }
-                    },
-                    error: function () {
-                        alert("Có lỗi xảy ra, vui lòng thử lại!");
-                    }
-                });
-            });
-
-                   function updateCart() {
-            $.ajax({
-                url: "/Cart/RefreshCart",
-                type: "GET",
-                success: function (data) {
-                    $("#cart-container").html(data);
-                }
-            });
-        }
-
-        });
+                  
+       
     </script>
 </body>
 

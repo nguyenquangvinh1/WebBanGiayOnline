@@ -16,7 +16,7 @@ namespace ClssLib
         public int loai_phieu_giam_gia { get; set; }
         public int kieu_giam_gia { get; set; }//
         public int gia_tri_giam { get; set; }//
-        public decimal? gia_tri_toi_thieu { get; set; }
+        public double? gia_tri_toi_thieu { get; set; }
         public int? so_tien_giam_toi_da { get; set; }//
         public int so_luong { get; set; }//
         public int trang_thai { get; set; }//

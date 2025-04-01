@@ -303,7 +303,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
         //}
 
         [HttpGet]
-        public IActionResult GetAvailableDiscounts(Guid? customerId, decimal orderTotal)
+        public IActionResult GetAvailableDiscounts(Guid? customerId, double orderTotal)
         {
             var now = DateTime.Now;
             var query = _context.phieu_Giam_Gias.Where(pg =>

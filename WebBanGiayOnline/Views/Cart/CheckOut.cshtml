@@ -39,10 +39,7 @@
             background-position: center;
         }
 
-        .ship {
-            text-align: right;
-        }
-
+     
 
     </style>
 </head>
@@ -155,7 +152,7 @@
     <!-- Checkout Page Start -->
     <div class="container-fluid py-5">
         <div class="container py-5">
-            <h1 class="mb-4">Billing details</h1>
+            <h1 class="mb-4">Thanh toán</h1>
             
             <form asp-action="Checkout" asp-controller="Cart" >
                 <div class="row g-5">
@@ -251,13 +248,13 @@
                                     }
                                     
 
-                                    <tr class="ship">
-                                       
+                                    <tr>
+                                        <td colspan="4">Phí vận chuyển :</td>
                                         <td  id="fee"></td>
                                     </tr>
                                     <tr>
-                                        <td colspan="2">Tổng Tiền:</td>
-                                        <td id="totalWithFee">@Model.Sum(p => p.ThanhTien).ToString("#,##0 VNĐ")</td>
+                                        <td colspan="4">Tổng Tiền :</td>
+                                        <td id="totalWithFee">@Model.Sum(p => p.ThanhTien).ToString("#,##0 VNĐ") </td>
                                     </tr>
 
 
@@ -379,7 +376,7 @@
                      let total = response.fee + subtotal;
                     console.log("Nhận phản hồi:", response); // Debug phản hồi
                     if (response.success) {
-                        $("#fee").text("Phí vận chuyển: " + response.fee + " VNĐ");
+                        $("#fee").text(response.fee.toLocaleString() + " VNĐ");
                         $("#totalWithFee").text( total.toLocaleString() + " VNĐ");
                     } else {
                         alert(response.message);

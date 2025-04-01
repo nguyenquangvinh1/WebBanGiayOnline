@@ -32,8 +32,9 @@ namespace WebBanGiay.Models.ViewModel
 
         public string GhiChu { get; set; }
         public double ThanhTien => SoLuong * DonGia;
+        public double ThanhTienGG { get; set; }
 
 
-       
+
     }
 }
