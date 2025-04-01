@@ -1,21 +1,39 @@
 ﻿using ClssLib;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using WebBanGiay.Data;
+using WebBanGiay.Helpers;
 using WebBanGiay.ViewModel;
+
+using System.Configuration;
 
 namespace WebBanGiay.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class BHTQController : Controller
+	[Route("Admin/[controller]/[action]")]
+
+	public class BHTQController : Controller
     {
         private readonly AppDbContext _context;
-        public BHTQController(AppDbContext context)
+        private readonly IConfiguration _configuration;
+
+        public BHTQController(AppDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
+
         }
         public IActionResult Index()
         {
+            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu");
+            ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.ToList(), "ID", "ten_loai_co_giay");
+            ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.ToList(), "ID", "ten_danh_muc");
+            ViewData["De_GiayID"] = new SelectList(_context.de_Giays.ToList(), "ID", "ten_de_giay");
+            ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.ToList(), "ID", "ten_mui_giay");
+            ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.ToList(), "ID", "ten_kieu_dang");
+            ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.ToList(), "ID", "ten_loai_giay");
             return View();
         }
 
@@ -30,9 +48,8 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     MaHoaDon = GenerateNewHoaDonID(),
                     tong_tien = 0,
                     ghi_chu = "",
-              
+
                     trang_thai = 0,
-                    dia_chi = "",
                     sdt_nguoi_nhan = "",
                     email_nguoi_nhan = "",
                     loai_hoa_don = 1,
@@ -45,14 +62,36 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 _context.hoa_Dons.Add(newInvoice);
                 _context.SaveChanges();
 
-                return Json(new { success = true, invoiceId = newInvoice.ID, message = "Tạo hóa đơn mới thành công!" });
+                return Json(new { success = true, invoiceId = newInvoice.ID,data = newInvoice, message = "Tạo hóa đơn mới thành công!" });
             }
             catch (Exception ex)
             {
                 return Json(new { success = false, message = "Lỗi khi tạo hóa đơn: " + ex.Message });
             }
         }
-   //hien thi danh sach san pham trong hoa don
+
+
+        [HttpPost]
+        public IActionResult GetInvoicesByIDs([FromBody] GetInvoicesParam param)
+        {
+            try
+            {
+                var data = _context.hoa_Dons
+                        .Where(hd => param.invoiceIds.Contains(hd.ID))
+                        .Select(hd => new {
+                            hd.ID,
+                            hd.MaHoaDon
+                        }
+                        ).ToList();
+                return Json(new { success = true, data = data });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, data = ex });
+            }
+        }
+
+        //hien thi danh sach san pham trong hoa don
 
         [HttpGet]
         public IActionResult GetInvoiceDetails(Guid invoiceId)
@@ -75,7 +114,6 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     trangThai = c.San_Pham_Chi_Tiet.trang_thai == 1 ? "Hoạt động" : "Không hoạt động"
                 })
                 .ToList();
-            
 
             return Json(new { success = true, data = products });
         }
@@ -265,6 +303,12 @@ namespace WebBanGiay.Areas.Admin.Controllers
         {
             public Guid chiTietId { get; set; }
             public int delta { get; set; } // +1 để tăng, -1 để giảm
+        }
+
+        // Model cho request cập nhật số lượng
+        public class GetInvoicesParam
+        {
+            public List<Guid> invoiceIds { get; set; }
         }
 
        
@@ -595,6 +639,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 }
             });
         }
+
         [HttpPost]
         public IActionResult FinalizePayment([FromBody] FinalizePaymentRequest model)
         {
@@ -616,37 +661,62 @@ namespace WebBanGiay.Areas.Admin.Controllers
                         Hoa_DonID = model.InvoiceId,
                         ngay_thanh_toan = DateTime.Now,
                         trang_thai = 0,
-                        mo_ta = "Thanh toán tự động"
+                        mo_ta = "Thanh toán"
                     };
                     _context.thanh_Toans.Add(payment);
                 }
                 _context.SaveChanges();
             }
 
-            // 3. Nếu có Voucher => giảm số lượng voucher
-            if (model.VoucherId.HasValue)
+            // 3. Nếu có Voucher (dựa vào VoucherCodeString)
+            if (!string.IsNullOrWhiteSpace(model.VoucherCodeString))
             {
-                var voucher = _context.phieu_Giam_Gias.FirstOrDefault(v => v.ID == model.VoucherId.Value);
+                // Tìm voucher theo mã (trường ma trong bảng phieu_Giam_Gias)
+                var voucher = _context.phieu_Giam_Gias.FirstOrDefault(v => v.ma == model.VoucherCodeString);
                 if (voucher == null)
-                    return Json(new { success = false, message = "Không tìm thấy phiếu giảm giá" });
+                    return Json(new { success = false, message = "Không tìm thấy phiếu giảm giá!" });
                 if (voucher.so_luong <= 0)
                     return Json(new { success = false, message = "Phiếu giảm giá đã hết!" });
 
+                double discountAmount = 0;
+                // Nếu loại phiếu giảm giá là 1 => Giảm %
+                if (voucher.loai_phieu_giam_gia == 1)
+                {
+                    discountAmount = invoice.tong_tien * (voucher.gia_tri_giam / 100.0);
+                    if (voucher.so_tien_giam_toi_da.HasValue && discountAmount > voucher.so_tien_giam_toi_da.Value)
+                        discountAmount = voucher.so_tien_giam_toi_da.Value;
+                }
+                // Nếu loại phiếu giảm giá là 0 => Giảm VND
+                else if (voucher.loai_phieu_giam_gia == 0)
+                {
+                    discountAmount = voucher.gia_tri_giam;
+                }
+
+                // Giảm số lượng voucher
                 voucher.so_luong -= 1;
                 _context.phieu_Giam_Gias.Update(voucher);
 
-                // Lưu voucher vào hóa đơn nếu cần (thêm cột VoucherID trong bảng hoa_Dons)
-                invoice.Giam_Gia.ID = model.VoucherId.Value;
+                // Lưu voucher vào hóa đơn
+                invoice.Giam_GiaID = voucher.ID;
+                _context.hoa_Dons.Update(invoice);
+                _context.SaveChanges();
+                // Cập nhật tổng tiền hóa đơn (trừ số tiền giảm)
+                double newTotal = invoice.tong_tien - discountAmount;
+                if (newTotal < 0)
+                    newTotal = 0;
+                invoice.tong_tien = newTotal;
             }
 
-            // 4. Update trạng thái hóa đơn thành 3 (Hoàn thành)
-            invoice.loai_hoa_don = 1;
+            // 4. Đổi trạng thái hóa đơn thành 3 (Hoàn thành)
             invoice.trang_thai = 3;
             _context.hoa_Dons.Update(invoice);
             _context.SaveChanges();
 
             return Json(new { success = true, message = "Thanh toán thành công!" });
         }
+
+
+
 
         // Ví dụ hàm map Method -> ID
         private Guid GetPaymentMethodIdByCode(string method)
@@ -676,6 +746,70 @@ namespace WebBanGiay.Areas.Admin.Controllers
             return Guid.Empty;
         }
 
+		//string vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+		//string vnp_Returnurl = "http://localhost:5089/BHTQ/PaymentReturn";
+		//string vnp_TmnCode = "NJJ0R8FS"; // DEMO
+		//string vnp_HashSecret = "BYKJBHPPZKQMKBIBGGXIYKWYFAYSJXCW"; // DEMO
 
-    }
+		//var pay = new VnPayLibrary();
+		//pay.AddRequestData("vnp_Version", "2.1.0");
+		//pay.AddRequestData("vnp_Command", "pay");
+		//pay.AddRequestData("vnp_TmnCode", vnp_TmnCode);
+		//pay.AddRequestData("vnp_Amount", ((long)(TotalAmount * 100)).ToString());
+		//pay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
+		//pay.AddRequestData("vnp_CurrCode", "VND");
+		//pay.AddRequestData("vnp_IpAddr", HttpContext.Connection.RemoteIpAddress?.ToString());
+		//pay.AddRequestData("vnp_Locale", "vn");
+		//pay.AddRequestData("vnp_OrderInfo", orderDescription);
+		//pay.AddRequestData("vnp_OrderType", "other");
+		//pay.AddRequestData("vnp_ReturnUrl", vnp_Returnurl);
+		//pay.AddRequestData("vnp_TxnRef", DateTime.Now.Ticks.ToString());
+
+		//string paymentUrl = pay.CreateRequestUrl(vnp_Url, vnp_HashSecret);
+		//return Redirect(paymentUrl);
+
+		[HttpPost]
+
+		public IActionResult PaymentReques(double TotalAmount, string orderDescription)
+		{
+			string vnp_Url = _configuration["VNPay:Url"];
+			string vnp_Returnurl = _configuration["VNPay:ReturnUrl"];
+			string vnp_TmnCode = _configuration["VNPay:TmnCode"];
+			string vnp_HashSecret = _configuration["VNPay:HashSecret"];
+
+			var pay = new VnPayLibrary();
+			pay.AddRequestData("vnp_Version", "2.1.0");
+			pay.AddRequestData("vnp_Command", "pay");
+			pay.AddRequestData("vnp_TmnCode", vnp_TmnCode);
+			pay.AddRequestData("vnp_Amount", ((long)(TotalAmount * 100)).ToString());
+			pay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
+			pay.AddRequestData("vnp_CurrCode", "VND");
+			pay.AddRequestData("vnp_IpAddr", HttpContext.Connection.RemoteIpAddress?.ToString());
+			pay.AddRequestData("vnp_Locale", "vn");
+			pay.AddRequestData("vnp_OrderInfo", orderDescription);
+			pay.AddRequestData("vnp_OrderType", "other");
+			pay.AddRequestData("vnp_ReturnUrl", vnp_Returnurl);
+			pay.AddRequestData("vnp_TxnRef", DateTime.Now.Ticks.ToString());
+
+			string paymentUrl = pay.CreateRequestUrl(vnp_Url, vnp_HashSecret);
+			return Redirect(paymentUrl);
+
+		}
+
+		[HttpGet]
+		public IActionResult PaymentReturn()
+		{
+			// Bạn có thể xử lý kết quả thanh toán tại đây
+			var vnp_ResponseCode = Request.Query["vnp_ResponseCode"];
+			if (vnp_ResponseCode == "00")
+			{
+				return Content("Thanh toán thành công!");
+			}
+			else
+			{
+				return Content("Thanh toán thất bại hoặc bị huỷ!");
+			}
+		}
+
+	}
 }

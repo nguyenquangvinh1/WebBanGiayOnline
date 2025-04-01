@@ -41,8 +41,18 @@
         /* Menu link trong sidebar: chữ màu đen, hover nền nhạt */
         .main-sidebar .nav-sidebar .nav-link {
             color: #000 !important;
+            font-size: 18px; /* Điều chỉnh cỡ chữ theo ý muốn */
+            padding: 15px 10px; /* Tăng khoảng cách bên trong để dễ nhìn hơn */
         }
 
+        .main-sidebar .nav-treeview .nav-item {
+            height: 45px;
+        }
+
+        /* Tăng cỡ chữ của menu con */
+        .main-sidebar .nav-treeview .nav-link {
+            font-size: 16px;
+        }
             .main-sidebar .nav-sidebar .nav-link:hover {
                 background-color: #f1f1f1 !important;
                 color: #333 !important;
@@ -54,7 +64,9 @@
         }
 
 
-
+        /* .main-sidebar .nav-sidebar .nav-item { */
+        /*     height: 50px; /* Hoặc giá trị khác theo mong muốn */ */
+        /* } */ 
 
             .main-sidebar .nav-treeview .nav-link:hover {
                 background-color: #f9f9f9 !important;
@@ -69,26 +81,26 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <!-- Sidebar user panel (optional) -->
-        @* <div class="user-panel mt-3 pb-3 mb-3 d-flex"> *@
-        @*     <div class="image"> *@
-        @*         <img src="/AdminLTE-master/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image"> *@
-        @*     </div> *@
-        @*     <div class="info"> *@
-        @*         <a href="#" class="d-block">Alexander Pierce</a> *@
-        @*     </div> *@
-        @* </div> *@
+        @* <div class="user-panel mt-3 pb-3 mb-3 d-flex">  *@
+        @*    <div class="image"> *@
+        @*       <img src="/AdminLTE-master/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image"> *@
+        @*    </div> *@
+        @*    <div class="info">  *@
+        @*        <a href="#" class="d-block">Alexander Pierce</a>  *@
+        @*      </div>  *@
+        @*  </div>  *@
 
-        <!-- SidebarSearch Form -->
-        @* <div class="form-inline">
-            <div class="input-group" data-widget="sidebar-search">
-                <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
-                <div class="input-group-append">
-                    <button class="btn btn-sidebar">
-                        <i class="fas fa-search fa-fw"></i>
-                    </button>
-                </div>
-            </div>
-        </div> *@
+        @* <!-- SidebarSearch Form --> *@
+        @* <div class="form-inline"> *@
+        @*     <div class="input-group" data-widget="sidebar-search"> *@
+        @*         <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search"> *@
+        @*         <div class="input-group-append"> *@
+        @*             <button class="btn btn-sidebar"> *@
+        @*                 <i class="fas fa-search fa-fw"></i> *@
+        @*             </button> *@
+        @*         </div> *@
+        @*     </div> *@
+        @* </div>  *@
 
         <!-- Sidebar Menu -->
         <nav class="mt-2">
@@ -99,7 +111,7 @@
                 <li class="nav-item">
                     <a class="nav-link" asp-area="Admin" asp-controller="ThongKes" asp-action="Index">
                         <span class="icon-holder">
-                            <i class="anticon anticon-dashboard"></i>
+                            <i class="fas fa-chart-bar"></i>
                         </span>
                         <span class="title">Thống kê</span>
                     </a>
@@ -107,7 +119,7 @@
                 <li class="nav-item ">
                     <a class="nav-link" asp-area="Admin" asp-controller="BHTQ" asp-action="Index">
                         <span class="icon-holder">
-                            <i class="anticon anticon-appstore"></i>
+                            <i class="fas fa-cash-register"></i>
                         </span>
                         <span class="title">Bán Hàng tại Quầy</span>
 
@@ -116,7 +128,7 @@
                 <li class="nav-item ">
                     <a class="nav-link" asp-area="Admin" asp-controller="HoaDon" asp-action="Index">
                         <span class="icon-holder">
-                            <i class="anticon anticon-appstore"></i>
+                            <i class="fas fa-file-invoice"></i>
                         </span>
                         <span class="title"> Danh sách hóa đơn</span>
 
@@ -125,9 +137,9 @@
                 <li class="nav-item">
                     <a class="nav-link" href="javascript:void(0);">
 
-                        @* <span class="icon-holder"> *@
-                        @*     <i class="fas fa-cubes"></i> *@
-                        @* </span> *@
+                        <span class="icon-holder">
+                            <i class="fas fa-cubes"></i>
+                        </span>
                         <span class="title">Quản lý sản phẩm</span>
                         <span class="arrow">
                             <i class="arrow-icon"></i>
@@ -169,9 +181,9 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="javascript:void(0);">
-                        @* <span class="icon-holder"> *@
-                        @*     <i class="anticon anticon-form"></i> *@
-                        @* </span> *@
+                        <span class="icon-holder">
+                            <i class="fas fa-ticket-alt"></i>
+                        </span>
                         <span class="title">
                             Giảm giá<span>
                                 <span class="arrow">
@@ -189,9 +201,9 @@
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link">
-                        @* <span class="icon-holder"> *@
-                        @*     <i class="fas fa-shipping-fast"></i> *@
-                        @* </span> *@
+                        <span class="icon-holder">
+                            <i class="fas fa-user"></i>
+                        </span>
                         <span class="title">Quản lý tài khoản</span>
                     </a>
                     <ul class="nav nav-treeview">
@@ -210,4 +222,3 @@
     <!-- /.sidebar -->
 </aside>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-

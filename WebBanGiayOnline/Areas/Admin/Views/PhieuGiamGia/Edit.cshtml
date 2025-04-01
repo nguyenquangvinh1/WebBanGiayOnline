@@ -66,6 +66,28 @@
                 <div class="col-md-12">
                     <form asp-action="Edit">
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label asp-for="ten_phieu_giam_gia" class="control-label">Tên</label>
+                                <input asp-for="ten_phieu_giam_gia" class="form-control" />
+                                <span asp-validation-for="ten_phieu_giam_gia" class="text-danger"></span>
+                            </div>
+
+
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label asp-for="ma" class="control-label">Mã</label>
+                                <input asp-for="ma" class="form-control" />
+                                <span asp-validation-for="ma" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label asp-for="nguoi_tao" class="control-label">Người tạo</label>
+                                <input asp-for="nguoi_tao" class="form-control" />
+                                <span asp-validation-for="nguoi_tao" class="text-danger"></span>
+                            </div>
+
+                        </div>
 
                         <div class="form-row">
                             <div class="form-group col-md-6">
@@ -107,7 +129,7 @@
                         </div>
 
                         <div class="form-group">
-                            <input type="submit" value="Save" class="btn btn-primary" />
+                            <input type="submit" value="Sửa" class="btn btn-primary" />
                         </div>
                     </form>
                 </div>

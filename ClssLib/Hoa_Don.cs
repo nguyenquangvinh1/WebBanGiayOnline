@@ -44,6 +44,10 @@ namespace ClssLib
         public string? nguoi_sua { get; set; }
         [JsonIgnore]
         public virtual ICollection<Tai_Khoan_Hoa_Don> Tai_Khoan_Hoa_Dons { get; set; }
+
+        [ForeignKey("Giam_Gia")]
+        public Guid? Giam_GiaID { get; set; }
+
         [JsonIgnore]
         public virtual Phieu_Giam_Gia? Giam_Gia { get; set;}
         [JsonIgnore]

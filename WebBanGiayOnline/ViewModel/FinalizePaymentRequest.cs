@@ -5,6 +5,9 @@
 
         public Guid InvoiceId { get; set; }
         public Guid? VoucherId { get; set; }
+        public double FinalTotal { get; set; }
+        public string VoucherCodeString { get; set; }
+
         public List<PaymentRowDto> PaymentRows { get; set; }
     }
     public class PaymentRowDto

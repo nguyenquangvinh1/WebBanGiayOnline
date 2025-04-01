@@ -128,9 +128,9 @@
                 <tr>
                     <th>STT</th>
                     <th class="filterable">Ảnh</th>
-                    <th>@Html.DisplayNameFor(model => model.First().Ten)</th>
-                    <th>@Html.DisplayNameFor(model => model.First().Kich_Thuoc)</th>
-                    <th>@Html.DisplayNameFor(model => model.First().Mau_Sac)</th>
+                    <th class="filterable">Tên Sản Phẩm :</th>
+                    <th class="filterable">Kích Thước :</th>
+                    <th class="filterable">Màu Sắc :</th>
                     <th class="filterable">Tên kiểu dáng</th>
                     <th class="filterable">Tên danh mục</th>
                     <th class="filterable">Tên loại giày</th>
@@ -138,9 +138,9 @@
                     <th class="filterable">Tên cổ giày</th>
                     <th class="filterable">Tên đế giày</th>
                     <th class="filterable">Tên chất liệu</th>
-                    <th>@Html.DisplayNameFor(model => model.First().so_luong)</th>
-                    <th>@Html.DisplayNameFor(model => model.First().trang_thai)</th>
-                    <th>@Html.DisplayNameFor(model => model.First().gia)</th>
+                    <th class="filterable">Số Lượng :</th>
+                    <th class="filterable">Trạng Thái :</th>
+                    <th class="filterable">Giá :</th>
                     <th>Thao Tác</th>
                 </tr>
             </thead>
@@ -212,20 +212,8 @@
                         <td>
                             <a href="#" class="btn btn-warning btn-edit"
                                data-id="@item.ID"
-                               data-ten="@item.Ten"
                                data-gia="@item.gia"
                                data-so-luong="@item.so_luong"
-                               data-trang-thai="@item.trang_thai"
-                               data-ngay-tao="@item.ngay_tao"
-                               data-kich-thuoc="@item.Kich_Thuoc"
-                               data-mau-sac="@item.Mau_Sac"
-                               data-kieu-dang="@item.Kieu_Dang"
-                               data-danh-muc="@item.Danh_Muc"
-                               data-loai-giay="@item.Loai_Giay"
-                               data-mui-giay="@item.Mui_Giay"
-                               data-co-giay="@item.Co_Giay"
-                               data-de-giay="@item.De_Giay"
-                               data-chat-lieu="@item.Chat_Lieu"
                                data-img-url="@item.imgUrl">
                                 <i class="fa fa-xs fa-pen"></i>
                             </a>
@@ -261,79 +249,12 @@
                         <input type="number" class="form-control" id="editSoLuong">
                     </div>
 
-                    <div class="form-group">
-                        <label for="editLoaiGiay" class="control-label"></label>
-                        <select id="editLoaiGiay" name="Loai_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddLoaiGiay" asp-items="ViewBag.Loai_GiayID"></select>
-
-                    </div>
-
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <div class="form-group">
-                                <label for="editChatLieu" class="control-label"></label>
-                                <select id="editChatLieu" name="Chat_LieuID" class="form-control select2" asp-items="ViewBag.Chat_LieuID" data-api="/Admin/SanPham/AddChatLieu"></select>
-
-                            </div>
-                        </div>
-                        <div class="col-sm-4">
-
-                            <div class="form-group">
-                                <label for="editCoGiay" class="control-label"></label>
-
-                                <select id="editCoGiay" name="Co_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddCoGiay" asp-items="ViewBag.Co_GiayID"></select>
-
-                            </div>
-                        </div>
-                        <div class="col-sm-4">
-
-                            <div class="form-group">
-                                <label for="editDanhMuc" class="control-label"></label>
-
-
-                                <select id="editDanhMuc" name="Danh_MucID" class="form-control select2" data-api="/Admin/SanPham/AddDanhMuc" asp-items="ViewBag.Danh_MucID"></select>
-
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <div class="form-group">
-                                <label for="editDeGiay" class="control-label"></label>
-
-                                <select id="editDeGiay" name="De_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddDeGiay" asp-items="ViewBag.De_GiayID"></select>
-
-                            </div>
-                        </div>
-                        <div class="col-sm-4">
-
-                            <div class="form-group">
-                                <label for="editMuiGiay" class="control-label"></label>
-
-                                <select id="editMuiGiay" name="Mui_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddMuiGiay" asp-items="ViewBag.Mui_GiayID"></select>
-
-                            </div>
-                        </div>
-                        <div class="col-sm-4">
-
-                            <div class="form-group">
-                                <label for="editKieuDang" class="control-label"></label>
-
-                                <select id="editKieuDang" name="Kieu_DangID" class="form-control select2" data-api="/Admin/SanPham/AddKieuDang" asp-items="ViewBag.Kieu_DangID"></select>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="mb-3">
-                        <label for="editTrangThai" class="form-label">Trạng thái</label>
-                        <select class="form-control" id="editTrangThai">
-                            <option value="1">Đang bán</option>
-                            <option value="0">Ngừng bán</option>
-                        </select>
-                    </div>
                     <div class="mb-3">
                         <label class="form-label">Ảnh sản phẩm</label>
+                        <button id="themAnhVaoSanPham">thêm ảnh vào sản phẩm</button>
                         <div id="editImages" class="d-flex flex-wrap"></div>
+                    </div>
+                    <div id="chonAnhSanPham">
                     </div>
                     <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
                 </form>
@@ -346,6 +267,16 @@
 
 <script>
     $(document).ready(function () {
+        $("#chonAnhSanPham").hide();
+
+        // Khi bấm vào nút "Thêm ảnh vào sản phẩm"
+        $(document).off("click", "#themAnhVaoSanPham").on("click", "#themAnhVaoSanPham", function (e) {
+            e.preventDefault(); // Ngăn form submit nếu trong thẻ <form>
+            $("#chonAnhSanPham").toggle(); // Hiện/ẩn phần chọn ảnh
+        });
+
+        let productImages = [];
+
         window.applyFilter = function () {
             console.log("📌 Hàm applyFilter đã chạy!");
 
@@ -392,6 +323,8 @@
 
 
 
+
+
         $(document).on('click', '.toggle-status', function () {
             let button = $(this);
             let id = button.data("id");
@@ -420,29 +353,16 @@
 
         $('.btn-edit').click(function () {
             let id = $(this).data('id');
-            let ten = $(this).data('ten');
             let gia = $(this).data('gia');
             let soLuong = $(this).data('so-luong');
-            let trangThai = $(this).data('trang-thai');
-            let kichthuoc = $(this).data('kich-thuoc');
-            let mausac = $(this).data('mau-sac');
-            let kieudang = $(this).data('kieu-dang');
-            let danhmuc = $(this).data('danh-muc');
-            let loaigiay = $(this).data('loai-giay');
-            let muigiay = $(this).data('mui-giay');
-            let cogiay = $(this).data('co-giay');
-            let degiay = $(this).data('de-giay');
-            let chatlieu = $(this).data('chat-lieu');
             let imgUrl = $(this).data('img-url');
 
             console.log("url anh:"+ imgUrl);
 
             // Đổ dữ liệu vào modal
             $('#editID').val(id);
-            $('#editTen').val(ten);
             $('#editGia').val(gia);
             $('#editSoLuong').val(soLuong);
-            $('#editTrangThai').val(trangThai);
 
             // Hiển thị ảnh sản phẩm
             // Hiển thị ảnh sản phẩm
@@ -489,6 +409,43 @@
             }
 
 
+            // Gửi AJAX lấy danh sách ảnh từ server
+            $.ajax({
+                url: "/Admin/SanPhamChiTiet/GetProductImages",
+                type: "GET",
+                data: { id: id },
+                dataType: "json",
+                success: function (imageUrls) {
+                    console.log("✅ Ảnh nhận được:", imageUrls);
+
+                    if (Array.isArray(imageUrls) && imageUrls.length > 0) {
+
+                        // Xóa ảnh cũ trong #chonAnhSanPham
+                        $('#chonAnhSanPham').empty();
+
+                        if (Array.isArray(imageUrls) && imageUrls.length > 0) {
+                            // Lưu vào input ẩn (chuỗi URL, phân tách bằng ",")
+                            $('#editAnhSanPham').val(imageUrls.join(","));
+
+                            // Hiển thị ảnh lên #chonAnhSanPham
+                            imageUrls.forEach(url => {
+                                $('#chonAnhSanPham').append(`
+                            <div class="m-1">
+                                <img src="${url}" class="border rounded" width="80" height="80">
+                            </div>
+                        `);
+                            });
+                        } else {
+                            $('#editAnhSanPham').val(""); // Nếu không có ảnh, để trống
+                            $('#chonAnhSanPham').append("<p>Không có ảnh</p>");
+                        }
+
+                },
+                error: function () {
+                    console.error("❌ Lỗi khi lấy ảnh sản phẩm!");
+                    alert("Không thể lấy ảnh sản phẩm, vui lòng thử lại!");
+                }
+            });
 
             // Hiển thị modal
             $('#editModal').modal('show');
@@ -500,17 +457,8 @@
 
             let data = {
                 ID: $('#editID').val(),
-                Ten: $('#editTen').val(),
                 gia: $('#editGia').val(),
-                so_luong: $('#editSoLuong').val(),
-                trang_thai: $('#editTrangThai').val(),
-                Chat_Lieu: $('#editChatLieu').val(),
-                Co_Giay: $('#editCoGiay').val(),
-                Danh_Muc: $('#editDanhMuc').val(),
-                De_Giay: $('#editDeGiay').val(),
-                Mui_Giay: $('#editMuiGiay').val(),
-                Kieu_Dang: $('#editKieuDang').val(),
-                Loai_Giay: $('#editLoaiGiay').val()
+                so_luong: $('#editSoLuong').val()
             };
 
             $.ajax({

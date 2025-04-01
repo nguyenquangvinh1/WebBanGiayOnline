@@ -5,8 +5,16 @@ using Microsoft.EntityFrameworkCore;
 using System.Net.Mail;
 using System.Net;
 using WebBanGiay.Data;
+using X.PagedList.Extensions;
+
+using X.PagedList.Mvc.Core;
 // Sử dụng MailKit
 using MimeKit;
+using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using DocumentFormat.OpenXml.InkML;
+
+
 
 namespace WebBanGiay.Areas.Admin.Controllers
 {
@@ -16,66 +24,88 @@ namespace WebBanGiay.Areas.Admin.Controllers
     {
         // GET: CoGiayController
         private readonly AppDbContext _context;
-        private readonly string _smtpServer = "smtp.gmail.com";
-        private readonly int _port = 587;
-        private readonly string _user = "datnguyen24102002@gmail.com"; // Thay bằng địa chỉ email của bạn
-        private readonly string _password = "ruub cfwn grrs ukkz"; // Thay bằng mật khẩu ứng dụng của bạn
-        private string connectionString = "YourConnectionStringHere";
+
         public PhieuGiamGiaController(AppDbContext context)
         {
             _context = context;
         }
-        public async Task<IActionResult> Index(string searchString, DateTime? startDate, DateTime? endDate, string searchStrings, int? trangThai)
+        public async Task<IActionResult> Index(
+     int? page,
+     string searchString,
+     int? Category,
+     DateTime? fromDate,
+     DateTime? toDate,
+     int? trangThai)
         {
-            var phieuGiamGias = await _context.phieu_Giam_Gias.ToListAsync();
+            // Truy vấn danh sách phiếu giảm giá
+            var query = _context.phieu_Giam_Gias.AsQueryable();
 
+            // Kiểm tra ngày hợp lệ
+            if (fromDate.HasValue && toDate.HasValue && fromDate >= toDate)
+            {
+                ViewBag.ThongBao = "❌ Ngày bắt đầu phải nhỏ hơn ngày kết thúc!";
+            }
 
+            // Lọc theo ngày nếu có
+            if (fromDate.HasValue)
+            {
+                query = query.Where(h => h.ngay_tao >= fromDate.Value);
+            }
+            if (toDate.HasValue)
+            {
+                query = query.Where(h => h.ngay_tao <= toDate.Value);
+            }
 
-            // Cập nhật trạng thái dựa trên ngày hết hạn
-            foreach (var phieu in phieuGiamGias)
+            // Lọc theo từ khóa (tìm theo mã hoặc tên)
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                query = query.Where(p => p.ma.Contains(searchString) || p.ten_phieu_giam_gia.Contains(searchString));
+            }
+
+            // Lọc theo trạng thái nếu có
+            if (Category.HasValue)
+            {
+                query = query.Where(h => h.trang_thai == Category);
+            }
+
+            // Chuyển về danh sách trước khi cập nhật trạng thái
+            var danhSachPhieu = query.ToList();
+
+            // Cập nhật trạng thái
+            foreach (var phieu in danhSachPhieu)
             {
                 phieu.UpdateTrangThai();
+                _context.Entry(phieu).State = EntityState.Modified;
             }
+            danhSachPhieu = danhSachPhieu
+            .Where(h => h.ngay_tao != null)
+            .OrderByDescending(h => h.ngay_tao)
+            .ThenByDescending(h => h.ID)
+            .ToList();
+            _context.SaveChanges();
 
-            _context.SaveChanges(); // Lưu thay đổi nếu cần
-            var phieuGiamGiass = from pg in _context.phieu_Giam_Gias
-                                 select pg;
+            // Sau khi cập nhật, thực hiện lại sắp xếp
+            danhSachPhieu = danhSachPhieu.OrderByDescending(h => h.ngay_tao).ToList();
 
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                phieuGiamGiass = phieuGiamGiass.Where(pg => pg.ma.Contains(searchString) ||
-                                                           pg.ten_phieu_giam_gia.Contains(searchString));
-            }
-            ViewData["SearchString"] = HttpContext.Request.Query["searchString"];
+            // Đổ dữ liệu vào dropdown trạng thái
+            ViewBag.TrangThaiList = new SelectList(new List<SelectListItem>
+    {
+        new SelectListItem { Value = "0", Text = "Đã hết hạn" },
+        new SelectListItem { Value = "1", Text = "Đang diễn ra" }
+    }, "Value", "Text", Category?.ToString());
 
-            return View(phieuGiamGias.ToList());
+            // Phân trang
+            int pageNumber = page ?? 1;
+            int pageSize = 5;
+            var pagedList = danhSachPhieu.ToPagedList(pageNumber, pageSize);
+
+            return View("Index", pagedList);
         }
 
-
-
-        // GET: KieuDangController/Details/5
-        public async Task<IActionResult> Details(Guid? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var phieu_giam_gia = await _context.phieu_Giam_Gias
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (phieu_giam_gia == null)
-            {
-                return NotFound();
-            }
-
-            return View(phieu_giam_gia);
-        }
-
-
-        //GET: KieuDangController/Create
         [HttpGet]
         public IActionResult Create()
         {
+
             var tai_khoan = _context.tai_Khoans.ToList();
             Console.WriteLine($"Số lượng tài khoản: {tai_khoan.Count}");
             ViewBag.tai_khoans = tai_khoan ?? new List<Tai_Khoan>();
@@ -90,40 +120,32 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
             if (ModelState.IsValid)
             {
-                // Thêm phiếu giảm giá mới
+                // Cập nhật ngày tạo mới nhất để đảm bảo sắp xếp đúng
+                phieu_giam_gia.ngay_tao = DateTime.Now;
+
                 _context.phieu_Giam_Gias.Add(phieu_giam_gia);
                 await _context.SaveChangesAsync();
 
+                // Xử lý nếu có danh sách khách hàng
                 if (customerIds != null && customerIds.Length > 0)
                 {
-                    // Lấy danh sách tài khoản được chọn từ customerIds
-                    var taiKhoanList = _context.tai_Khoans.Where(c => customerIds.Contains(c.ID)).ToList();
-                    Console.WriteLine($"Số lượng tài khoản được chọn: {taiKhoanList.Count}");
+                    var tai_khoan = _context.tai_Khoans.Where(c => customerIds.Contains(c.ID)).ToList();
 
-                    // Nếu voucher là cá nhân (kieu_giam_gia == 0)
-                    if (phieu_giam_gia.kieu_giam_gia == 0)
+                    if (phieu_giam_gia.kieu_giam_gia == 0) // Nếu là cá nhân
                     {
-                        foreach (var tk in taiKhoanList)
+                        foreach (var tk in tai_khoan)
                         {
-                            Console.WriteLine($"Kiểm tra tài khoản: {tk?.ho_ten}, Email: {tk?.email}");
-
-                            // Gửi email cho khách hàng (nếu có email)
-                            if (!string.IsNullOrEmpty(tk?.email))
+                            if (!string.IsNullOrEmpty(tk.email))
                             {
                                 await SendEmail(tk.email, phieu_giam_gia);
                             }
-                            else
-                            {
-                                Console.WriteLine("Email trống hoặc null");
-                            }
 
-                            // Lưu thông tin liên kết voucher cá nhân cho khách hàng
                             var link = new Phieu_Giam_Gia_Tai_Khoan
                             {
-                                ID = Guid.NewGuid(), // Nếu sử dụng composite key, bạn có thể cấu hình khác
+                                ID = Guid.NewGuid(),
                                 Tai_KhoanID = tk.ID,
                                 Phieu_Giam_GiaID = phieu_giam_gia.ID,
-                                trang_thai = 0, // 0: active theo hệ thống của bạn
+                                trang_thai = 0,
                                 ngay_tao = DateTime.Now,
                                 nguoi_tao = User.Identity?.Name ?? "admin"
                             };
@@ -131,25 +153,26 @@ namespace WebBanGiay.Areas.Admin.Controllers
                         }
                         await _context.SaveChangesAsync();
                     }
-                    else
+                    else // Nếu là công khai, chỉ gửi email
                     {
-                        // Nếu voucher công khai, bạn chỉ gửi email (hoặc xử lý theo yêu cầu)
-                        foreach (var tk in taiKhoanList)
+                        foreach (var tk in tai_khoan)
                         {
-                            Console.WriteLine($"Kiểm tra tài khoản: {tk?.ho_ten}, Email: {tk?.email}");
-                            if (!string.IsNullOrEmpty(tk?.email))
+                            if (!string.IsNullOrEmpty(tk.email))
                             {
                                 await SendEmail(tk.email, phieu_giam_gia);
                             }
                         }
                     }
                 }
-                else
-                {
-                    Console.WriteLine("customerIds trống hoặc null");
-                }
+                // Truy vấn danh sách phiếu giảm giá
+                var query = _context.tai_Khoans.AsQueryable();
+                // Lọc theo từ khóa (tìm theo mã hoặc tên)
 
-                return RedirectToAction("Index");
+                // 🔥 Đặt thông báo thành công
+                TempData["SuccessMessage"] = "✅ Thêm thành công!";
+
+                // 🔥 Điều hướng về trang đầu tiên sau khi thêm
+                return RedirectToAction("Index", new { page = 1 });
             }
 
             ViewBag.tai_khoans = _context.tai_Khoans.ToList();
@@ -196,12 +219,6 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 Console.WriteLine($"Lỗi không xác định khi gửi email: {ex.Message}\n{ex.StackTrace}");
             }
         }
-
-
-
-
-
-
         private string GenerateDiscountCode()
         {
             // Logic để sinh mã ngẫu nhiên (VD: "DISCOUNT2023")
@@ -257,104 +274,13 @@ namespace WebBanGiay.Areas.Admin.Controllers
             return vouchers.Where(v => v.trang_thai == status);
         }
 
-        //[HttpGet]
-        //public IActionResult GetAvailableDiscounts(Guid? customerId, decimal orderTotal)
-        //{
-        //    var now = DateTime.Now;
-        //    var query = _context.phieu_Giam_Gias.Where(pg => pg.trang_thai == 0  // Thay 1 -> 0 nếu active là 0
-        //                                                     && (pg.ngay_ket_thuc == null || pg.ngay_ket_thuc > now)
-        //                                                     && pg.so_luong > 0
-        //                                                     && (pg.gia_tri_toi_thieu == null || pg.gia_tri_toi_thieu <= orderTotal));
-
-        //    if (customerId == null)
-        //    {
-        //        // Khách lẻ: chỉ lấy voucher công khai
-        //        query = query.Where(pg => pg.kieu_giam_gia == 1);
-        //    }
-        //    else
-        //    {
-        //        // Nếu có khách hàng, lấy voucher công khai hoặc voucher cá nhân của họ
-        //        var personalVoucherIds = _context.phieu_Giam_Gia_Tai_Khoans
-        //            .Where(x => x.Tai_KhoanID == customerId)
-        //            .Select(x => x.Phieu_Giam_GiaID)
-        //            .ToList();
-        //        query = query.Where(pg => pg.kieu_giam_gia == 1 || (pg.kieu_giam_gia == 0 && personalVoucherIds.Contains(pg.ID)));
-        //    }
-
-        //    var list = query.ToList();
-        //    Console.WriteLine("Số phiếu giảm giá phù hợp: " + list.Count);
-
-        //    foreach (var pg in list)
-        //    {
-        //        pg.UpdateTrangThai();
-        //    }
-        //    _context.SaveChanges();
-
-        //    var result = list.Select(pg => new {
-        //        id = pg.ID,
-        //        ma = pg.ma,
-        //        ten = pg.ten_phieu_giam_gia,
-        //        loai = pg.loai_phieu_giam_gia,  // 0 => %, 1 => VND
-        //        kieu = pg.kieu_giam_gia,         // 0 => cá nhân, 1 => công khai
-        //        gia_tri = pg.gia_tri_giam,
-        //        so_tien_giam_toi_da = pg.so_tien_giam_toi_da,
-        //    });
-        //    return Json(result);
-        //}
-
-        [HttpGet]
-        public IActionResult GetAvailableDiscounts(Guid? customerId, double orderTotal)
-        {
-            var now = DateTime.Now;
-            var query = _context.phieu_Giam_Gias.Where(pg =>
-                pg.trang_thai == 0 &&
-                (pg.ngay_ket_thuc == null || pg.ngay_ket_thuc > now) &&
-                pg.so_luong > 0 &&
-                (pg.gia_tri_toi_thieu == null || pg.gia_tri_toi_thieu <= orderTotal)
-            );
-
-            if (customerId == null)
-            {
-                // Khách lẽ: chỉ lấy voucher công khai
-                query = query.Where(pg => pg.kieu_giam_gia == 1);
-            }
-            else
-            {
-                // Nếu có khách hàng: lấy voucher công khai hoặc voucher cá nhân được gán cho khách
-                var personalVoucherIds = _context.phieu_Giam_Gia_Tai_Khoans
-                    .Where(x => x.Tai_KhoanID == customerId)
-                    .Select(x => x.Phieu_Giam_GiaID)
-                    .ToList();
-
-                query = query.Where(pg => pg.kieu_giam_gia == 1 || (pg.kieu_giam_gia == 0 && personalVoucherIds.Contains(pg.ID)));
-            }
-
-            var list = query.ToList();
-
-            // Cập nhật trạng thái voucher nếu cần (ví dụ: giảm số lượng nếu hết hạn, v.v.)
-            foreach (var pg in list)
-            {
-                pg.UpdateTrangThai();
-            }
-            _context.SaveChanges();
-
-            var result = list.Select(pg => new {
-                id = pg.ID,
-                ma = pg.ma,
-                ten = pg.ten_phieu_giam_gia,
-                loai = pg.loai_phieu_giam_gia,  // 0 => %, 1 => VND
-                kieu = pg.kieu_giam_gia,         // 0 => cá nhân, 1 => công khai
-                gia_tri = pg.gia_tri_giam,
-                so_tien_giam_toi_da = pg.so_tien_giam_toi_da,
-            });
-            return Json(result);
-        }
-
-
-
-
         // Thêm chức năng tìm kiếm theo mã hoặc tên
+        public static IEnumerable<Phieu_Giam_Gia> SearchByCodeOrName(IEnumerable<Phieu_Giam_Gia> vouchers, string searchTerm)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm)) return vouchers;
 
+            searchTerm = searchTerm.ToLower();
+            return vouchers.Where(v => v.ma.ToLower().Contains(searchTerm) || v.ten_phieu_giam_gia.ToLower().Contains(searchTerm));
+        }
     }
-
 }
