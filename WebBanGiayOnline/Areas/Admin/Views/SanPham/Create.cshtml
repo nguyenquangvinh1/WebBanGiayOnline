@@ -33,7 +33,7 @@
     </div>
     <div class="card-body">
 
-        <form asp-action="Create">
+        <form asp-action="Create" >
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             @Html.AntiForgeryToken()
 
@@ -165,7 +165,7 @@
                 <span asp-validation-for="mo_ta" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <button class="btn btn-primary" id="saveProduct">ktra</button>
+                <button type="submit" class="btn btn-primary" id="saveProduct">ktra</button>
                 @* <input type="submit" value="Create" id="saveProduct" class="btn btn-primary" /> *@
             </div>
 
@@ -373,7 +373,7 @@
             }
         });
 
-        
+
         $('#showColorPicker').click(function () {
             $('#colorPickerContainer').show();
             $('#newColor').focus();
@@ -641,7 +641,7 @@
             });
         }
 
-        
+
 
         // 🔹 Xử lý sự kiện kiểm tra tên sản phẩm
         function kiemTraTenSanPham() {
@@ -812,7 +812,7 @@
                 $('body').removeClass('modal-open'); // Loại bỏ lớp giữ nền bị tối
             }, 300);
         });
-        
+
 
 
         function initPerfectScrollbar() {
@@ -887,7 +887,7 @@
             // Chuyển dữ liệu thành JSON và gán vào input ẩn
             $('#lstSPCT').val(JSON.stringify(sanPhamCTList));
 
-            
+
 
             let danhSachTenGiay = @Html.Raw(Json.Serialize(ViewBag.TenGiay));
             function kiemTraTrungLap(tenSanPham) {

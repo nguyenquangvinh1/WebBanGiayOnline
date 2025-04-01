@@ -227,7 +227,7 @@ namespace WebBanGiay.Controllers
                     
                     sdt_nguoi_nhan = model.Sdt ?? khach.sdt,
                     email_nguoi_nhan = model.Email ?? khach.email,
-                    tong_tien = Cart.Sum(x=>x.DonGia*x.SoLuong)  ,
+                    tong_tien = Cart.Sum(x=>x.ThanhTienGG)  ,
                     ngay_tao = DateTime.Now,
                     trang_thai = 0,
                     loai_hoa_don = 2,
@@ -267,7 +267,7 @@ namespace WebBanGiay.Controllers
                                 ma = newMa,
                                 so_luong = item.SoLuong,
                                 gia = item.DonGia,
-                                thanh_tien= item.DonGia*item.SoLuong,
+                                thanh_tien= item.ThanhTienGG,
                                 Hoa_DonID = hoadon.ID,
                                 ngay_tao = DateTime.Now,
 

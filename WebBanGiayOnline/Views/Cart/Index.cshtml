@@ -419,8 +419,6 @@
                
 
                 $('#totalPrice').text(newTotal.toLocaleString() + " VNĐ");
-        $('#discountModal').modal('hide');
-            });
                  $.ajax({
             url: "/Cart/ApplyDiscount",
             type: "POST",
@@ -436,6 +434,9 @@
                 alert("Có lỗi xảy ra!");
             }
         });
+        $('#discountModal').modal('hide');
+            });
+                
 
         });
     </script>

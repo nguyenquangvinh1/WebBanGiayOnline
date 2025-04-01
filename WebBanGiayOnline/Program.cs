@@ -49,7 +49,7 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
-//<<<<<<< Updated upstream
+
 builder.Services.AddSingleton<IVnPayService, VnPayService>();
 builder.Services.Configure<MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
 builder.Services.AddScoped<IMomoService, MomoService>();
@@ -59,8 +59,7 @@ builder.Services.AddScoped<IGhnService, GhnService>();
 
 builder.Services.AddHttpClient();
 
-//=======
-//>>>>>>> Stashed changes
+
 
 var app = builder.Build();
 
