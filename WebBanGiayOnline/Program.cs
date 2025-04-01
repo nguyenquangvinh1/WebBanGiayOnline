@@ -57,6 +57,7 @@ builder.Services.AddScoped<IMomoService, MomoService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<IGhnService, GhnService>();
 
+builder.Services.AddHttpClient();
 
 //=======
 //>>>>>>> Stashed changes

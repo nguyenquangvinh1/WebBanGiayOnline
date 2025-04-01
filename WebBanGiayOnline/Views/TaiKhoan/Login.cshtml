@@ -1,35 +1,30 @@
-﻿@model WebBanGiay.ViewModel.LoginViewmodel
+﻿@model WebBanGiay.Models.ViewModel.LoginViewmodel
 
 @{
     ViewBag.Title = "Đăng nhập";
-    Layout = null; 
+    
 }
 
-<div style="display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f9;">
-    <div style="padding: 40px; background-color: white; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); border-radius: 8px;">
-        <h2>Đăng nhập</h2>
-        <form asp-action="LoginAdmin" method="post">
-            <div class="form-group">
-                <label for="Username">Tên đăng nhập</label>
-                <input type="text" class="form-control" id="Username" name="Username" required />
-            </div>
-            <div class="form-group">
-                <label for="Password">Mật khẩu</label>
-                <input type="password" class="form-control" id="Password" name="Password" required />
-            </div>
-            <button type="submit" class="btn btn-primary mt-3">Đăng nhập</button>
 
-            @if (ViewData.ModelState.ErrorCount > 0)
-            {
-                <div class="alert alert-danger mt-3">
-                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                    {
-                        <p>@error.ErrorMessage</p>
-                    }
-                </div>
-            }
+
+<div class="d-flex justify-content-center align-items-center vh-100" style="background: url(/coloshop-master/images/anhdep.jpg) center/cover no-repeat; filter: brightness(0.8);">
+    <div class="p-5 bg-white shadow-lg rounded text-center" style="width: 450px; padding: 60px; ">
+        <h3 class="fw-bold text-primary">Sign In</h3>
+        <form asp-action="LoginAdmin" method="post">
+            <div class="mb-4">
+                <input type="text" class="form-control form-control-lg" id="Username" name="Username" required placeholder="Tên đăng nhập" />
+            </div>
+            <div class="mb-4 position-relative">
+                <input type="password" class="form-control form-control-lg" id="Password" name="Password" required placeholder="Mật khẩu" />
+
+            </div>
+            <button type="submit" class="btn btn-primary w-100 rounded-pill btn-lg">Đăng nhập</button>
+            <div class="mt-4">
+                <a href="#" class="text-decoration-none">Quên <span class="text-primary">mật khẩu ?</span></a>
+            </div>
+            <div>
+                <a asp-controller="Taikhoan" asp-action="Register" class="text-decoration-none">Tạo <span class="text-primary">tài khoản mới?</span></a>
+            </div>
         </form>
     </div>
 </div>
-
-
