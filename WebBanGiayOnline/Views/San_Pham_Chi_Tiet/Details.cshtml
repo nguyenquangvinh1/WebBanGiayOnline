@@ -510,9 +510,8 @@
 
 
             // Cảnh báo khi nhấn nút Mua Hàng nhưng chưa chọn đủ
-         $('#btnMuaHang').click(function (e) {
+         $('#btnMuaHang').click(function () {
             if (!selectedMauSac || !selectedKichThuoc) {
-                e.preventDefault(); // Ngăn chặn điều hướng
                 alert("Vui lòng chọn đầy đủ Màu Sắc và Kích Thước trước khi mua hàng!");
             }
             var productId = $(this).data("id");
@@ -522,21 +521,20 @@
                     type: "POST",
                    data: { id: productId ,quantity : quantity  },
                     success: function (response) {
-                      
+
+                        alert("Thêm vào giỏ hàng thành công!");
                          window.location.href = "/Cart/Index";
                     },
                     error: function () {
                         alert("Có lỗi xảy ra, vui lòng thử lại.");
                     }
                 });
-                
-            });
+         });
 
-             $("#add-to-cart").click(function () {
+           $("#add-to-cart").click(function () {
             if (!selectedMauSac || !selectedKichThuoc) {
-              e.preventDefault(); // Ngăn chặn điều hướng
               alert("Vui lòng chọn đầy đủ Màu Sắc và Kích Thước trước khi mua hàng!");
-           }
+            }
                
                var productId = $(this).data("id");
               var quantity = $('input[name="quantity"]').val();

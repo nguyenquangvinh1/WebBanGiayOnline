@@ -419,24 +419,24 @@
                
 
                 $('#totalPrice').text(newTotal.toLocaleString() + " VNĐ");
-                 $.ajax({
-            url: "/Cart/ApplyDiscount",
-            type: "POST",
-            data: { totalPrice: newTotal },
-            success: function (response) {
-                if (response.success) {
-                    console.log("Giảm giá áp dụng thành công!");
-                } else {
-                    alert("Lỗi: " + response.message);
-                }
-            },
-            error: function () {
-                alert("Có lỗi xảy ra!");
-            }
-        });
-        $('#discountModal').modal('hide');
+                $.ajax({
+                    url: "/Cart/ApplyDiscount",
+                    type: "POST",
+                    data: { totalPrice: newTotal },
+                    success: function (response) {
+                        if (response.success) {
+                            console.log("Giảm giá áp dụng thành công!");
+                        } else {
+                            alert("Lỗi: " + response.message);
+                        }
+                    },
+                    error: function () {
+                        alert("Có lỗi xảy ra!");
+                    }
+                });
+                $('#discountModal').modal('hide');
             });
-                
+
 
         });
     </script>
