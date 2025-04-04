@@ -143,6 +143,18 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
 
+    <script>
+        $(document).ready(function () {
+            if (!window.jQuery) {
+                console.error("❌ jQuery chưa được tải!");
+            } else if (!$.fn.DataTable) {
+                console.error("❌ DataTables chưa được tải!");
+            } else {
+                console.log("✅ jQuery và DataTables đã sẵn sàng!");
+            }
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
     @*  @await Component.InvokeAsync("Notyf") *@
 </body>
