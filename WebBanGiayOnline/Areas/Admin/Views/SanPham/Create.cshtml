@@ -26,181 +26,190 @@
         </div>
     </div>
 </div>
+<div class="row">
+    <div class="col-sm-12 col-md-6">
 
-<div class="card card-primary">
-    <div class="card-header">
-        <h3 class="card-title">Thêm Sản Phẩm</h3>
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Thêm Sản Phẩm</h3>
+            </div>
+            <div class="card-body">
+
+                <form id="formSanPham" asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <input class="form-control" type="hidden" id="lstSPCT" required="" name="lstSPCT" />
+
+                    <input class="form-control" type="hidden" id="productImages" name="productImages" />
+
+
+                    <button type="button" class="btn btn-secondary ms-2 anh_form" data-toggle="modal" data-target="#productImageModal">
+                        Thêm Ảnh
+                    </button>
+
+                    <div class="form-group">
+                        <label for="ten_san_pham" class="col-form-label">Tên Sản Phẩm</label>
+                        <select id="ten_san_pham" name="ten_san_pham" class="form-control select2">
+                            <option value="">-- Nhập hoặc chọn tên sản phẩm --</option>
+                            @foreach (var item in ViewBag.TenGiay as List<string>)
+                            {
+                                <option value="@item">@item</option>
+                            }
+                        </select>
+                        <span id="ten_san_pham_warning" class="text-danger" style="display: none;">⚠️ Tên sản phẩm đã tồn tại!</span>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label asp-for="Loai_Giay" class="control-label"></label>
+                        <select id="Loai_GiayID" name="Loai_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddLoaiGiay">
+                            <option value="">-- Nhập hoặc chọn Loại Giày --</option>
+                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Loai_GiayID)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label asp-for="Chat_LieuID" class="control-label"></label>
+                                <select id="Chat_LieuID" name="Chat_LieuID" class="form-control select2" data-api="/Admin/SanPham/AddChatLieu">
+                                    <option value="">-- Nhập hoặc chọn Chất Liệu --</option>
+                                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Chat_LieuID)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+
+                            <div class="form-group">
+                                <label asp-for="Co_GiayID" class="control-label"></label>
+
+                                <select id="Co_GiayID" name="Co_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddCoGiay">
+                                    <option value="">-- Nhập hoặc chọn Cổ Giày --</option>
+                                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Co_GiayID)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+
+                            <div class="form-group">
+                                <label asp-for="Danh_MucID" class="control-label"></label>
+
+
+                                <select id="Danh_MucID" name="Danh_MucID" class="form-control select2" data-api="/Admin/SanPham/AddDanhMuc">
+                                    <option value="">-- Nhập hoặc chọn Danh Mục --</option>
+                                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Danh_MucID)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label asp-for="De_GiayID" class="control-label"></label>
+
+                                <select id="De_GiayID" name="De_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddDeGiay">
+                                    <option value="">-- Nhập hoặc chọn Đế Giày --</option>
+                                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.De_GiayID)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+
+                            <div class="form-group">
+                                <label asp-for="Mui_GiayID" class="control-label"></label>
+
+                                <select id="Mui_GiayID" name="Mui_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddMuiGiay">
+                                    <option value="">-- Nhập hoặc chọn Mũi Giày --</option>
+                                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Mui_GiayID)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+
+                            <div class="form-group">
+                                <label asp-for="Kieu_DangID" class="control-label"></label>
+
+                                <select id="Kieu_DangID" name="Kieu_DangID" class="form-control select2" data-api="/Admin/SanPham/AddKieuDang">
+                                    <option value="">-- Nhập hoặc chọn Kiểu Dáng --</option>
+                                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Kieu_DangID)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="mo_ta" class="control-label">Mô Tả Sản Phẩm</label>
+                        <textarea asp-for="mo_ta" class="form-control"></textarea>
+                        <span asp-validation-for="mo_ta" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary" id="saveProduct">thêm</button>
+                        @* <input type="submit" value="Create" id="saveProduct" class="btn btn-primary" /> *@
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+
+        <div class="card card-primary">
+            <div class="card-header">
+                <h2 class="card-title">Thêm Sản Phẩm Chi Tiết</h2>
+            </div>
+            <div class="card-body">
+
+                <div>
+                    <div class="form-group">
+                        <label class="form-label">Màu Sắc:</label>
+                        <button type="button" class="btn btn-primary" data-toggle="modal"
+                                data-target="#colorModal">
+                            +
+                        </button>
+                    </div>
+                    <div id="selectedColors" class="mb-3"></div>
+
+                    <div class="form-group">
+                        <label class="form-label">Kích Cỡ:</label>
+                        <button type="button" class="btn btn-primary" data-toggle="modal"
+                                data-target="#sizeModal">
+                            +
+                        </button>
+                    </div>
+                    <div id="selectedSize" class="mb-3"></div>
+
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="card-body">
-
-        <form id="formSanPham" asp-action="Create" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-            <input class="form-control" type="hidden" id="lstSPCT" required="" name="lstSPCT" />
-
-            <input class="form-control" type="hidden" id="productImages" name="productImages" />
-
-
-            <button type="button" class="btn btn-secondary ms-2 anh_form" data-toggle="modal" data-target="#productImageModal">
-                Thêm Ảnh
-            </button>
-
-            <div class="form-group">
-                <label for="ten_san_pham" class="col-form-label">Tên Sản Phẩm</label>
-                <select id="ten_san_pham" name="ten_san_pham" class="form-control select2">
-                    <option value="">-- Nhập hoặc chọn tên sản phẩm --</option>
-                    @foreach (var item in ViewBag.TenGiay as List<string>)
-                    {
-                        <option value="@item">@item</option>
-                    }
-                </select>
-                <span id="ten_san_pham_warning" class="text-danger" style="display: none;">⚠️ Tên sản phẩm đã tồn tại!</span>
-            </div>
-
-
-            <div class="form-group">
-                <label asp-for="Loai_Giay" class="control-label"></label>
-                <select id="Loai_GiayID" name="Loai_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddLoaiGiay">
-                    <option value="">-- Nhập hoặc chọn Loại Giày --</option>
-                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Loai_GiayID)
-                    {
-                        <option value="@item.Value">@item.Text</option>
-                    }
-                </select>
-            </div>
-
-            <div class="row">
-                <div class="col-sm-4">
-                    <div class="form-group">
-                        <label asp-for="Chat_LieuID" class="control-label"></label>
-                        <select id="Chat_LieuID" name="Chat_LieuID" class="form-control select2" data-api="/Admin/SanPham/AddChatLieu">
-                            <option value="">-- Nhập hoặc chọn Chất Liệu --</option>
-                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Chat_LieuID)
-                            {
-                                <option value="@item.Value">@item.Text</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-                <div class="col-sm-4">
-
-                    <div class="form-group">
-                        <label asp-for="Co_GiayID" class="control-label"></label>
-
-                        <select id="Co_GiayID" name="Co_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddCoGiay">
-                            <option value="">-- Nhập hoặc chọn Cổ Giày --</option>
-                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Co_GiayID)
-                            {
-                                <option value="@item.Value">@item.Text</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-                <div class="col-sm-4">
-
-                    <div class="form-group">
-                        <label asp-for="Danh_MucID" class="control-label"></label>
-
-
-                        <select id="Danh_MucID" name="Danh_MucID" class="form-control select2" data-api="/Admin/SanPham/AddDanhMuc">
-                            <option value="">-- Nhập hoặc chọn Danh Mục --</option>
-                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Danh_MucID)
-                            {
-                                <option value="@item.Value">@item.Text</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-
-            </div>
-            <div class="row">
-                <div class="col-sm-4">
-                    <div class="form-group">
-                        <label asp-for="De_GiayID" class="control-label"></label>
-
-                        <select id="De_GiayID" name="De_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddDeGiay">
-                            <option value="">-- Nhập hoặc chọn Đế Giày --</option>
-                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.De_GiayID)
-                            {
-                                <option value="@item.Value">@item.Text</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-                <div class="col-sm-4">
-
-                    <div class="form-group">
-                        <label asp-for="Mui_GiayID" class="control-label"></label>
-
-                        <select id="Mui_GiayID" name="Mui_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddMuiGiay">
-                            <option value="">-- Nhập hoặc chọn Mũi Giày --</option>
-                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Mui_GiayID)
-                            {
-                                <option value="@item.Value">@item.Text</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-                <div class="col-sm-4">
-
-                    <div class="form-group">
-                        <label asp-for="Kieu_DangID" class="control-label"></label>
-
-                        <select id="Kieu_DangID" name="Kieu_DangID" class="form-control select2" data-api="/Admin/SanPham/AddKieuDang">
-                            <option value="">-- Nhập hoặc chọn Kiểu Dáng --</option>
-                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Kieu_DangID)
-                            {
-                                <option value="@item.Value">@item.Text</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="form-group">
-                <label asp-for="mo_ta" class="control-label">Mô Tả Sản Phẩm</label>
-                <textarea asp-for="mo_ta" class="form-control"></textarea>
-                <span asp-validation-for="mo_ta" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary" id="saveProduct">thêm</button>
-                @* <input type="submit" value="Create" id="saveProduct" class="btn btn-primary" /> *@
-            </div>
-        </form>
-
-    </div>
-</div>
-
-
-<div class="card card-primary">
-    <div class="card-header">
-        <h2 class="card-title">Thêm Sản Phẩm Chi Tiết</h2>
-    </div>
-    <div class="card-body">
-
-        <div>
-            <div class="form-group">
-                <label class="form-label">Màu Sắc:</label>
-                <button type="button" class="btn btn-primary" data-toggle="modal"
-                        data-target="#colorModal">
-                    +
-                </button>
-            </div>
-            <div id="selectedColors" class="mb-3"></div>
-
-            <div class="form-group">
-                <label class="form-label">Kích Cỡ:</label>
-                <button type="button" class="btn btn-primary" data-toggle="modal"
-                        data-target="#sizeModal">
-                    +
-                </button>
-            </div>
-            <div id="selectedSize" class="mb-3"></div>
-
+    <div class="col-sm-12 col-md-6">
+        <div id="productTables" class="card">
         </div>
     </div>
 </div>
+
 
 <!-- Thêm màu sắc -->
 <!-- Modal chọn màu -->
@@ -309,12 +318,7 @@
 
 
 
-<div class="row">
-    <div class="col-12">
-        <div id="productTables" class="card">
-        </div>
-    </div>
-</div>
+
 
 <script>
     $(document).ready(function () {
