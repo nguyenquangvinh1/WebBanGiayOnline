@@ -33,7 +33,7 @@
     </div>
     <div class="card-body">
 
-        <form asp-action="Create" method="post">
+        <form id="formSanPham" asp-action="Create" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <input class="form-control" type="hidden" id="lstSPCT" required="" name="lstSPCT" />
@@ -179,7 +179,7 @@
     </div>
     <div class="card-body">
 
-        <form>
+        <div>
             <div class="form-group">
                 <label class="form-label">Màu Sắc:</label>
                 <button type="button" class="btn btn-primary" data-toggle="modal"
@@ -198,7 +198,7 @@
             </div>
             <div id="selectedSize" class="mb-3"></div>
 
-        </form>
+        </div>
     </div>
 </div>
 
@@ -291,7 +291,7 @@
                 <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="quickEditForm">
+                <div >
                     <div class="mb-3">
                         <label for="modalQuantity" class="form-label">Số Lượng</label>
                         <input type="number" class="form-control" id="modalQuantity" min="0" value="0">
@@ -300,8 +300,8 @@
                         <label for="modalPrice" class="form-label">Giá</label>
                         <input type="number" class="form-control" id="modalPrice" min="0" value="0">
                     </div>
-                    <button class="btn btn-success">Lưu</button>
-                </form>
+                    <button class="btn btn-success" id="quickEditForm">Lưu</button>
+                </div>
             </div>
         </div>
     </div>
@@ -314,7 +314,6 @@
         <div id="productTables" class="card">
         </div>
     </div>
-
 </div>
 
 <script>
@@ -917,9 +916,9 @@
                 return;
             }
 
-            console.log("✅ Không có lỗi, gửi form...");
-            $('form').submit();
             debugger;
+            console.log("✅ Không có lỗi, gửi form...");
+            $('#formSanPham').submit();
         });
         let currentTable = null;
 

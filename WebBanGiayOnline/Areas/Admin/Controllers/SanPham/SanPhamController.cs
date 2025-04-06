@@ -28,6 +28,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 
         public async Task<IActionResult> Index()
         {
+
             var list = await _context.san_Phams
                 .AsNoTracking()
                 .OrderByDescending(x => x.ngay_sua)
@@ -517,101 +518,113 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(San_Pham san_Pham, string lstSPCT, string productImages)
         {
-
-
-            var kich = await _context.kich_Thuocs.ToListAsync();
-            var mau = await _context.mau_Sacs.ToListAsync();
-
-            var SP = new San_Pham();
-            SP.ID = Guid.NewGuid();
-            SP.ten_san_pham = san_Pham.ten_san_pham;
-            SP.mo_ta = san_Pham.mo_ta;
-            SP.trang_thai = 1;
-            SP.ngay_tao = DateTime.Now;
-            SP.ngay_sua = DateTime.Now;
-            SP.Kieu_DangID = san_Pham.Kieu_DangID;
-            SP.Danh_MucID = san_Pham.Danh_MucID;
-            SP.Loai_GiayID = san_Pham.Loai_GiayID;
-            SP.Mui_GiayID = san_Pham.Mui_GiayID;
-            SP.Co_GiayID = san_Pham.Co_GiayID;
-            SP.De_GiayID = san_Pham.De_GiayID;
-            SP.Chat_LieuID = san_Pham.Chat_LieuID;
-            await _context.san_Phams.AddAsync(SP);
-            // ✅ Xử lý ảnh sản phẩm nếu có
-            List<Anh_San_Pham> anhSP = new List<Anh_San_Pham>();
-            if (!string.IsNullOrEmpty(productImages))
+            try
             {
-                var imgUrls = JsonConvert.DeserializeObject<List<string>>(productImages);
-                foreach (var url in imgUrls)
+                // ✅ Logic xử lý dữ liệu, lưu DB
+                var kich = await _context.kich_Thuocs.ToListAsync();
+                var mau = await _context.mau_Sacs.ToListAsync();
+
+                var SP = new San_Pham();
+                SP.ID = Guid.NewGuid();
+                SP.ten_san_pham = san_Pham.ten_san_pham;
+                SP.mo_ta = san_Pham.mo_ta;
+                SP.trang_thai = 1;
+                SP.ngay_tao = DateTime.Now;
+                SP.ngay_sua = DateTime.Now;
+                SP.Kieu_DangID = san_Pham.Kieu_DangID;
+                SP.Danh_MucID = san_Pham.Danh_MucID;
+                SP.Loai_GiayID = san_Pham.Loai_GiayID;
+                SP.Mui_GiayID = san_Pham.Mui_GiayID;
+                SP.Co_GiayID = san_Pham.Co_GiayID;
+                SP.De_GiayID = san_Pham.De_GiayID;
+                SP.Chat_LieuID = san_Pham.Chat_LieuID;
+                await _context.san_Phams.AddAsync(SP);
+                // ✅ Xử lý ảnh sản phẩm nếu có
+                List<Anh_San_Pham> anhSP = new List<Anh_San_Pham>();
+                if (!string.IsNullOrEmpty(productImages))
                 {
-                    var anh = new Anh_San_Pham
+                    var imgUrls = JsonConvert.DeserializeObject<List<string>>(productImages);
+                    foreach (var url in imgUrls)
                     {
-                        ID = Guid.NewGuid(),
-                        anh_url = url,
-                        San_PhamID = SP.ID
-                    };
-                    await _context.anh_San_Phams.AddAsync(anh);
-                    anhSP.Add(anh);
-                }
-            }
-            if (!lstSPCT.IsNullOrEmpty())
-            {
-
-                var listCT = JsonConvert.DeserializeObject<List<San_PhamCTView>>(lstSPCT);
-                foreach (var item in listCT)
-                {
-                    var kichThuoc = kich.FirstOrDefault(x => x.ten_kich_thuoc == item.Kich_Thuoc);
-                    var mauSac = mau.Find(x => x.ma_mau == item.Mau_Sac);
-
-                    if (kichThuoc == null || mauSac == null)
-                    {
-                        // Ghi log hoặc xử lý trường hợp không tìm thấy
-                        continue;
-                    }
-
-                    var sp = new San_Pham_Chi_Tiet()
-                    {
-                        ID = new Guid(),
-                        ten_SPCT = SP.ten_san_pham + " [" + item.Mau_Sac + "-" + item.Kich_Thuoc + "]",
-                        gia = item.gia,
-                        so_luong = item.so_luong,
-                        trang_thai = (int)item.trang_thai,
-                        ngay_tao = (DateTime)item.ngay_tao,
-                        ngay_sua = DateTime.Now,
-                        Kich_ThuocID = kichThuoc.ID,
-                        Mau_SacID = mauSac.ID,
-                        San_PhamID = SP.ID,
-                        Kieu_DangID = SP.Kieu_DangID,
-                        Danh_MucID = SP.Danh_MucID,
-                        Loai_GiayID = SP.Loai_GiayID,
-                        Mui_GiayID = SP.Mui_GiayID,
-                        Co_GiayID = SP.Co_GiayID,
-                        De_GiayID = SP.De_GiayID,
-                        Chat_LieuID = SP.Chat_LieuID
-                    };
-
-                    _context.san_Pham_Chi_Tiets.Add(sp);
-
-                    if (!string.IsNullOrEmpty(item.imgUrl))
-                    {
-                        var imgUrls = JsonConvert.DeserializeObject<List<string>>(productImages);
-                        for (int i = 0; i < imgUrls.Count; i++)
+                        var anh = new Anh_San_Pham
                         {
-                            var anh_sp = new Anh_San_Pham_San_Pham_Chi_Tiet()
-                            {
-                                ID = Guid.NewGuid(),
-                                San_Pham_Chi_TietID = sp.ID,
-                                Anh_San_PhamID = anhSP.Find(x => x.anh_url == imgUrls[i]).ID
-                            };
-                            await _context.anh_San_Pham_San_Pham_Chi_Tiets.AddAsync(anh_sp);
-                        }
+                            ID = Guid.NewGuid(),
+                            anh_url = url,
+                            San_PhamID = SP.ID
+                        };
+                        await _context.anh_San_Phams.AddAsync(anh);
+                        anhSP.Add(anh);
                     }
-
                 }
+                if (!lstSPCT.IsNullOrEmpty())
+                {
+
+                    var listCT = JsonConvert.DeserializeObject<List<San_PhamCTView>>(lstSPCT);
+                    foreach (var item in listCT)
+                    {
+                        var kichThuoc = kich.FirstOrDefault(x => x.ten_kich_thuoc == item.Kich_Thuoc);
+                        var mauSac = mau.Find(x => x.ma_mau == item.Mau_Sac);
+
+                        if (kichThuoc == null || mauSac == null)
+                        {
+                            // Ghi log hoặc xử lý trường hợp không tìm thấy
+                            continue;
+                        }
+
+                        var sp = new San_Pham_Chi_Tiet()
+                        {
+                            ID = new Guid(),
+                            ten_SPCT = SP.ten_san_pham + " [" + item.Mau_Sac + "-" + item.Kich_Thuoc + "]",
+                            gia = item.gia,
+                            so_luong = item.so_luong,
+                            trang_thai = (int)item.trang_thai,
+                            ngay_tao = (DateTime)item.ngay_tao,
+                            ngay_sua = DateTime.Now,
+                            Kich_ThuocID = kichThuoc.ID,
+                            Mau_SacID = mauSac.ID,
+                            San_PhamID = SP.ID,
+                            Kieu_DangID = SP.Kieu_DangID,
+                            Danh_MucID = SP.Danh_MucID,
+                            Loai_GiayID = SP.Loai_GiayID,
+                            Mui_GiayID = SP.Mui_GiayID,
+                            Co_GiayID = SP.Co_GiayID,
+                            De_GiayID = SP.De_GiayID,
+                            Chat_LieuID = SP.Chat_LieuID
+                        };
+
+                        _context.san_Pham_Chi_Tiets.Add(sp);
+
+                        if (!string.IsNullOrEmpty(item.imgUrl))
+                        {
+                            var imgUrls = JsonConvert.DeserializeObject<List<string>>(productImages);
+                            for (int i = 0; i < imgUrls.Count; i++)
+                            {
+                                var anh_sp = new Anh_San_Pham_San_Pham_Chi_Tiet()
+                                {
+                                    ID = Guid.NewGuid(),
+                                    San_Pham_Chi_TietID = sp.ID,
+                                    Anh_San_PhamID = anhSP.Find(x => x.anh_url == imgUrls[i]).ID
+                                };
+                                await _context.anh_San_Pham_San_Pham_Chi_Tiets.AddAsync(anh_sp);
+                            }
+                        }
+
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+
+                TempData["status"] = "CreateSuccess";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["status"] = "CreateError";
+                // Ghi log nếu cần: _logger.LogError(ex, "Lỗi khi tạo sản phẩm.");
+                return RedirectToAction(nameof(Index));
             }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
 
         }
         [HttpPost]
@@ -621,9 +634,6 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             {
                 return BadRequest(new { success = false, message = "Dữ liệu không hợp lệ" });
             }
-
-
-
 
             foreach (var spct in updatedSPCT)
             {
@@ -782,120 +792,133 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(San_Pham san_Pham, string lstSPCT, string productImages)
         {
-            // Kiểm tra xem san_Pham và danh sách spct có null không
-            if (san_Pham == null)
+            try
             {
-                ModelState.AddModelError("", "Dữ liệu sản phẩm không hợp lệ.");
-                return View(san_Pham); // Hiển thị lại trang với thông báo lỗi
-            }
-            // ✅ Xử lý ảnh sản phẩm nếu có
-            List<Anh_San_Pham> anhSP = new List<Anh_San_Pham>();
-            if (!string.IsNullOrEmpty(productImages))
-            {
-                var imgExisting = _context.anh_San_Phams.Where(x => x.San_PhamID == san_Pham.ID).ToList();
-                var imgUrls = JsonConvert.DeserializeObject<List<string>>(productImages);
-                foreach (var url in imgUrls)
-                {
-                    if (imgExisting.FirstOrDefault(x => x.anh_url == url) == null)
-                    {
+                // ✅ Logic xử lý lưu DB
 
-                        var anh = new Anh_San_Pham
-                        {
-                            ID = Guid.NewGuid(),
-                            anh_url = url,
-                            San_PhamID = san_Pham.ID
-                        };
-                        await _context.anh_San_Phams.AddAsync(anh);
-                        anhSP.Add(anh);
-                    }
-                    continue;
+                // Kiểm tra xem san_Pham và danh sách spct có null không
+                if (san_Pham == null)
+                {
+                    ModelState.AddModelError("", "Dữ liệu sản phẩm không hợp lệ.");
+                    return View(san_Pham); // Hiển thị lại trang với thông báo lỗi
                 }
-            }
-
-
-            var listCT = JsonConvert.DeserializeObject<List<San_PhamCTView>>(lstSPCT);
-
-            foreach (var spct in listCT)
-            {
-                var existingSPCT = _context.san_Pham_Chi_Tiets.FirstOrDefault(x => x.ID == spct.ID);
-
-                if (existingSPCT != null)
+                // ✅ Xử lý ảnh sản phẩm nếu có
+                List<Anh_San_Pham> anhSP = new List<Anh_San_Pham>();
+                if (!string.IsNullOrEmpty(productImages))
                 {
-                    existingSPCT.so_luong = spct.so_luong;
-                    existingSPCT.gia = spct.gia;
-                    existingSPCT.trang_thai = (int)spct.trang_thai;
-                    existingSPCT.ngay_sua = DateTime.Now;
-                    _context.san_Pham_Chi_Tiets.Update(existingSPCT);
-                    List<Anh_San_Pham> anh = new List<Anh_San_Pham>();
-                    List<string> lis = JsonConvert.DeserializeObject<List<string>>(spct.imgUrl);
-                    if (lis == null)
+                    var imgExisting = _context.anh_San_Phams.Where(x => x.San_PhamID == san_Pham.ID).ToList();
+                    var imgUrls = JsonConvert.DeserializeObject<List<string>>(productImages);
+                    foreach (var url in imgUrls)
                     {
+                        if (imgExisting.FirstOrDefault(x => x.anh_url == url) == null)
+                        {
+
+                            var anh = new Anh_San_Pham
+                            {
+                                ID = Guid.NewGuid(),
+                                anh_url = url,
+                                San_PhamID = san_Pham.ID
+                            };
+                            await _context.anh_San_Phams.AddAsync(anh);
+                            anhSP.Add(anh);
+                        }
                         continue;
                     }
-                    for (int i = 0; i < lis.Count; i++)
-                    {
-                        anh.Add(_context.anh_San_Phams.First(x => x.anh_url == lis[i]));
-                    }
-
-                    // Lấy danh sách ID của các ảnh đã được lưu trong bảng liên kết với San_Pham_Chi_TietID == spct.ID
-                    var existingAnhIds = _context.anh_San_Pham_San_Pham_Chi_Tiets
-                        .Where(x => x.San_Pham_Chi_TietID == existingSPCT.ID)
-                        .Select(x => x.Anh_San_PhamID)
-                        .ToList();
-
-
-                    // Lấy danh sách ID của các ảnh cần bỏ qua
-                    var anhIds = anh.Select(a => a.ID).ToList();
-
-                    // Lọc danh sách, bỏ qua các mục có Anh_San_PhamID trùng với danh sách anhIds
-                    var imgdel = _context.anh_San_Pham_San_Pham_Chi_Tiets
-                        .Where(x => !anhIds.Contains(x.Anh_San_PhamID) && x.San_Pham_Chi_TietID == existingSPCT.ID)
-                        .ToList();
-                    foreach (var item in imgdel)
-                    {
-                        _context.anh_San_Pham_San_Pham_Chi_Tiets.Remove(item);
-                    }
-
-
-                    // Lọc danh sách anh, chỉ giữ lại các ảnh chưa tồn tại trong bảng liên kết
-                    anh = anh.Where(a => !existingAnhIds.Contains(a.ID)).ToList();
-                    foreach (var item in anh)
-                    {
-                        var link = new Anh_San_Pham_San_Pham_Chi_Tiet()
-                        {
-                            ID = Guid.NewGuid(),
-                            Anh_San_PhamID = item.ID,
-                            San_Pham_Chi_TietID = existingSPCT.ID
-                        };
-                        _context.anh_San_Pham_San_Pham_Chi_Tiets.Add(link);
-                    }
-
-
-
                 }
-            }
 
-            var san = await _context.san_Phams.FindAsync(san_Pham.ID);
-            if (san == null)
+
+                var listCT = JsonConvert.DeserializeObject<List<San_PhamCTView>>(lstSPCT);
+
+                foreach (var spct in listCT)
+                {
+                    var existingSPCT = _context.san_Pham_Chi_Tiets.FirstOrDefault(x => x.ID == spct.ID);
+
+                    if (existingSPCT != null)
+                    {
+                        existingSPCT.so_luong = spct.so_luong;
+                        existingSPCT.gia = spct.gia;
+                        existingSPCT.trang_thai = (int)spct.trang_thai;
+                        existingSPCT.ngay_sua = DateTime.Now;
+                        _context.san_Pham_Chi_Tiets.Update(existingSPCT);
+                        List<Anh_San_Pham> anh = new List<Anh_San_Pham>();
+                        List<string> lis = JsonConvert.DeserializeObject<List<string>>(spct.imgUrl);
+                        if (lis == null)
+                        {
+                            continue;
+                        }
+                        for (int i = 0; i < lis.Count; i++)
+                        {
+                            anh.Add(_context.anh_San_Phams.First(x => x.anh_url == lis[i]));
+                        }
+
+                        // Lấy danh sách ID của các ảnh đã được lưu trong bảng liên kết với San_Pham_Chi_TietID == spct.ID
+                        var existingAnhIds = _context.anh_San_Pham_San_Pham_Chi_Tiets
+                            .Where(x => x.San_Pham_Chi_TietID == existingSPCT.ID)
+                            .Select(x => x.Anh_San_PhamID)
+                            .ToList();
+
+
+                        // Lấy danh sách ID của các ảnh cần bỏ qua
+                        var anhIds = anh.Select(a => a.ID).ToList();
+
+                        // Lọc danh sách, bỏ qua các mục có Anh_San_PhamID trùng với danh sách anhIds
+                        var imgdel = _context.anh_San_Pham_San_Pham_Chi_Tiets
+                            .Where(x => !anhIds.Contains(x.Anh_San_PhamID) && x.San_Pham_Chi_TietID == existingSPCT.ID)
+                            .ToList();
+                        foreach (var item in imgdel)
+                        {
+                            _context.anh_San_Pham_San_Pham_Chi_Tiets.Remove(item);
+                        }
+
+
+                        // Lọc danh sách anh, chỉ giữ lại các ảnh chưa tồn tại trong bảng liên kết
+                        anh = anh.Where(a => !existingAnhIds.Contains(a.ID)).ToList();
+                        foreach (var item in anh)
+                        {
+                            var link = new Anh_San_Pham_San_Pham_Chi_Tiet()
+                            {
+                                ID = Guid.NewGuid(),
+                                Anh_San_PhamID = item.ID,
+                                San_Pham_Chi_TietID = existingSPCT.ID
+                            };
+                            _context.anh_San_Pham_San_Pham_Chi_Tiets.Add(link);
+                        }
+
+
+
+                    }
+                }
+
+                var san = await _context.san_Phams.FindAsync(san_Pham.ID);
+                if (san == null)
+                {
+                    return NotFound();
+                }
+
+                san.ten_san_pham = san_Pham.ten_san_pham;
+                san.Chat_LieuID = san_Pham.Chat_LieuID;
+                san.Co_GiayID = san_Pham.Co_GiayID;
+                san.De_GiayID = san_Pham.De_GiayID;
+                san.ngay_sua = DateTime.Now;
+                san.mo_ta = san_Pham.mo_ta;
+                san.Kieu_DangID = san_Pham.Kieu_DangID;
+                san.Danh_MucID = san_Pham.Danh_MucID;
+                san.Loai_GiayID = san_Pham.Loai_GiayID;
+                san.Mui_GiayID = san_Pham.Mui_GiayID;
+
+
+                _context.Entry(san).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
+                TempData["status"] = "EditSuccess";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                TempData["status"] = "EditError";
+                return RedirectToAction(nameof(Index));
             }
 
-            san.ten_san_pham = san_Pham.ten_san_pham;
-            san.Chat_LieuID = san_Pham.Chat_LieuID;
-            san.Co_GiayID = san_Pham.Co_GiayID;
-            san.De_GiayID = san_Pham.De_GiayID;
-            san.ngay_sua = DateTime.Now;
-            san.mo_ta = san_Pham.mo_ta;
-            san.Kieu_DangID = san_Pham.Kieu_DangID;
-            san.Danh_MucID = san_Pham.Danh_MucID;
-            san.Loai_GiayID = san_Pham.Loai_GiayID;
-            san.Mui_GiayID = san_Pham.Mui_GiayID;
-
-
-            _context.Entry(san).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
 

@@ -152,6 +152,29 @@
             } else {
                 console.log("✅ jQuery và DataTables đã sẵn sàng!");
             }
+            var Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+
+            var status = '@TempData["status"]';
+
+            if (status === 'CreateSuccess') {
+                toastr.success('Tạo sản phẩm thành công!')
+            } else if (status === 'CreateError') {
+                toastr.error('Tạo sản phẩm thất bại!')
+            } else if (status === 'EditSuccess') {
+                toastr.error('Sửa sản phẩm thất bại!')
+            } else if (status === 'EditError') {
+                toastr.error('Sửa sản phẩm thất bại!')
+            } 
+            // else if (status === 'info') {
+            //     toastr.error('Tạo sản phẩm thất bại!')
+            // } else if (status === 'Warning') {
+            //     toastr.error('Tạo sản phẩm thất bại!')
+            // }
         });
     </script>
 

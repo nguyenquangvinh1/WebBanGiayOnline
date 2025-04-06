@@ -1,4 +1,5 @@
-﻿@model IEnumerable<ClssLib.San_Pham>
+﻿@using WebBanGiay.ViewModel
+@model IEnumerable<San_PhamViewModel>
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
@@ -7,89 +8,7 @@
 <h1>Sản Phẩm</h1>
 
 
-<!-- Nút mở modal lọc -->
-<!-- Modal lọc -->
-<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="filterModalLabel">Lọc sản phẩm</h5>
-                <button type="button" class="btn-close" id="closeFilterModal" aria-label="Close">
-                    <span aria-hidden="true">x</span>
-                </button>
 
-            </div>
-            <div class="modal-body">
-                <label for="filterChatLieu">Chất liệu:</label>
-                <select id="filterChatLieu" class="form-control filter-select">
-                    <option value="">Tất cả</option>
-                    @foreach (var item in (SelectList)ViewData["Chat_LieuID"])
-                    {
-                        <option value="@item.Value">@item.Text</option>
-                    }
-                </select>
-
-                <label for="filterCoGiay">Cổ giày:</label>
-                <select id="filterCoGiay" class="form-control filter-select">
-                    <option value="">Tất cả</option>
-                    @foreach (var item in (SelectList)ViewData["Co_GiayID"])
-                    {
-                        <option value="@item.Value">@item.Text</option>
-                    }
-                </select>
-
-                <label for="filterDanhMuc">Danh mục:</label>
-                <select id="filterDanhMuc" class="form-control filter-select">
-                    <option value="">Tất cả</option>
-                    @foreach (var item in (SelectList)ViewData["Danh_MucID"])
-                    {
-                        <option value="@item.Value">@item.Text</option>
-                    }
-                </select>
-
-                <label for="filterDeGiay">Đế giày:</label>
-                <select id="filterDeGiay" class="form-control filter-select">
-                    <option value="">Tất cả</option>
-                    @foreach (var item in (SelectList)ViewData["De_GiayID"])
-                    {
-                        <option value="@item.Value">@item.Text</option>
-                    }
-                </select>
-
-                <label for="filterMuiGiay">Mũi giày:</label>
-                <select id="filterMuiGiay" class="form-control filter-select">
-                    <option value="">Tất cả</option>
-                    @foreach (var item in (SelectList)ViewData["Mui_GiayID"])
-                    {
-                        <option value="@item.Value">@item.Text</option>
-                    }
-                </select>
-
-                <label for="filterKieuDang">Kiểu dáng:</label>
-                <select id="filterKieuDang" class="form-control filter-select">
-                    <option value="">Tất cả</option>
-                    @foreach (var item in (SelectList)ViewData["Kieu_DangID"])
-                    {
-                        <option value="@item.Value">@item.Text</option>
-                    }
-                </select>
-
-                <label for="filterLoaiGiay">Loại giày:</label>
-                <select id="filterLoaiGiay" class="form-control filter-select">
-                    <option value="">Tất cả</option>
-                    @foreach (var item in (SelectList)ViewData["Loai_GiayID"])
-                    {
-                        <option value="@item.Value">@item.Text</option>
-                    }
-                </select>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                <button type="button" class="btn btn-primary" id="applyFilter">Lọc</button>
-            </div>
-        </div>
-    </div>
-</div>
 <div class="row">
     <div class="col-12">
         <div class="card">
@@ -144,6 +63,7 @@
                             <th>@Html.DisplayNameFor(model => model.First().mo_ta)</th>
                             <th>@Html.DisplayNameFor(model => model.First().trang_thai)</th>
                             <th>@Html.DisplayNameFor(model => model.First().ngay_tao)</th>
+                            <th>@Html.DisplayNameFor(model => model.First().so_luong_tong)</th>
                             
                             <th>Tùy chỉnh</th>
                         </tr>
@@ -164,6 +84,9 @@
                                 </td>
                                 <td>
                                     <button class='toggle-status btn btn-sm @(item.trang_thai == 1 ? "btn-success" : "btn-danger")' data-id='@item.ID' data-status='@item.trang_thai' style='width: 150px; height: 30px; line-height: 18px; white-space: nowrap;'>@(item.trang_thai == 1 ? "Hoạt động" : "Không hoạt động")</button>
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.so_luong_tong)
                                 </td>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.ngay_tao)
