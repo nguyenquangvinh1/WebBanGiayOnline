@@ -1,4 +1,7 @@
-﻿using ClssLib;
+﻿
+
+using ClssLib;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebBanGiay.ViewModel
@@ -25,17 +28,16 @@ namespace WebBanGiay.ViewModel
     public class San_PhamViewModel
     {
         public Guid ID { get; set; }
+        [Display(Name = "Tên Sản Phẩm :")]
         public string ten_san_pham { get; set; }
+        [Display(Name = "Mô Tả :")]
         public string mo_ta { get; set; }
+        [Display(Name = "Trạng Thái :")]
         public int? trang_thai { get; set; }
+        [Display(Name = "Ngày Tạo :")]
         public DateTime ngay_tao { get; set; }
-        public Guid? Kieu_DangID { get; set; }
-        public Guid? Danh_MucID { get; set; }
-        public Guid? Loai_GiayID { get; set; }
-        public Guid? Mui_GiayID { get; set; }
-        public Guid? Co_GiayID { get; set; }
-        public Guid? De_GiayID { get; set; }
-        public Guid? Chat_LieuID { get; set; }
-        public string ListCT;
+        [Display(Name = "Số lượng :")]
+        public int? so_luong_tong { get; set; }
+
     }
 }

@@ -531,6 +531,11 @@ namespace WebBanGiay.Areas.Admin.Controllers
             {
                 _context.tai_Khoan_Hoa_Dons.RemoveRange(oldLinks);
             }
+            invoice.dia_chi = "Tại Quầy";
+            invoice.email_nguoi_nhan = customer.email;
+            invoice.ten_nguoi_nhan = customer.ho_ten;
+            invoice.sdt_nguoi_nhan = customer.sdt;
+
 
             // 5. Tạo bản ghi liên kết mới
             var link = new Tai_Khoan_Hoa_Don

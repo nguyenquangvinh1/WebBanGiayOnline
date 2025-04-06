@@ -176,12 +176,30 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 return NotFound();
             }
 
+            CheckStatusSP(sanPham.San_PhamID, trang_thai);
             // Cập nhật trạng thái
             sanPham.trang_thai = trang_thai;
             _context.san_Pham_Chi_Tiets.Update(sanPham);
             _context.SaveChanges();
 
             return Json(new { success = true });
+        }
+        public void CheckStatusSP(Guid id, int trang_thai)
+        {
+            var sp = _context.san_Phams.Find(id);
+            if (sp == null) return;
+
+            var spctList = _context.san_Pham_Chi_Tiets
+                .Where(x => x.San_PhamID == id)
+                .ToList();
+
+            bool allMatch = spctList.All(x => x.trang_thai == trang_thai);
+
+            if (allMatch)
+            {
+                sp.trang_thai = trang_thai;
+                _context.SaveChanges();
+            }
         }
         [HttpPost]
         public async Task<IActionResult> UpdateSpct([FromBody] San_PhamCTView model)

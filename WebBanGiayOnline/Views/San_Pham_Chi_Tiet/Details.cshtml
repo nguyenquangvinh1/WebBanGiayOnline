@@ -471,42 +471,65 @@
                 }
             }
 
-            setMinPriceOnLoad(); 
+            setMinPriceOnLoad();
+
 
 
             // Khi chọn màu sắc
             $('.mau-sac-btn').click(function () {
-                selectedMauSac = $(this).data('mausac');
-                $('.kich-thuoc-btn').prop('disabled', false);
+                const clickedMauSac = $(this).data('mausac');
 
-                let validKichThuocs = sanPhamChiTietList
-                    .filter(spct => spct.mauSac === selectedMauSac)
-                    .map(spct => spct.kichThuoc);
+                // Toggle: nếu đã chọn, click lần 2 sẽ bỏ chọn
+                if (selectedMauSac === clickedMauSac) {
+                    selectedMauSac = null;
+                    $('.kich-thuoc-btn').show();
+                    $('.mau-sac-btn').removeClass('active');
+                } else {
+                    selectedMauSac = clickedMauSac;
+                    $('.mau-sac-btn').removeClass('active');
+                    $(this).addClass('active');
 
-                $('.kich-thuoc-btn').each(function () {
-                    let kichThuocID = $(this).data('kichthuoc');
-                    $(this).prop('disabled', !validKichThuocs.includes(kichThuocID));
-                });
+                    const validKichThuocs = sanPhamChiTietList
+                        .filter(spct => spct.mauSac === selectedMauSac)
+                        .map(spct => spct.kichThuoc);
+
+                    $('.kich-thuoc-btn').each(function () {
+                        const id = $(this).data('kichthuoc');
+                        $(this).toggle(validKichThuocs.includes(id));
+                    });
+                }
 
                 updateMuaHangButton();
             });
 
             // Khi chọn kích thước
             $('.kich-thuoc-btn').click(function () {
-                selectedKichThuoc = $(this).data('kichthuoc');
-                $('.mau-sac-btn').prop('disabled', false);
+                const clickedKichThuoc = $(this).data('kichthuoc');
 
-                let validMauSacs = sanPhamChiTietList
-                    .filter(spct => spct.kichThuoc === selectedKichThuoc)
-                    .map(spct => spct.mauSac);
+                if (selectedKichThuoc === clickedKichThuoc) {
+                    selectedKichThuoc = null;
+                    $('.mau-sac-btn').show();
+                    $('.kich-thuoc-btn').removeClass('active');
+                } else {
+                    selectedKichThuoc = clickedKichThuoc;
+                    $('.kich-thuoc-btn').removeClass('active');
+                    $(this).addClass('active');
 
-                $('.mau-sac-btn').each(function () {
-                    let mauSacID = $(this).data('mausac');
-                    $(this).prop('disabled', !validMauSacs.includes(mauSacID));
-                });
+                    const validMauSacs = sanPhamChiTietList
+                        .filter(spct => spct.kichThuoc === selectedKichThuoc)
+                        .map(spct => spct.mauSac);
+
+                    $('.mau-sac-btn').each(function () {
+                        const id = $(this).data('mausac');
+                        $(this).toggle(validMauSacs.includes(id));
+                    });
+                }
 
                 updateMuaHangButton();
             });
+
+
+
 
 
             // Cảnh báo khi nhấn nút Mua Hàng nhưng chưa chọn đủ
