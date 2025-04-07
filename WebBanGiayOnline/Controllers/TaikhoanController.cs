@@ -13,7 +13,6 @@ using System.Net.Mail;
 using System.Net;
 using WebBanGiay.ViewModel;
 using Microsoft.AspNetCore.Authorization;
-using WebBanGiay.Models.ViewModel;
 
 namespace WebBanGiay.Controllers
 {

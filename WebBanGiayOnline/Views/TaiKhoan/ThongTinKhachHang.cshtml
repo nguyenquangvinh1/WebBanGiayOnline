@@ -35,7 +35,7 @@
                 <label>Phường/Xã:</label>
                 <select id="phuongXa" name="PhuongXa"></select><br />
             </div>
-            @*             <div class="mb-3">
+@*             <div class="mb-3">
                 <label>Địa chỉ chi tiết:</label>
                 <input type="text" id="dia_chi" class="form-control" value="@Model." required />
 
@@ -50,9 +50,7 @@
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
         $(document).ready(function () {
             // Load Tỉnh/Thành
@@ -134,4 +132,3 @@
             });
     </script>
 }
-
