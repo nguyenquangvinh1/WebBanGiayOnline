@@ -511,7 +511,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             List<Anh_San_Pham> anhSP = new List<Anh_San_Pham>();
             if (!string.IsNullOrEmpty(productImages))
             {
-                var imgUrls = JsonConvert.DeserializeObject<List<string>>(productImages);
+                List<string> imgUrls = JsonConvert.DeserializeObject<List<string>>(productImages);
                 foreach (var url in imgUrls)
                 {
                     var anh = new Anh_San_Pham

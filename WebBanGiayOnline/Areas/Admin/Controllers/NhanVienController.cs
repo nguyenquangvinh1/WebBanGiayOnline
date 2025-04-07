@@ -19,12 +19,16 @@ using Microsoft.IdentityModel.Tokens;
 using ClosedXML.Excel;
 using System.IO;
 using DocumentFormat.OpenXml.ExtendedProperties;
+using Microsoft.AspNetCore.Authorization;
 
 
 
 namespace WebBanGiay.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    //[Authorize(Policy = "EmployeePolicy")]
+    [Authorize(Policy = "EmployeePolicy")]
+
     //[Route("Admin/NhanVien")]
 
     public class NhanVienController : Controller

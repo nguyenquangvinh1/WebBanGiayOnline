@@ -28,14 +28,20 @@ namespace WebBanGiay.Areas.Admin.Controllers
             _context = context;
         }
 
-        // GET: Admin/HoaDon
+       
+
         public async Task<IActionResult> Index(int? page, string searchString, int? Category, DateTime? fromDate, DateTime? toDate)
         {
-
             int pageNumber = page ?? 1;
             int pageSize = 5; // Số hóa đơn trên mỗi trang
 
+            // Lấy tất cả hóa đơn
             var hoaDons = _context.hoa_Dons.AsQueryable();
+
+            // Nếu là hóa đơn bán hàng tại quầy (loại = 1), ẩn nếu trạng thái là 0 (chờ xử lý) hoặc 4 (đã hủy)
+            hoaDons = hoaDons.Where(hd => hd.loai_hoa_don != 1 || (hd.loai_hoa_don == 1 && hd.trang_thai != 0 && hd.trang_thai != 4));
+
+            // Các điều kiện lọc theo ngày tạo
             if (fromDate.HasValue)
             {
                 hoaDons = hoaDons.Where(h => h.ngay_tao >= fromDate.Value);
@@ -46,37 +52,26 @@ namespace WebBanGiay.Areas.Admin.Controllers
             }
             hoaDons = hoaDons.OrderBy(h => h.ngay_tao);
 
-            if (fromDate >= toDate)
-            {
-                ViewBag.ThongBao = "❌ Ngày bắt đầu phải nhỏ hơn ngày kết thúc!";
-            }
-
-
-
             if (!string.IsNullOrEmpty(searchString))
             {
                 hoaDons = hoaDons.Where(h => h.MaHoaDon.Contains(searchString));
             }
-
 
             if (Category.HasValue)
             {
                 hoaDons = hoaDons.Where(h => h.trang_thai == Category);
             }
 
-
+            // Nếu cần cập nhật mã hóa đơn cho những hóa đơn chưa có mã
             foreach (var hoaDon in hoaDons)
             {
-                if (string.IsNullOrEmpty(hoaDon.MaHoaDon)) // Nếu chưa có mã
+                if (string.IsNullOrEmpty(hoaDon.MaHoaDon))
                 {
                     hoaDon.MaHoaDon = GenerateNewHoaDonID();
                 }
-
             }
 
-
-
-            // Đổ dữ liệu vào SelectList để hiển thị dropdown
+            // Đổ dữ liệu vào SelectList cho dropdown trạng thái (nếu cần)
             ViewBag.TrangThaiList = new SelectList(new List<SelectListItem>
     {
         new SelectListItem { Value = "0", Text = "Chờ xử lý" },
@@ -84,12 +79,10 @@ namespace WebBanGiay.Areas.Admin.Controllers
         new SelectListItem { Value = "2", Text = "Đang giao hàng" },
         new SelectListItem { Value = "3", Text = "Hoàn thành" },
         new SelectListItem { Value = "4", Text = "Đã hủy" }
-    }, "Value", "Text", Category.ToString());
-
+    }, "Value", "Text", Category?.ToString());
 
             var pagedList = hoaDons.ToPagedList(pageNumber, pageSize);
-
-            return View("Index", pagedList); // Trả về View Index để dùng lại giao diện
+            return View("Index", pagedList);
         }
 
 

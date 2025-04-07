@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using WebBanGiay.Data;
 using WebBanGiay.Models.ViewModel;
 using WebBanGiay.Service;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,21 +16,25 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromMinutes(5000);
 });
 
+
+//Authen và Autho
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-       .AddCookie(options =>
-       {
-           options.LoginPath = "/Account/Login/";
-           options.LogoutPath = "/Account/Logout/";
-       });
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/TaiKhoan/Login";  
+        options.LogoutPath = "/TaiKhoan/Logout";
 
-builder.Services.AddHttpClient();
+        options.AccessDeniedPath = "/TaiKhoan/AccessDenied";
+    });
 
-builder.Services.AddAuthentication(options =>
+builder.Services.AddAuthorization(options =>
 {
-    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("EmployeePolicy", policy => policy.RequireRole("Nhân Viên"));
+    options.AddPolicy("CustomerPolicy", policy => policy.RequireRole("Khách hàng"));
+    options.AddPolicy("AdminOrEmployeePolicy", policy => policy.RequireRole("Admin", "Nhân Viên"));
 });
+
 // Đăng ký dbcontext
 builder.Services.AddDbContext<AppDbContext>(options => {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -43,12 +49,15 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
 builder.Services.AddSingleton<IVnPayService, VnPayService>();
 builder.Services.Configure<MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
 builder.Services.AddScoped<IMomoService, MomoService>();
 
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<IGhnService, GhnService>();
+
+builder.Services.AddHttpClient();
 
 
 
@@ -71,8 +80,9 @@ app.UseRouting();
 app.UseSession();
 
 app.UseAuthentication();
-
 app.UseAuthorization();
+
+
 app.MapControllerRoute(
      name: "areas",
       pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
