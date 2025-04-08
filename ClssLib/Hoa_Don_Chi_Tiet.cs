@@ -16,6 +16,7 @@ namespace ClssLib
         public int? trang_thai { get; set; }
         public double? thanh_tien { get; set; }
         public int so_luong { get; set; }
+        public int phuongThucthanhtoan { get; set; }
         public DateTime ngay_tao { get; set; }
         public DateTime? ngay_sua { get; set; }
         public string? nguoi_tao { get; set; }

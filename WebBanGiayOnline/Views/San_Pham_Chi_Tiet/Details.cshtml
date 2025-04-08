@@ -430,7 +430,9 @@
     
 </body>
 
+
 </html>
+
 @section Scripts{
 
     <script>
@@ -510,9 +512,9 @@
 
 
             // Cảnh báo khi nhấn nút Mua Hàng nhưng chưa chọn đủ
-         $('#btnMuaHang').click(function (e) {
+         $('#btnMuaHang').click(function () {
             if (!selectedMauSac || !selectedKichThuoc) {
-                e.preventDefault(); // Ngăn chặn điều hướng
+               // Ngăn chặn điều hướng
                 alert("Vui lòng chọn đầy đủ Màu Sắc và Kích Thước trước khi mua hàng!");
             }
             var productId = $(this).data("id");

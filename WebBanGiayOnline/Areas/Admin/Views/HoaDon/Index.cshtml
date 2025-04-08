@@ -228,7 +228,7 @@
                     <th>Người đặt</th>
                     
                     <th>Số điện thoại</th>
-                   
+                    <th>Nhân Viên</th>
                     <th>Ngày xuất hóa đơn</th>
                     <th>Loại hóa đơn</th>
                     <th>Trạng thái đơn hàng</th>
@@ -252,7 +252,7 @@
                             <td>@item.ten_nguoi_nhan</td>
                         
                             <td>@item.sdt_nguoi_nhan</td>
-                           
+                        <td>@item.nguoi_tao</td>
                             <td>@item.ngay_tao.ToString("dd/MM/yyyy")</td>
                             <td>@if(item.loai_hoa_don ==1 )
                                 {
@@ -273,6 +273,8 @@
                                         2 => "Đang giao hàng",
                                         3 => "Hoàn thành",
                                         4 => "Đã hủy",
+                                        5 => "Chưa Thanh Toán",
+                                        6 => "Đã Thanh Toán",
                                         _ => "Không xác định"
                                     };
                                 }

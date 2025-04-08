@@ -170,7 +170,7 @@ new ThongKe()
                 .Select(g => new
                 {
                     doanhThu = g.Key.ToString("yyyy-MM-dd"), // Chuyển DateTime thành string
-                    TongTien = g.Where(x => x.trang_thai == 3).Sum(x => x.tong_tien),
+                    TongTien = g.Where(x => x.trang_thai == 3 ).Sum(x => x.tong_tien),
                     donThanhCong = g.Count(hd => hd.trang_thai == 3),
                     donHuy = g.Count(hd => hd.trang_thai == 4)
                 }).ToList();

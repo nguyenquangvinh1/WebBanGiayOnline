@@ -117,7 +117,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     ID = Guid.NewGuid(),
                     user_name = model.UserName,
                     ho_ten = model.Ho_ten,
-                    pass_word = model.PassWord,
+                  
                     ngay_sinh = model.DateOfBirth,
                     sdt = model.PhoneNumber,
                     email = model.Email,

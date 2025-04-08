@@ -16,16 +16,21 @@ using NuGet.Common;
 using System.Drawing;
 using ClosedXML.Excel;
 using WebBanGiay.ViewModel;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using System.Net.Mail;
+using System.Net;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace WebBanGiay.Areas.Admin.Controllers
 {
     [Area("Admin")]
     public class HoaDonController : Controller
     {
         private readonly AppDbContext _context;
-
+   
         public HoaDonController(AppDbContext context)
         {
             _context = context;
+           
         }
 
         // GET: Admin/HoaDon
@@ -83,7 +88,9 @@ namespace WebBanGiay.Areas.Admin.Controllers
         new SelectListItem { Value = "1", Text = "Đã xác nhận" },
         new SelectListItem { Value = "2", Text = "Đang giao hàng" },
         new SelectListItem { Value = "3", Text = "Hoàn thành" },
-        new SelectListItem { Value = "4", Text = "Đã hủy" }
+        new SelectListItem { Value = "4", Text = "Đã hủy" },
+        new SelectListItem { Value = "5", Text = "Chưa thanh toán" },
+        new SelectListItem { Value = "6", Text = "Đã thanh toán" },
     }, "Value", "Text", Category.ToString());
 
 
@@ -108,7 +115,9 @@ namespace WebBanGiay.Areas.Admin.Controllers
     new SelectListItem { Value = "1", Text = "Đã xác nhận" },
     new SelectListItem { Value = "2", Text = "Đang giao hàng" },
     new SelectListItem { Value = "3", Text = "Hoàn thành" },
-    new SelectListItem { Value = "4", Text = "Đã hủy" }
+    new SelectListItem { Value = "4", Text = "Đã hủy" },
+     new SelectListItem { Value = "5", Text = "Chưa thanh toán" },
+        new SelectListItem { Value = "6", Text = "Đã thanh toán" }
 };
 
             if (hoaDon == null)
@@ -127,11 +136,22 @@ namespace WebBanGiay.Areas.Admin.Controllers
         public JsonResult UpdateStatus(Guid? id, int newStatus)
         {
             var hoaDon = _context.hoa_Dons.FirstOrDefault(h => h.ID == id);
-            if (hoaDon != null) // Đảm bảo trạng thái hợp lệ
+            if (hoaDon != null) 
             {
                 hoaDon.trang_thai = newStatus;
                 _context.Update(hoaDon);
                 _context.SaveChanges();
+
+
+
+                try
+                {
+                    SendEmail(hoaDon.email_nguoi_nhan,hoaDon.trang_thai , hoaDon.ten_nguoi_nhan,hoaDon.MaHoaDon);
+                }
+                catch (Exception ex)
+                {
+                   
+                }
 
 
 
@@ -146,7 +166,51 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
             return Json(new { success = false, message = "Cập nhật thất bại!" });
         }
+        private void SendEmail(string toEmail, int status, string username ,string ma)
+        {
+            var hoadon = _context.hoa_Dons.FirstOrDefault(x => x.trang_thai == status);
+            string GetOrderStatusName(int status)
+            {
+                switch (status)
+                {
+                    case 0: return "Chờ xử lý";
+                    case 1: return "Đã xác nhận";
+                    case 2: return "Đang giao hàng";
+                    case 3: return "Hoàn thành";
+                    case 4: return "Đã hủy";
+                    default: return "Không xác định";
+                }
+            }
+            string orderStatus = GetOrderStatusName(hoadon.trang_thai);
+            string fromEmail = "trangthph44337@fpt.edu.vn";  // Thay bằng Gmail của bạn
+            string fromPassword = "fdqe bzsy cscd kerv"; // Thay bằng App Password (16 ký tự)
 
+            string subject = $@"Cập nhập trạng thái đơn hàng {ma} của bạn ";
+            string body = $@"
+            <p>Chào {username},</p>
+            <p>Trạng thái đơn hàng của bạn {orderStatus}. </p>
+            <p>Đơn hàng đang trong quá trính gửi đi hãy để ý đơn hàng nhé .</p>
+             <p> Adidas Shop rất cảm ơn vì sự ủng hộ của bạn .</p>
+ <p>Nếu có thắc mắc hay muốn thay đổi đơn hàng hãy goi Hotline : <strong> 0865884051 </strong> </p>";
+
+
+            using (MailMessage mail = new MailMessage())
+            {
+                mail.From = new MailAddress(fromEmail);
+                mail.To.Add(toEmail);
+                mail.Subject = subject;
+                mail.Body = body;
+                mail.IsBodyHtml = true;
+
+                using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                {
+                    smtp.UseDefaultCredentials = false; // Bắt buộc phải đặt false
+                    smtp.Credentials = new NetworkCredential(fromEmail, fromPassword);
+                    smtp.EnableSsl = true;
+                    smtp.Send(mail);
+                }
+            }
+        }
 
 
         // GET: Admin/HoaDon/Create
@@ -356,37 +420,37 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
 
         }
-        //[HttpPost]
-        //public JsonResult HuyDonHang(Guid? id)
-        //{
-        //    var hoaDon = _context.hoa_Dons.FirstOrDefault(h => h.ID == id);
-        //    if (hoaDon == null)
-        //    {
-        //        return Json(new { success = false, message = "Không tìm thấy đơn hàng!" });
-        //    }
+        [HttpPost]
+        public JsonResult HuyDonHang(Guid? id)
+        {
+            var hoaDon = _context.hoa_Dons.FirstOrDefault(h => h.ID == id);
+            if (hoaDon == null)
+            {
+                return Json(new { success = false, message = "Không tìm thấy đơn hàng!" });
+            }
 
 
-        //    if (hoaDon.trang_thai == 3 || hoaDon.trang_thai == 2) // Hoàn thành hoặc Đang giao hàng
-        //    {
-        //        return Json(new { success = false, message = "Không thể hủy đơn hàng đã hoàn thành hoặc đang giao hàng!" });
-        //    }
-        //    if (hoaDon.trang_thai == 4)
-        //    {
+            if (hoaDon.trang_thai == 3 || hoaDon.trang_thai == 2) // Hoàn thành hoặc Đang giao hàng
+            {
+                return Json(new { success = false, message = "Không thể hủy đơn hàng đã hoàn thành hoặc đang giao hàng!" });
+            }
+            if (hoaDon.trang_thai == 4)
+            {
 
-        //        return Json(new { success = false, message = "Đơn hàng đã bị hủy, không thể thay đổi trạng thái!" });
-        //    }
-        //    hoaDon.tong_tien = 0;
-        //    hoaDon.trang_thai = 4;
-
-
-
-        //    _context.hoa_Dons.Update(hoaDon);
-        //    _context.SaveChanges();
-        //    Console.WriteLine($"Hủy đơn hàng: {hoaDon.ID} - Sau khi cập nhật: Tổng tiền = {hoaDon.tong_tien}");
+                return Json(new { success = false, message = "Đơn hàng đã bị hủy, không thể thay đổi trạng thái!" });
+            }
+            hoaDon.tong_tien = 0;
+            hoaDon.trang_thai = 4;
 
 
-        //    return Json(new { success = true });
-        //}
+
+            _context.hoa_Dons.Update(hoaDon);
+            _context.SaveChanges();
+            Console.WriteLine($"Hủy đơn hàng: {hoaDon.ID} - Sau khi cập nhật: Tổng tiền = {hoaDon.tong_tien}");
+
+
+            return Json(new { success = true });
+        }
 
 
         //[HttpPost]
@@ -401,7 +465,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
         //            trang_thai = 0,                 
         //            ngay_tao = DateTime.Now
         //        };
-                
+
         //        _context.SaveChanges(); // Lưu vào DB
 
         //        return Json(new {
@@ -435,7 +499,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
         //}
 
 
-       
+
 
 
     }

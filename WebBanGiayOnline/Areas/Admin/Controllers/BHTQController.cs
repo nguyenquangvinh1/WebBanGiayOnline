@@ -48,7 +48,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     MaHoaDon = GenerateNewHoaDonID(),
                     tong_tien = 0,
                     ghi_chu = "",
-
+                    dia_chi="",
                     trang_thai = 0,
                     sdt_nguoi_nhan = "",
                     email_nguoi_nhan = "",

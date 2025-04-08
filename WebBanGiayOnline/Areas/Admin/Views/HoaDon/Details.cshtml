@@ -80,9 +80,10 @@
 
 <div class="container mt-4">
     <h2>Quản lý đơn hàng / Chi tiết hóa đơn @Model.MaHoaDon</h2>
-  
 
-   
+
+
+  
     @{
         var trangThaiText = "";
         switch (Model.trang_thai)
@@ -92,6 +93,8 @@
             case 2: trangThaiText = "Đang giao hàng"; break;
             case 3: trangThaiText = "Hoàn thành"; break;
             case 4: trangThaiText = "Đã hủy"; break;
+            case 5: trangThaiText = "Chưa thanh toán "; break;
+            case 6: trangThaiText = "Đã thanh toán "; break;
             default: trangThaiText = "Không xác định"; break;
         }
     }
@@ -122,8 +125,8 @@
     </div>
 
     <div class="d-flex justify-content-center mt-3">
-        <button id="prevBtn" class="btn btn-primary me-2">⬅ Lùi lại </button>
-        <button id="nextBtn" class="btn btn-primary me-2">Tiến ➡</button>
+        <button id="prevBtn" class="btn btn-primary me-2">⬅ Sửa trang thái </button>
+        <button id="nextBtn" class="btn btn-primary me-2">Cập nhập trạng thái ➡</button>
         <button class="btn btn-danger btnCancelOrder" data-id="@Model.ID" id="huy">❌ Hủy Đơn</button>
         
 
@@ -203,6 +206,7 @@
                @*  <th>Tên Sản Phẩm</th> *@
                 <th>Số Tiền</th>
                 <th>Số lượng</th>
+                <th>Phương thức thanh toán</th>
                  <th>Tổng tiền</th>
                 <th>Thời Gian</th>
                  
@@ -228,6 +232,20 @@
 
                             <td>@item.gia.ToString("#,##0 VNĐ")</td>
                         <td>@item.so_luong</td>
+                            <td>
+                                @{
+                                    string phuongthuc = item.phuongThucthanhtoan switch
+                                    {
+                                        0 => "Tiền mặt",
+                                        1 => "Chuyển khoản",
+                                        2 => "Thanh toán khi nhận hàng",
+                                        3 => "Thanh toán VnPay",
+                                        4 => "Thanh toán MoMo",
+                                        _ => "Không xác định"
+                                    };
+                                }
+                                @phuongthuc
+                            </td>
                             <td>@item.thanh_tien?.ToString("#,##0 VNĐ")</td>
                         <td>@item.ngay_tao.ToString("dd/MM/yyyy HH:mm")</td>
                       
