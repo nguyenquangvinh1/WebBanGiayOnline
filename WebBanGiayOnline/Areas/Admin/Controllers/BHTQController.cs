@@ -1,29 +1,27 @@
-﻿using ClssLib;
+﻿using System.Diagnostics;
+using ClssLib;
+using DocumentFormat.OpenXml.Math;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using WebBanGiay.Data;
-using WebBanGiay.Helpers;
 using WebBanGiay.ViewModel;
-
-using System.Configuration;
 
 namespace WebBanGiay.Areas.Admin.Controllers
 {
     [Area("Admin")]
-	[Route("Admin/[controller]/[action]")]
-
-	public class BHTQController : Controller
+    //[Authorize(Policy = "AdminPolicy")]
+    //[Authorize(Policy = "EmployeePolicy")]
+    [Authorize(Policy = "AdminOrEmployeePolicy")]
+    public class BHTQController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly IConfiguration _configuration;
-
-        public BHTQController(AppDbContext context, IConfiguration configuration)
+        public BHTQController(AppDbContext context)
         {
             _context = context;
-            _configuration = configuration;
-
         }
         public IActionResult Index()
         {
@@ -42,21 +40,25 @@ namespace WebBanGiay.Areas.Admin.Controllers
         {
             try
             {
+                string ma = User.FindFirst("ma")?.Value ?? "Unknown";
+
+                
                 var newInvoice = new Hoa_Don
                 {
                     ID = Guid.NewGuid(),
                     MaHoaDon = GenerateNewHoaDonID(),
                     tong_tien = 0,
                     ghi_chu = "",
-                    dia_chi="",
-                    trang_thai = 0,
+                    //(chờ thêm sản phẩm)
+                    trang_thai = 5,
+                    dia_chi = "Tại quầy",
                     sdt_nguoi_nhan = "",
                     email_nguoi_nhan = "",
                     loai_hoa_don = 1,
                     ten_nguoi_nhan = "",
                     thoi_gian_nhan_hang = DateTime.Now,
                     ngay_tao = DateTime.Now,
-                    nguoi_tao = "system"
+                    nguoi_tao = ma
                 };
 
                 _context.hoa_Dons.Add(newInvoice);
@@ -69,6 +71,112 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 return Json(new { success = false, message = "Lỗi khi tạo hóa đơn: " + ex.Message });
             }
         }
+        [HttpGet]
+        public IActionResult GetHoaDonTaiQuay()
+        {
+            var invoices = _context.hoa_Dons
+                .Where(hd => hd.trang_thai == 5
+                             && hd.dia_chi == "Tại quầy"
+                             && hd.loai_hoa_don == 1)  // chỉ lấy hóa đơn tại quầy
+                .OrderBy(hd => hd.ngay_tao)
+                .Select(hd => new {
+                    hd.ID,
+                    hd.MaHoaDon,
+                    hd.ngay_tao,
+                    hd.tong_tien,
+                    // Hiển thị trạng thái dưới dạng chuỗi
+                    TrangThai = "Chờ xử lí",
+                    // Lấy thông tin khách hàng (giả sử mỗi hóa đơn có 1 khách hàng được liên kết)
+                    KhachHang = hd.Tai_Khoan_Hoa_Dons
+                                 .Select(tkhd => new {
+                                     id = tkhd.Tai_Khoan != null ? tkhd.Tai_Khoan.ID : (Guid?)null,
+
+                                     Ten = tkhd.Tai_Khoan != null ?tkhd.Tai_Khoan.ho_ten : "",
+
+                                    Email=tkhd.Tai_Khoan != null ?tkhd.Tai_Khoan.email :"",
+                                    PhoneNumber=tkhd.Tai_Khoan != null ? tkhd.Tai_Khoan.sdt:"",
+                                    TenVaiTro=(tkhd.Tai_Khoan != null && tkhd.vai_tro !=null)?tkhd.Tai_Khoan.Vai_Tro.ten_vai_tro : tkhd.vai_tro,
+                                    NgayTao=tkhd.Tai_Khoan != null ?tkhd.Tai_Khoan.ngay_tao : tkhd.ngay_tao
+
+
+                                 })
+                                 .FirstOrDefault(),
+
+            // Lấy thông tin phiếu giảm giá nếu có
+            PhieuGiamGia = hd.Giam_Gia != null ? new
+                    {
+                        hd.Giam_Gia.ma,
+                        hd.Giam_Gia.ten_phieu_giam_gia,
+                        hd.Giam_Gia.gia_tri_giam,
+                        hd.Giam_Gia.so_tien_giam_toi_da,
+                        hd.Giam_Gia.ngay_bat_dau,
+                        hd.Giam_Gia.ngay_ket_thuc,
+                        hd.Giam_Gia.trang_thai
+                    } : null
+                })
+                .ToList();
+            
+
+            return Json(new { success = true, data = invoices });
+        }
+        //lưu khach hang vao taikhoanhoadon khi nhấn chọn khách hàng 
+        [HttpPost]
+        public IActionResult LinkCustomerToInvoice(Guid invoiceId, Guid customerId)
+        {
+            // 1. Tìm hóa đơn
+            var invoice = _context.hoa_Dons.FirstOrDefault(h => h.ID == invoiceId);
+            if (invoice == null)
+            {
+                return Json(new { success = false, message = "Không tìm thấy hóa đơn!" });
+            }
+
+            // 2. Tìm khách hàng
+            var customer = _context.tai_Khoans
+                .Include(tk => tk.Vai_Tro)
+                .FirstOrDefault(t => t.ID == customerId);
+            if (customer == null)
+            {
+                return Json(new { success = false, message = "Không tìm thấy khách hàng!" });
+            }
+
+            // 3. Kiểm tra vai trò khách hàng
+            if (customer.Vai_Tro == null || customer.Vai_Tro.ten_vai_tro != "Khách hàng")
+            {
+                return Json(new { success = false, message = "Tài khoản này không phải khách hàng!" });
+            }
+
+            // 4. Xóa các liên kết cũ (nếu có) cho invoiceId này
+            var oldLinks = _context.tai_Khoan_Hoa_Dons
+                .Where(x => x.Hoa_DonID == invoiceId)
+                .ToList();
+            if (oldLinks.Any())
+            {
+                _context.tai_Khoan_Hoa_Dons.RemoveRange(oldLinks);
+            }
+            invoice.dia_chi = "Tại Quầy";
+            invoice.email_nguoi_nhan = customer.email;
+            invoice.ten_nguoi_nhan = customer.ho_ten;
+            invoice.sdt_nguoi_nhan = customer.sdt;
+            _context.hoa_Dons.Update(invoice);
+
+
+            // 5. Tạo bản ghi liên kết mới
+            var link = new Tai_Khoan_Hoa_Don
+            {
+                ID = Guid.NewGuid(),
+                Tai_KhoanID = customerId,
+                Hoa_DonID = invoiceId,
+                ngay_tao = DateTime.Now,
+                Ten = customer.ho_ten,           // Gán tên khách hàng
+                vai_tro = customer.Vai_Tro?.ten_vai_tro // Gán vai trò
+            };
+            _context.tai_Khoan_Hoa_Dons.Add(link);
+
+            _context.SaveChanges();
+
+            return Json(new { success = true, message = "Đã gắn khách hàng vào hóa đơn thành công!" });
+        }
+
 
 
         [HttpPost]
@@ -134,52 +242,62 @@ namespace WebBanGiay.Areas.Admin.Controllers
             return Json(new { success = true, message = "Thanh toán thành công!" });
         }
 
-        //huy hoa don
+        // hủy đơn hàng
         [HttpPost]
-        public IActionResult CancelInvoice(Guid invoiceId)
+        
+        public JsonResult HuyDonHang(Guid? id)// Kiểm tra
         {
-            var invoice = _context.hoa_Dons.FirstOrDefault(h => h.ID == invoiceId);
-
-            if (invoice == null)
-                return Json(new { success = false, message = "Không tìm thấy hóa đơn!" });
-
-            invoice.trang_thai = 2; // 2: Đã hủy
-            _context.SaveChanges();
-
-            return Json(new { success = true, message = "Hóa đơn đã bị hủy!" });
-        }
-
-        [HttpPost]
-        public JsonResult HuyDonHang(Guid? id)
-        {
-            var hoaDon = _context.hoa_Dons.FirstOrDefault(h => h.ID == id);
-            if (hoaDon == null)
+            var hoaDon = _context.hoa_Dons
+                                      // Lấy thông tin sản phẩm
+                                  .FirstOrDefault(h => h.ID == id);
+            var lsthdct = _context.don_Chi_Tiets.Where(x => x.Hoa_DonID == id).ToList();
+            if (lsthdct == null)
             {
                 return Json(new { success = false, message = "Không tìm thấy đơn hàng!" });
             }
-
-
-            if (hoaDon.trang_thai == 3 || hoaDon.trang_thai == 2) // Hoàn thành hoặc Đang giao hàng
+            foreach (
+                var chitiets in lsthdct)
             {
-                return Json(new { success = false, message = "Không thể hủy đơn hàng đã hoàn thành hoặc đang giao hàng!" });
-            }
-            if (hoaDon.trang_thai == 4)
-            {
+                var spct = _context.san_Pham_Chi_Tiets.FirstOrDefault(sp => sp.ID == chitiets.San_Pham_Chi_TietID);
 
-                return Json(new { success = false, message = "Đơn hàng đã bị hủy, không thể thay đổi trạng thái!" });
+                if(spct != null)
+                {
+                    spct.so_luong += chitiets.so_luong;
+                    _context.san_Pham_Chi_Tiets.Update(spct);
+
+                }
+                _context.don_Chi_Tiets.Remove(chitiets);
+                Console.WriteLine("da xoa san pham" + spct.ID);
+                
             }
+
+
+            // Cập nhật trạng thái đơn hàng
             hoaDon.tong_tien = 0;
-            hoaDon.trang_thai = 4;
-
-
-
+            hoaDon.trang_thai = 4; // Đã hủy
             _context.hoa_Dons.Update(hoaDon);
+
+            // Lưu thay đổi
             _context.SaveChanges();
-            Console.WriteLine($"Hủy đơn hàng: {hoaDon.ID} - Sau khi cập nhật: Tổng tiền = {hoaDon.tong_tien}");
 
-
-            return Json(new { success = true });
+            return Json(new { success = true ,Message="Hủy đơn hàng thành công"});
         }
+
+        // Phương thức để cập nhật số lượng sản phẩm chi tiết
+        private void UpdateSanPhamChiTiet(IEnumerable<Hoa_Don_Chi_Tiet> hoaDonChiTiets)
+        {
+            foreach (var chiTiet in hoaDonChiTiets)
+            {
+                var sanPhamct = _context.san_Pham_Chi_Tiets.FirstOrDefault(sp => sp.ID == chiTiet.San_Pham_Chi_TietID);
+                if (sanPhamct != null)
+                {
+                    sanPhamct.so_luong += chiTiet.so_luong; // Cộng số lượng sản phẩm vào kho
+                    _context.san_Pham_Chi_Tiets.Update(sanPhamct); // Cập nhật lại sản phẩm chi tiết
+                }
+            }
+        }
+
+
         private string GenerateNewHoaDonID()
         {
             // Tìm hóa đơn có ID lớn nhất
@@ -223,80 +341,77 @@ namespace WebBanGiay.Areas.Admin.Controllers
             });
         }
 
+        
+
         [HttpPost]
         public IActionResult UpdateInvoiceItemQuantity([FromBody] UpdateInvoiceItemRequest req)
         {
             try
             {
-                // Tìm chi tiết hóa đơn
-                var chiTiet = _context.don_Chi_Tiets.FirstOrDefault(x => x.ID == req.chiTietId);
-                if (chiTiet == null)
+                // Lấy dòng chi tiết hóa đơn
+                var invoiceItem = _context.don_Chi_Tiets.FirstOrDefault(x => x.ID == req.chiTietId);
+                if (invoiceItem == null)
                     return Json(new { success = false, message = "Không tìm thấy chi tiết hóa đơn!" });
 
-                // Tìm sản phẩm trong kho tương ứng
-                var spCT = _context.san_Pham_Chi_Tiets.FirstOrDefault(sp => sp.ID == chiTiet.San_Pham_Chi_TietID);
-                if (spCT == null)
-                    return Json(new { success = false, message = "Không tìm thấy sản phẩm trong kho!" });
+                // Lấy giá hiện tại của sản phẩm từ DB
+                var productDetail = _context.san_Pham_Chi_Tiets.FirstOrDefault(p => p.ID == invoiceItem.San_Pham_Chi_TietID);
+                if (productDetail == null)
+                    return Json(new { success = false, message = "Không tìm thấy sản phẩm!" });
 
-                int oldQty = chiTiet.so_luong;
-                int newQty = oldQty + req.delta; // req.delta có thể âm (giảm) hoặc dương (tăng)
+                // So sánh giá: nếu giá của hóa đơn khác với giá hiện tại, tức sản phẩm đã thay đổi giá
+                if (invoiceItem.gia != productDetail.gia)
+                {
+                    string priceChangeMessage = $"{productDetail.ten_SPCT} đã có sự thay đổi về giá từ {invoiceItem.gia:N0} thành {productDetail.gia:N0}.";
 
-                // Lấy hóa đơn chứa chi tiết này
-                var invoice = _context.hoa_Dons.FirstOrDefault(h => h.ID == chiTiet.Hoa_DonID);
-                if (invoice == null)
-                    return Json(new { success = false, message = "Không tìm thấy hóa đơn chứa chi tiết này!" });
+                    return Json(new
+                    {
+                        success = false,
+                        priceChangeMessage = priceChangeMessage
+                    });
+                }
 
+                // Nếu đang tăng số lượng, kiểm tra kho
+                if (req.delta > 0)
+                {
+                    if (productDetail.so_luong < req.delta)
+                        return Json(new { success = false, message = "Kho không đủ hàng để tăng số lượng!" });
+
+                    // Trừ tồn kho tương ứng
+                    productDetail.so_luong -= req.delta;
+                    _context.san_Pham_Chi_Tiets.Update(productDetail);
+                }
+                else if (req.delta < 0)
+                {
+                    // Nếu giảm số lượng, cộng lại kho
+                    productDetail.so_luong += (-req.delta);
+                    _context.san_Pham_Chi_Tiets.Update(productDetail);
+                }
+
+                // Cập nhật số lượng và thành tiền của dòng chi tiết
+                int newQty = invoiceItem.so_luong + req.delta;
                 if (newQty <= 0)
                 {
-                    // Nếu số lượng giảm xuống 0 hoặc âm, trả lại toàn bộ số lượng của chi tiết vào kho,
-                    // sau đó xóa chi tiết khỏi hóa đơn.
-                    spCT.so_luong += oldQty;
-                    _context.san_Pham_Chi_Tiets.Update(spCT);
-                    _context.don_Chi_Tiets.Remove(chiTiet);
+                    // Nếu số lượng giảm về 0 hoặc âm, xóa dòng
+                    _context.don_Chi_Tiets.Remove(invoiceItem);
+                    newQty = 0;
                 }
                 else
                 {
-                    int diff = newQty - oldQty; // diff > 0: tăng; diff < 0: giảm
-                    if (diff > 0)
-                    {
-                        // Nếu tăng, kiểm tra kho có đủ không
-                        if (spCT.so_luong < diff)
-                            return Json(new { success = false, message = "Kho không đủ hàng!" });
-                        spCT.so_luong -= diff;
-                    }
-                    else if (diff < 0)
-                    {
-                        // Nếu giảm, cộng số lượng đã giảm (-diff) vào kho
-                        spCT.so_luong += (-diff);
-                    }
-
-                    // Cập nhật chi tiết hóa đơn
-                    chiTiet.so_luong = newQty;
-                    chiTiet.thanh_tien = chiTiet.gia * newQty;
-                    chiTiet.ngay_sua = DateTime.Now;
-                    chiTiet.nguoi_sua = "system";
-                    _context.don_Chi_Tiets.Update(chiTiet);
-                    _context.san_Pham_Chi_Tiets.Update(spCT);
+                    invoiceItem.so_luong = newQty;
+                    invoiceItem.thanh_tien = invoiceItem.gia * newQty;
+                    _context.don_Chi_Tiets.Update(invoiceItem);
                 }
-
-                // Sau khi cập nhật/xóa chi tiết, tính lại tổng tiền của hóa đơn
-                // Tính lại tổng tiền
-                invoice.tong_tien = _context.don_Chi_Tiets
-                    .Where(x => x.Hoa_DonID == invoice.ID)
-                    .Sum(x => (double?)x.thanh_tien) ?? 0;
-
-                _context.hoa_Dons.Update(invoice);
 
                 _context.SaveChanges();
 
-                // Nếu chi tiết đã bị xóa thì trả về newQty = 0 và newTotal = 0
-                return Json(new { success = true, newQty = newQty > 0 ? newQty : 0, newTotal = newQty > 0 ? chiTiet.thanh_tien : 0 });
+                return Json(new { success = true, newQty = newQty, newTotal = invoiceItem.thanh_tien });
             }
             catch (Exception ex)
             {
                 return Json(new { success = false, message = ex.Message });
             }
         }
+
 
         // Model cho request cập nhật số lượng
         public class UpdateInvoiceItemRequest
@@ -310,95 +425,6 @@ namespace WebBanGiay.Areas.Admin.Controllers
         {
             public List<Guid> invoiceIds { get; set; }
         }
-
-       
-
-
-        //   [HttpPost]
-        //public IActionResult RemoveInvoiceItem([FromBody] Guid chiTietId)
-        //{
-        //    try
-        //    {
-        //        var chiTiet = _context.don_Chi_Tiets.FirstOrDefault(x => x.ID == chiTietId);
-        //        if (chiTiet == null)
-        //            return Json(new { success = false, message = "Không tìm thấy chi tiết hóa đơn!" });
-
-        //        // Trả lại số lượng vào kho
-        //        var spCT = _context.san_Pham_Chi_Tiets.FirstOrDefault(sp => sp.ID == chiTiet.San_Pham_Chi_TietID);
-        //        if (spCT != null)
-        //        {
-        //            spCT.so_luong += chiTiet.so_luong;
-        //            _context.san_Pham_Chi_Tiets.Update(spCT);
-        //        }
-
-        //        _context.don_Chi_Tiets.Remove(chiTiet);
-        //        _context.SaveChanges();
-
-        //        return Json(new { success = true });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Json(new { success = false, message = ex.Message });
-        //    }
-        //}
-
-        //[HttpPost]
-        //public IActionResult AddProductToInvoice([FromBody] AddProductDto request)
-        //{
-        //    // Lấy hóa đơn
-        //    var invoice = _context.hoa_Dons.FirstOrDefault(h => h.ID == request.InvoiceId);
-        //    if (invoice == null)
-        //        return Json(new { success = false, message = "Không tìm thấy hóa đơn!" });
-
-        //    // Lấy sản phẩm
-        //    var productDetail = _context.san_Pham_Chi_Tiets.FirstOrDefault(p => p.ID == request.ProductId);
-        //    if (productDetail == null)
-        //        return Json(new { success = false, message = "Không tìm thấy sản phẩm!" });
-
-        //    // Kiểm tra kho đủ không
-        //    if (productDetail.so_luong < request.Quantity)
-        //        return Json(new { success = false, message = "Kho không đủ hàng!" });
-
-        //    // Tìm chi tiết hoá đơn hiện có
-        //    var existing = _context.don_Chi_Tiets
-        //        .FirstOrDefault(ct => ct.Hoa_DonID == request.InvoiceId
-        //                           && ct.San_Pham_Chi_TietID == request.ProductId);
-
-        //    if (existing != null)
-        //    {
-        //        // Cộng dồn
-        //        existing.so_luong += request.Quantity;
-        //        existing.thanh_tien = existing.gia * existing.so_luong;
-        //    }
-        //    else
-        //    {
-        //        // Tạo mới
-        //        var newMa = "CT" + Guid.NewGuid().ToString().Substring(0, 8);
-        //        var chiTiet = new Hoa_Don_Chi_Tiet
-        //        {
-        //            ID = Guid.NewGuid(),
-        //            ma = newMa,
-        //            Hoa_DonID = request.InvoiceId,
-        //            San_Pham_Chi_TietID = request.ProductId,
-        //            so_luong = request.Quantity,
-        //            gia = productDetail.gia,
-        //            thanh_tien = productDetail.gia * request.Quantity,
-        //            ngay_tao = DateTime.Now,
-        //            nguoi_tao = "system",
-        //            trang_thai = 0
-        //        };
-        //        _context.don_Chi_Tiets.Add(chiTiet);
-        //    }
-
-        //    // Trừ số lượng trong kho
-        //    productDetail.so_luong -= request.Quantity;
-
-        //    // Lưu
-        //    _context.SaveChanges();
-
-        //    return Json(new { success = true, message = "Thêm sản phẩm thành công!" });
-        //}
-
 
         [HttpPost]
         public IActionResult RemoveInvoiceItem([FromBody] Guid chiTietId)
@@ -428,78 +454,102 @@ namespace WebBanGiay.Areas.Admin.Controllers
             }
         }
 
+      
         [HttpPost]
         public IActionResult AddProductToInvoice([FromBody] AddProductDto request)
         {
-            // Lấy hóa đơn
-            var invoice = _context.hoa_Dons.FirstOrDefault(h => h.ID == request.InvoiceId);
-            if (invoice == null)
-                return Json(new { success = false, message = "Không tìm thấy hóa đơn!" });
-
-            // Lấy sản phẩm chi tiết
-            var productDetail = _context.san_Pham_Chi_Tiets.FirstOrDefault(p => p.ID == request.ProductId);
-            if (productDetail == null)
-                return Json(new { success = false, message = "Không tìm thấy sản phẩm!" });
-
-            // Kiểm tra số lượng kho
-            if (productDetail.so_luong < request.Quantity)
-                return Json(new { success = false, message = "Kho không đủ hàng!" });
-
-            // Tìm chi tiết hóa đơn đã tồn tại với sản phẩm này
-            var existing = _context.don_Chi_Tiets
-                .FirstOrDefault(ct => ct.Hoa_DonID == request.InvoiceId
-                                   && ct.San_Pham_Chi_TietID == request.ProductId);
-
-            // Tính giá cuối cùng: nếu request.Price > 0 thì dùng, còn không dùng giá gốc của sản phẩm
-            double finalPrice = request.Price > 0 ? request.Price : productDetail.gia;
-
-            if (existing != null)
+            try
             {
-                // Log giá trị hiện có để debug
-                Console.WriteLine("Existing invoice detail found: Quantity = " + existing.so_luong);
+                // Lấy hóa đơn hiện tại
+                var invoice = _context.hoa_Dons.FirstOrDefault(h => h.ID == request.InvoiceId);
+                if (invoice == null)
+                    return Json(new { success = false, message = "Không tìm thấy hóa đơn!" });
 
-                // Cộng dồn số lượng và cập nhật thành tiền
-                existing.so_luong += request.Quantity;
-                existing.thanh_tien = existing.gia * existing.so_luong;
-                // Đánh dấu entity này là Modified
-                _context.don_Chi_Tiets.Update(existing);
-            }
-            else
-            {
-                // Tạo chi tiết hóa đơn mới
-                string newMa = "CT" + Guid.NewGuid().ToString().Substring(0, 8);
-                var chiTiet = new Hoa_Don_Chi_Tiet
+                // Lấy sản phẩm chi tiết
+                var productDetail = _context.san_Pham_Chi_Tiets.FirstOrDefault(p => p.ID == request.ProductId);
+                if (productDetail == null)
+                    return Json(new { success = false, message = "Không tìm thấy sản phẩm!" });
+
+                // Kiểm tra số lượng tồn kho
+                if (productDetail.so_luong < request.Quantity)
+                    return Json(new { success = false, message = "Kho không đủ hàng!" });
+
+                // Tính giá cuối cùng: nếu request.Price > 0 thì dùng, nếu không thì dùng giá gốc
+                double finalPrice = request.Price > 0 ? request.Price : productDetail.gia;
+
+                string priceChangeMessage = null;
+
+                // Tìm dòng chi tiết có cùng sản phẩm và có giá bằng với finalPrice
+                var detailWithSamePrice = _context.don_Chi_Tiets
+                    .FirstOrDefault(ct => ct.Hoa_DonID == request.InvoiceId
+                                       && ct.San_Pham_Chi_TietID == request.ProductId
+                                       && ct.gia == finalPrice);
+
+                if (detailWithSamePrice != null)
                 {
-                    ID = Guid.NewGuid(),
-                    ma = newMa,
-                    Hoa_DonID = request.InvoiceId,
-                    San_Pham_Chi_TietID = request.ProductId,
-                    so_luong = request.Quantity,
-                    gia = finalPrice,
-                    thanh_tien = finalPrice * request.Quantity,
-                    ngay_tao = DateTime.Now,
-                    nguoi_tao = "system",
-                    trang_thai = 0
-                };
-                _context.don_Chi_Tiets.Add(chiTiet);
+                    // Giá trùng: cộng dồn số lượng và cập nhật thành tiền
+                    detailWithSamePrice.so_luong += request.Quantity;
+                    detailWithSamePrice.thanh_tien = detailWithSamePrice.gia * detailWithSamePrice.so_luong;
+                    _context.don_Chi_Tiets.Update(detailWithSamePrice);
+                }
+                else
+                {
+                    // Kiểm tra xem có dòng nào của sản phẩm này (với giá cũ) hay không
+                    var existingAnyDetail = _context.don_Chi_Tiets
+                        .FirstOrDefault(ct => ct.Hoa_DonID == request.InvoiceId
+                                           && ct.San_Pham_Chi_TietID == request.ProductId);
+                    if (existingAnyDetail != null)
+                    {
+                        // Có dòng tồn tại nhưng giá không khớp, báo thông báo thay đổi giá
+                        priceChangeMessage = $"Sản phẩm <b>{productDetail.ten_SPCT}</b> đã có sự thay đổi về giá từ <b>{existingAnyDetail.gia:N0}</b> thành <b>{finalPrice:N0}</b>.";
+
+
+                    }
+
+                    // Tạo dòng chi tiết mới với giá mới
+                    var newDetail = new Hoa_Don_Chi_Tiet
+                    {
+                        ID = Guid.NewGuid(),
+                        ma = "CT" + Guid.NewGuid().ToString().Substring(0, 8),
+                        Hoa_DonID = request.InvoiceId,
+                        San_Pham_Chi_TietID = request.ProductId,
+                        so_luong = request.Quantity,
+                        gia = finalPrice,
+                        thanh_tien = finalPrice * request.Quantity,
+                        ngay_tao = DateTime.Now,
+                        nguoi_tao = "system",  // Bạn có thể lấy thông tin người tạo từ Claims nếu cần
+                        trang_thai = 0
+                    };
+                    _context.don_Chi_Tiets.Add(newDetail);
+                }
+
+                // Cập nhật số lượng tồn kho: trừ số lượng được bán
+                productDetail.so_luong -= request.Quantity;
+                _context.san_Pham_Chi_Tiets.Update(productDetail);
+
+                // Cập nhật tổng tiền hóa đơn
+                //invoice.tong_tien = _context.don_Chi_Tiets
+                //    .Where(x => x.Hoa_DonID == request.InvoiceId)
+                //    .Sum(x => (double?)x.thanh_tien) ?? 0;
+                invoice.tong_tien = _context.don_Chi_Tiets.Where(x => x.Hoa_DonID == request.InvoiceId).Sum(x => x.so_luong * x.gia);
+                _context.hoa_Dons.Update(invoice);
+
+                _context.SaveChanges();
+
+                return Json(new { success = true, message = "Thêm sản phẩm thành công!", priceChangeMessage = priceChangeMessage });
             }
-
-            // Cập nhật số lượng trong kho
-            productDetail.so_luong -= request.Quantity;
-            _context.san_Pham_Chi_Tiets.Update(productDetail);
-
-            // Cập nhật tổng tiền của hóa đơn
-            invoice.tong_tien += finalPrice * request.Quantity;
-            _context.hoa_Dons.Update(invoice);
-
-            _context.SaveChanges();
-
-            return Json(new { success = true, message = "Thêm sản phẩm thành công!" });
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
+
+
+
 
         //lưu khach hang vao taikhoanhoadon khi nhấn chọn khách hàng 
         [HttpPost]
-        public IActionResult LinkCustomerToInvoice(Guid invoiceId, Guid customerId)
+        public IActionResult get(Guid invoiceId, Guid customerId)
         {
             // 1. Tìm hóa đơn
             var invoice = _context.hoa_Dons.FirstOrDefault(h => h.ID == invoiceId);
@@ -607,15 +657,17 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
             _context.thanh_Toans.Add(newPayment);
             _context.SaveChanges();
-
+            invoice.tong_tien = _context.don_Chi_Tiets.Where(c => c.Hoa_DonID == model.Hoa_DonID).Sum(c => c.so_luong * c.gia);
             // 4. Tính tổng tiền đã thanh toán
             var totalPaid = _context.thanh_Toans
                 .Where(t => t.Hoa_DonID == model.Hoa_DonID)
                 .Sum(x => (double?)x.so_tien_thanh_toan) ?? 0;
 
+
             // 5. Tính tiền còn thiếu (nếu bảng hoa_Dons có cột tong_tien)
             double remaining = (invoice.tong_tien - totalPaid);
             if (remaining < 0) remaining = 0;
+
 
             // (Tuỳ logic) Nếu remaining = 0 => cập nhật trạng thái hóa đơn
             if (remaining == 0)
@@ -677,6 +729,9 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     return Json(new { success = false, message = "Không tìm thấy phiếu giảm giá!" });
                 if (voucher.so_luong <= 0)
                     return Json(new { success = false, message = "Phiếu giảm giá đã hết!" });
+                invoice.tong_tien = _context.don_Chi_Tiets
+      .Where(c => c.Hoa_DonID == invoice.ID)
+      .Sum(c => c.so_luong * c.gia);
 
                 double discountAmount = 0;
                 // Nếu loại phiếu giảm giá là 1 => Giảm %
@@ -707,8 +762,8 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 invoice.tong_tien = newTotal;
             }
 
-            // 4. Đổi trạng thái hóa đơn thành 3 (Hoàn thành)
-            invoice.trang_thai = 3;
+            // 4. Đổi trạng thái hóa đơn thành 6 (Đã thanh toán)
+            invoice.trang_thai = 6;
             _context.hoa_Dons.Update(invoice);
             _context.SaveChanges();
 
@@ -746,70 +801,6 @@ namespace WebBanGiay.Areas.Admin.Controllers
             return Guid.Empty;
         }
 
-		//string vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-		//string vnp_Returnurl = "http://localhost:5089/BHTQ/PaymentReturn";
-		//string vnp_TmnCode = "NJJ0R8FS"; // DEMO
-		//string vnp_HashSecret = "BYKJBHPPZKQMKBIBGGXIYKWYFAYSJXCW"; // DEMO
 
-		//var pay = new VnPayLibrary();
-		//pay.AddRequestData("vnp_Version", "2.1.0");
-		//pay.AddRequestData("vnp_Command", "pay");
-		//pay.AddRequestData("vnp_TmnCode", vnp_TmnCode);
-		//pay.AddRequestData("vnp_Amount", ((long)(TotalAmount * 100)).ToString());
-		//pay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
-		//pay.AddRequestData("vnp_CurrCode", "VND");
-		//pay.AddRequestData("vnp_IpAddr", HttpContext.Connection.RemoteIpAddress?.ToString());
-		//pay.AddRequestData("vnp_Locale", "vn");
-		//pay.AddRequestData("vnp_OrderInfo", orderDescription);
-		//pay.AddRequestData("vnp_OrderType", "other");
-		//pay.AddRequestData("vnp_ReturnUrl", vnp_Returnurl);
-		//pay.AddRequestData("vnp_TxnRef", DateTime.Now.Ticks.ToString());
-
-		//string paymentUrl = pay.CreateRequestUrl(vnp_Url, vnp_HashSecret);
-		//return Redirect(paymentUrl);
-
-		[HttpPost]
-
-		public IActionResult PaymentReques(double TotalAmount, string orderDescription)
-		{
-			string vnp_Url = _configuration["VNPay:Url"];
-			string vnp_Returnurl = _configuration["VNPay:ReturnUrl"];
-			string vnp_TmnCode = _configuration["VNPay:TmnCode"];
-			string vnp_HashSecret = _configuration["VNPay:HashSecret"];
-
-			var pay = new VnPayLibrary();
-			pay.AddRequestData("vnp_Version", "2.1.0");
-			pay.AddRequestData("vnp_Command", "pay");
-			pay.AddRequestData("vnp_TmnCode", vnp_TmnCode);
-			pay.AddRequestData("vnp_Amount", ((long)(TotalAmount * 100)).ToString());
-			pay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
-			pay.AddRequestData("vnp_CurrCode", "VND");
-			pay.AddRequestData("vnp_IpAddr", HttpContext.Connection.RemoteIpAddress?.ToString());
-			pay.AddRequestData("vnp_Locale", "vn");
-			pay.AddRequestData("vnp_OrderInfo", orderDescription);
-			pay.AddRequestData("vnp_OrderType", "other");
-			pay.AddRequestData("vnp_ReturnUrl", vnp_Returnurl);
-			pay.AddRequestData("vnp_TxnRef", DateTime.Now.Ticks.ToString());
-
-			string paymentUrl = pay.CreateRequestUrl(vnp_Url, vnp_HashSecret);
-			return Redirect(paymentUrl);
-
-		}
-
-		[HttpGet]
-		public IActionResult PaymentReturn()
-		{
-			// Bạn có thể xử lý kết quả thanh toán tại đây
-			var vnp_ResponseCode = Request.Query["vnp_ResponseCode"];
-			if (vnp_ResponseCode == "00")
-			{
-				return Content("Thanh toán thành công!");
-			}
-			else
-			{
-				return Content("Thanh toán thất bại hoặc bị huỷ!");
-			}
-		}
-
-	}
+    }
 }

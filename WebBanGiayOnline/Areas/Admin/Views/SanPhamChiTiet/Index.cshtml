@@ -418,34 +418,29 @@
                 success: function (imageUrls) {
                     console.log("✅ Ảnh nhận được:", imageUrls);
 
+                    $('#chonAnhSanPham').empty();
+
                     if (Array.isArray(imageUrls) && imageUrls.length > 0) {
+                        $('#editAnhSanPham').val(imageUrls.join(","));
 
-                        // Xóa ảnh cũ trong #chonAnhSanPham
-                        $('#chonAnhSanPham').empty();
-
-                        if (Array.isArray(imageUrls) && imageUrls.length > 0) {
-                            // Lưu vào input ẩn (chuỗi URL, phân tách bằng ",")
-                            $('#editAnhSanPham').val(imageUrls.join(","));
-
-                            // Hiển thị ảnh lên #chonAnhSanPham
-                            imageUrls.forEach(url => {
-                                $('#chonAnhSanPham').append(`
-                            <div class="m-1">
-                                <img src="${url}" class="border rounded" width="80" height="80">
-                            </div>
-                        `);
-                            });
-                        } else {
-                            $('#editAnhSanPham').val(""); // Nếu không có ảnh, để trống
-                            $('#chonAnhSanPham').append("<p>Không có ảnh</p>");
-                        }
-
+                        imageUrls.forEach(url => {
+                            $('#chonAnhSanPham').append(`
+                        <div class="m-1">
+                            <img src="${url}" class="border rounded" width="80" height="80">
+                        </div>
+                    `);
+                        });
+                    } else {
+                        $('#editAnhSanPham').val("");
+                        $('#chonAnhSanPham').append("<p>Không có ảnh</p>");
+                    }
                 },
                 error: function () {
                     console.error("❌ Lỗi khi lấy ảnh sản phẩm!");
                     alert("Không thể lấy ảnh sản phẩm, vui lòng thử lại!");
                 }
             });
+
 
             // Hiển thị modal
             $('#editModal').modal('show');

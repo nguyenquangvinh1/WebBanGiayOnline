@@ -1,5 +1,4 @@
-﻿@model IEnumerable<ClssLib.San_Pham_Chi_Tiet>
-
+﻿<!DOCTYPE html>
 <style>
 	.close-tab {
 		cursor: pointer;
@@ -24,6 +23,7 @@
 		<button class="btn btn-primary" id="createInvoice">+ Tạo hóa đơn</button>
 		<ul class="nav nav-tabs mt-3" id="invoiceTabs"></ul>
 		<div class="tab-content" id="invoiceContent"></div>
+		<div id="invoiceList"></div>
 	</div>
 
 	<!-- Template Hóa đơn (ẩn) -->
@@ -47,7 +47,7 @@
 						<th>Số lượng</th>
 						<th>Kích thước</th>
 						<th>Màu sắc</th>
-						<th>Trạng thái</th>
+						@* <th>Trạng thái</th> *@
 						<th>Thành tiền</th>
 						<th>Hành động</th>
 					</tr>
@@ -115,9 +115,10 @@
 						<label class="form-label">Tổng tiền</label>
 						<input type="text" class="form-control finalTotal" placeholder="0 VND" readonly>
 					</div>
-					@* <div class="mb-3"> *@
-					@* 	<button class="btn btn-success ms-3 confirmPaymentInvoice" data-id="INVOICE_ID">Xác nhận thanh toán</button> *@
-					@* </div> *@
+
+					 <div class="mb-3">
+						<button type="button" class="btn btn-success" id="finalConfirmBtn">Xác nhận thanh toán</button>
+					 </div> 
 				</div>
 			</div>
 		</div>
@@ -134,6 +135,8 @@
 				</div>
 				<div class="modal-body">
 					<p class="text-center">[Danh sách sản phẩm]</p>
+					<canvas id="qrcode"></canvas>
+
 				</div>
 			</div>
 		</div>
@@ -414,7 +417,8 @@
 					<!-- Nút “Thêm” để thêm dòng thanh toán -->
 					<button type="button" class="btn btn-warning" id="addPaymentRowBtn">Thêm</button>
 					<!-- Nút “Xác nhận thanh toán” để gửi toàn bộ dữ liệu lên server -->
-					<button type="button" class="btn btn-success" id="finalConfirmBtn">Xác nhận thanh toán</button>
+				
+					<button type="button" class="btn btn-success" id="confirmPaymentInModal">Xác nhận </button>
 				</div>
 
 			</div>
@@ -444,6 +448,12 @@
 			$(".filter-select, #searchProduct").on("change keyup", function () {
 				filterProducts(); // Gọi hàm lọc sản phẩm
 			});
+			 console.log("Document ready");
+			  $('#menuBanHangTaiQuay').on('click', function(e) {
+			e.preventDefault();  // Ngăn hành vi mặc định của link nếu cần
+			getDataInvoices();
+		});
+
 		});
 
 				function filterProducts() {
@@ -516,150 +526,6 @@
 		}
 
 
-		 // comment lại do chưa làm mịn code
-		 this.initEvent();
-
-		 /**
-		  * Function khởi tạo sự kiện cho màn hình này
-		  */
-		 async function initEvent(){
-			 let me = this;
-			// gọi function binding thông tin của hóa đơn
-			 await me.getDataInvoices();
-			 // debugger;
-			 if(data && data.length > 0 && dataMaster && dataMaster.length > 0){
-					 dataMaster.forEach(item => {
-
-					 if(item){
-						 // lấy thông tin detail
-						 let invoiceID = item.id,// id của hóa đơn
-							dataDetail = data.filter(x=>x[0] == invoiceID );
-						 if(invoiceID && dataDetail ){
-							// let html =  me.renderTableStart(1, dataDetail, invoiceID, item);
-							// $('.container').append(html);
-							// Clone template, tạo tab và gán invoiceId vào DOM...
-							 let newInvoiceDomId = 'invoice_' + invoiceID;
-							 let newInvoiceHtml = $('#invoiceTemplate').html().replace(/INVOICE_ID/g, newInvoiceDomId);
-							 let htmlDetail = '';
-									$('#invoiceTabs').append(`
-										<li class="nav-item">
-											<a class="nav-link" id="tab-${newInvoiceDomId}" data-bs-toggle="tab" href="#${newInvoiceDomId}">
-												${(item && item.maHoaDon) ? item.maHoaDon : ''}
-														 <!-- Thêm vòng tròn/badge hiển thị số lượng: -->
-										  <span class="badge invoice-count-badge" id="badge-${newInvoiceDomId}">0</span>
-												<span class="close-tab" data-id="${newInvoiceDomId}">✖</span>
-											</a>
-										</li>
-									`);
-							 $('#invoiceContent').append(newInvoiceHtml);
-							 $(`#${newInvoiceDomId}`).attr('data-db-invoice-id', invoiceID);
-							 let tab = new bootstrap.Tab(document.querySelector(`#tab-${newInvoiceDomId}`))
-							 debugger;
-							 tab.show();
-
-							// todo  binding detail của hóa đơn tìm theo invoiceTable-invoice_caef2ec5-817e-4d12-b29b-f0c01486aa81
-							debugger;
-							dataDetail[0].forEach((item, index) => {
-								// vì mảng dataDEtail này lưu theo kiểu idInvoice, dataDetail, dataMaster
-								if(index == 0)
-									return;
-								htmlDetail+= me.renderDetailInvoice(item,index-1);
-							 });
-								$(`#invoiceTable-${newInvoiceDomId} tbody`).html(htmlDetail);
-						 }
-					 }
-
-				 })
-
-
-
-			 }
-		 }
-
-		 /**
-		  * Xử lý binding thông tin hóa đơn
-		  */
-		 async function getDataInvoices(){
-			 let me = this,
-				// chỗ này cần gọi vào DB để lấy id của hóa đơn,
-				idEmployee = 'idEmployee',
-				idInvoices = me.loadStorageIdInvoices(idEmployee); // ['a2539406-e025-47b7-ae71-90b9cd743dc6', 'a59fc92e-cf1c-4f6d-9770-f058d4024d2b', 'd4784825-7760-4c61-a683-72c2a3878473'];
-				console.log(idInvoices);
-				  // Trường hợp không có ID hóa đơn trong localStorage => bỏ qua
-
-					  if (!idInvoices || idInvoices.length === 0) {
-		  console.log("Chưa có hóa đơn nào trong localStorage, không gọi API GetInvoicesByIDs");
-		  return;
-		}
-			await $.ajax({
-				 url: '/Admin/BHTQ/GetInvoicesByIDs',
-				 type: 'POST',
-				contentType: 'application/json;charset=utf-8',
-				data: JSON.stringify({ invoiceIds: idInvoices}),
-				 success: function(res){
-					 debugger;
-					 if(res.success){
-						 // lấy ra thông tin hóa đơn
-						 let dataInvoice = (res.data && res.data.length > 0) ? res.data : null
-
-						 // binding thông tin detial cho hóa đơn
-						 if(idInvoices && idInvoices.length > 0){
-							idInvoices.forEach(item =>{
-								// lấy ra thông tin hóa đơn master
-
-								let infoInvoiceStorage = localStorage.getItem('info_invoice_'+ idEmployee + '_'+item),
-									newArr = [];
-
-								if(infoInvoiceStorage){
-									let infoInvoiceCache = JSON.parse(infoInvoiceStorage),
-										infoInvoice = infoInvoiceCache ? JSON.parse(infoInvoiceCache.value) : null;
-										newArr.push(...infoInvoice);
-										data.push([item, ...newArr]); //Thêm một dòng mới
-								}
-							})
-						}
-						if(dataInvoice){
-								dataMaster.push(...dataInvoice)
-						}
-					 } else {
-						 console.log("Lỗi lấy dữ liệu!");
-					 }
-				 },
-				 error: function(err){
-					 console.error(err);
-					 alert("Không thể tạo hóa đơn");
-				 }
-			 });
-
-
-
-		}
-
-		 /**
-		  * Xử lý lấy ID của hóa đơn
-		  */
-		function loadStorageIdInvoices(idEmployee){
-			let data = [];
-			// Lặp qua tất cả các key trong localStorage
-			for (let i = 0; i < localStorage.length; i++) {
-				let key = localStorage.key(i);
-				// Kiểm tra nếu key chứa 'info_invoice_idEmployee'
-				if (key.includes('info_invoice_'+idEmployee)) {
-					// In ra key và value tương ứng
-					data.push(key.split('_').pop());  // Lấy phần tử cuối cùng sau khi tách theo dấu "_"
-				}
-			}
-			return data;
-		}
-
-		 // tạo mới session
-		 // sessionStorage.setItem("username", "Dat");
-		 // lấy thông tin seesion
-		 // var username = sessionStorage.getItem("username");
-		 // console.log(username); // Kết quả: "Dat"
-		 // xóa thông tin session
-		 // sessionStorage.removeItem("username");
-
 			 // 1. Tạo hóa đơn mới
 		$('#createInvoice').on('click', function(){
 
@@ -679,7 +545,8 @@
 								newInvoiceDomId = 'invoice_' + id,
 							newInvoiceHtml = $('#invoiceTemplate').html().replace(/INVOICE_ID/g, newInvoiceDomId),
 								invoiceCode = (res && res.data && res.data.maHoaDon) ? res.data.maHoaDon : '';
-							debugger;
+								
+							// debugger;
 						 $('#invoiceTabs').append(`
 							 <li class="nav-item">
 								 <a class="nav-link" id="tab-${newInvoiceDomId}" data-bs-toggle="tab" href="#${newInvoiceDomId}">
@@ -693,6 +560,7 @@
 							 $(`#${newInvoiceDomId}`).attr('data-db-invoice-id', id);
 						 let tab = new bootstrap.Tab(document.querySelector(`#tab-${newInvoiceDomId}`));
 						 tab.show();
+						
 					 } else {
 						 alert("Lỗi tạo hóa đơn: " + res.message);
 					 }
@@ -706,94 +574,178 @@
 
 
 		 //close hoa don
-				 // Sự kiện khi nhấn nút "close-tab" trên tab hóa đơn
-				$(document).on('click', '.close-tab', function(e) {
-			 e.stopPropagation();
-			 let removedInvoiceDomId = $(this).attr('data-id');
-			 // Xóa tab và nội dung hóa đơn tương ứng
-			 $(`#tab-${removedInvoiceDomId}`).parent().remove();
-			 $(`#${removedInvoiceDomId}`).remove();
-		 });
 
+			$(document).on('click', '.close-tab', function(e) {
+			// e.stopPropagation();
+			let removedInvoiceDomId = $(this).attr('data-id');
+
+			// Loại bỏ 'invoice_' trước khi gửi API
+			let cleanId = removedInvoiceDomId.replace("invoice_", "");
+
+			console.log("ID đơn hàng sau khi làm sạch:", cleanId); // Kiểm tra lại ID
+
+			$.post('/Admin/BHTQ/HuyDonHang', { id: cleanId }, function(response) {
+				if (response.success) {
+					    $(`#tab-${removedInvoiceDomId}`).parent().remove();
+						$(`#${removedInvoiceDomId}`).remove();
+						alert("Đơn hàng đã được hủy và các sản phẩm đã được cộng lại vào kho!");
+				} else {
+					alert(response.message);
+				}
+			});
+		});
+
+
+
+			function getDataInvoices() {
+			
+			$.ajax({
+				url: '/Admin/BHTQ/GetHoaDonTaiQuay',
+				type: 'GET',
+				success: function(res) {
+					
+					if (res.success) {
+						// Xóa nội dung cũ nếu cần
+						$("#invoiceTabs").empty();
+						$("#invoiceContent").empty();
+
+						// Lặp qua từng hóa đơn và tạo tab cùng container nội dung cho từng hóa đơn
+						res.data.forEach((invoice) => {
+							let newInvoiceDomId = 'invoice_' + invoice.id;
+
+							// Cập nhật số lượng
+							// Tạo tab cho hóa đơn
+							$("#invoiceTabs").append(`
+								<li class="nav-item">
+									<a class="nav-link" id="tab-${newInvoiceDomId}" data-bs-toggle="tab" href="#${newInvoiceDomId}" data-invoice-id="${invoice.id}">
+										${invoice.maHoaDon}
+										<span class="badge invoice-count-badge" id="badge-${newInvoiceDomId}">${invoice.soLuongSanPham || 0}</span>
+										<span class="close-tab" data-id="${newInvoiceDomId}">✖</span>
+									</a>
+								</li>
+							`);
+							// Tạo container nội dung cho hóa đơn (clone template)
+							let newInvoiceHtml = $('#invoiceTemplate').html().replace(/INVOICE_ID/g, newInvoiceDomId);
+							$("#invoiceContent").append(newInvoiceHtml);
+
+							// Gán attribute chứa id hóa đơn
+							$(`#${newInvoiceDomId}`).attr('data-db-invoice-id', invoice.id);
+
+							// Kiểm tra xem hóa đơn có khách hàng không
+							let container = $('#' + newInvoiceDomId);
+							if (invoice.khachHang) {
+								// Nếu có khách hàng, ẩn "khách lẻ" và hiển thị thông tin khách hàng
+								let customer = invoice.khachHang;
+								container.find('.khachLe').hide(); // Ẩn phần khách lẻ
+								container.find('.customerForm').show(); // Hiển thị phần thông tin khách hàng
+								container.find('.customerName').val(customer.ten);
+								container.find('.customerPhone').val(customer.phoneNumber);
+								container.find('.customerEmail').val(customer.email);
+									container.attr('data-customer-id', customer.id);
+
+								// Gọi tự động chọn phiếu giảm giá ngay sau khi cập nhật thông tin khách hàng
+								autoSelectDiscountCode(newInvoiceDomId);
+							} else {
+								// Nếu không có khách hàng, hiển thị thông tin khách lẻ
+								container.find('.khachLe').show(); // Hiển thị phần khách lẻ
+								container.find('.customerForm').hide(); // Ẩn phần thông tin khách hàng
+							}
+						});
+
+						// Optionally, tự động kích hoạt tab đầu tiên nếu có
+						if (res.data.length > 0) {
+							// Cập nhật currentInvoiceId với tab đầu tiên
+							let firstInvoiceId = res.data[0].id;
+							currentInvoiceId = 'invoice_' + firstInvoiceId;
+							// Kích hoạt tab đầu tiên
+							let firstTab = new bootstrap.Tab(document.querySelector(`#tab-${currentInvoiceId}`));
+							firstTab.show();
+							// Gọi hàm loadInvoiceDetails() để load dữ liệu chi tiết cho hóa đơn đầu tiên
+							loadInvoiceDetails();
+						}
+					} else {
+						console.error("Lỗi API:", res.message);
+					}
+				},
+				error: function(err) {
+					console.error("Lỗi khi gọi API GetHoaDonTaiQuay", err);
+				}
+			});
+		}
+
+		//Cập nhật biến currentInvoiceId khi người dùng chuyển tab
+								$(document).on('shown.bs.tab', 'a[data-bs-toggle="tab"]', function (e) {
+			let invoiceId = $(e.target).data('invoice-id'); // lấy id của hóa đơn từ tab
+			currentInvoiceId = "invoice_" + invoiceId;      // cập nhật currentInvoiceId cho container
+			loadInvoiceDetails();
+		});
+				
 
 
 
 		  // 3. Hiển thị danh sách sản phẩm trong hóa đơn
-		function loadInvoiceDetails() {
-			 let me = this,
-				dbInvoiceId = $(`#${currentInvoiceId}`).attr('data-db-invoice-id');
+						function loadInvoiceDetails() {
+			let dbInvoiceId = $(`#${currentInvoiceId}`).attr('data-db-invoice-id');
+		
 
-			
-			 $.getJSON('/Admin/BHTQ/GetInvoiceDetails', { invoiceId: dbInvoiceId }, function(res) {
-				 if (res && res.success) {
-
-					 let html = "";
-					 if(res.data){
-
-						let idEmployee = 'idEmployee';
-						 // set session lưu thông tin cho detail invoice
-						 me.setSession('info_invoice_' + idEmployee + '_' +dbInvoiceId, JSON.stringify(res.data) ,2);
-						 res.data.forEach((item, index) => {
-							 html+= me.renderDetailInvoice(item,index);
-						 });
-						 $(`#invoiceTable-${currentInvoiceId} tbody`).html(html);
-							recalcInvoiceTotal();
-					 }else{
-						 console.log('có lỗi xảy ra!');
-					 }
-
-				 }
-			 });
-		 }
-
-		 /**
-		  * Xử lý ren HTML cho thông tin detail danh sách
-		  */
-		 function renderDetailInvoice(item,index){
-			 debugger;
-			return `
-			  <tr data-id="${item.id}">
-									 <td>${index + 1}</td>
-									<td><img src="${item.anhUrl}" alt="Ảnh SP" width="50"></td>
-									 <td>${item.tenSP}</td>
-									 <td>${item.gia}</td>
-									 <td>
-										 <button class="btn btn-sm btn-outline-secondary minus">-</button>
-										 <span class="quantity">${item.soLuong}</span>
-										 <button class="btn btn-sm btn-outline-secondary plus">+</button>
-									 </td>
-									 <td>${item.kichThuoc}</td>
-									 <td>${item.mauSac}</td>
-									 <td>${item.trangThai}</td>
-									 <td class="row-total">${item.thanhTien}</td>
-									 <td><button class="btn btn-danger btn-sm deleteItem">Xóa</button></td>
-								 </tr>
-			 ` ;
-								
-							
-		 }
-
-
-
-
-
-		function setSession(key, value, expireHours) {
-			var now = new Date();
-			var expireTime = now.getTime() + expireHours * 60 * 60 * 1000; // Chuyển giờ thành mili giây
-			var sessionData = {
-				value: value,
-				expire: expireTime
-			};
-				console.log("Lưu session:", key, sessionData); // Debug dữ liệu lưu session
-
-			localStorage.setItem(key, JSON.stringify(sessionData));
+			$.getJSON('/Admin/BHTQ/GetInvoiceDetails', { invoiceId: dbInvoiceId }, function(res) {
+				if (res && res.success) {
+					let html = "";
+					if (res.data) {
+						res.data.forEach((item, index) => {
+							html += renderDetailInvoice(item, index);
+						});
+						
+						// Giả sử bảng sản phẩm chi tiết có id là invoiceTable-{currentInvoiceId}
+						$(`#invoiceTable-${currentInvoiceId} tbody`).html(html);
+						recalcInvoiceTotal();
+					} else {
+						console.log('Không có dữ liệu chi tiết hóa đơn!');
+					}
+				}
+			});
 		}
 
 
 
-		 // xư li tang so luong o hoa don ban hang
-					$(document).on('click', '.plus', function() {
+		 /**
+		  * Xử lý ren HTML cho thông tin detail danh sách
+		  */
+				function renderDetailInvoice(item, index){
+			return `
+			  <tr data-id="${item.id}">
+				 <td>${index + 1}</td>
+				 <td><img src="${item.anhUrl}" alt="Ảnh SP" width="50"></td>
+				 <td>${item.tenSP}</td>
+				 <td>${item.gia}</td>
+				 <td>
+					 <button class="btn btn-sm btn-outline-secondary minus">-</button>
+					 <span class="quantity">${item.soLuong}</span>
+					 <button class="btn btn-sm btn-outline-secondary plus">+</button>
+				 </td>
 
+					
+
+				 <td>${item.kichThuoc}</td>
+				 <td>${item.mauSac}</td>
+				
+				 <td class="row-total">${item.thanhTien}</td>
+				 <td><button class="btn btn-danger btn-sm deleteItem">Xóa</button></td>
+			  </tr>
+						
+			  
+			  <tr class="price-change-row" style="display: none;">
+			<td colspan="9">
+				<span class="price-change-message text-danger small"></span>
+			</td>
+		</tr>
+
+			`;
+		}
+
+
+		 // xư li tang so luong o hoa don ban hang
+						$(document).on('click', '.plus', function () {
 			let row = $(this).closest('tr');
 			let chiTietId = row.data('id');
 
@@ -802,23 +754,28 @@
 				type: 'POST',
 				contentType: 'application/json;charset=utf-8',
 				data: JSON.stringify({ chiTietId: chiTietId, delta: 1 }),
-				success: function(res) {
+				success: function (res) {
+					const infoRow = row.next('.price-change-row');
+
 					if (res.success) {
 						row.find('.quantity').text(res.newQty);
 						row.find('.row-total').text(res.newTotal);
-						debugger;
-						// cập nhật tổng tiền của hóa đơn
-						
-					recalcInvoiceTotal(); // cập nhật tổng tiền của hóa đơn
-						// setSession("item_"+ chiTietId,res.newQty,1);
-						// 						recalcInvoiceTotal();
 
+						
+
+						recalcInvoiceTotal(); // Cập nhật tổng tiền hóa đơn
 					} else {
-						alert(res.message);
+							if (res.priceChangeMessage) {
+			infoRow.find('.price-change-message').html(res.priceChangeMessage);
+		} else {
+			infoRow.find('.price-change-message').text(res.message);
+		}
+		infoRow.show();
 					}
 				}
 			});
 		});
+
 	
 
 
@@ -839,8 +796,6 @@
 							row.find('.quantity').text(res.newQty);
 							row.find('.row-total').text(res.newTotal);
 						}
-						setSession("item_"+ chiTietId,res.newQty,1);
-
 						recalcInvoiceTotal(); // cập nhật tổng tiền của hóa đơn
 					} else {
 						alert(res.message);
@@ -859,25 +814,6 @@
 						// Cập nhật badge
 						$(`#badge-${invoiceDomId}`).text(sumQty);
 		}
-
-
-		// Hàm tính tổng tiền hóa đơn dựa trên các giá trị thanhTien của từng dòng
-		// function recalcInvoiceTotal() {
-		// 	let total = 0;
-		// 	$(`#invoiceTable-${currentInvoiceId} tbody tr`).each(function () {
-		// 		let rowTotal = parseFloat($(this).find('.row-total').text()) || 0;
-		// 		total += rowTotal;
-		// 	});
-		// 	Cập nhật hiển thị tổng tiền tạm tính (span)
-		// 	$(`#totalPrice-${currentInvoiceId}`).text(total);
-
-		// 	Giả sử bạn có các input với class hoặc ID riêng cho phần thanh toán:
-		// 	$('.basePrice').val(total);       Hiển thị giá gốc (có thể là tổng tiền chưa giảm giá)
-		// 	$('.discountAmount').val(0);        Nếu chưa có mã giảm giá, giá trị mặc định là 0
-		// 	$('.finalTotal').val(total);   
-		// 	Tổng tiền cuối cùng (có thể sau khi trừ giảm giá)
-		// 			 updateInvoiceBadgeCount(currentInvoiceId);
-		// }
 
 						function recalcInvoiceTotal() {
 			let total = 0;
@@ -964,14 +900,25 @@
 					 if (res.success) {
 						 // Cập nhật danh sách sản phẩm trong hóa đơn
 						 loadInvoiceDetails();
-
+						
 						 // Đóng modal sau khi thêm sản phẩm thành công
 						 let modal = bootstrap.Modal.getInstance(document.getElementById('detailedProductModal'));
 						 if (modal) {
 							 modal.hide();
 						 }
-					 } else {
+					 }
+					 else{
+						 if(res.message.includes("đã có sự thay đổi về giá")){
+							 Swal.fire({
+					icon: 'warning',
+					title: 'Cảnh báo giá',
+					text: res.message
+				});
+						 }
+					 
+					 else {
 						 alert("Lỗi thêm sản phẩm: " + res.message);
+					 }
 					 }
 				 },
 				 error: function (err) {
@@ -1076,7 +1023,7 @@
 
 			 //them nhanh khach hang
 							$(document).on('submit', '#quickAddCustomerForm', function (e) {
-			e.preventDefault();
+		
 
 			let customerData = {
 				HoTen: $('#quickCustomerName').val().trim(),
@@ -1130,7 +1077,7 @@
 
 
 
-		
+		//chọn khách hàng 
 			$(document).on('click', '.choose-customer', function () {
 			let customerId = $(this).data('id');
 			let name = $(this).data('name');
@@ -1202,19 +1149,21 @@
 			}
 		});
 
-
-
-
 		//API GetAvailableDiscounts để lấy danh sách voucher
 				let bestDiscountAmount = 0;
 		// let bestVoucherCode = null; ban đầu là null
 					 function autoSelectDiscountCode(invoiceDomId) {
 			let container = $('#' + invoiceDomId);
 			// Lấy orderTotal từ span
-			let orderTotal = parseFloat($('#totalPrice-' + invoiceDomId).text()) || 0;
+
+				 let totalText = $('#totalPrice-' + invoiceDomId).text();
+				console.log('Total price text for', invoiceDomId, ':', totalText);
+				let orderTotal = parseFloat(totalText) || 0;
+				console.log('Computed orderTotal:', orderTotal);
+
 			// Lấy customerId đã lưu (nếu có); nếu chưa có, customerId sẽ là null
 			let customerId = container.attr('data-customer-id') || null;
-
+			console.log('Ctmid:',customerId);
 			$.ajax({
 				url: '/Admin/PhieuGiamGia/GetAvailableDiscounts',
 				type: 'GET',
@@ -1361,7 +1310,7 @@
 			console.log("Voucher applied:", { voucherId, voucherCode, discount, finalTotal: orderTotal - discount });
 		});
 
-
+		////////
 
 		   function loadPaymentMethods(){
 			  // Gọi API (nếu bạn có) hoặc load sẵn
@@ -1394,29 +1343,13 @@
 		  $('#paymentDetailsTable tbody').empty();
 
 		  // Load voucher (nếu có)
-		  loadVouchers();
+		  // loadVouchers();
 
 		  // Mở modal
 		  let modal = new bootstrap.Modal(document.getElementById('paymentModal'));
 		  modal.show();
 		});
-				function loadVouchers(){
-		  // Nếu chưa có API, bạn có thể để rỗng hoặc load dữ liệu mẫu.
-		  // Ví dụ, hiển thị một số voucher mẫu:
-		  let sampleVouchers = [
-			{ id: "11111111-1111-1111-1111-111111111111", ma: "VC001", ten: "Voucher 10%", so_luong: 5 },
-			{ id: "22222222-2222-2222-2222-222222222222", ma: "VC002", ten: "Voucher 50000 VND", so_luong: 3 }
-		  ];
-
-		  let select = $('#voucherSelect');
-		  select.empty();
-		  select.append(`<option value="">Không dùng</option>`);
-		  sampleVouchers.forEach(function(v){
-			if(v.so_luong > 0){
-			  select.append(`<option value="${v.id}">${v.ma} - SL: ${v.so_luong}</option>`);
-			}
-		  });
-		}
+		
 
 							  // Nút "Thêm" => thêm dòng vào table
 				$('#addPaymentRowBtn').on('click', function(){
@@ -1480,44 +1413,51 @@
 
 						   // Nút "Xác nhận thanh toán" -> gửi toàn bộ dữ liệu thanh toán lên server
 					// Mảng paymentRows, currentInvoiceId, ... đã có sẵn
-				$('#finalConfirmBtn').on('click', function() {
-			if (paymentRows.length === 0) {
-				alert("Chưa có dòng thanh toán nào!");
-				return;
-			}
-			let invoiceDom = $('#' + currentInvoiceId);
-			let invoiceId = invoiceDom.attr('data-db-invoice-id');
-			if (!invoiceId) {
-				alert("Không tìm thấy hóa đơn!");
+							$(document).on('click', '#finalConfirmBtn', function() {
+			console.log("Nút thanh toán được nhấn!");
+
+			let paymentAmountStr = $('#paymentAmount').val(); // Lấy giá trị từ input
+			console.log("Giá trị paymentAmountStr: ", paymentAmountStr);
+
+			// Kiểm tra nếu giá trị rỗng hoặc không hợp lệ
+			if (!paymentAmountStr || isNaN(paymentAmountStr.replace(/\D/g, ''))) {
+				alert("Vui lòng nhập số tiền thanh toán hợp lệ.");
 				return;
 			}
 
-			// Lấy voucher code từ input bên trong container của hóa đơn
-			let voucherCode = invoiceDom.find('.discountCodeInput').val();  // Sử dụng container
+			// Chuyển đổi thành số
+			let finalTotal = parseFloat(paymentAmountStr.replace(/\D/g, '')) || 0;
+			console.log("finalTotal sau khi chuyển đổi: ", finalTotal);
+
+			if (finalTotal <= 0) {
+				alert("Số tiền thanh toán phải lớn hơn 0.");
+				return;
+			}
 
 			let requestData = {
-				InvoiceId: invoiceId,
-				PaymentRows: paymentRows,  // Mảng các dòng thanh toán
-				VoucherCodeString: voucherCode  // Có thể là string hoặc null
+				InvoiceId: window.tempPaymentData.InvoiceId,
+				FinalTotal: finalTotal,
+				VoucherCodeString: window.tempPaymentData.VoucherCodeString,
+				VoucherId: null,
+				PaymentRows: window.tempPaymentData.PaymentRows
 			};
+
+			console.log("Request Data:", requestData);
 
 			$.ajax({
 				url: '/Admin/BHTQ/FinalizePayment',
 				type: 'POST',
 				contentType: 'application/json;charset=utf-8',
 				data: JSON.stringify(requestData),
-				success: function(res){
-					if(res.success){
+				success: function(res) {
+					if (res.success) {
 						alert("Thanh toán thành công!");
-						localStorage.removeItem("currentInvoiceData");
-						localStorage.removeItem("invoiceExtra_" + currentInvoiceId);
-						let modal = bootstrap.Modal.getInstance(document.getElementById('paymentModal'));
-						if(modal) modal.hide();
+						window.tempPaymentData = null;
 					} else {
-						alert("Lỗi: " + res.message);
+						alert("Lỗi thanh toán: " + res.message);
 					}
 				},
-				error: function(err){
+				error: function(err) {
 					console.error("FinalizePayment error:", err);
 					alert("Có lỗi xảy ra, vui lòng thử lại!");
 				}
@@ -1525,135 +1465,173 @@
 		});
 
 
+
+
 		//thêm phương thức thanh toán 
-		$('#confirmPaymentBtn').on('click', function(){
-			let amount = parseFloat($('#paymentAmount').val().replace(/\D/g,'')) || 0;
-			let methodId = $('#paymentMethodSelect').val();
-			let note = $('#paymentNote').val() || '';
+		// $('#confirmPaymentBtn').on('click', function(){
+		// 	let amount = parseFloat($('#paymentAmount').val().replace(/\D/g,'')) || 0;
+		// 	let methodId = $('#paymentMethodSelect').val();
+		// 	let note = $('#paymentNote').val() || '';
 
-			if (!amount || amount <= 0) {
-			  alert("Vui lòng nhập số tiền > 0");
-			  return;
-			}
-			if (!methodId) {
-			  alert("Vui lòng chọn phương thức thanh toán");
-			  return;
-			}
+		// 	if (!amount || amount <= 0) {
+		// 	  alert("Vui lòng nhập số tiền > 0");
+		// 	  return;
+		// 	}
+		// 	if (!methodId) {
+		// 	  alert("Vui lòng chọn phương thức thanh toán");
+		// 	  return;
+		// 	}
 
-			// Gọi API AddPayment
-			let invoiceDom = $('#' + currentInvoiceId);
-			let invoiceId = invoiceDom.attr('data-db-invoice-id');
+		// 	Gọi API AddPayment
+		// 	let invoiceDom = $('#' + currentInvoiceId);
+		// 	let invoiceId = invoiceDom.attr('data-db-invoice-id');
 
-			let requestData = {
-			  Hoa_DonID: invoiceId,
-			  Phuong_Thuc_Thanh_ToanID: methodId,
-			  SoTien: amount,
-			  MoTa: note
+		// 	let requestData = {
+		// 	  Hoa_DonID: invoiceId,
+		// 	  Phuong_Thuc_Thanh_ToanID: methodId,
+		// 	  SoTien: amount,
+		// 	  MoTa: note
+		// 	};
+
+		// 	$.ajax({
+		// 	  url: '/Admin/BHTQ/AddPayment',
+		// 	  type: 'POST',
+		// 	  contentType: 'application/json;charset=utf-8',
+		// 	  data: JSON.stringify(requestData),
+		// 	  success: function(res) {
+		// 		  if (res.success) {
+		// 			  alert("Thanh toán thành công!");
+		// 			  Cập nhật hiển thị
+		// 			  updatePaymentUI(res.data);
+		// 		  } else {
+		// 			  alert("Lỗi: " + res.message);
+		// 		  }
+		// 	  },
+		// 	  error: function(err) {
+		// 		  console.error("Lỗi thanh toán:", err);
+		// 		  alert("Có lỗi xảy ra, vui lòng thử lại!");
+		// 	  }
+		// 	});
+		// });
+
+
+		////
+			$(document).on('click', '#confirmPaymentInModal', function () {
+			let finalTotalStr = $('#finalTotal').val() || '0';
+			let finalTotal = parseFloat(finalTotalStr.replace(/\D/g, '')) || 0;
+
+			let paymentAmount = $('#paymentAmount').val() || '0';
+			let paymentMethod = currentMethod || '';
+			let paymentNote = $('#paymentNote').val() || '';
+			let voucherCode = $('#discountCodeInput').val() || '';
+
+			window.tempPaymentData = {
+				InvoiceId: $('#invoiceContent .active').data('db-invoice-id'),
+				FinalTotal: finalTotal,
+				PaymentRows: paymentRows,
+				VoucherCodeString: voucherCode,
+				SoTien: paymentAmount,
+				Phuong_Thuc: paymentMethod,
+				MoTa: paymentNote
 			};
 
-			$.ajax({
-			  url: '/Admin/BHTQ/AddPayment',
-			  type: 'POST',
-			  contentType: 'application/json;charset=utf-8',
-			  data: JSON.stringify(requestData),
-			  success: function(res) {
-				  if (res.success) {
-					  alert("Thanh toán thành công!");
-					  // Cập nhật hiển thị
-					  updatePaymentUI(res.data);
-				  } else {
-					  alert("Lỗi: " + res.message);
-				  }
-			  },
-			  error: function(err) {
-				  console.error("Lỗi thanh toán:", err);
-				  alert("Có lỗi xảy ra, vui lòng thử lại!");
-			  }
-			});
+			console.log("Temp Payment Data:", window.tempPaymentData);
+
+			alert("Thông tin thanh toán đã được lưu. Vui lòng nhấn nút 'Xác nhận thanh toán' bên ngoài để tiến hành thanh toán.");
+
+			let modalInstance = bootstrap.Modal.getInstance(document.getElementById('paymentModal'));
+			if (modalInstance) {
+				modalInstance.hide();
+			}
 		});
 
-			  function updatePaymentUI(data){
-			// data gồm PaymentID, SoTien, PhuongThuc, TotalPaid, Remaining
-			let newRow = `
-			  <tr>
-				<td>${$('#paymentHistoryTable tbody tr').length + 1}</td>
-				<td>${data.SoTien.toLocaleString()}</td>
-				<td>${data.PhuongThuc}</td>
-				<td>...</td>
-			  </tr>
-			`;
-			$('#paymentHistoryTable tbody').append(newRow);
-			$('#paidAmount').text(data.TotalPaid.toLocaleString());
-			$('#remainingAmount').text(data.Remaining.toLocaleString());
 
-			// Nếu còn thiếu = 0 => có thể đóng modal
-			if (data.Remaining <= 0) {
-			  let modal = bootstrap.Modal.getInstance(document.getElementById('paymentModal'));
-			  if (modal) {
-				  modal.hide();
-			  }
-			}
-		}
+
+
+		// 	  function updatePaymentUI(data){
+		// 	data gồm PaymentID, SoTien, PhuongThuc, TotalPaid, Remaining
+		// 	let newRow = `
+		// 	  <tr>
+		// 		<td>${$('#paymentHistoryTable tbody tr').length + 1}</td>
+		// 		<td>${data.SoTien.toLocaleString()}</td>
+		// 		<td>${data.PhuongThuc}</td>
+		// 		<td>...</td>
+		// 	  </tr>
+		// 	`;
+		// 	$('#paymentHistoryTable tbody').append(newRow);
+		// 	$('#paidAmount').text(data.TotalPaid.toLocaleString());
+		// 	$('#remainingAmount').text(data.Remaining.toLocaleString());
+
+		// 	Nếu còn thiếu = 0 => có thể đóng modal
+		// 	if (data.Remaining <= 0) {
+		// 	  let modal = bootstrap.Modal.getInstance(document.getElementById('paymentModal'));
+		// 	  if (modal) {
+		// 		  modal.hide();
+		// 	  }
+		// 	}
+		// }
 
 				let currentMethod = null;  // Lưu mã phương thức (TTM / CK / all)
 				let paymentRows = [];
-						$(document).on('click', '.payment-method', function(){
-		  // Lấy mã từ data-method
-		  currentMethod = $(this).data('method'); // "TTM", "CK", "all"
 
-		  // Hiển thị text cho #selectedMethod
-		  if (currentMethod === 'TTM') {
-			$('#selectedMethod').text('Tiền mặt');
-		  } else if (currentMethod === 'CK') {
-			$('#selectedMethod').text('Chuyển khoản');
-		  } else if (currentMethod === 'all') {
-			$('#selectedMethod').text('Cả 2');
-		  }
-		});
+			$(document).on('click', '.payment-method', function(){
+			  // Lấy mã từ data-method
+			  currentMethod = $(this).data('method'); // "TTM", "CK", "all"
+
+			  // Hiển thị text cho #selectedMethod
+			  if (currentMethod === 'TTM') {
+				  $('#selectedMethod').text('Tiền mặt');
+			  } else if (currentMethod === 'CK') {
+				  $('#selectedMethod').text('Chuyển khoản');
+				  // Nếu là chuyển khoản, gọi hàm xử lý thanh toán VNPay
+				  processVNPayPayment();
+			  } else if (currentMethod === 'all') {
+				  $('#selectedMethod').text('Cả 2');
+			  }
+			});
+
+					function processVNPayPayment(){
+			// Lấy thông tin tổng tiền đơn hàng từ giao diện (giả sử được lưu trong input finalTotal)
+			let invoiceDom = $('#' + currentInvoiceId);
+			let orderTotal = parseFloat(invoiceDom.find('.finalTotal').val()) || 0;
+
+			// Lấy thông tin mô tả đơn hàng nếu cần (có thể lấy từ một trường ẩn hoặc từ mã hóa đơn)
+			let orderInfo = invoiceDom.find('.orderInfo').text() || 'Thanh toán đơn hàng';
+
+			// Gọi API tạo request thanh toán VNPay
+			$.ajax({
+					   url: '/Admin/VNPayPayment/CreatePayment',
+		// Endpoint cần được định nghĩa trên server
+				type: 'GET',
+				data: {
+					amount: orderTotal,
+					orderInfo: orderInfo
+				},
+				success: function(res){
+					if (res && res.redirectUrl) {
+						// Chuyển hướng trình duyệt sang URL VNPay
+						window.location.href = res.redirectUrl;
+					} else {
+						alert("Không thể tạo URL thanh toán VNPay");
+					}
+				},
+				error: function(err){
+					console.error(err);
+					alert("Có lỗi xảy ra khi tạo thanh toán VNPay");
+				}
+			});
+		}
 
 
 
+		
 
 
 
-		 // 4. Thanh toán hóa đơn
-		 // $('#checkoutInvoice').on('click', function(){
-		 //     let dbInvoiceId = $(`#${currentInvoiceId}`).attr('data-db-invoice-id');
-		 //     $.ajax({
-		 //         url: '/Admin/BHTQ/CheckoutInvoice',
-		 //         type: 'POST',
-		 //         data: { invoiceId: dbInvoiceId },
-		 //         success: function(res){
-		 //             if(res.success){
-		 //                 alert("Thanh toán thành công!");
-		 //                 Cập nhật lại trạng thái hóa đơn trên giao diện hoặc reload trang
-		 //             } else {
-		 //                 alert("Lỗi: " + res.message);
-		 //             }
-		 //         }
-		 //     });
-		 // });
-
-		 // 5. Hủy hóa đơn
-		 // $('#cancelInvoice').on('click', function(){
-		 //     let dbInvoiceId = $(`#${currentInvoiceId}`).attr('data-db-invoice-id');
-		 //     $.ajax({
-		 //         url: '/Admin/HoaDon/CancelInvoice',
-		 //         type: 'POST',
-		 //         data: { invoiceId: dbInvoiceId },
-		 //         success: function(res){
-		 //             if(res.success){
-		 //                 alert("Hóa đơn đã bị hủy!");
-		 //                 Cập nhật lại giao diện: xóa tab, chuyển trạng thái, v.v.
-		 //             } else {
-		 //                 alert("Lỗi: " + res.message);
-		 //             }
-		 //         }
-		 //     });
-		 // });
+		
 	</script>
 
 
-
+	<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 }

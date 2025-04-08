@@ -63,20 +63,30 @@ namespace WebBanGiay.Controllers
 
             // Đăng nhập thành công - Tạo claims
             var claims = new List<Claim>
-    {
-        new Claim("userid", user.ID.ToString()),
-        new Claim(ClaimTypes.Name, user.user_name),
-        new Claim(ClaimTypes.Role, user.Vai_Tro.ten_vai_tro),
-        new Claim(ClaimTypes.Email, user.email ?? "")
-    };
+{
+    new Claim("userid", user.ID.ToString()),
+        new Claim("ma", user.ma.ToString()),
+
+    new Claim(ClaimTypes.Name, user.user_name),
+    new Claim(ClaimTypes.Role, user.Vai_Tro.ten_vai_tro),
+    new Claim(ClaimTypes.Email, user.email ?? "")
+};
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
-            // Điều hướng sau khi đăng nhập thành công
+            // Điều hướng dựa trên vai trò
+            if (isAdminOrEmployee)
+            {
+                return RedirectToAction("Index", "Home", new { area = "Admin" }); // Chuyển hướng đến Admin
+            }
+            else if (isCustomer)
+            {
+                return RedirectToAction("Index", "Home"); // Chuyển hướng đến trang chủ khách hàng
+            }
+
             return returnUrl != null ? Redirect(returnUrl) : RedirectToAction("Index", "Home");
         }
-
 
 
 

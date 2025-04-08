@@ -80,27 +80,7 @@
     </div>
     <!-- Sidebar -->
     <div class="sidebar">
-        <!-- Sidebar user panel (optional) -->
-        @* <div class="user-panel mt-3 pb-3 mb-3 d-flex">  *@
-        @*    <div class="image"> *@
-        @*       <img src="/AdminLTE-master/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image"> *@
-        @*    </div> *@
-        @*    <div class="info">  *@
-        @*        <a href="#" class="d-block">Alexander Pierce</a>  *@
-        @*      </div>  *@
-        @*  </div>  *@
-
-        @* <!-- SidebarSearch Form --> *@
-        @* <div class="form-inline"> *@
-        @*     <div class="input-group" data-widget="sidebar-search"> *@
-        @*         <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search"> *@
-        @*         <div class="input-group-append"> *@
-        @*             <button class="btn btn-sidebar"> *@
-        @*                 <i class="fas fa-search fa-fw"></i> *@
-        @*             </button> *@
-        @*         </div> *@
-        @*     </div> *@
-        @* </div>  *@
+       
 
         <!-- Sidebar Menu -->
         <nav class="mt-2">
@@ -117,13 +97,21 @@
                     </a>
                 </li>
                 <li class="nav-item ">
-                    <a class="nav-link" asp-area="Admin" asp-controller="BHTQ" asp-action="Index">
+                    <a class="nav-link" id="menuBanHangTaiQuay" onclick="getDataInvoices();" asp-area="Admin" asp-controller="BHTQ" asp-action="Index">
                         <span class="icon-holder">
                             <i class="fas fa-cash-register"></i>
                         </span>
                         <span class="title">Bán Hàng tại Quầy</span>
-
                     </a>
+
+
+                    @* <a class="nav-link" id="menuBanHangTaiQuay" asp-area="Admin" asp-controller="BHTQ" asp-action="Index"> *@
+                    @*     <span class="icon-holder"> *@
+                    @*         <i class="fas fa-cash-register"></i> *@
+                    @*     </span> *@
+                    @*     <span class="title">Bán Hàng tại Quầy</span> *@
+
+                    @* </a> *@
                 </li>
                 <li class="nav-item ">
                     <a class="nav-link" asp-area="Admin" asp-controller="HoaDon" asp-action="Index">

@@ -176,12 +176,30 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 return NotFound();
             }
 
+            CheckStatusSP(sanPham.San_PhamID, trang_thai);
             // Cập nhật trạng thái
             sanPham.trang_thai = trang_thai;
             _context.san_Pham_Chi_Tiets.Update(sanPham);
             _context.SaveChanges();
 
             return Json(new { success = true });
+        }
+        public void CheckStatusSP(Guid id, int trang_thai)
+        {
+            var sp = _context.san_Phams.Find(id);
+            if (sp == null) return;
+
+            var spctList = _context.san_Pham_Chi_Tiets
+                .Where(x => x.San_PhamID == id)
+                .ToList();
+
+            bool allMatch = spctList.All(x => x.trang_thai == trang_thai);
+
+            if (allMatch)
+            {
+                sp.trang_thai = trang_thai;
+                _context.SaveChanges();
+            }
         }
         [HttpPost]
         public async Task<IActionResult> UpdateSpct([FromBody] San_PhamCTView model)
@@ -436,22 +454,23 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             try
             {
                 var list = _context.san_Pham_Chi_Tiets
-                .Include(x => x.Kich_Thuoc)
-                .Include(x => x.Mau_Sac)
-                .Select(x => new {
-                    id = x.ID,
-                    imageUrl = (from asp in _context.anh_San_Pham_San_Pham_Chi_Tiets
-                                join a in _context.anh_San_Phams on asp.Anh_San_PhamID equals a.ID
-                                where asp.San_Pham_Chi_TietID == x.ID
-                                select a.anh_url).FirstOrDefault() ?? "/img/default.jpg",  // Nếu null, dùng ảnh mặc định
-                    ten_SPCT = x.ten_SPCT, // Đổi lại để đồng bộ với JS
-                    price = x.gia,
-                    dbQuantity = x.so_luong,
-                    size = x.Kich_Thuoc != null ? x.Kich_Thuoc.ten_kich_thuoc : "Không xác định",
-                    color = x.Mau_Sac != null ? x.Mau_Sac.ma_mau : "Không xác định",
-                    status = x.trang_thai == 1 ? "Hoạt động" : "Không hoạt động"
-                })
-                .ToList();
+                    .Include(x => x.Kich_Thuoc)
+                    .Include(x => x.Mau_Sac)
+                    .Where(x => x.trang_thai == 1) // ✅ Chỉ lấy SPCT có trạng thái 1
+                    .Select(x => new {
+                        id = x.ID,
+                        imageUrl = (from asp in _context.anh_San_Pham_San_Pham_Chi_Tiets
+                                    join a in _context.anh_San_Phams on asp.Anh_San_PhamID equals a.ID
+                                    where asp.San_Pham_Chi_TietID == x.ID
+                                    select a.anh_url).FirstOrDefault() ?? "/img/default.jpg", // Ảnh mặc định nếu null
+                        ten_SPCT = x.ten_SPCT,
+                        price = x.gia,
+                        dbQuantity = x.so_luong,
+                        size = x.Kich_Thuoc != null ? x.Kich_Thuoc.ten_kich_thuoc : "Không xác định",
+                        color = x.Mau_Sac != null ? x.Mau_Sac.ma_mau : "Không xác định",
+                        status = "Hoạt động" // Vì chỉ có trạng thái = 1, nên luôn là "Hoạt động"
+                    })
+                    .ToList();
 
                 return Json(list);
             }

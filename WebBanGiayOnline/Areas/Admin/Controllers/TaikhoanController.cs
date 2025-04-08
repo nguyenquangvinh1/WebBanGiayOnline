@@ -21,29 +21,29 @@
 //            _context = context;
 //        }
 
-  
+
 //        public async Task<IActionResult> DangNhap()
 //        {
-//            return View(); 
+//            return View();
 //        }
 
-        
+
 //        [HttpPost]
 //        public async Task<IActionResult> DangNhap(LoginViewModel model)
 //        {
 //            if (!ModelState.IsValid)
 //            {
-//                return View(model); 
+//                return View(model);
 //            }
 
-            
+
 //            var taiKhoan = _context.tai_Khoans
 //                .Include(t => t.Vai_Tro) // Đảm bảo lấy Vai_Tro cho việc phân quyền
 //                .FirstOrDefault(t => t.user_name == model.Username && t.pass_word == model.Password);
 
 //            if (taiKhoan == null)
 //            {
-               
+
 //                model.ErrorMessage = "Tên hoặc mật khẩu không đúng!";
 //                return View(model);
 //            }
@@ -69,18 +69,18 @@
 //            }
 //            else if (taiKhoan.Vai_Tro.ten_vai_tro == "Nhân Viên")
 //            {
-//                return RedirectToAction("Index", "NhanVien"); 
+//                return RedirectToAction("Index", "NhanVien");
 //            }
 //            else
 //            {
-//                return RedirectToAction("Index", "Home"); 
+//                return RedirectToAction("Index", "Home");
 //            }
 //        }
 
-       
+
 //        public IActionResult DangKy()
 //        {
-//            return View(); 
+//            return View();
 //        }
 
 
@@ -89,7 +89,7 @@
 //        {
 //            if (!ModelState.IsValid)
 //            {
-//                return View(model); 
+//                return View(model);
 //            }
 
 //            // Kiểm tra nếu tài khoản đã tồn tại
@@ -107,7 +107,7 @@
 //                ID = Guid.NewGuid(),
 //                email = model.Username,
 //                pass_word = model.Password,
-//                Vai_TroID = khachhang.ID, 
+//                Vai_TroID = khachhang.ID,
 //                ngay_tao = DateTime.Now
 //            };
 

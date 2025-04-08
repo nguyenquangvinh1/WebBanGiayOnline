@@ -26,183 +26,190 @@
         </div>
     </div>
 </div>
+<div class="row">
+    <div class="col-sm-12 col-md-6">
 
-<div class="card card-primary">
-    <div class="card-header">
-        <h3 class="card-title">Thêm Sản Phẩm</h3>
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Thêm Sản Phẩm</h3>
+            </div>
+            <div class="card-body">
+
+                <form id="formSanPham" asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <input class="form-control" type="hidden" id="lstSPCT" required="" name="lstSPCT" />
+
+                    <input class="form-control" type="hidden" id="productImages" name="productImages" />
+
+
+                    <button type="button" class="btn btn-secondary ms-2 anh_form" data-toggle="modal" data-target="#productImageModal">
+                        Thêm Ảnh
+                    </button>
+
+                    <div class="form-group">
+                        <label for="ten_san_pham" class="col-form-label">Tên Sản Phẩm</label>
+                        <select id="ten_san_pham" name="ten_san_pham" class="form-control select2">
+                            <option value="">-- Nhập hoặc chọn tên sản phẩm --</option>
+                            @foreach (var item in ViewBag.TenGiay as List<string>)
+                            {
+                                <option value="@item">@item</option>
+                            }
+                        </select>
+                        <span id="ten_san_pham_warning" class="text-danger" style="display: none;">⚠️ Tên sản phẩm đã tồn tại!</span>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label asp-for="Loai_Giay" class="control-label"></label>
+                        <select id="Loai_GiayID" name="Loai_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddLoaiGiay">
+                            <option value="">-- Nhập hoặc chọn Loại Giày --</option>
+                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Loai_GiayID)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label asp-for="Chat_LieuID" class="control-label"></label>
+                                <select id="Chat_LieuID" name="Chat_LieuID" class="form-control select2" data-api="/Admin/SanPham/AddChatLieu">
+                                    <option value="">-- Nhập hoặc chọn Chất Liệu --</option>
+                                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Chat_LieuID)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+
+                            <div class="form-group">
+                                <label asp-for="Co_GiayID" class="control-label"></label>
+
+                                <select id="Co_GiayID" name="Co_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddCoGiay">
+                                    <option value="">-- Nhập hoặc chọn Cổ Giày --</option>
+                                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Co_GiayID)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+
+                            <div class="form-group">
+                                <label asp-for="Danh_MucID" class="control-label"></label>
+
+
+                                <select id="Danh_MucID" name="Danh_MucID" class="form-control select2" data-api="/Admin/SanPham/AddDanhMuc">
+                                    <option value="">-- Nhập hoặc chọn Danh Mục --</option>
+                                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Danh_MucID)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label asp-for="De_GiayID" class="control-label"></label>
+
+                                <select id="De_GiayID" name="De_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddDeGiay">
+                                    <option value="">-- Nhập hoặc chọn Đế Giày --</option>
+                                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.De_GiayID)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+
+                            <div class="form-group">
+                                <label asp-for="Mui_GiayID" class="control-label"></label>
+
+                                <select id="Mui_GiayID" name="Mui_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddMuiGiay">
+                                    <option value="">-- Nhập hoặc chọn Mũi Giày --</option>
+                                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Mui_GiayID)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+
+                            <div class="form-group">
+                                <label asp-for="Kieu_DangID" class="control-label"></label>
+
+                                <select id="Kieu_DangID" name="Kieu_DangID" class="form-control select2" data-api="/Admin/SanPham/AddKieuDang">
+                                    <option value="">-- Nhập hoặc chọn Kiểu Dáng --</option>
+                                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Kieu_DangID)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="mo_ta" class="control-label">Mô Tả Sản Phẩm</label>
+                        <textarea asp-for="mo_ta" class="form-control"></textarea>
+                        <span asp-validation-for="mo_ta" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary" id="saveProduct">thêm</button>
+                        @* <input type="submit" value="Create" id="saveProduct" class="btn btn-primary" /> *@
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+
+        <div class="card card-primary">
+            <div class="card-header">
+                <h2 class="card-title">Thêm Sản Phẩm Chi Tiết</h2>
+            </div>
+            <div class="card-body">
+
+                <div>
+                    <div class="form-group">
+                        <label class="form-label">Màu Sắc:</label>
+                        <button type="button" class="btn btn-primary" data-toggle="modal"
+                                data-target="#colorModal">
+                            +
+                        </button>
+                    </div>
+                    <div id="selectedColors" class="mb-3"></div>
+
+                    <div class="form-group">
+                        <label class="form-label">Kích Cỡ:</label>
+                        <button type="button" class="btn btn-primary" data-toggle="modal"
+                                data-target="#sizeModal">
+                            +
+                        </button>
+                    </div>
+                    <div id="selectedSize" class="mb-3"></div>
+
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="card-body">
-
-        <form asp-action="Create" >
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            @Html.AntiForgeryToken()
-
-            <input class="form-control" type="hidden" id="lstSPCT" required="" name="lstSPCT" />
-
-            <input class="form-control" type="hidden" id="productImages" name="productImages" />
-
-
-            <button type="button" class="btn btn-secondary ms-2 anh_form" data-toggle="modal" data-target="#productImageModal">
-                Thêm Ảnh
-            </button>
-
-            <div class="form-group">
-                <label for="ten_san_pham" class="col-form-label">Tên Sản Phẩm</label>
-                <select id="ten_san_pham" name="ten_san_pham" class="form-control select2">
-                    <option value="">-- Nhập hoặc chọn tên sản phẩm --</option>
-                    @foreach (var item in ViewBag.TenGiay as List<string>)
-                    {
-                        <option value="@item">@item</option>
-                    }
-                </select>
-                <span id="ten_san_pham_warning" class="text-danger" style="display: none;">⚠️ Tên sản phẩm đã tồn tại!</span>
-            </div>
-
-
-            <div class="form-group">
-                <label asp-for="Loai_Giay" class="control-label"></label>
-                <select id="Loai_GiayID" name="Loai_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddLoaiGiay">
-                    <option value="">-- Nhập hoặc chọn Loại Giày --</option>
-                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Loai_GiayID)
-                    {
-                        <option value="@item.Value">@item.Text</option>
-                    }
-                </select>
-            </div>
-
-            <div class="row">
-                <div class="col-sm-4">
-                    <div class="form-group">
-                        <label asp-for="Chat_LieuID" class="control-label"></label>
-                        <select id="Chat_LieuID" name="Chat_LieuID" class="form-control select2" data-api="/Admin/SanPham/AddChatLieu">
-                            <option value="">-- Nhập hoặc chọn Chất Liệu --</option>
-                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Chat_LieuID)
-                            {
-                                <option value="@item.Value">@item.Text</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-                <div class="col-sm-4">
-
-                    <div class="form-group">
-                        <label asp-for="Co_GiayID" class="control-label"></label>
-
-                        <select id="Co_GiayID" name="Co_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddCoGiay">
-                            <option value="">-- Nhập hoặc chọn Cổ Giày --</option>
-                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Co_GiayID)
-                            {
-                                <option value="@item.Value">@item.Text</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-                <div class="col-sm-4">
-
-                    <div class="form-group">
-                        <label asp-for="Danh_MucID" class="control-label"></label>
-
-
-                        <select id="Danh_MucID" name="Danh_MucID" class="form-control select2" data-api="/Admin/SanPham/AddDanhMuc">
-                            <option value="">-- Nhập hoặc chọn Danh Mục --</option>
-                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Danh_MucID)
-                            {
-                                <option value="@item.Value">@item.Text</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-
-            </div>
-            <div class="row">
-                <div class="col-sm-4">
-                    <div class="form-group">
-                        <label asp-for="De_GiayID" class="control-label"></label>
-
-                        <select id="De_GiayID" name="De_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddDeGiay">
-                            <option value="">-- Nhập hoặc chọn Đế Giày --</option>
-                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.De_GiayID)
-                            {
-                                <option value="@item.Value">@item.Text</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-                <div class="col-sm-4">
-
-                    <div class="form-group">
-                        <label asp-for="Mui_GiayID" class="control-label"></label>
-
-                        <select id="Mui_GiayID" name="Mui_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddMuiGiay">
-                            <option value="">-- Nhập hoặc chọn Mũi Giày --</option>
-                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Mui_GiayID)
-                            {
-                                <option value="@item.Value">@item.Text</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-                <div class="col-sm-4">
-
-                    <div class="form-group">
-                        <label asp-for="Kieu_DangID" class="control-label"></label>
-
-                        <select id="Kieu_DangID" name="Kieu_DangID" class="form-control select2" data-api="/Admin/SanPham/AddKieuDang">
-                            <option value="">-- Nhập hoặc chọn Kiểu Dáng --</option>
-                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Kieu_DangID)
-                            {
-                                <option value="@item.Value">@item.Text</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="form-group">
-                <label asp-for="mo_ta" class="control-label">Mô Tả Sản Phẩm</label>
-                <textarea asp-for="mo_ta" class="form-control"></textarea>
-                <span asp-validation-for="mo_ta" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary" id="saveProduct">ktra</button>
-                @* <input type="submit" value="Create" id="saveProduct" class="btn btn-primary" /> *@
-            </div>
-
-        </form>
-
+    <div class="col-sm-12 col-md-6">
+        <div id="productTables" class="card">
+        </div>
     </div>
 </div>
 
-
-<div class="card card-primary">
-    <div class="card-header">
-        <h2 class="card-title">Thêm Sản Phẩm Chi Tiết</h2>
-    </div>
-    <div class="card-body">
-
-        <form>
-            <div class="form-group">
-                <label class="form-label">Màu Sắc:</label>
-                <button type="button" class="btn btn-primary" data-toggle="modal"
-                        data-target="#colorModal">
-                    +
-                </button>
-            </div>
-            <div id="selectedColors" class="mb-3"></div>
-
-            <div class="form-group">
-                <label class="form-label">Kích Cỡ:</label>
-                <button type="button" class="btn btn-primary" data-toggle="modal"
-                        data-target="#sizeModal">
-                    +
-                </button>
-            </div>
-            <div id="selectedSize" class="mb-3"></div>
-
-        </form>
-    </div>
-</div>
 
 <!-- Thêm màu sắc -->
 <!-- Modal chọn màu -->
@@ -293,7 +300,7 @@
                 <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="quickEditForm">
+                <div >
                     <div class="mb-3">
                         <label for="modalQuantity" class="form-label">Số Lượng</label>
                         <input type="number" class="form-control" id="modalQuantity" min="0" value="0">
@@ -302,8 +309,8 @@
                         <label for="modalPrice" class="form-label">Giá</label>
                         <input type="number" class="form-control" id="modalPrice" min="0" value="0">
                     </div>
-                    <button type="submit" class="btn btn-success">Lưu</button>
-                </form>
+                    <button class="btn btn-success" id="quickEditForm">Lưu</button>
+                </div>
             </div>
         </div>
     </div>
@@ -311,12 +318,7 @@
 
 
 
-<div class="row">
-    <div class="col-12">
-        <div id="productTables" class="card">
-        </div>
-    </div>
-</div>
+
 
 <script>
     $(document).ready(function () {
@@ -333,10 +335,10 @@
             $("#imagePreviewContainer").html("");
             uploadedImages.forEach(url => {
                 $("#imagePreviewContainer").append(`
-                                        <div class="col-md-3 mt-2">
-                                            <img src="${url}" class="img-thumbnail" width="100">
-                                        </div>
-                                    `);
+                                            <div class="col-md-3 mt-2">
+                                                <img src="${url}" class="img-thumbnail" width="100">
+                                            </div>
+                                        `);
             });
         });
 
@@ -358,10 +360,10 @@
                         success: function (response) {
                             // Thêm checkbox kích cỡ mới vào danh sách
                             $('#sizeModalBody').append(`
-                                    <div class="form-check">
-                                        <input class="form-check-input size-checkbox" type="checkbox" value="${response}" checked> ${response}
-                                    </div>
-                                `);
+                                        <div class="form-check">
+                                            <input class="form-check-input size-checkbox" type="checkbox" value="${response}" checked> ${response}
+                                        </div>
+                                    `);
                             $('#sizePickerContainer').hide(); // Ẩn ô nhập kích cỡ
                             $('#newSize').val(''); // Xóa nội dung nhập
                         },
@@ -393,17 +395,17 @@
                         data: JSON.stringify(newColor), // Chuyển thành JSON
                         success: function (response) {
                             $('#colorModalBody').append(`<div class="form-check">
-                                    <!-- Checkbox chọn màu -->
-                                        <input class="form-check-input color-checkbox me-2" type="checkbox" value="${response}" checked>
-                                    <!-- Nút hiển thị màu -->
-                                    <button class="btn text-white d-flex align-items-center justify-content-center"
-                                                style="background-color: ${response};
-                                   border: 1px solid #ccc;
-                                   width: 50px; height: 50px;
-                                   border-radius: 8px;">
-                ${response}
-                                    </button>
-                                </div>`);
+                                        <!-- Checkbox chọn màu -->
+                                            <input class="form-check-input color-checkbox me-2" type="checkbox" value="${response}" checked>
+                                        <!-- Nút hiển thị màu -->
+                                        <button class="btn text-white d-flex align-items-center justify-content-center"
+                                                    style="background-color: ${response};
+                                       border: 1px solid #ccc;
+                                       width: 50px; height: 50px;
+                                       border-radius: 8px;">
+                    ${response}
+                                        </button>
+                                    </div>`);
                             $('#colorPickerContainer').hide();
                             $('#newColor').val('');
                         },
@@ -438,10 +440,10 @@
                     if (response.success) {
                         uploadedImages.push(response.filePath);
                         $("#imagePreviewContainer").append(`
-                                            <div class="col-md-3 mt-2">
-                                                <img src="${response.filePath}" class="img-thumbnail" width="100">
-                                            </div>
-                                        `);
+                                                <div class="col-md-3 mt-2">
+                                                    <img src="${response.filePath}" class="img-thumbnail" width="100">
+                                                </div>
+                                            `);
                         $("#productImages").val(JSON.stringify(uploadedImages)); // Lưu vào input ẩn
                     } else {
                         alert("❌ Lỗi khi tải ảnh!");
@@ -470,11 +472,11 @@
             // Hiển thị danh sách ảnh đã lưu
             uploadedImages.forEach(url => {
                 $("#imagePreviewContainer").append(`
-                                                        <div class="col-md-3 mt-2 d-inline-block">
-                                            <input type="checkbox" class="image-checkbox" value="${url}">
-                                            <img src="${url}" class="img-thumbnail" width="100">
-                                    </div>
-                                        `);
+                                                            <div class="col-md-3 mt-2 d-inline-block">
+                                                <input type="checkbox" class="image-checkbox" value="${url}">
+                                                <img src="${url}" class="img-thumbnail" width="100">
+                                        </div>
+                                            `);
             });
 
 
@@ -530,8 +532,8 @@
 
                 selectedImages.forEach(url => {
                     imgContainer.append(`
-                            <img src="${url}" class="img-thumbnail me-2" width="100">
-                        `);
+                                <img src="${url}" class="img-thumbnail me-2" width="100">
+                            `);
                 });
             }
 
@@ -697,121 +699,140 @@
         });
 
 
+        // Thêm màu
         $(document).off("click", "#addColor").on("click", "#addColor", function () {
             console.log("Đã nhấn thêm");
 
-            $('.color-checkbox:checked').each(function () {
-                let color = $(this).val().replace("#", ""); // Loại bỏ dấu # nếu có
+            const checkedColors = $('.color-checkbox:checked').map(function () {
+                return $(this).val().replace("#", "");
+            }).get();
 
+            // Xóa những màu không còn được chọn
+            $('#selectedColors > span').each(function () {
+                let color = $(this).attr("id").replace("color-", "");
+                if (!checkedColors.includes(color)) {
+                    $(this).remove();
+                    $(`#table-${color}`).parent().remove(); // .row chứa bảng và ảnh
+                    $(`#${color}`).remove();
+                }
+            });
 
-                // Kiểm tra nếu bảng màu đã tồn tại trong productTables
-                if ($("#productTables").find("#table-" + color).length === 0) {
-                    // Thêm badge màu vào danh sách màu đã chọn
+            // Thêm màu mới
+            checkedColors.forEach(color => {
+                if ($(`#color-${color}`).length === 0) {
                     $('#selectedColors').append(`<span id="color-${color}" class="badge bg-secondary me-2">${color}</span>`);
+                }
 
-                    // Thêm bảng sản phẩm theo màu nếu chưa có
+                if ($("#productTables").find(`#table-${color}`).length === 0) {
                     $('#productTables').append(`
-                                <div class="row">
-                                        <div class="card col-md-6" id="table-${color}">
-                                        <div class="card-header">
-                                            <h3 class="card-title">Sản phẩm màu ${color}</h3>
-                                            <div class="card-tools">
-                                                                <button type="button" class="btn btn-primary btn-sm open-modal" data-color="${color}" data-toggle="modal" data-target="#quickEditModal">
-                                                            Thêm Nhanh
-                                                        </button>
-                                            </div>
-                                        </div>
-                                        <div class="card-body table-responsive p-0">
-                                            <table class="table table-hover text-nowrap">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Tên Sản Phẩm</th>
-                                                        <th>Kích Cỡ</th>
-                                                        <th>Số Lượng</th>
-                                                        <th>Giá</th>
-                                                            <th class="d-none">Ảnh</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody></tbody>
-                                            </table>
-
-                                        </div>
+                        <div class="row">
+                            <div class="card col-md-6" id="table-${color}">
+                                <div class="card-header">
+                                    <h3 class="card-title">Sản phẩm màu ${color}</h3>
+                                    <div class="card-tools">
+                                        <button type="button" class="btn btn-primary btn-sm open-modal" data-color="${color}" data-toggle="modal" data-target="#quickEditModal">
+                                            Thêm Nhanh
+                                        </button>
                                     </div>
-                                    <div class="card col-md-6" id="${color}">
-                                    <div class="card-header">
+                                </div>
+                                <div class="card-body table-responsive p-0">
+                                    <table class="table table-hover text-nowrap">
+                                        <thead>
+                                            <tr>
+                                                <th>Tên Sản Phẩm</th>
+                                                <th>Kích Cỡ</th>
+                                                <th>Số Lượng</th>
+                                                <th>Giá</th>
+                                                <th class="d-none">Ảnh</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card col-md-6" id="${color}">
+                                <div class="card-header">
                                     <h3 class="card-title">Ảnh Sản Phẩm ${color}</h3>
-                                    </div>
-                                    <div class="card-body">
+                                </div>
+                                <div class="card-body">
                                     <div class="mt-2">
                                         <label class="form-label">Ảnh Sản Phẩm ${color}</label>
                                         <button type="button" class="btn btn-primary choose-image-btn" data-color="${color}">
                                             Chọn ảnh
                                         </button>
-                                            <div class="mt-2 imgSelected"></div>
-                                    </div>
+                                        <div class="mt-2 imgSelected"></div>
                                     </div>
                                 </div>
-                                </div>
-
-                            `);
-                } else {
-                    console.log(`Bảng cho màu ${color} đã tồn tại, bỏ qua.`);
+                            </div>
+                        </div>
+                    `);
                 }
             });
 
-            // Đóng modal sau khi chọn xong màu
             $('#colorModal').modal('hide');
-
             setTimeout(() => {
                 $('.modal-backdrop').fadeOut(300, function () {
                     $(this).remove();
                 });
-                $('body').removeClass('modal-open'); // Loại bỏ lớp giữ nền bị tối
-            }, 300); // Đợi 300ms để hiệu ứng fade chạy
+                $('body').removeClass('modal-open');
+            }, 300);
         });
 
-
-
+        // Thêm kích cỡ
         $(document).off("click", "#addSize").on("click", "#addSize", function () {
-            let tenSanPham = $("#ten_san_pham").val(); // Lấy tên sản phẩm
+            let tenSanPham = $("#ten_san_pham").val();
 
-            $('.size-checkbox:checked').each(function () {
-                let size = $(this).val(); // Lấy kích cỡ đã chọn
+            const checkedSizes = $('.size-checkbox:checked').map(function () {
+                return $(this).val();
+            }).get();
 
-                // Duyệt qua tất cả bảng sản phẩm có màu sắc
+            // Xóa size không còn được chọn
+            $('#selectedSize > span').each(function () {
+                let size = $(this).attr("id").replace("size-", "");
+                if (!checkedSizes.includes(size)) {
+                    $(this).remove();
+                    $("[id^='table-'] tbody tr").each(function () {
+                        if ($(this).find("td:eq(1)").text() === size) {
+                            $(this).remove();
+                        }
+                    });
+                }
+            });
+
+            // Thêm size mới
+            checkedSizes.forEach(size => {
+                if ($(`#size-${size}`).length === 0) {
+                    $('#selectedSize').append(`<span id="size-${size}" class="badge bg-secondary me-2">${size}</span>`);
+                }
+
                 $("[id^='table-']").each(function () {
-                    let color = $(this).attr("id").replace("table-", ""); // Lấy màu từ ID bảng
-                    let tenSPCT = `${tenSanPham} [${color} - ${size}]`; // Tạo tên sản phẩm chi tiết
+                    let color = $(this).attr("id").replace("table-", "");
+                    let tenSPCT = `${tenSanPham} [${color} - ${size}]`;
 
-                    // Kiểm tra nếu kích cỡ đã tồn tại trong bảng
                     if ($(this).find(`tbody tr:has(td:contains('${size}'))`).length === 0) {
-                        // Nếu chưa có, thêm hàng mới vào bảng sản phẩm
-                        $('#selectedSize').append(`<span id="size-${size}" class="badge bg-secondary me-2">${size}</span>`);
                         $(this).find("tbody").append(`
-                                    <tr>
-                                        <td>${tenSPCT}</td>
-                                        <td>${size}</td>
-                                        <td><input type="number" class="form-control quantity" data-size="${size}"></td>
-                                        <td><input type="number" class="form-control price" data-size="${size}"></td>
-                                            <td class="d-none"><input type="text" class="form-control lst_img" data-size="${size}"></td>
-                                    </tr>
-                                `);
-                    } else {
-                        console.log(`Kích cỡ ${size} đã tồn tại trong bảng ${color}, bỏ qua.`);
+                            <tr>
+                                <td>${tenSPCT}</td>
+                                <td>${size}</td>
+                                <td><input type="number" class="form-control quantity" data-size="${size}"></td>
+                                <td><input type="number" class="form-control price" data-size="${size}"></td>
+                                <td class="d-none"><input type="text" class="form-control lst_img" data-size="${size}"></td>
+                            </tr>
+                        `);
                     }
                 });
             });
 
-            // Đóng modal sau khi thêm kích cỡ
             $('#sizeModal').modal('hide');
-
             setTimeout(() => {
                 $('.modal-backdrop').fadeOut(300, function () {
                     $(this).remove();
                 });
-                $('body').removeClass('modal-open'); // Loại bỏ lớp giữ nền bị tối
+                $('body').removeClass('modal-open');
             }, 300);
         });
+
+
 
 
 
@@ -834,7 +855,6 @@
         }
 
         $('#saveProduct').click(function () {
-           
 
             let sanPhamCTList = [];
             let hasError = false; // Biến kiểm tra lỗi
@@ -862,7 +882,7 @@
                         console.error(`❌ Lỗi: Màu: ${color}, Size: ${size}, SL: ${quantity}, Giá: ${price}`);
                     } else {
                         sanPhamCTList.push({
-                            Mau_Sac:  color,
+                            Mau_Sac: color,
                             Kich_Thuoc: size,
                             so_luong: quantity,
                             gia: price,
@@ -899,10 +919,10 @@
                 alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
                 return;
             }
-            debugger;
 
+            debugger;
             console.log("✅ Không có lỗi, gửi form...");
-            $('form').submit();
+            $('#formSanPham').submit();
         });
         let currentTable = null;
 
@@ -916,8 +936,7 @@
         });
 
         // Khi nhấn "Lưu", cập nhật tất cả sản phẩm trong bảng tương ứng
-        $(document).off("submit", "#quickEditForm").on("submit", "#quickEditForm", function (e) {
-            e.preventDefault();
+        $(document).off("click", "#quickEditForm").on("click", "#quickEditForm", function (e) {
 
             if (!currentTable) {
                 alert("⚠️ Không tìm thấy bảng sản phẩm!");

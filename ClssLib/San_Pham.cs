@@ -19,7 +19,10 @@ namespace ClssLib
         public string mo_ta { get; set; }
 
 
+        [Display(Name = "Trạng Thái :")]
         public int trang_thai { get; set; }
+
+        [Display(Name = "Ngày Tạo :")]
         public DateTime ngay_tao { get; set; }
         public DateTime? ngay_sua { get; set; }
         public string? nguoi_tao { get; set; }

@@ -21,7 +21,7 @@ builder.Services.AddSession(options =>
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/TaiKhoan/Login";
+        options.LoginPath = "/TaiKhoan/Login";  
         options.LogoutPath = "/TaiKhoan/Logout";
 
         options.AccessDeniedPath = "/TaiKhoan/AccessDenied";
@@ -30,10 +30,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("EmployeePolicy", policy => policy.RequireRole("Nhân viên"));
+    options.AddPolicy("EmployeePolicy", policy => policy.RequireRole("Nhân Viên"));
     options.AddPolicy("CustomerPolicy", policy => policy.RequireRole("Khách hàng"));
+    options.AddPolicy("AdminOrEmployeePolicy", policy => policy.RequireRole("Admin", "Nhân Viên"));
 });
-
 
 // Đăng ký dbcontext
 builder.Services.AddDbContext<AppDbContext>(options => {

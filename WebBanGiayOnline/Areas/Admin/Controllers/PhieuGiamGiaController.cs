@@ -282,5 +282,50 @@ namespace WebBanGiay.Areas.Admin.Controllers
             searchTerm = searchTerm.ToLower();
             return vouchers.Where(v => v.ma.ToLower().Contains(searchTerm) || v.ten_phieu_giam_gia.ToLower().Contains(searchTerm));
         }
+
+        [HttpGet]
+        public IActionResult GetAvailableDiscounts(Guid? customerId, double orderTotal)
+        {
+            var now = DateTime.Now;
+            var query = _context.phieu_Giam_Gias.Where(pg => pg.trang_thai == 1  // Thay 1 -> 0 nếu active là 0
+                                                             && (pg.ngay_ket_thuc == null || pg.ngay_ket_thuc > now)
+                                                             && pg.so_luong > 0
+                                                             && (pg.gia_tri_toi_thieu == null || pg.gia_tri_toi_thieu <= orderTotal));
+
+            if (customerId == null)
+            {
+                // Khách lẻ: chỉ lấy voucher công khai
+                query = query.Where(pg => pg.kieu_giam_gia == 1);
+            }
+            else
+            {
+                // Nếu có khách hàng, lấy voucher công khai hoặc voucher cá nhân của họ
+                var personalVoucherIds = _context.phieu_Giam_Gia_Tai_Khoans
+                    .Where(x => x.Tai_KhoanID == customerId)
+                    .Select(x => x.Phieu_Giam_GiaID)
+                    .ToList();
+                query = query.Where(pg => pg.kieu_giam_gia == 1 || (pg.kieu_giam_gia == 0 && personalVoucherIds.Contains(pg.ID)));
+            }
+
+            var list = query.ToList();
+            //Console.WriteLine("Số phiếu giảm giá phù hợp: " + list.Count);
+
+            foreach (var pg in list)
+            {
+                pg.UpdateTrangThai();
+            }
+            _context.SaveChanges();
+
+            var result = list.Select(pg => new {
+                id = pg.ID,
+                ma = pg.ma,
+                ten = pg.ten_phieu_giam_gia,
+                loai = pg.loai_phieu_giam_gia,  // 0 => %, 1 => VND
+                kieu = pg.kieu_giam_gia,         // 0 => cá nhân, 1 => công khai
+                gia_tri = pg.gia_tri_giam,
+                so_tien_giam_toi_da = pg.so_tien_giam_toi_da,
+            });
+            return Json(result);
+        }
     }
 }
