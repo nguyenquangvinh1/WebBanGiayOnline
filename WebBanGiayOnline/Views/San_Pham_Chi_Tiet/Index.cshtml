@@ -193,7 +193,7 @@
                     <div class="row g-4">
                         <div class="col-xl-3">
                             <div class="input-group w-100 mx-auto d-flex">
-                                <input type="search" class="form-control p-3" placeholder="keywords" aria-describedby="search-icon-1">
+                                <input type="search" id="searchProduct" class="form-control p-3" placeholder="Nhập tên sản phẩm..." aria-describedby="search-icon-1">
                                 <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
                             </div>
                         </div>
@@ -506,7 +506,11 @@
                     filters[paramName] = value;
                 }
             });
-
+                // Lấy dữ liệu từ ô tìm kiếm
+                let searchValue = $('#searchProduct').val().trim();
+                if (searchValue !== '') {
+                    filters.tenSanPham = searchValue;
+                }
             console.log("📌 Dữ liệu lọc gửi đi:", filters);
 
             let queryString = $.param(filters);
@@ -514,6 +518,14 @@
 
             window.location.href = '/San_Pham_Chi_Tiet/Filter?' + queryString;
         };
+
+         // Bắt sự kiện khi nhấn Enter trong ô tìm kiếm
+        $('#searchProduct').keypress(function (e) {
+            if (e.which === 13) { // 13 = Enter key
+                e.preventDefault();
+                applyFilter();
+            }
+        });
              // Lọc ngay khi chọn dropdown
         $('select.filter-select').change(function () {
             applyFilter();
