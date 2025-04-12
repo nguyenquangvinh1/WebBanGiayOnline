@@ -261,23 +261,25 @@
                                     @: Online
                                 }
                             </td>
-                        
 
 
-                            <td >
-                                @{
-                                    string trangThaiText = item.trang_thai switch
-                                    {
-                                        0 => "Chờ xử lý",
-                                        1 => "Đã xác nhận",
-                                        2 => "Đang giao hàng",
-                                        3 => "Hoàn thành",
-                                        4 => "Đã hủy",
-                                        _ => "Không xác định"
-                                    };
-                                }
-                                @trangThaiText
-                            </td>
+
+                        <td>
+                            @{
+                                string trangThaiText = item.trang_thai switch
+                                {
+                                    0 => "Chờ xử lý",
+                                    1 => "Đã xác nhận",
+                                    2 => "Đang giao hàng",
+                                    3 => "Hoàn thành",
+                                    4 => "Đã hủy",
+                                    5 => "Chưa Thanh Toán",
+                                    6 => "Đã Thanh Toán",
+                                    _ => "Không xác định"
+                                };
+                            }
+                            @trangThaiText
+                        </td>
                         <td>@string.Format("{0:0,0} VND", item.tong_tien)</td>
                             <td>
                                 <div class="btn-group">

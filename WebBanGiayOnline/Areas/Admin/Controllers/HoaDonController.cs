@@ -78,7 +78,9 @@ namespace WebBanGiay.Areas.Admin.Controllers
         new SelectListItem { Value = "1", Text = "Đã xác nhận" },
         new SelectListItem { Value = "2", Text = "Đang giao hàng" },
         new SelectListItem { Value = "3", Text = "Hoàn thành" },
-        new SelectListItem { Value = "4", Text = "Đã hủy" }
+        new SelectListItem { Value = "4", Text = "Đã hủy" },
+        new SelectListItem { Value = "5", Text = "Chờ thêm sản phẩm " },
+        new SelectListItem { Value = "4", Text = "Đã thanh toán" }
     }, "Value", "Text", Category?.ToString());
 
             var pagedList = hoaDons.ToPagedList(pageNumber, pageSize);

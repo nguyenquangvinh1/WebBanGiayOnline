@@ -60,10 +60,10 @@
                         <tr>
                             <th>STT</th>
                             <th>@Html.DisplayNameFor(model => model.First().ten_san_pham)</th>
-                            <th>@Html.DisplayNameFor(model => model.First().mo_ta)</th>
                             <th>@Html.DisplayNameFor(model => model.First().trang_thai)</th>
                             <th>@Html.DisplayNameFor(model => model.First().ngay_tao)</th>
                             <th>@Html.DisplayNameFor(model => model.First().so_luong_tong)</th>
+
                             
                             <th>Tùy chỉnh</th>
                         </tr>
@@ -79,17 +79,16 @@
                                 <td>
                                     @Html.DisplayFor(modelItem => item.ten_san_pham)
                                 </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.mo_ta)
-                                </td>
+                               
                                 <td>
                                     <button class='toggle-status btn btn-sm @(item.trang_thai == 1 ? "btn-success" : "btn-danger")' data-id='@item.ID' data-status='@item.trang_thai' style='width: 150px; height: 30px; line-height: 18px; white-space: nowrap;'>@(item.trang_thai == 1 ? "Hoạt động" : "Không hoạt động")</button>
                                 </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.so_luong_tong)
-                                </td>
+                                
                                 <td>
                                     @Html.DisplayFor(modelItem => item.ngay_tao)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.so_luong_tong)
                                 </td>
 
                                 <td>

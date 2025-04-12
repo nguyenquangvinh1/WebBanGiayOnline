@@ -8,6 +8,27 @@
 @{
     var successMessage = Model.SuccessMessage ?? "";
 }
+<head>
+    <style>
+        .badge-hd {
+            color: #CC33CC;
+            background-color: #fff;
+            border: 1px solid #CC33CC;
+            border-radius: 20px;
+            padding: 4px 10px;
+            white-space: nowrap; /* Không cho xuống dòng */
+        }
+
+        .badge-khd {
+            color: #2196F3;
+            background-color: #fff;
+            border: 1px solid #2196F3;
+            border-radius: 20px;
+            padding: 4px 10px;
+            white-space: nowrap; /* Không cho xuống dòng */
+        }
+    </style>
+</head>
 <div class="page-content-wrapper">
     <div class="container-fluid">
         <!-- Tiêu đề trang -->
@@ -118,11 +139,11 @@
                                 <td class="align-center status-badge">
                                     @if (item.trang_thai == 0)
                                     {
-                                        <span class="badge bg-success">Hoạt động</span>
+                                        <span class="badge-hd" >Hoạt động</span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-danger">Không hoạt động</span>
+                                        <span class="badge-khd" >Không hoạt động</span>
                                     }
                                 </td>
                                 <td class="align-center">
@@ -261,9 +282,9 @@
                         // Badge hiển thị trạng thái
                         let statusBadge = "";
                         if (item.trang_thai == 0) {
-                            statusBadge = '<span class="badge bg-success">Hoạt động</span>';
+                            statusBadge = '<span class=" badge-hd">Hoạt động</span>';
                         } else {
-                            statusBadge = '<span class="badge bg-danger">Không hoạt động</span>';
+                            statusBadge = '<span class="badge-kdh">Không hoạt động</span>';
                         }
 
                         // Tạo dòng HTML giống với bảng ban đầu
@@ -315,8 +336,8 @@
                     data.forEach((item, index) => {
                         // Tạo badge hiển thị trạng thái
                         let statusBadge = item.trang_thai == 0
-                            ? '<span class="badge bg-success">Hoạt động</span>'
-                            : '<span class="badge bg-danger">Không hoạt động</span>';
+                            ? '<span class="badge-hd">Hoạt động</span>'
+                            : '<span class="badge-khd">Không hoạt động</span>';
 
                         let row = `
                             <tr>
@@ -370,8 +391,8 @@
                                   // Tìm hàng có data-id bằng id của nhân viên
                             let row = $("tr[data-id='" + id + "']");
                             let newBadge = response.newStatus == 0
-                                ? '<span class="badge bg-success">Hoạt động</span>'
-                                : '<span class="badge bg-danger">Không hoạt động</span>';
+                                ? '<span class="badge-hd">Hoạt động</span>'
+                                : '<span class="badge-khd">Không hoạt động</span>';
                             row.find("td.status-badge").html(newBadge);
 
                             let newStatusVal = response.newStatus == 0 ? 1 : 0;
