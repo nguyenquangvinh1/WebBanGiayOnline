@@ -93,8 +93,7 @@
             case 2: trangThaiText = "Đang giao hàng"; break;
             case 3: trangThaiText = "Hoàn thành"; break;
             case 4: trangThaiText = "Đã hủy"; break;
-            case 5: trangThaiText = "Chưa thanh toán "; break;
-            case 6: trangThaiText = "Đã thanh toán "; break;
+        
             default: trangThaiText = "Không xác định"; break;
         }
     }
@@ -131,24 +130,48 @@
         
 
     </div>
-    <div class="container mt-4">
-        <h3 class="text-center">Lịch sử thay đổi trạng thái</h3>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Trạng thái</th>
-                    <th>Lý do</th>
-                    <th>Thời gian</th>
-                </tr>
-            </thead>
-            <tbody id="historyTable">
-                <tr>
-                    <td colspan="4" class="text-center text-muted">Chưa có thay đổi nào</td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- Nút mở modal -->
+    <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#modalLichSu">
+        <i class="bi bi-clock-history"></i> Lịch sử
+    </button>
+    <!-- Modal -->
+    <div class="modal fade" id="modalLichSu" tabindex="-1" aria-labelledby="modalLichSuLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content rounded-4">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLichSuLabel">Lịch sử trạng thái hóa đơn</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>Trạng thái</th>
+                                <th>Thời gian</th>
+                                <th>Người xác nhận</th>
+                                <th>Ghi chú</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           
+                                <tr>
+                                    <td>@Model.trang_thai</td>
+                                <td>@Model.ngay_sua</td>
+                                <td>@Model.nguoi_sua</td>
+                                <td>@Model.Status</td>
+                                </tr>
+                           
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
     </div>
+
+
 
     <div id="cancelReasonContainer" style="display: none; margin-top: 10px;">
         <input type="text" id="txtCancelReason" class="form-control" placeholder="Nhập lý do hủy đơn..." />
@@ -223,15 +246,16 @@
 
             {
                 var hoadon = Model.Hoa_Don_Chi_Tiets;
-            
-                foreach (var item in hoadon)
-                {   
-                    <tr>
-                      
-                        <td>@item.ma</td>
+
+                    @foreach (var item in hoadon)
+                    {
+                        <tr>
+                            <td>@item.ma</td>
 
                             <td>@item.gia.ToString("#,##0 VNĐ")</td>
-                        <td>@item.so_luong</td>
+                            <td>
+                               @item.so_luong
+                            </td>
                             <td>
                                 @{
                                     string phuongthuc = item.phuongThucthanhtoan switch
@@ -246,13 +270,11 @@
                                 }
                                 @phuongthuc
                             </td>
-                            <td>@item.thanh_tien?.ToString("#,##0 VNĐ")</td>
-                        <td>@item.ngay_tao.ToString("dd/MM/yyyy HH:mm")</td>
-                      
-                      
-                    </tr>
-                
-                }
+                            <td >@item.thanh_tien?.ToString("#,##0 VNĐ")</td>
+                            <td>@item.ngay_tao.ToString("dd/MM/yyyy HH:mm")</td>
+                        </tr>
+                    }
+
             }
             else
             {
@@ -271,6 +293,7 @@
                 <th>Mã</th>
                 
             @*     <th>Sản phẩm</th> *@
+                    
                 <th>Đơn giá</th>
                 <th>Số lượng</th>
                 <th>Số tiền</th>
@@ -290,10 +313,30 @@
                 {
                     <tr>
                         <td>@item.ma</td>
+                      
                      @*    <td>@item.San_Pham_Chi_Tiet.ten_SPCT</td> *@
                             <td>@item.gia.ToString("#,##0 VNĐ")</td>
-                        <td>@item.so_luong</td>
-                            <td>@item.thanh_tien?.ToString("#,##0 VNĐ")</td>
+                        <td>
+                                <div class="input-group quantity mt-4" style="width: 100px;">
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-sm btn-minus rounded-circle bg-light border updateQuantity"
+                                                data-id="@item.ID" data-type="minus">
+                                            <i class="fa fa-minus"></i>
+                                        </button>
+                                    </div>
+                                    <input type="text"
+                                           class="form-control form-control-sm text-center border-0 product-quantity"
+                                           data-id="@item.ID"
+                                           value="@item.so_luong">
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-sm btn-plus rounded-circle bg-light border updateQuantity"
+                                                data-id="@item.ID" data-type="plus">
+                                            <i class="fa fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                        </td>
+                            <td id="total-@item.ID">@item.thanh_tien?.ToString("#,##0 VNĐ")</td>
                            
                     </tr>
                    
@@ -323,13 +366,13 @@
 <br />
     <div class="row payment-summary">
         <div class="col-md-6">
-            <p><strong>Tổng tiền hàng:</strong> @Model.tong_tien.ToString("N0") đ</p>
+            <p><strong>Tổng tiền hàng:</strong> @Model.tong_tien.ToString("#,##0 VNĐ")</p>
             <p><strong>Phí vận chuyển:</strong> </p>
-            <p><strong>Mã giảm giá:</strong> Không có</p>
+            <p><strong>Mã giảm giá:</strong>@* @Model.Giam_Gia.ten_phieu_giam_gia *@ </p>
         </div>
-        <div class="col-md-6 text-right total-price">
+        <div class="col-md-6 text-right total-price" >
             <h4>
-                <strong>Tổng thanh toán: @Model.tong_tien.ToString("N0")) đ</strong>
+                <strong>Tổng thanh toán: @Model.tong_tien.ToString("N0") đ</strong>
             </h4>
         </div>
     </div>
@@ -345,6 +388,7 @@
 
 
         <script>
+                    
             
             let currentStep = @Model.trang_thai ;
         const steps = document.querySelectorAll(".step");
@@ -355,11 +399,14 @@
 
         let historyLog = [];
                 const statusText = [
+          
             "Chờ xử lý",
             "Đã xác nhận",
             "Đang giao hàng",
             "Hoàn thành",
-            "Đã hủy"
+            "Đã hủy",
+              "Đã Thanh Toán",
+            "Chưa Thanh Toán",
         ];
 
             function updateProgress() {
@@ -371,7 +418,7 @@
                  statusTextElement.innerText = statusText[currentStep];
 
                       statusTextElement.className = "badge";
-        const colors = ["bg-secondary", "bg-primary", "bg-warning", "bg-success", "bg-danger"];
+        const colors = ["bg-secondary", "bg-primary", "bg-warning", "bg-success","bg-warning","bg-success","bg-danger" ];
         statusTextElement.classList.add(colors[currentStep]);
          if (currentStep === 4) {
             nextBtn.style.display = "none";
@@ -388,13 +435,20 @@
             "Đã xác nhận",
             "Đang giao hàng",
             "Hoàn thành",
+           
 
         ];
 
         }else if (currentStep === 2){
             prevBtn.style.display ="none";
             huy.style.display ="none"
-        } else {
+        }else if(currentStep === -1 && currentStep===-2 )
+        {
+              nextBtn.style.display = "none";
+            prevBtn.style.display = "none";
+             huy.style.display ="none"
+        }
+        else {
             nextBtn.style.display = "inline-block";
             prevBtn.style.display = "inline-block";
         }
@@ -428,8 +482,7 @@
                     success: function (response) {
                         if (response.success) {
                             currentStep = response.status;
-                            historyLog.push({ step: currentStep, reason: reason, time: new Date().toLocaleString() });
-                renderHistory();
+                           
                             updateProgress();
                         } else {
                             alert("Cập nhật trạng thái thất bại!");
@@ -440,17 +493,7 @@
                     }
                 });
             }
-                    function renderHistory() {
-            let historyHTML = historyLog.map((log, index) =>
-                `<tr>
-                    <td>${index + 1}</td>
-                    <td>${statusText[log.step]}</td>
-                    <td>${log.reason}</td>
-                    <td>${log.time}</td>
-                </tr>`
-            ).join("");
-            document.getElementById("historyTable").innerHTML = historyHTML;
-        }
+
                     nextBtn.addEventListener("click", () => {
             if (currentStep < steps.length - 1) {
                 promptReason((reason) => {
@@ -519,6 +562,45 @@
 
 
         });
+
+                       $(".updateQuantity").click(function () {
+            var button = $(this);
+            var productId = button.data("id");
+            var type = button.data("type");
+            var input = $(`.product-quantity[data-id='${productId}']`);
+            var currentQuantity = parseInt(input.val());
+
+            // Thay đổi số lượng theo nút nhấn
+            if (type === "plus") {
+                currentQuantity++;
+            } else if (type === "minus" && currentQuantity > 1) {
+                currentQuantity--;
+            }
+
+            input.val(currentQuantity);
+
+            $.ajax({
+                 url: '@Url.Action("UpdateQuantity", "HoaDon")',
+                type: "POST",
+                data: { id: productId, quantity: currentQuantity },
+                success: function (response) {
+                    if (response.success) {
+                        var newTotal = response.newTotal;
+                        $(`#total-${productId}`).text(newTotal.toLocaleString() + " VNĐ");
+
+                        $("#totalCart").text(response.totalCart.toLocaleString() + " VNĐ");
+                         location.reload(); 
+                    } else {
+                        alert("Lỗi: " + response.message);
+                    }
+                },
+                error: function () {
+                    alert("Có lỗi xảy ra!");
+                }
+            });
+        });
+
+
 
         
             

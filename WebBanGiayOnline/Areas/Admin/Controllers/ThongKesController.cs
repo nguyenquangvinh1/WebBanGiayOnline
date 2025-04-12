@@ -159,11 +159,14 @@ new ThongKe()
         {
 
             var thongKe = _context.hoa_Dons
+                .Where(x => x.trang_thai == 3 || x.trang_thai == 6)
                .GroupBy(x => x.ngay_tao)
+               
                 .Select(x => new
                 {
                     DoanhThu = x.Key,
-                    TongTien = x.Sum(x => x.tong_tien),
+                    TongTien =  x.Sum(x => x.tong_tien),
+
                     DonThanhCong = x.Sum(x => x.trang_thai == 3 ? 1 : 0),
                     DonHuy = x.Sum(x => x.trang_thai == 4 ? 1 : 0),
                 }).ToList();
@@ -182,7 +185,8 @@ new ThongKe()
                 .Select(g => new
                 {
                     doanhThu = g.Key.ToString("yyyy-MM-dd"), // Chuyển DateTime thành string
-                    tongTien = g.Sum(hd => hd.tong_tien),
+                    TongTien = g.Where(x => x.trang_thai == 3 || x.trang_thai == 6).Sum(x => x.tong_tien),
+
                     donThanhCong = g.Count(hd => hd.trang_thai == 3),
                     donHuy = g.Count(hd => hd.trang_thai == 4)
                 }).ToList();

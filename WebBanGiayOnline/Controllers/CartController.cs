@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Threading.Tasks;
 using WebBanGiay.Areas.Admin.Models.ViewModel;
 using WebBanGiay.Data;
 using WebBanGiay.Helpers;
@@ -85,6 +86,7 @@ namespace WebBanGiay.Controllers
                     so_tien_giam_toi_da = x.so_tien_giam_toi_da,
                 }).ToList();
 
+    
 
             return Json(discounts);
         }
@@ -186,6 +188,7 @@ namespace WebBanGiay.Controllers
             try
             {
                 var ship = await _ghnService.CalculateFeeAsync(request);
+               
                 return Json(new { success = true, ship });
             }
             catch (Exception ex)
@@ -196,7 +199,7 @@ namespace WebBanGiay.Controllers
 
         [HttpPost]
 
-        public IActionResult CheckOut(CheckoutVM model, Guid? id, GHNShipping request/* , string payment = "COD"*/)
+        public async Task<IActionResult> CheckOut(CheckoutVM model, Guid? id, GHNShipping request/* , string payment = "COD"*/)
         {
 
             if (ModelState.IsValid)
@@ -218,9 +221,10 @@ namespace WebBanGiay.Controllers
                 //        return Redirect(_vnPayservice.CreatePaymentUrl(HttpContext, vnPayModel));
                 //    }
 
-
+               
                 var fee = _ghnService.CalculateFeeAsync(request);
-                var khach = new Tai_Khoan();
+               
+               var khach = new Tai_Khoan();
                 var tien = new CartItem();
                 //var diachi = new Dia_Chi();
                 var lastHoaDon = db.hoa_Dons
@@ -264,7 +268,7 @@ namespace WebBanGiay.Controllers
                ? Cart.Sum(x => x.ThanhTien)
                : Cart.Sum(x => x.ThanhTienGG),
                     ngay_tao = DateTime.Now,
-                    
+                  
                     trang_thai = 0,
                     loai_hoa_don = 2,
                     ghi_chu = model.GhiChu,
@@ -340,6 +344,7 @@ namespace WebBanGiay.Controllers
 
                 catch
                 {
+                    db.Database.RollbackTransaction();
 
                     return View();
                 }

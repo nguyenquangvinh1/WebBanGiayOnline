@@ -214,9 +214,29 @@ int pageNumber = 1, int pageSize = 12)
                 lstspct = lsSPCT
 
             };
-            ViewData["Kich_ThuocID"] = new SelectList(_context.kich_Thuocs, "ID", "ten_kich_thuoc");
-            ViewData["Mau_SacID"] = new SelectList(_context.mau_Sacs, "ID", "ma_mau");
+
+            var lstSpct = spct.Include(x => x.Mau_Sac).Include(x => x.Kich_Thuoc).ToList();
+
+            var kichThuoc = lstSpct
+                .Where(x => x.Kich_Thuoc != null)
+                .Select(x => x.Kich_Thuoc)
+                .DistinctBy(k => k.ID)
+                .ToList();
+
+            var mauSac = lstSpct
+                .Where(x => x.Mau_Sac != null)
+                .Select(x => x.Mau_Sac)
+                .DistinctBy(m => m.ID)
+                .ToList();
+
+            // Không cần foreach phía dưới nữa!
+
+            ViewData["Kich_ThuocID"] = new SelectList(kichThuoc, "ID", "ten_kich_thuoc");
+            ViewData["Mau_SacID"] = new SelectList(mauSac, "ID", "ma_mau");
+
             return View(result);
+
+           
         }
         // GET: San_Pham_Chi_Tiet/Create
         public IActionResult Create()
