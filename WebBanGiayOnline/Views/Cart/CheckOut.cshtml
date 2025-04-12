@@ -252,7 +252,11 @@
                                     </tr>
                                     <tr>
                                         <td colspan="4">Tổng Tiền :</td>
-                                        <td id="totalWithFee">@Model.Sum(p => p.ThanhTienGG).ToString("#,##0 VNĐ") </td>
+                                        <td id="totalWithFee">
+                                            @(Model.Sum(p => p.ThanhTienGG) > 0
+                                                ? Model.Sum(p => p.ThanhTienGG).ToString("#,##0 VNĐ")
+                                                : Model.Sum(p => p.ThanhTien).ToString("#,##0 VNĐ"))
+                                        </td>
                                     </tr>
 
 
@@ -443,10 +447,19 @@
                 data: JSON.stringify(requestData),
                 dataType: "json",
                 success: function(response) {
-                     let total = response.fee + subtotal;
+
+                    if(provinceId !=  201){
+                         
+                        response.ship = 50000;
+                    }
+                    if(subtotal > 2000000)
+                   {
+                       response.ship = 0;
+                   }
+                     let total = response.ship + subtotal;
                     console.log("Nhận phản hồi:", response); // Debug phản hồi
                     if (response.success) {
-                        $("#fee").text(response.fee.toLocaleString() + " VNĐ");
+                        $("#fee").text(response.ship.toLocaleString() + " VNĐ");
                         $("#totalWithFee").text( total.toLocaleString() + " VNĐ");
                     } else {
                         alert(response.message);

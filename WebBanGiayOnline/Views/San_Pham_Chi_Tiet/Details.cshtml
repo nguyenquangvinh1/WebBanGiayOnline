@@ -430,7 +430,9 @@
     
 </body>
 
+
 </html>
+
 @section Scripts{
 
     <script>
@@ -471,70 +473,48 @@
                 }
             }
 
-            setMinPriceOnLoad();
-
+            setMinPriceOnLoad(); 
 
 
             // Khi chọn màu sắc
             $('.mau-sac-btn').click(function () {
-                const clickedMauSac = $(this).data('mausac');
+                selectedMauSac = $(this).data('mausac');
+                $('.kich-thuoc-btn').prop('disabled', false);
 
-                // Toggle: nếu đã chọn, click lần 2 sẽ bỏ chọn
-                if (selectedMauSac === clickedMauSac) {
-                    selectedMauSac = null;
-                    $('.kich-thuoc-btn').show();
-                    $('.mau-sac-btn').removeClass('active');
-                } else {
-                    selectedMauSac = clickedMauSac;
-                    $('.mau-sac-btn').removeClass('active');
-                    $(this).addClass('active');
+                let validKichThuocs = sanPhamChiTietList
+                    .filter(spct => spct.mauSac === selectedMauSac)
+                    .map(spct => spct.kichThuoc);
 
-                    const validKichThuocs = sanPhamChiTietList
-                        .filter(spct => spct.mauSac === selectedMauSac)
-                        .map(spct => spct.kichThuoc);
-
-                    $('.kich-thuoc-btn').each(function () {
-                        const id = $(this).data('kichthuoc');
-                        $(this).toggle(validKichThuocs.includes(id));
-                    });
-                }
+                $('.kich-thuoc-btn').each(function () {
+                    let kichThuocID = $(this).data('kichthuoc');
+                    $(this).prop('disabled', !validKichThuocs.includes(kichThuocID));
+                });
 
                 updateMuaHangButton();
             });
 
             // Khi chọn kích thước
             $('.kich-thuoc-btn').click(function () {
-                const clickedKichThuoc = $(this).data('kichthuoc');
+                selectedKichThuoc = $(this).data('kichthuoc');
+                $('.mau-sac-btn').prop('disabled', false);
 
-                if (selectedKichThuoc === clickedKichThuoc) {
-                    selectedKichThuoc = null;
-                    $('.mau-sac-btn').show();
-                    $('.kich-thuoc-btn').removeClass('active');
-                } else {
-                    selectedKichThuoc = clickedKichThuoc;
-                    $('.kich-thuoc-btn').removeClass('active');
-                    $(this).addClass('active');
+                let validMauSacs = sanPhamChiTietList
+                    .filter(spct => spct.kichThuoc === selectedKichThuoc)
+                    .map(spct => spct.mauSac);
 
-                    const validMauSacs = sanPhamChiTietList
-                        .filter(spct => spct.kichThuoc === selectedKichThuoc)
-                        .map(spct => spct.mauSac);
-
-                    $('.mau-sac-btn').each(function () {
-                        const id = $(this).data('mausac');
-                        $(this).toggle(validMauSacs.includes(id));
-                    });
-                }
+                $('.mau-sac-btn').each(function () {
+                    let mauSacID = $(this).data('mausac');
+                    $(this).prop('disabled', !validMauSacs.includes(mauSacID));
+                });
 
                 updateMuaHangButton();
             });
 
 
-
-
-
             // Cảnh báo khi nhấn nút Mua Hàng nhưng chưa chọn đủ
          $('#btnMuaHang').click(function () {
             if (!selectedMauSac || !selectedKichThuoc) {
+               // Ngăn chặn điều hướng
                 alert("Vui lòng chọn đầy đủ Màu Sắc và Kích Thước trước khi mua hàng!");
             }
             var productId = $(this).data("id");
@@ -544,20 +524,21 @@
                     type: "POST",
                    data: { id: productId ,quantity : quantity  },
                     success: function (response) {
-
-                        alert("Thêm vào giỏ hàng thành công!");
+                      
                          window.location.href = "/Cart/Index";
                     },
                     error: function () {
                         alert("Có lỗi xảy ra, vui lòng thử lại.");
                     }
                 });
-         });
+                
+            });
 
-           $("#add-to-cart").click(function () {
+             $("#add-to-cart").click(function () {
             if (!selectedMauSac || !selectedKichThuoc) {
+              e.preventDefault(); // Ngăn chặn điều hướng
               alert("Vui lòng chọn đầy đủ Màu Sắc và Kích Thước trước khi mua hàng!");
-            }
+           }
                
                var productId = $(this).data("id");
               var quantity = $('input[name="quantity"]').val();

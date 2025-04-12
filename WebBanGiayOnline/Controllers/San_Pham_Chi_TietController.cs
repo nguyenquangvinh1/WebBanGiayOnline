@@ -69,13 +69,13 @@ namespace WebBanGiay.Controllers
         [HttpGet]
         public async Task<IActionResult> Filter(
 string chatLieu, string coGiay, string danhMuc, string deGiay,
-string muiGiay, string kieuDang, string loaiGiay,
+string muiGiay, string kieuDang, string loaiGiay, string tenSanPham,
 int pageNumber = 1, int pageSize = 12)
         {
             Console.WriteLine($"📌 Nhận giá trị lọc: chatLieu={chatLieu}, coGiay={coGiay}, danhMuc={danhMuc}, deGiay={deGiay}, muiGiay={muiGiay}, kieuDang={kieuDang}, loaiGiay={loaiGiay}");
 
             var query = _context.san_Phams
-                .Where(sp => sp.San_Pham_Chi_Tiets.Any(ct => ct.so_luong > 0)) // Chỉ lấy sản phẩm có số lượng > 0
+                .Where(sp => sp.San_Pham_Chi_Tiets.Any(ct => ct.so_luong > 0 && ct.trang_thai ==1)) // Chỉ lấy sản phẩm có số lượng > 0
                 .AsQueryable();
 
             // Áp dụng bộ lọc
@@ -93,6 +93,10 @@ int pageNumber = 1, int pageSize = 12)
                 query = query.Where(sp => sp.Kieu_DangID.ToString() == kieuDang);
             if (!string.IsNullOrEmpty(loaiGiay))
                 query = query.Where(sp => sp.Loai_GiayID.ToString() == loaiGiay);
+            // Tìm kiếm theo tên sản phẩm (không phân biệt chữ hoa/thường)
+            if (!string.IsNullOrEmpty(tenSanPham))
+                query = query.Where(sp => sp.ten_san_pham.Contains(tenSanPham));
+
 
             // Truy vấn dữ liệu sản phẩm
             var result = query.Select(x => new HangHoaVM
@@ -133,6 +137,7 @@ int pageNumber = 1, int pageSize = 12)
             ViewData["SelectedMuiGiay"] = muiGiay;
             ViewData["SelectedKieuDang"] = kieuDang;
             ViewData["SelectedLoaiGiay"] = loaiGiay;
+            ViewData["SelectedTenSanPham"] = tenSanPham;
 
             // Truyền dữ liệu dropdown
             ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu", chatLieu);
@@ -214,8 +219,24 @@ int pageNumber = 1, int pageSize = 12)
                 lstspct = lsSPCT
 
             };
-            ViewData["Kich_ThuocID"] = new SelectList(_context.kich_Thuocs, "ID", "ten_kich_thuoc");
-            ViewData["Mau_SacID"] = new SelectList(_context.mau_Sacs, "ID", "ma_mau");
+            var kichThuoc = new List<Kich_Thuoc>();
+            var mauSac = new List<Mau_Sac>();
+            var lstSpct = spct.Include(x => x.Mau_Sac).Include(x => x.Kich_Thuoc).ToList();
+            if (spct != null)
+            {
+                foreach (var item in lstSpct)
+                {
+                    if (item.Kich_Thuoc != null && !kichThuoc.Contains(item.Kich_Thuoc))
+                        kichThuoc.Add(item.Kich_Thuoc);
+
+                    if (item.Mau_Sac != null && !mauSac.Contains(item.Mau_Sac))
+                        mauSac.Add(item.Mau_Sac);
+                }
+            }
+
+            ViewData["Kich_ThuocID"] = new SelectList(kichThuoc, "ID", "ten_kich_thuoc");
+            ViewData["Mau_SacID"] = new SelectList(mauSac, "ID", "ma_mau");
+
             return View(result);
         }
         // GET: San_Pham_Chi_Tiet/Create

@@ -89,6 +89,12 @@
                     <div class="d-flex m-3 me-0">
                         <button class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fas fa-search text-primary"></i></button>
                        
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div class="alert alert-danger" id="errorMessage">
+                                @TempData["ErrorMessage"]
+                            </div>
+                        }
                         @if (User.Identity.IsAuthenticated)
                         {
                             <div class="dropdown my-auto">
@@ -185,21 +191,22 @@
                                     <td>
                                         <div class="input-group quantity mt-4" style="width: 100px;">
                                             <div class="input-group-btn">
-                                                <button class="btn btn-sm btn-minus rounded-circle bg-light border" type="button">
+                                                <button class="btn btn-sm btn-minus rounded-circle bg-light border updateQuantity" data-id="@item.id" data-type="minus">
                                                     <i class="fa fa-minus"></i>
                                                 </button>
                                             </div>
-                                            <input type="text" class="form-control form-control-sm text-center border-0" value="@item.SoLuong">
+                                            <input type="text" class="form-control form-control-sm text-center border-0 product-quantity" data-id="@item.id" value="@item.SoLuong">
                                             <div class="input-group-btn">
-                                                <button class="btn btn-sm btn-plus rounded-circle bg-light border" type="button">
+                                                <button class="btn btn-sm btn-plus rounded-circle bg-light border updateQuantity" data-id="@item.id" data-type="plus">
                                                     <i class="fa fa-plus"></i>
                                                 </button>
                                             </div>
                                         </div>
                                     </td>
                                     <td>
-                                        <p class="mb-0 mt-4">@item.ThanhTien.ToString("#,##0 VNĐ")</p>
+                                        <p class="mb-0 mt-4 product-total" id="total-@item.id">@item.ThanhTien.ToString("#,##0 VNĐ")</p>
                                     </td>
+
                                     <td>
                                         <a asp-action="RemoveCart" asp-controller="Cart" asp-route-id="@item.id" class="btn btn-md rounded-circle bg-light border mt-4">
                                             <i class="fa fa-times text-danger"></i>
@@ -261,14 +268,14 @@
                             <h1 class="display-6 mb-4">Tổng <span class="fw-normal">Tiền</span></h1>
                             <div class="d-flex justify-content-between mb-4">
                                 <h5 class="mb-0 me-4">Tổng tiền tạm tính:</h5>
-                                <p class="mb-0">@Model.Sum(x => x.ThanhTien).ToString("#,##0 VNĐ")</p>
+                                <p class="mb-0" id="totalPrice1">@Model.Sum(x => x.ThanhTien).ToString("#,##0 VNĐ")</p>
                             </div>
                            
                             
                         </div>
                         <div class="py-4 mb-4 border-top border-bottom d-flex justify-content-between">
                             <h5 class="mb-0 ps-4 me-4">Tổng tiền thanh toán:</h5>
-                            <p class="mb-0 pe-4" id="totalPrice"> @Model.Sum(x => x.ThanhTien).ToString("#,##0 VNĐ")</p>
+                            <p class="mb-0 pe-4" id="totalPrice">@Model.Sum(x => x.ThanhTien).ToString("#,##0 VNĐ")</p>
                         </div>
                         <a asp-controller="Cart" asp-action="CheckOut"  class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4" >Đặt Hàng</a>
                     </div>
@@ -285,7 +292,7 @@
                         <a href="#">
                             <h1 class="text-primary mb-0">Fruitables</h1>
                             <p class="text-secondary mb-0">Fresh products</p>
-                        </a>
+                        </a><a href="d:\thành cổ loa\webbangiayonline\webbangiayonline\views\cart\checkout.cshtml">d:\thành cổ loa\webbangiayonline\webbangiayonline\views\cart\checkout.cshtml</a>
                     </div>
                     <div class="col-lg-6">
                         <div class="position-relative mx-auto">
@@ -385,6 +392,12 @@
 </html>
 @section Scripts{
     <script>
+              setTimeout(function () {
+            var errorMessage = document.getElementById("errorMessage");
+            if (errorMessage) {
+                errorMessage.style.display = "none";
+            }
+        }, 3000);
         $(document).ready(function () {
             // Khi nhấn nút chọn mã giảm giá
             $('.selectDiscount').click(function () {
@@ -395,8 +408,8 @@
                         let html = "";
                         data.forEach(discount => {
                             html += `<li class="list-group-item d-flex justify-content-between align-items-center">
-                                        <span>${discount.ten_phieu_giam_gia} - Giảm ${discount.gia_tri_giam}% </span>
-                                        <button class="btn btn-primary btn-sm applyDiscount" data-id="${discount.id}" data-value="${discount.gia_tri_giam}">Chọn</button>
+                                        <span>${discount.ten_phieu_giam_gia} - Giảm ${discount.gia_tri_giam}% số tiền giảm tối thiểu ${discount.so_tien_giam_toi_da} </span>
+                                        <button class="btn btn-primary btn-sm applyDiscount" data-id="${discount.id}" data-value="${discount.gia_tri_giam}" data-giam="${discount.so_tien_giam_toi_da}">Chọn</button>
                                     </li>`;
                         });
                         $('#discountList').html(html);
@@ -408,24 +421,62 @@
             $(document).on('click', '.applyDiscount', function () {
                 let discountValue = $(this).data('value');
                 let discountId = $(this).data('id');
-
+                let discount=$(this).data('giam');
              
                 $('.discountCodeInput').val(`Giảm ${discountValue}%`);
 
-               
+             
                 let subtotal = @Model.Sum(x => x.ThanhTien);
                 let discountAmount = subtotal * (discountValue / 100);
-                let newTotal = subtotal - discountAmount;
-               
+                let newTotal = subtotal
+                if(discountAmount > discount){
+                     newTotal = subtotal - discount;
+                     
+                }else{
+                    newTotal = subtotal - discountAmount ;
+                  
+                }
+                 $('#totalPrice').text(newTotal.toLocaleString() + " VNĐ");
+                
+                 $.ajax({
+            url: "/Cart/ApplyDiscount",
+            type: "POST",
+            data: { totalPrice: newTotal },
+            success: function (response) {
+                if (response.success) {
+                    console.log("Giảm giá áp dụng thành công!");
+                } else {
+                    alert("Lỗi: " + response.message);
+                }
+            },
+           
+        });
+        $('#discountModal').modal('hide');
+            });
+                
 
-                $('#totalPrice').text(newTotal.toLocaleString() + " VNĐ");
+        });
+
+            $(document).ready(function () {
+            $(".updateQuantity").click(function () {
+                var button = $(this);
+                var productId = button.data("id");
+                var type = button.data("type");
+                var input = $(`.product-quantity[data-id='${productId}']`);
+                var currentQuantity = parseInt(input.val());
+                input.val(currentQuantity);
+
                 $.ajax({
-                    url: "/Cart/ApplyDiscount",
+                    url: "/Cart/UpdateQuantity",
                     type: "POST",
-                    data: { totalPrice: newTotal },
+                    data: { id: productId, quantity: currentQuantity },
                     success: function (response) {
                         if (response.success) {
-                            console.log("Giảm giá áp dụng thành công!");
+                            var newTotal = response.newTotal;
+                            $(`#total-${productId}`).text(newTotal.toLocaleString() + " VNĐ");
+                            $("#totalPrice1").text(response.totalCart.toLocaleString() + " VNĐ");
+                            $("#totalPrice").text(response.totalCart.toLocaleString() + " VNĐ");
+                         location.reload();
                         } else {
                             alert("Lỗi: " + response.message);
                         }
@@ -434,10 +485,7 @@
                         alert("Có lỗi xảy ra!");
                     }
                 });
-                $('#discountModal').modal('hide');
             });
-
-
         });
     </script>
 

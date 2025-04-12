@@ -7,50 +7,66 @@
 
 <h1>Sản Phẩm</h1>
 
+<!-- Thẻ "Bộ lọc" -->
+<div class="card mb-3">
+    <div class="card-header">
+        <h5 class="mb-0">Bộ lọc</h5>
+    </div>
+    <div class="card-body">
+        <div class="row align-items-center">
+            <!-- Ô tìm kiếm -->
+            <div class="col-md-4 d-flex align-items-center mb-2">
+                <div class="input-group" style="max-width: 300px;">
+                    <span class="input-group-text">
+                        <i class="fas fa-search text-orange"></i>
+                    </span>
+                    <input type="text" id="searchProduct" class="form-control" placeholder="Tìm kiếm sản phẩm..." value="@Context.Request.Query["tenSanPham"]">
+                </div>
+            </div>
+
+            <!-- Bộ lọc trạng thái + Xuất Excel -->
+            <div class="col-md-6 d-flex align-items-center gap-3 mb-2">
+                <span class="fw-bold">Trạng thái:</span>
+                <div class="dropdown me-2">
+                    
+                    <select id="filterTrangThai" class="form-control filter-select">
+                        <option value=null>Tất cả</option>
+
+                        <option value="1" selected="@(ViewData["SelectedTrangThai"]?.ToString() == "1" ? "checked" : null)">
+                            <label class="form-check-label" for="trangThaiHoatDong">Hoạt động</label>
+                        </option>
+                        <option value="0" selected="@(ViewData["SelectedTrangThai"]?.ToString() == "0" ? "checked" : null)">
+                            <label class="form-check-label" for="trangThaiKhongHoatDong">Không hoạt động</label>
+                        </option>
+
+                    </select>
+                </div>
+                
+                
+
+                <!-- Xuất Excel -->
+                
+                    <button id="exportExcel" type="submit" class="btn btn-outline-success">
+                        <i class="fas fa-file-excel"></i>
+                    </button>
+                
+            </div>
+
+            <!-- Nút tạo nhân viên -->
+            <div class="col-md-2 text-end mb-2">
+                <a asp-action="Create" class="btn btn-outline-orange" style="border: 1px solid #e0e0e0;">
+                    <i class="fas fa-plus"></i> Tạo Sản Phẩm
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 
 
-<div class="row">
-    <div class="col-12">
+
         <div class="card">
             <div class="card-header">
-                <div class="row">
-                    <div class="col-md-6 row">
-                        <div class="col-12">
-                            <input type="text" id="searchProduct" class="form-control" placeholder="Tìm kiếm sản phẩm..." value="@Context.Request.Query["tenSanPham"]">
-                        </div>
-                        
-                        <div class="d-flex justify-content-between align-items-center col-12 row">
-                            <div class="col-7">
-                                <label><strong>Trạng thái:</strong></label>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="trangThai" id="trangThaiHoatDong" value="1"
-                                    @(ViewData["SelectedTrangThai"]?.ToString() == "1" ? "checked" : "")>
-                                    <label class="form-check-label" for="trangThaiHoatDong">Hoạt động</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="trangThai" id="trangThaiKhongHoatDong" value="0"
-                                    @(ViewData["SelectedTrangThai"]?.ToString() == "0" ? "checked" : "")>
-                                    <label class="form-check-label" for="trangThaiKhongHoatDong">Không hoạt động</label>
-                                </div>
-                            </div>
-                            <div class="d-grid gap-2 d-md-block col-5">
-
-                            <!-- Nút Xuất Excel -->
-                            <button id="exportExcel" class="btn btn-success">
-                                <i class="fas fa-file-excel"></i> Xuất Excel
-                            </button>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="col-md-6">
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button type="button" class="btn btn-primary buttons-html5 me-md-2" tabindex="0" type="button">
-                                <a asp-action="Create" style="color:white">Tạo mới</a>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                
             </div>
             
             <div class="card-body table-responsive p-0">
@@ -60,11 +76,9 @@
                         <tr>
                             <th>STT</th>
                             <th>@Html.DisplayNameFor(model => model.First().ten_san_pham)</th>
-                            <th>@Html.DisplayNameFor(model => model.First().trang_thai)</th>
                             <th>@Html.DisplayNameFor(model => model.First().ngay_tao)</th>
                             <th>@Html.DisplayNameFor(model => model.First().so_luong_tong)</th>
-
-                            
+                            <th>@Html.DisplayNameFor(model => model.First().trang_thai)</th>
                             <th>Tùy chỉnh</th>
                         </tr>
                     </thead>
@@ -79,21 +93,21 @@
                                 <td>
                                     @Html.DisplayFor(modelItem => item.ten_san_pham)
                                 </td>
-                               
-                                <td>
-                                    <button class='toggle-status btn btn-sm @(item.trang_thai == 1 ? "btn-success" : "btn-danger")' data-id='@item.ID' data-status='@item.trang_thai' style='width: 150px; height: 30px; line-height: 18px; white-space: nowrap;'>@(item.trang_thai == 1 ? "Hoạt động" : "Không hoạt động")</button>
-                                </td>
-                                
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.ngay_tao)
-                                </td>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.so_luong_tong)
                                 </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ngay_tao)
+                                </td>
 
+                                <td>
+
+                            <span id="status-badge" class="@(item.trang_thai == 1 ? "trang-thai-dang-dien-ra" : "trang-thai-het-han")" style='width: 150px; height: 30px; line-height: 18px; white-space: nowrap;'>@(item.trang_thai == 1 ? "Hoạt động" : "Ngừng hoạt động")</span>
+                                </td>
                                 <td>
                                     <a asp-area="Admin" asp-action="Edit" asp-route-id="@item.ID" class="btn btn-warning"><i class="fa fa-xs fa-pen"></i></a>
                                     <a asp-area="Admin" asp-controller="SanPhamChiTiet" asp-action="Index" class="btn btn-warning"><i class="fa-solid fa-eye"></i></a>
+                                    <a class='toggle-status btn btn-secondary' data-id='@item.ID' data-status='@item.trang_thai'><i class="fa fa-sync"></i></a>
                                 </td>
                             </tr>
                             stt++;
@@ -104,8 +118,7 @@
 
             </div>
         </div>
-    </div>
-</div>
+    
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
@@ -122,6 +135,20 @@
                     "info": true,
                     "autoWidth": false,
                     "responsive": true,
+                    language: {
+                        info: "Tổng số nhân viên: _TOTAL_ | Hiển thị từ _START_  đến _END_ ",
+                        infoEmpty: " Tổng số nhân viên: 0 | Hiển thị từ 0 đến 0 ",
+                        infoPostFix: "| Hiển thị 10 nục/trang",
+                        loadingRecords: "",
+                        zeroRecords: "Không có dữ liệu phù hợp",
+                        emptyTable: "Không có dữ liệu",
+                        paginate: {
+                            first:  '<i class="fas fa-angle-double-left"></i>',
+                            previous:  '<i class="fas fa-angle-left"></i>',
+                            next:  '<i class="fas fa-angle-right"></i>',
+                            last:  '<i class="fas fa-angle-double-right"></i>'
+                        },
+                    },
                 });
                 console.log("✅ DataTables đã khởi tạo thành công!");
             } catch (error) {
@@ -206,6 +233,11 @@
             applyFilter();
         });
 
+        // Bắt sự kiện khi thay đổi giá trị của select box
+        $('select.filter-select').change(function () {
+            applyFilter();
+        });
+
 
 
 
@@ -214,6 +246,7 @@
             let id = button.data("id");
             let currentStatus = button.data("status");
             let newStatus = currentStatus === 1 ? 0 : 1;
+            let badge = $('#status-badge');
 
             $.ajax({
                 url: '/Admin/SanPham/ChangeStatus',
@@ -222,8 +255,8 @@
                 async: false,  // Đảm bảo request hoàn tất trước khi tiếp tục
                 success: function () {
                     button.data("status", newStatus);
-                    button.toggleClass('btn-success btn-danger')
-                        .text(newStatus === 1 ? 'Hoạt động' : 'Không hoạt động');
+                    badge.toggleClass('trang-thai-dang-dien-ra trang-thai-het-han')
+                        .text(newStatus === 1 ? 'Hoạt động' : 'Ngừng hoạt động');
                 },
                 error: function (xhr, status, error) {
                     console.error("Lỗi AJAX:", status, error);

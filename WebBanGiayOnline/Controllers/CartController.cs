@@ -24,7 +24,7 @@ namespace WebBanGiay.Controllers
         private readonly IVnPayService _vnPayService;
         private readonly EmailService _emailService;
         private readonly IGhnService _ghnService;
-      
+
 
         public CartController(AppDbContext db, IVnPayService vnPayservice, IMomoService momoService, EmailService emailService, IGhnService ghnService)
         {
@@ -39,49 +39,75 @@ namespace WebBanGiay.Controllers
 
         public IActionResult Index(Guid id)
         {
-          
+
 
             return View(Cart);
         }
+        [HttpPost]
+        public IActionResult UpdateQuantity(Guid id, int quantity)
+        {
+            var cart = Cart;
+
+            if (cart != null)
+            {
+                var item = cart.FirstOrDefault(x => x.id == id);
+
+                if (item != null)
+                {
+                    item.SoLuong = quantity;
+
+                    item.ThanhTienGG = item.DonGia * quantity;
+                }
+
+                HttpContext.Session.Set(MySetting.CART_KEY, cart);
+
+                return Json(new
+                {
+                    success = true,
+                    newTotal = item.ThanhTien,
+                    totalCart = cart.Sum(x => x.ThanhTien)
+                });
+            }
+
+            return Json(new { success = false, message = "Không tìm thấy sản phẩm trong giỏ hàng!" });
+        }
+
         [HttpGet]
         public IActionResult GetDiscounts()
         {
-            //var totalPrice = Cart.Sum(x => x.ThanhTien);
+            var totalPrice = Cart.Sum(x => x.ThanhTien);
             var discounts = db.phieu_Giam_Gias
-                .Where(x => x.kieu_giam_gia == 1 && x.trang_thai == 0 /*&& x.gia_tri_toi_thieu<= totalPrice*/) 
+                .Where(x => x.kieu_giam_gia == 1 && x.trang_thai == 1 && x.gia_tri_toi_thieu <= totalPrice)
                 .Select(x => new {
                     id = x.ID,
                     ten_phieu_giam_gia = x.ten_phieu_giam_gia,
-                    gia_tri_giam = x.gia_tri_giam
+                    gia_tri_giam = x.gia_tri_giam,
+                    so_tien_giam_toi_da = x.so_tien_giam_toi_da,
                 }).ToList();
-            
+
 
             return Json(discounts);
         }
 
+
         [HttpPost]
         public IActionResult ApplyDiscount(double totalPrice)
         {
-            var cart = HttpContext.Session.Get<List<CartItem>>(MySetting.CART_KEY); 
+            var cart = HttpContext.Session.Get<List<CartItem>>(MySetting.CART_KEY);
             if (cart != null && cart.Any())
             {
                 foreach (var item in cart)
                 {
-                    item.ThanhTienGG = totalPrice; 
+                    item.ThanhTienGG = totalPrice;
                 }
 
-                HttpContext.Session.Set(MySetting.CART_KEY, cart); 
+                HttpContext.Session.Set(MySetting.CART_KEY, cart);
                 return Json(new { success = true, message = "Giảm giá đã áp dụng!" });
             }
             return Json(new { success = false, message = "Giỏ hàng rỗng!" });
         }
 
-
-
-
-
         [HttpPost]
-  
         public IActionResult AddCart1(Guid id, int quantity)
         {
             var Cart1 = Cart;
@@ -98,7 +124,7 @@ namespace WebBanGiay.Controllers
                     TempData["Message"] = $"Không tìm thấy {id}";
                     return Redirect("/404");
                 }
-              
+
 
                 item = new CartItem
                 {
@@ -106,7 +132,7 @@ namespace WebBanGiay.Controllers
                     TenHH = hanghoa.ten_SPCT,
                     DonGia = db.san_Pham_Chi_Tiets.Find(id).gia,
                     SoLuong = quantity,
-                    Hinh = hinh?.FirstOrDefault(x=>x.San_Pham_Chi_TietID==id)?.Anh_San_Pham.anh_url ?? "Default_Image_URL"
+                    Hinh = hinh?.FirstOrDefault(x => x.San_Pham_Chi_TietID == id)?.Anh_San_Pham.anh_url ?? "Default_Image_URL"
                 };
                 Cart1.Add(item);
             }
@@ -136,7 +162,15 @@ namespace WebBanGiay.Controllers
         [HttpGet]
         public IActionResult CheckOut()
         {
-
+            foreach (var item in Cart)
+            {
+                var sanpham = db.san_Pham_Chi_Tiets.SingleOrDefault(x => x.ID == item.id);
+                if (sanpham.so_luong < item.SoLuong)
+                {
+                    TempData["ErrorMessage"] = "Sản phẩm "+sanpham.ten_SPCT + " trong kho chỉ còn"  +  sanpham.so_luong + " sản phẩm " ;
+                    return RedirectToAction("Index");
+                }
+            }
 
             if (Cart.Count == 0)
             {
@@ -148,12 +182,11 @@ namespace WebBanGiay.Controllers
         [Route("GetShippingFee")]
         public async Task<IActionResult> GetShippingFee([FromBody] GHNShipping request)
         {
-            
+
             try
             {
-             
-                var fee = await _ghnService.CalculateFeeAsync(request);
-                return Json(new { success = true, fee });
+                var ship = await _ghnService.CalculateFeeAsync(request);
+                return Json(new { success = true, ship });
             }
             catch (Exception ex)
             {
@@ -162,10 +195,10 @@ namespace WebBanGiay.Controllers
         }
 
         [HttpPost]
-       
+
         public IActionResult CheckOut(CheckoutVM model, Guid? id, GHNShipping request/* , string payment = "COD"*/)
         {
-         
+
             if (ModelState.IsValid)
             {
                 //    if (payment == "Thanh toán VnPay")
@@ -186,7 +219,7 @@ namespace WebBanGiay.Controllers
                 //    }
 
 
-                var fee =  _ghnService.CalculateFeeAsync(request);
+                var fee = _ghnService.CalculateFeeAsync(request);
                 var khach = new Tai_Khoan();
                 var tien = new CartItem();
                 //var diachi = new Dia_Chi();
@@ -224,15 +257,18 @@ namespace WebBanGiay.Controllers
                     MaHoaDon = newMa,
                     ten_nguoi_nhan = model.TenKhachHang ?? khach.ho_ten,
                     dia_chi = model.fulldiachi,
-                    
+
                     sdt_nguoi_nhan = model.Sdt ?? khach.sdt,
                     email_nguoi_nhan = model.Email ?? khach.email,
-                    tong_tien = Cart.Sum(x=>x.ThanhTienGG)  ,
+                    tong_tien = Cart.Sum(x => x.ThanhTienGG) == 0
+               ? Cart.Sum(x => x.ThanhTien)
+               : Cart.Sum(x => x.ThanhTienGG),
                     ngay_tao = DateTime.Now,
+                    
                     trang_thai = 0,
                     loai_hoa_don = 2,
                     ghi_chu = model.GhiChu,
-                    
+
 
 
                 };
@@ -249,37 +285,40 @@ namespace WebBanGiay.Controllers
 
                         var spChiTiet = db.san_Pham_Chi_Tiets
                                 .SingleOrDefault(X => X.ID == item.id);
-                               
-                                
+
+
 
                         if (spChiTiet != null && spChiTiet.so_luong >= item.SoLuong)
                         {
-                          
+
                             spChiTiet.so_luong -= item.SoLuong;
                             db.Update(spChiTiet);
                         }
-                   
-                            cthd.Add(new Hoa_Don_Chi_Tiet
-                            {
 
 
-                                ID = Guid.NewGuid(),
-                                ma = newMa,
-                                so_luong = item.SoLuong,
-                                gia = item.DonGia,
-                                thanh_tien= item.ThanhTienGG,
-                                Hoa_DonID = hoadon.ID,
-                                ngay_tao = DateTime.Now,
+
+                        cthd.Add(new Hoa_Don_Chi_Tiet
+                        {
 
 
-                            });
+                            ID = Guid.NewGuid(),
+                            ma = newMa,
+                            so_luong = item.SoLuong,
+                            gia = item.DonGia,
+                            thanh_tien = item.DonGia * item.SoLuong,
+                            phuongThucthanhtoan = 2,
+                            Hoa_DonID = hoadon.ID,
+                            ngay_tao = DateTime.Now,
+
+
+                        });
                         //var taiKhoanHoaDon = new Tai_Khoan_Hoa_Don
                         //{
                         //    ID = Guid.NewGuid(),
                         //    Ten = model.TenKhachHang ?? khach.ho_ten,
                         //    vai_tro = "Khách hàng",
                         //    ngay_tao = DateTime.Now,
-                            
+
                         //    Hoa_DonID = hoadon.ID  // Liên kết với hóa đơn
                         //};
                         //db.Add(taiKhoanHoaDon);
@@ -288,8 +327,8 @@ namespace WebBanGiay.Controllers
 
 
 
-                        
-                        
+
+
 
                     }
                     //return View("Success");
@@ -301,25 +340,27 @@ namespace WebBanGiay.Controllers
 
                 catch
                 {
-                  
-                    return View("Cart");
+
+                    return View();
                 }
             }
 
 
 
-        
+
 
             return View(Cart);
-        
+
         }
 
         [HttpPost]
-        public IActionResult PayMent(CheckoutVM model,GHNShipping request)
+        public IActionResult PayMent(CheckoutVM model, GHNShipping request)
         {
             var hoadon1 = new Hoa_Don();
             var fee = _ghnService.CalculateFeeAsync(request).Result;
-            var totalAmount = Cart.Sum(p => p.DonGia * p.SoLuong)+fee;
+            var totalAmount = Cart.Sum(x => x.ThanhTienGG) == 0
+               ? Cart.Sum(x => x.ThanhTien)
+               : Cart.Sum(x => x.ThanhTienGG);
 
             var orderId = new Random().Next(1000, 100000);
             var description = $"{model.TenKhachHang} {model.Sdt}";
@@ -334,12 +375,92 @@ namespace WebBanGiay.Controllers
                 OrderId = orderId,
                 Status = hoadon1.trang_thai = 3
             };
+            Random TenBienRanDom = new Random();
+
+            int soNgauNhien = TenBienRanDom.Next(10000, 99999);
+            string newMa = $"HD{soNgauNhien}";
+            var khach = new Tai_Khoan();
+            var tien = new CartItem();
+            var lastHoaDon = db.hoa_Dons
+           .OrderByDescending(h => h.MaHoaDon)
+           .FirstOrDefault();
 
 
-           
+            var hoadon = new Hoa_Don
+            {
 
-            return Redirect(_vnPayservice.CreatePaymentUrl(HttpContext, vnPayModel));
+                MaHoaDon = newMa,
+                ten_nguoi_nhan = model.TenKhachHang ?? khach.ho_ten,
+                dia_chi = model.fulldiachi,
+                sdt_nguoi_nhan = model.Sdt ?? khach.sdt,
+                email_nguoi_nhan = model.Email ?? khach.email,
+                tong_tien = Cart.Sum(x => x.ThanhTienGG) == 0
+           ? Cart.Sum(x => x.ThanhTien)
+           : Cart.Sum(x => x.ThanhTienGG),
+                ngay_tao = DateTime.Now,
+               
+                trang_thai = 0,
+                loai_hoa_don = 2,
+                ghi_chu = model.GhiChu,
+
+
+
+            };
+            db.Database.BeginTransaction();
+            try
+            {
+                db.Database.CommitTransaction();
+                db.Add(hoadon);
+                db.SaveChanges();
+                var cthd = new List<Hoa_Don_Chi_Tiet>();
+                foreach (var item in Cart)
+                {
+
+
+                    var spChiTiet = db.san_Pham_Chi_Tiets
+                            .SingleOrDefault(X => X.ID == item.id);
+
+
+
+                    if (spChiTiet != null && spChiTiet.so_luong >= item.SoLuong)
+                    {
+
+                        spChiTiet.so_luong -= item.SoLuong;
+                        db.Update(spChiTiet);
+                    }
+                    cthd.Add(new Hoa_Don_Chi_Tiet
+                    {
+
+
+                        ID = Guid.NewGuid(),
+                        ma = newMa,
+                        so_luong = item.SoLuong,
+                        gia = item.DonGia,
+                        thanh_tien = item.DonGia * item.SoLuong,
+                        phuongThucthanhtoan = 3,
+                        Hoa_DonID = hoadon.ID,
+                        ngay_tao = DateTime.Now,
+
+
+                    });
+                }
+                //return View("Success");
+                db.AddRange(cthd);
+                db.SaveChanges();
+                HttpContext.Session.Set<List<CartItem>>(MySetting.CART_KEY, new List<CartItem>());
+                return Redirect(_vnPayservice.CreatePaymentUrl(HttpContext, vnPayModel));
+            }
+
+            catch
+            {
+
+                return View();
+            }
         }
+          
+
+        
+       
 
         public IActionResult PaymentSuccess()
         {
@@ -384,9 +505,89 @@ namespace WebBanGiay.Controllers
                 OrderId = orderId,
                 Status = hoadon1.trang_thai = 3
             };
+            Random TenBienRanDom = new Random();
 
-            var response = await _momoService.CreatePaymentMoMo(MomoModel);
-            return Redirect(response.PayUrl);
+            int soNgauNhien = TenBienRanDom.Next(10000, 99999);
+            string newMa = $"HD{soNgauNhien}";
+            var khach = new Tai_Khoan();
+            var tien = new CartItem();
+            var lastHoaDon = db.hoa_Dons
+           .OrderByDescending(h => h.MaHoaDon)
+           .FirstOrDefault();
+
+
+            var hoadon = new Hoa_Don
+            {
+
+                MaHoaDon = newMa,
+                ten_nguoi_nhan = model.TenKhachHang ?? khach.ho_ten,
+                dia_chi = model.fulldiachi,
+                sdt_nguoi_nhan = model.Sdt ?? khach.sdt,
+                email_nguoi_nhan = model.Email ?? khach.email,
+                tong_tien = Cart.Sum(x => x.ThanhTienGG) == 0
+           ? Cart.Sum(x => x.ThanhTien)
+           : Cart.Sum(x => x.ThanhTienGG),
+                ngay_tao = DateTime.Now,
+                trang_thai = 0,
+                loai_hoa_don = 2,
+                ghi_chu = model.GhiChu,
+
+
+
+            };
+            db.Database.BeginTransaction();
+            try
+            {
+                db.Database.CommitTransaction();
+                db.Add(hoadon);
+                db.SaveChanges();
+                var cthd = new List<Hoa_Don_Chi_Tiet>();
+                foreach (var item in Cart)
+                {
+
+
+                    var spChiTiet = db.san_Pham_Chi_Tiets
+                            .SingleOrDefault(X => X.ID == item.id);
+
+
+
+                    if (spChiTiet != null && spChiTiet.so_luong >= item.SoLuong)
+                    {
+
+                        spChiTiet.so_luong -= item.SoLuong;
+                        db.Update(spChiTiet);
+                    }
+                    cthd.Add(new Hoa_Don_Chi_Tiet
+                    {
+
+
+                        ID = Guid.NewGuid(),
+                        ma = newMa,
+                        so_luong = item.SoLuong,
+                        gia = item.DonGia,
+                        thanh_tien = item.DonGia * item.SoLuong,
+                        phuongThucthanhtoan =4,
+                        Hoa_DonID = hoadon.ID,
+                        ngay_tao = DateTime.Now,
+
+
+                    });
+                }
+                //return View("Success");
+                db.AddRange(cthd);
+                db.SaveChanges();
+                HttpContext.Session.Set<List<CartItem>>(MySetting.CART_KEY, new List<CartItem>());
+                var response = await _momoService.CreatePaymentMoMo(MomoModel);
+                return Redirect(response.PayUrl);
+            }
+
+            catch
+            {
+
+                return View();
+            }
+
+          
 
         }
     
