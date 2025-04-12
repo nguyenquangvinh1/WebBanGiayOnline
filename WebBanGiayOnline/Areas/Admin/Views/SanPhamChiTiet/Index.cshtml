@@ -207,7 +207,7 @@
                             @Html.DisplayFor(modelItem => item.gia)
                         </td>
                         <td>
-                            <button class='toggle-status btn btn-sm @(item.trang_thai == 1 ? "btn-success" : "btn-danger")' data-id='@item.ID' data-status='@item.trang_thai' style='width: 150px; height: 30px; line-height: 18px; white-space: nowrap;'>@(item.trang_thai == 1 ? "Hoạt động" : "Không hoạt động")</button>
+                            <span id="status-badge" class="@(item.trang_thai == 1 ? "trang-thai-dang-dien-ra" : "trang-thai-het-han")" style='width: 150px; height: 30px; line-height: 18px; white-space: nowrap;'>@(item.trang_thai == 1 ? "Hoạt động" : "Ngừng hoạt động")</span>
                         </td>
                         <td>
                             <a href="#" class="btn btn-warning btn-edit"
@@ -217,6 +217,8 @@
                                data-img-url="@item.imgUrl">
                                 <i class="fa fa-xs fa-pen"></i>
                             </a>
+                            <a class='toggle-status btn btn-secondary' data-id='@item.ID' data-status='@item.trang_thai'><i class="fa fa-sync"></i></a>
+
                         </td>
                     </tr>
                     stt++;
@@ -268,6 +270,38 @@
 <script>
     $(document).ready(function () {
         $("#chonAnhSanPham").hide();
+        if ($('#sanPhamTable').length > 0) {
+            try {
+                $("#sanPhamTable").DataTable({
+                    "paging": true,
+                    "lengthChange": false,
+                    "searching": false,
+                    "ordering": false,
+                    "info": true,
+                    "autoWidth": false,
+                    "responsive": true,
+                    language: {
+                        info: "Tổng số nhân viên: _TOTAL_ | Hiển thị từ _START_  đến _END_ ",
+                        infoEmpty: " Tổng số nhân viên: 0 | Hiển thị từ 0 đến 0 ",
+                        infoPostFix: "| Hiển thị 10 nục/trang",
+                        loadingRecords: "",
+                        zeroRecords: "Không có dữ liệu phù hợp",
+                        emptyTable: "Không có dữ liệu",
+                        paginate: {
+                            first: '<i class="fas fa-angle-double-left"></i>',
+                            previous: '<i class="fas fa-angle-left"></i>',
+                            next: '<i class="fas fa-angle-right"></i>',
+                            last: '<i class="fas fa-angle-double-right"></i>'
+                        },
+                    },
+                });
+                console.log("✅ DataTables đã khởi tạo thành công!");
+            } catch (error) {
+                console.error("❌ Lỗi khi khởi tạo DataTables:", error);
+            }
+        } else {
+            console.warn("⚠️ Không tìm thấy bảng DataTables!");
+        }
 
         // Khi bấm vào nút "Thêm ảnh vào sản phẩm"
         $(document).off("click", "#themAnhVaoSanPham").on("click", "#themAnhVaoSanPham", function (e) {
@@ -330,6 +364,7 @@
             let id = button.data("id");
             let currentStatus = button.data("status");
             let newStatus = currentStatus === 1 ? 0 : 1;
+            let badge = $('#status-badge');
 
             $.ajax({
                 url: '/Admin/SanPhamChiTiet/ChangeStatus',
@@ -338,8 +373,8 @@
                 async: false,  // Đảm bảo request hoàn tất trước khi tiếp tục
                 success: function () {
                     button.data("status", newStatus);
-                    button.toggleClass('btn-success btn-danger')
-                        .text(newStatus === 1 ? 'Hoạt động' : 'Không hoạt động');
+                    badge.toggleClass('trang-thai-dang-dien-ra trang-thai-het-han')
+                        .text(newStatus === 1 ? 'Hoạt động' : 'Ngừng hoạt động');
                 },
                 error: function (xhr, status, error) {
                     console.error("Lỗi AJAX:", status, error);

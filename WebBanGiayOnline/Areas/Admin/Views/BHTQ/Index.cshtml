@@ -99,9 +99,9 @@
 							<button class="btn btn-outline-secondary selectDiscount" type="button" data-id="INVOICE_ID">Chọn mã giảm giá</button>
 						</div>
 						<!-- Dòng thông báo -->
-						<div id="bestVoucherMessage" style="display:none; color: green; font-weight: 600;">
-							Hiện tại đây là phiếu giảm giá tốt nhất
-						</div>
+						@* <div id="bestVoucherMessage" style="display:none; color: green; font-weight: 600;"> *@
+						@* 	Hiện tại đây là phiếu giảm giá tốt nhất *@
+						@* </div> *@
 					</div>
 					<div class="mb-3">
 						<label class="form-label">Giá gốc</label>
@@ -153,6 +153,9 @@
 				<div class="modal-body">
 					<!-- Form Thêm nhanh khách hàng, đặt ở đây -->
 					<div class="mb-3">
+						<input type="text" id="customerSearchInput" class="form-control" placeholder="Nhập từ khóa tìm kiếm khách hàng..." />
+					</div>
+					<div class="mb-3">
 						<h6>Thêm nhanh khách hàng</h6>
 						<form id="quickAddCustomerForm" class="row g-2">
 							<div class="col-md-4">
@@ -184,8 +187,12 @@
 						<tbody>
 							<!-- Các dòng khách hàng sẽ được load vào đây -->
 
+
 						</tbody>
 					</table>
+					<nav aria-label="Customer Pagination">
+						<ul id="customerPaginationContainer" class="pagination justify-content-center"></ul>
+					</nav>
 				</div>
 			</div>
 		</div>
@@ -196,7 +203,7 @@
 		<div class="modal-dialog modal-xl">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="detailedProductModalLabel">Danh sách sản phẩm chi tiết</h5>
+					<h5 class="modal-title" id="detailedProductModalLabel">Thêm sản phẩm</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
 				</div>
 				<div class="modal-body">
@@ -310,7 +317,11 @@
 								<th>Số lượng</th>
 								<th>Kích thước</th>
 								<th>Màu sắc</th>
-								<th>Trạng thái</th>
+								
+								<th>Cổ giày</th>
+								<th>Đế giày</th>
+								<th>Chất liệu</th>
+								
 
 								<th>Hành động</th>
 							</tr>
@@ -320,11 +331,41 @@
 
 						</tbody>
 					</table>
+					<nav aria-label="Product Pagination">
+						<ul id="productPaginationContainer" class="pagination justify-content-center"></ul>
+					</nav>
 				</div>
 			</div>
 		</div>
 	</div>
 
+	<!-- Modal nhập số lượng -->
+	<div class="modal fade" id="quantityModal" tabindex="-1" aria-labelledby="quantityModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-sm">
+			<!-- .modal-sm để modal nhỏ -->
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="quantityModalLabel">Nhập số lượng</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+				</div>
+				<div class="modal-body">
+					<!-- Thông tin sản phẩm -->
+					<p id="productNameLabel" style="font-weight: bold;"></p>
+					<p>Giá: <span id="productPriceLabel"></span> VND</p>
+
+					<!-- Ô nhập số lượng -->
+					<div class="mb-3">
+						<label for="quantityInput" class="form-label">Số lượng</label>
+						<input type="number" class="form-control" id="quantityInput" min="1" value="1">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+					<button type="button" class="btn btn-primary" id="confirmQuantityBtn">Thêm sản phẩm</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 
 	<!-- Chỗ hiển thị Tổng tiền hóa đơn: ... -->
@@ -455,6 +496,61 @@
 		});
 
 		});
+			 // 1. Tạo hóa đơn mới
+		$('#createInvoice').on('click', function(){
+
+			 if (invoiceCount >= MAX_INVOICE) {
+				 Swal.fire({
+						 icon: 'success',
+						title: "Bạn chỉ được tạo tối đa ${MAX_INVOICE} hóa đơn cùng lúc! ",
+						toast: true,
+						position: 'top-end',
+						showConfirmButton: false,
+						timer: 3000,
+						timerProgressBar: true
+					});
+				 return;
+			 }
+			 // Nếu chưa đạt, gọi Ajax để tạo hóa đơn mới
+			 $.ajax({
+				 url: '/Admin/BHTQ/CreateInvoice',
+				 type: 'POST',
+				 success: function(res){
+					 if(res && res.success){
+						   invoiceCount++;
+						 // debugger;
+						 // Clone template, tạo tab và gán invoiceId vào DOM...
+						 let id = (res && res.data && res.data.id) ? res.data.id : '',
+								newInvoiceDomId = 'invoice_' + id,
+							newInvoiceHtml = $('#invoiceTemplate').html().replace(/INVOICE_ID/g, newInvoiceDomId),
+								invoiceCode = (res && res.data && res.data.maHoaDon) ? res.data.maHoaDon : '';
+
+							// debugger;
+						 $('#invoiceTabs').append(`
+							 <li class="nav-item">
+								 <a class="nav-link" id="tab-${newInvoiceDomId}" data-bs-toggle="tab" href="#${newInvoiceDomId}">
+									 ${invoiceCode}
+											 <!-- Thêm vòng tròn/badge hiển thị số lượng: -->
+								  <span class="badge invoice-count-badge" id="badge-${newInvoiceDomId}">0</span>
+									 <span class="close-tab" data-id="${newInvoiceDomId}">✖</span>
+								 </a>
+							 </li>`);
+						 $('#invoiceContent').append(newInvoiceHtml);
+							 $(`#${newInvoiceDomId}`).attr('data-db-invoice-id', id);
+						 let tab = new bootstrap.Tab(document.querySelector(`#tab-${newInvoiceDomId}`));
+						 tab.show();
+
+					 } else {
+						 alert("Lỗi tạo hóa đơn: " + res.message);
+					 }
+				 },
+				 error: function(err){
+					 console.error(err);
+					 alert("Không thể tạo hóa đơn, vui lòng thử lại!");
+				 }
+			 });
+		 });
+
 
 				function filterProducts() {
 			let searchQuery = $("#searchProduct").val().toLowerCase();
@@ -498,7 +594,6 @@
 									<td>${product.dbQuantity}</td>
 									<td>${product.size}</td>
 									<td>${product.color}</td>
-									<td>${product.status}</td>
 									<td>
 										<button class="btn btn-success btn-sm add-product"
 											data-id="${product.id}"
@@ -526,52 +621,7 @@
 		}
 
 
-			 // 1. Tạo hóa đơn mới
-		$('#createInvoice').on('click', function(){
-
-			 if (invoiceCount >= MAX_INVOICE) {
-				 alert('Bạn chỉ được tạo tối đa ${MAX_INVOICE} hóa đơn cùng lúc!');
-				 return;
-			 }
-			 // Nếu chưa đạt, gọi Ajax để tạo hóa đơn mới
-			 $.ajax({
-				 url: '/Admin/BHTQ/CreateInvoice',
-				 type: 'POST',
-				 success: function(res){
-					 if(res && res.success){
-						 // debugger;
-						 // Clone template, tạo tab và gán invoiceId vào DOM...
-						 let id = (res && res.data && res.data.id) ? res.data.id : '',
-								newInvoiceDomId = 'invoice_' + id,
-							newInvoiceHtml = $('#invoiceTemplate').html().replace(/INVOICE_ID/g, newInvoiceDomId),
-								invoiceCode = (res && res.data && res.data.maHoaDon) ? res.data.maHoaDon : '';
-								
-							// debugger;
-						 $('#invoiceTabs').append(`
-							 <li class="nav-item">
-								 <a class="nav-link" id="tab-${newInvoiceDomId}" data-bs-toggle="tab" href="#${newInvoiceDomId}">
-									 ${invoiceCode}
-											 <!-- Thêm vòng tròn/badge hiển thị số lượng: -->
-								  <span class="badge invoice-count-badge" id="badge-${newInvoiceDomId}">0</span>
-									 <span class="close-tab" data-id="${newInvoiceDomId}">✖</span>
-								 </a>
-							 </li>`);
-						 $('#invoiceContent').append(newInvoiceHtml);
-							 $(`#${newInvoiceDomId}`).attr('data-db-invoice-id', id);
-						 let tab = new bootstrap.Tab(document.querySelector(`#tab-${newInvoiceDomId}`));
-						 tab.show();
-						
-					 } else {
-						 alert("Lỗi tạo hóa đơn: " + res.message);
-					 }
-				 },
-				 error: function(err){
-					 console.error(err);
-					 alert("Không thể tạo hóa đơn, vui lòng thử lại!");
-				 }
-			 });
-		 });
-
+		
 
 		 //close hoa don
 
@@ -588,7 +638,15 @@
 				if (response.success) {
 					    $(`#tab-${removedInvoiceDomId}`).parent().remove();
 						$(`#${removedInvoiceDomId}`).remove();
-						alert("Đơn hàng đã được hủy và các sản phẩm đã được cộng lại vào kho!");
+						Swal.fire({
+						 icon: 'success',
+						title: "Huỷ đơn hàng thành công",
+						toast: true,
+						position: 'top-end',
+						showConfirmButton: false,
+						timer: 3000,
+						timerProgressBar: true
+					});
 				} else {
 					alert(response.message);
 				}
@@ -870,161 +928,331 @@
 
 
 		 // 2. Thêm sản phẩm vào hóa đơn
-		$(document).on('click', '.add-product', function () {
-			 let productId = $(this).data('id');
-			 let quantity = 1; // Mặc định thêm 1 sản phẩm
-			 let price = parseFloat($(this).data('price')) || 0;
+							$(document).on('click', '.add-product', function () {
+			// Lấy thông tin sản phẩm từ data attribute
+			let productId = $(this).data('id');
+			let productName = $(this).data('name');
+			let price = parseFloat($(this).data('price')) || 0;
 
-			 let invoiceDomId = currentInvoiceId; // Lấy invoiceId hiện hành
-			 let dbInvoiceId = $(`#${invoiceDomId}`).attr('data-db-invoice-id');
+			// Lưu tạm thông tin sản phẩm hiện chọn (có thể lưu trong biến toàn cục)
+			window.currentSelectedProduct = {
+				id: productId,
+				name: productName,
+				price: price
+			};
 
-			 console.log("Invoice DOM id:", invoiceDomId, "-> dbInvoiceId:", dbInvoiceId);
+			// Hiển thị thông tin sản phẩm lên modal (nếu cần)
+			$('#modalProductName').text(productName);
+			// Đặt giá trị mặc định cho ô nhập số lượng
+			$('#quantityInput').val(1);
 
-			 if (!dbInvoiceId) {
-				 alert("Không tìm thấy hóa đơn!");
-				 return;
-			 }
+			// Mở modal nhập số lượng
+			let modal = new bootstrap.Modal(document.getElementById('quantityModal'));
+			modal.show();
+		});
 
-			 $.ajax({
-				 url: '/Admin/BHTQ/AddProductToInvoice',
-				 type: 'POST',
-				 data: JSON.stringify({
-					 InvoiceId: dbInvoiceId,
-					 ProductId: productId,
-					 Quantity: quantity,
-					 Price: price
-				 }),
-				 contentType: 'application/json; charset=utf-8',
-				 success: function (res) {
-					 console.log("Kết quả thêm sản phẩm:", res);
-					 if (res.success) {
-						 // Cập nhật danh sách sản phẩm trong hóa đơn
-						 loadInvoiceDetails();
-						
-						 // Đóng modal sau khi thêm sản phẩm thành công
-						 let modal = bootstrap.Modal.getInstance(document.getElementById('detailedProductModal'));
-						 if (modal) {
-							 modal.hide();
-						 }
-					 }
-					 else{
-						 if(res.message.includes("đã có sự thay đổi về giá")){
-							 Swal.fire({
-					icon: 'warning',
-					title: 'Cảnh báo giá',
-					text: res.message
-				});
-						 }
-					 
-					 else {
-						 alert("Lỗi thêm sản phẩm: " + res.message);
-					 }
-					 }
-				 },
-				 error: function (err) {
-					 console.error("Lỗi khi thêm sản phẩm:", err);
-					 alert("Có lỗi xảy ra, vui lòng thử lại!");
-				 }
-			 });
-		 });
+				$(document).on('click', '#confirmQuantityBtn', function() {
+			let quantity = parseInt($('#quantityInput').val());
+			if (isNaN(quantity) || quantity <= 0) {
+				alert("Số lượng phải là số và lớn hơn 0");
+				return;
+			}
+
+			// Lấy thông tin sản phẩm đã lưu
+			let product = window.currentSelectedProduct;
+			if (!product || !product.id) {
+				alert("Không tìm thấy thông tin sản phẩm");
+				return;
+			}
+
+			let invoiceDomId = currentInvoiceId; // Biến chứa id DOM hóa đơn hiện tại
+			let dbInvoiceId = $(`#${invoiceDomId}`).attr('data-db-invoice-id');
+			if (!dbInvoiceId) {
+				alert("Không tìm thấy hóa đơn!");
+				return;
+			}
+
+			// Gọi AJAX để thêm sản phẩm với số lượng người dùng nhập
+			$.ajax({
+				url: '/Admin/BHTQ/AddProductToInvoice',
+				type: 'POST',
+				contentType: 'application/json; charset=utf-8',
+				data: JSON.stringify({
+					InvoiceId: dbInvoiceId,
+					ProductId: product.id,
+					Quantity: quantity,
+					Price: product.price
+				}),
+				success: function (res) {
+					console.log("Kết quả thêm sản phẩm:", res);
+					if (res.success) {
+						// Cập nhật lại danh sách sản phẩm trong hóa đơn
+						loadInvoiceDetails();
+						// Đóng modal nhập số lượng
+						let modal = bootstrap.Modal.getInstance(document.getElementById('quantityModal'));
+						if (modal) {
+							modal.hide();
+						}
+					} else {
+						if (res.message.includes("đã có sự thay đổi về giá")) {
+							Swal.fire({
+								icon: 'warning',
+								title: 'Cảnh báo giá',
+								text: res.message
+							});
+						} else {
+							alert("Lỗi thêm sản phẩm: " + res.message);
+						}
+					}
+				},
+				error: function (err) {
+					console.error("Lỗi khi thêm sản phẩm:", err);
+					alert("Có lỗi xảy ra, vui lòng thử lại!");
+				}
+			});
+		});
+
 
 		 // danh sach san pham hien thi tai modal va xu li su kien nut them san pham tai modal
-						function loadDetailedProducts() {
-			 $.getJSON('/Admin/SanPhamChiTiet/GetAllSanPhamChiTiet', function(data) {
-				 let tbody = $('#detailedProductTable tbody');
-				 tbody.empty();
+							let currentProductPage = 1;
+		const productPageSize = 5;
 
-				 if(data && data.length > 0) {
-					 $.each(data, function(index, product){
-						 let imgUrl = product.imageUrl || "/img/default.jpg"; // Đảm bảo luôn có ảnh
-						 let availableQty = product.dbQuantity || 0;
+		function loadDetailedProducts(page = currentProductPage) {
+			$.ajax({
+				url: '/Admin/SanPhamChiTiet/GetAllSanPhamChiTiet',
+				type: 'GET',
+				data: { pageNumber: page, pageSize: productPageSize },
+				success: function (res) {
+					let tbody = $('#detailedProductTable tbody');
+					tbody.empty();
+					if (res.success && res.data && res.data.length > 0) {
+						$.each(res.data, function (index, product) {
+							let imgUrl = product.imageUrl || "/img/default.jpg";
+							let rowHtml = `
+								<tr>
+									<td>${(page - 1) * productPageSize + index + 1}</td>
+									<td><img src="${imgUrl}" alt="${product.ten_SPCT}" width="50"></td>
+									<td>${product.ten_SPCT}</td>
+									<td>${parseFloat(product.price).toLocaleString()} VND</td>
+									<td>${product.dbQuantity}</td>
+									<td>${product.size}</td>
+									<td>${product.color}</td>
+									<td>${product.status}</td>
+									<td>${product.cogiay}</td>
+									<td>${product.degiay}</td>
+									<td>${product.chatlieu}</td>
+									<td>
+										<button class="btn btn-success btn-sm add-product"
+												data-id="${product.id}"
+												data-name="${product.ten_SPCT}"
+												data-price="${product.price}"
+												data-size="${product.size}"
+												data-color="${product.color}">
 
-								let rowHtml = `
-		 <tr>
-		   <td>${index + 1}</td>
-		   <td><img src="${imgUrl}" alt="${product.ten_SPCT}" width="50"></td>
-		   <td>${product.ten_SPCT}</td>
-		   <td>${parseFloat(product.price).toLocaleString()} VND</td>
-		   <td>${product.dbQuantity}</td>
-		   <td>${product.size}</td>
-		   <td>${product.color}</td>
-		   <td>${product.status}</td>
-		   <td>
-			 <button class="btn btn-success btn-sm add-product"
-					 data-id="${product.id}"
-					 data-name="${product.ten_SPCT}"
-					 data-price="${product.price}"
-					 data-size="${product.size}"
-					 data-color="${product.color}"
-					 data-status="${product.status}"
-					 data-img="${imgUrl}">
-			   Thêm
-			 </button>
-		   </td>
-		 </tr>
-		 `;
+												
+											Thêm
+										</button>
+									</td>
+								</tr>
+							`;
+							tbody.append(rowHtml);
+						});
+						renderProductPagination(res.pagination);
+					} else {
+						tbody.append('<tr><td colspan="9" class="text-center">Không có sản phẩm</td></tr>');
+						renderProductPagination(null);
+					}
+				},
+				error: function (err) {
+					console.error("Lỗi khi lấy dữ liệu sản phẩm chi tiết:", err);
+				}
+			});
+		}
 
-						 tbody.append(rowHtml);
-					 });
-				 } else {
-					 tbody.append('<tr><td colspan="9" class="text-center">Không có sản phẩm</td></tr>');
-				 }
-			 }).fail(function(jqXHR, textStatus, errorThrown){
-				 console.error("Lỗi khi lấy dữ liệu sản phẩm chi tiết:", textStatus);
-			 });
-		 }
+				function renderProductPagination(pagination) {
+		  let container = $('#productPaginationContainer');
+		  container.empty();
+		  if (!pagination) return;
+
+		  // Nút First («)
+		  container.append(`<li class="page-item ${pagination.pageNumber === 1 ? 'disabled' : ''}">
+			<a class="page-link" href="#" data-page="1">&laquo;</a>
+		  </li>`);
+
+		  // Nút Prev (‹)
+		  let prevPage = pagination.pageNumber > 1 ? pagination.pageNumber - 1 : 1;
+		  container.append(`<li class="page-item ${pagination.pageNumber === 1 ? 'disabled' : ''}">
+			<a class="page-link" href="#" data-page="${prevPage}">&lsaquo;</a>
+		  </li>`);
+
+		  // Số trang
+		  for (let i = 1; i <= pagination.totalPages; i++) {
+			let activeClass = i === pagination.pageNumber ? "active" : "";
+			container.append(`<li class="page-item ${activeClass}">
+			  <a class="page-link" href="#" data-page="${i}">${i}</a>
+			</li>`);
+		  }
+
+		  // Nút Next (›)
+		  let nextPage = pagination.pageNumber < pagination.totalPages ? pagination.pageNumber + 1 : pagination.totalPages;
+		  container.append(`<li class="page-item ${pagination.pageNumber === pagination.totalPages ? 'disabled' : ''}">
+			<a class="page-link" href="#" data-page="${nextPage}">&rsaquo;</a>
+		  </li>`);
+
+		  // Nút Last (»)
+		  container.append(`<li class="page-item ${pagination.pageNumber === pagination.totalPages ? 'disabled' : ''}">
+			<a class="page-link" href="#" data-page="${pagination.totalPages}">&raquo;</a>
+		  </li>`);
+		}
+				//xư li su kien khi nhan icon phan trang sp
+
+				$(document).on('click', '#productPaginationContainer .page-link', function(e) {
+		  e.preventDefault();
+		  let page = parseInt($(this).data('page'));
+		  if (page) {
+			currentProductPage = page;
+			loadDetailedProducts(page);
+		  }
+		});
+		
+
+		$(document).on('click', '.product-pagination-btn', function() {
+			let page = parseInt($(this).data('page'));
+			if (page) {
+				currentProductPage = page;
+				loadDetailedProducts(page);
+			}
+		});
 
 
 
 		//xu li su kien lay danh sach khach hang
 
+						// Các biến toàn cục cho phân trang khách hàng
+		let currentCustomerPage = 1;
+		const customerPageSize = 5;
 
-				// Sự kiện khi nhấn nút "Tài khoản"
-			   $(document).on('click', '.selectCustomer', function(){
-			 $.ajax({
-				  url: '/Admin/KhachHang/GetAllKhachHang', // Đường dẫn đến action lấy danh sách khách hàng
-				 type: 'GET',
-				 success: function(res) {
-					 if (res.success) {
-						 let tbody = $('#customerTable tbody');
-						 tbody.empty();
-						 $.each(res.data, function(index, customer) {
-							 tbody.append(`
-								 <tr>
-									 <td>${index + 1}</td>
-									 <td>${customer.ho_ten}</td>
-									 <td>${customer.phoneNumber}</td>
-									 <td>${customer.email}</td>
-									 <td>
-										 <button class="btn btn-primary btn-sm choose-customer"
-												 data-id="${customer.id}"
-												 data-name="${customer.ho_ten}"
-												 data-phone="${customer.phoneNumber}"
-												 data-email="${customer.email}">
-											 Chọn
-										 </button>
-									 </td>
-								 </tr>
-							 `);
-						 });
-						 // Hiển thị modal khách hàng
-						 let modal = new bootstrap.Modal(document.getElementById('customerModal'));
-						 modal.show();
-					 } else {
-						 alert("Lỗi: " + res.message);
-					 }
-				 },
-				 error: function(err) {
-					 console.error("Lỗi khi lấy dữ liệu khách hàng:", err);
-					 alert("Có lỗi xảy ra, vui lòng thử lại sau.");
-				 }
-			 });
-		 });
+	
+		//tim kiem khach hang
 
+				function loadCustomers(page = currentCustomerPage, keyword = currentSearchKeyword) {
+			$.ajax({
+				url: '/Admin/KhachHang/SearchCustomers',
+				type: 'GET',
+				data: { pageNumber: page, pageSize: customerPageSize, keyword: keyword },
+				success: function (res) {
+					let tbody = $('#customerTable tbody');
+					tbody.empty();
+					if (res.success && res.data && res.data.length > 0) {
+						$.each(res.data, function (index, customer) {
+							tbody.append(`
+								<tr>
+									<td>${(page - 1) * customerPageSize + index + 1}</td>
+									<td>${customer.ho_ten}</td>
+									<td>${customer.phoneNumber}</td>
+									<td>${customer.email}</td>
+									<td>
+										<button class="btn btn-primary btn-sm choose-customer"
+												data-id="${customer.id}"
+												data-name="${customer.ho_ten}"
+												data-phone="${customer.phoneNumber}"
+												data-email="${customer.email}">
+											Chọn
+										</button>
+									</td>
+								</tr>
+							`);
+						});
+						renderCustomerPagination(res.pagination);
+					} else {
+						tbody.append('<tr><td colspan="5" class="text-center">Không có khách hàng</td></tr>');
+						renderCustomerPagination(null);
+					}
+				},
+				error: function (err) {
+					console.error("Lỗi khi lấy danh sách khách hàng:", err);
+					alert("Có lỗi xảy ra, vui lòng thử lại sau.");
+				}
+			});
+		}
+
+		// Hàm render nút phân trang cho khách hàng
+				function renderCustomerPagination(pagination) {
+		  let container = $('#customerPaginationContainer');
+		  container.empty();
+		  if (!pagination) return;
+
+		  // Nút First («)
+		  container.append(`<li class="page-item ${pagination.pageNumber === 1 ? 'disabled' : ''}">
+			<a class="page-link" href="#" data-page="1">&laquo;</a>
+		  </li>`);
+
+		  // Nút Prev (‹)
+		  let prevPage = pagination.pageNumber > 1 ? pagination.pageNumber - 1 : 1;
+		  container.append(`<li class="page-item ${pagination.pageNumber === 1 ? 'disabled' : ''}">
+			<a class="page-link" href="#" data-page="${prevPage}">&lsaquo;</a>
+		  </li>`);
+
+		  // Số trang
+		  for (let i = 1; i <= pagination.totalPages; i++) {
+			let activeClass = i === pagination.pageNumber ? "active" : "";
+			container.append(`<li class="page-item ${activeClass}">
+			  <a class="page-link" href="#" data-page="${i}">${i}</a>
+			</li>`);
+		  }
+
+		  // Nút Next (›)
+		  let nextPage = pagination.pageNumber < pagination.totalPages ? pagination.pageNumber + 1 : pagination.totalPages;
+		  container.append(`<li class="page-item ${pagination.pageNumber === pagination.totalPages ? 'disabled' : ''}">
+			<a class="page-link" href="#" data-page="${nextPage}">&rsaquo;</a>
+		  </li>`);
+
+		  // Nút Last (»)
+		  container.append(`<li class="page-item ${pagination.pageNumber === pagination.totalPages ? 'disabled' : ''}">
+			<a class="page-link" href="#" data-page="${pagination.totalPages}">&raquo;</a>
+		  </li>`);
+		}
+
+		// Bắt sự kiện click trên các nút phân trang của khách hàng
+		$(document).on('click', '.customer-pagination-btn', function() {
+			let page = parseInt($(this).data('page'));
+			if (page) {
+				currentCustomerPage = page;
+				loadCustomers(page);
+			}
+		});
+		//xư li su kien khi nhan icon phan trang khach hang
+				$(document).on('click', '.page-item a', function(e) {
+		  e.preventDefault();
+		  let page = parseInt($(this).data('page'));
+		  if (page) {
+			currentCustomerPage = page;
+			loadCustomers(currentCustomerPage, currentSearchKeyword);
+		  }
+		});
+
+		// Sự kiện khi nhấn nút "Tài khoản"
+		$(document).on('click', '.selectCustomer', function(){
+			// Khi nhấn "Tài khoản", load danh sách khách hàng ở trang đầu tiên
+			currentCustomerPage = 1;
+			  currentSearchKeyword = "";
+			loadCustomers(currentCustomerPage,currentSearchKeyword);
+			// Hiển thị modal khách hàng
+			let modal = new bootstrap.Modal(document.getElementById('customerModal'));
+			modal.show();
+		});
+
+		// goi ham xu li tim kiem khach hang
+				$(document).on('input', '#customerSearchInput', function() {
+					  currentSearchKeyword = $(this).val().trim();
+
+			currentCustomerPage = 1; // reset về trang 1
+			loadCustomers(currentCustomerPage, currentSearchKeyword);
+		});
 			 //them nhanh khach hang
 							$(document).on('submit', '#quickAddCustomerForm', function (e) {
 		
-
+								e.preventDefault();
 			let customerData = {
 				HoTen: $('#quickCustomerName').val().trim(),
 				PhoneNumber: $('#quickCustomerPhone').val().trim(),
@@ -1152,67 +1380,122 @@
 		//API GetAvailableDiscounts để lấy danh sách voucher
 				let bestDiscountAmount = 0;
 		// let bestVoucherCode = null; ban đầu là null
-					 function autoSelectDiscountCode(invoiceDomId) {
+		// 			 function autoSelectDiscountCode(invoiceDomId) {
+		// 	let container = $('#' + invoiceDomId);
+		// 	Lấy orderTotal từ span
+
+		// 		 let totalText = $('#totalPrice-' + invoiceDomId).text();
+		// 		console.log('Total price text for', invoiceDomId, ':', totalText);
+		// 		let orderTotal = parseFloat(totalText) || 0;
+		// 		console.log('Computed orderTotal:', orderTotal);
+
+		// 	Lấy customerId đã lưu (nếu có); nếu chưa có, customerId sẽ là null
+		// 	let customerId = container.attr('data-customer-id') || null;
+		// 	console.log('Ctmid:',customerId);
+		// 	$.ajax({
+		// 		url: '/Admin/PhieuGiamGia/GetAvailableDiscounts',
+		// 		type: 'GET',
+		// 		data: { customerId: customerId, orderTotal: orderTotal },
+		// 		success: function(vouchers) {
+		// 			if (!vouchers || vouchers.length === 0) {
+		// 				Không có voucher phù hợp, không fill gì
+		// 				return;
+		// 			}
+		// 			Tìm voucher tốt nhất
+		// 			let bestVoucher = null, maxDiscount = 0;
+		// 			vouchers.forEach(function(voucher) {
+		// 				let discount = 0;
+		// 				if(voucher.loai === 0){ giảm theo VND
+		// 					discount = voucher.gia_tri;
+		// 				} else if(voucher.loai === 1){ giảm theo %
+		// 					discount = orderTotal * (voucher.gia_tri / 100);
+		// 					if(voucher.so_tien_giam_toi_da && discount > voucher.so_tien_giam_toi_da){
+		// 						discount = voucher.so_tien_giam_toi_da;
+		// 					}
+		// 				}
+		// 				if(discount > maxDiscount){
+		// 					maxDiscount = discount;
+		// 					bestVoucher = voucher;
+		// 				}
+		// 			});
+		// 			if(bestVoucher){
+		// 			bestDiscountAmount=maxDiscount;
+		// 			bestVoucherCode=bestVoucher.ma;
+		// 				container.find('.discountCodeInput').val(bestVoucher.ma);
+		// 				container.find('.discountAmount').val(maxDiscount);
+		// 				container.find('.finalTotal').val(orderTotal - maxDiscount);
+		// 				hien thi thong bao ma giam gia toot nhat
+		// 						container.find('#bestVoucherMessage').show();	
+		// 					} else {
+		// 				Không tìm được voucher tốt nhất
+		// 				container.find('#bestVoucherMessage').hide();
+		// 				bestVoucherCode=null;
+		// 				bestDiscountAmount=0;
+		// 			}
+		// 		},
+		// 		error: function(err) {
+		// 			console.error("Lỗi autoSelectDiscountCode:", err);
+		// 					 container.find('#bestVoucherMessage').hide();
+		// 					 bestVoucherCode=null;
+		// 						bestDiscountAmount=0;
+		// 		}
+		// 	});
+		// }
+
+						function autoSelectDiscountCode(invoiceDomId) {
 			let container = $('#' + invoiceDomId);
-			// Lấy orderTotal từ span
-
-				 let totalText = $('#totalPrice-' + invoiceDomId).text();
-				console.log('Total price text for', invoiceDomId, ':', totalText);
-				let orderTotal = parseFloat(totalText) || 0;
-				console.log('Computed orderTotal:', orderTotal);
-
-			// Lấy customerId đã lưu (nếu có); nếu chưa có, customerId sẽ là null
+			let orderTotal = parseFloat($('#totalPrice-' + invoiceDomId).text()) || 0;
 			let customerId = container.attr('data-customer-id') || null;
-			console.log('Ctmid:',customerId);
+
 			$.ajax({
 				url: '/Admin/PhieuGiamGia/GetAvailableDiscounts',
 				type: 'GET',
 				data: { customerId: customerId, orderTotal: orderTotal },
 				success: function(vouchers) {
 					if (!vouchers || vouchers.length === 0) {
-						// Không có voucher phù hợp, không fill gì
 						return;
 					}
-					// Tìm voucher tốt nhất
 					let bestVoucher = null, maxDiscount = 0;
 					vouchers.forEach(function(voucher) {
 						let discount = 0;
-						if(voucher.loai === 0){ // giảm theo VND
+						if (voucher.loai === 0) { // giảm theo VND
 							discount = voucher.gia_tri;
-						} else if(voucher.loai === 1){ // giảm theo %
+						} else if (voucher.loai === 1) { // giảm theo %
 							discount = orderTotal * (voucher.gia_tri / 100);
-							if(voucher.so_tien_giam_toi_da && discount > voucher.so_tien_giam_toi_da){
+							if (voucher.so_tien_giam_toi_da && discount > voucher.so_tien_giam_toi_da) {
 								discount = voucher.so_tien_giam_toi_da;
 							}
 						}
-						if(discount > maxDiscount){
+						if (discount > maxDiscount) {
 							maxDiscount = discount;
 							bestVoucher = voucher;
 						}
 					});
-					if(bestVoucher){
+					if (bestVoucher) {
 					bestDiscountAmount=maxDiscount;
-					// bestVoucherCode=bestVoucher.ma;
+					bestVoucherCode=bestVoucher.ma;
 						container.find('.discountCodeInput').val(bestVoucher.ma);
 						container.find('.discountAmount').val(maxDiscount);
 						container.find('.finalTotal').val(orderTotal - maxDiscount);
-						//hien thi thong bao ma giam gia toot nhat
-								container.find('#bestVoucherMessage').show();	
-							} else {
-						// Không tìm được voucher tốt nhất
-						container.find('#bestVoucherMessage').hide();
-						// bestVoucherCode=null;
-						bestDiscountAmount=0;
+						// Nếu có voucher tốt nhất, hiển thị toast confirm
+						Swal.fire({
+									icon: 'success',
+									title: 'Phiếu giảm giá tốt nhất đã được áp dụng!',
+									toast: true,
+									position: 'top-end',
+									showConfirmButton: false,
+									timer: 3000,
+									timerProgressBar: true
+							});
+						// Bạn cũng có thể lưu lại thông tin voucher nếu cần dùng sau
 					}
 				},
 				error: function(err) {
 					console.error("Lỗi autoSelectDiscountCode:", err);
-							 container.find('#bestVoucherMessage').hide();
-							 // bestVoucherCode=null;
-								bestDiscountAmount=0;
 				}
 			});
 		}
+
 
 				$(document).on('click', '.selectDiscount', function() {
 			let invoiceDomId = $(this).data('id');
@@ -1297,7 +1580,15 @@
 
 			//kiem tra xem co ma gg nay co trung voi ma gg cua voucher code hay khong
 			if(Math.abs(discount - bestDiscountAmount) < 0.01){
-						container.find('#bestVoucherMessage').show();
+						Swal.fire({
+									icon: 'success',
+									title: 'Phiếu giảm giá tốt nhất đã được áp dụng!',
+									toast: true,
+									position: 'top-end',
+									showConfirmButton: false,
+									timer: 3000,
+									timerProgressBar: true
+							});
 			}else{
 						container.find('#bestVoucherMessage').hide();
 			}
@@ -1413,53 +1704,99 @@
 
 						   // Nút "Xác nhận thanh toán" -> gửi toàn bộ dữ liệu thanh toán lên server
 					// Mảng paymentRows, currentInvoiceId, ... đã có sẵn
-							$(document).on('click', '#finalConfirmBtn', function() {
-			console.log("Nút thanh toán được nhấn!");
+								$(document).on('click', '#finalConfirmBtn', function() {
+			// Hiển thị hộp thoại xác nhận thanh toán
+			Swal.fire({
+				title: "Xác nhận thanh toán",
+				text: "Bạn có chắc chắn muốn thanh toán đơn hàng này không?",
+				icon: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#3085d6",
+				cancelButtonColor: "#d33",
+				confirmButtonText: "Có, thanh toán!",
+				cancelButtonText: "Hủy"
+			}).then((result) => {
+				if (result.isConfirmed) {
+					// Sau khi người dùng xác nhận, tiếp tục xử lý thanh toán
 
-			let paymentAmountStr = $('#paymentAmount').val(); // Lấy giá trị từ input
-			console.log("Giá trị paymentAmountStr: ", paymentAmountStr);
+					let paymentAmountStr = $('#paymentAmount').val(); // Lấy giá trị từ input
 
-			// Kiểm tra nếu giá trị rỗng hoặc không hợp lệ
-			if (!paymentAmountStr || isNaN(paymentAmountStr.replace(/\D/g, ''))) {
-				alert("Vui lòng nhập số tiền thanh toán hợp lệ.");
-				return;
-			}
-
-			// Chuyển đổi thành số
-			let finalTotal = parseFloat(paymentAmountStr.replace(/\D/g, '')) || 0;
-			console.log("finalTotal sau khi chuyển đổi: ", finalTotal);
-
-			if (finalTotal <= 0) {
-				alert("Số tiền thanh toán phải lớn hơn 0.");
-				return;
-			}
-
-			let requestData = {
-				InvoiceId: window.tempPaymentData.InvoiceId,
-				FinalTotal: finalTotal,
-				VoucherCodeString: window.tempPaymentData.VoucherCodeString,
-				VoucherId: null,
-				PaymentRows: window.tempPaymentData.PaymentRows
-			};
-
-			console.log("Request Data:", requestData);
-
-			$.ajax({
-				url: '/Admin/BHTQ/FinalizePayment',
-				type: 'POST',
-				contentType: 'application/json;charset=utf-8',
-				data: JSON.stringify(requestData),
-				success: function(res) {
-					if (res.success) {
-						alert("Thanh toán thành công!");
-						window.tempPaymentData = null;
-					} else {
-						alert("Lỗi thanh toán: " + res.message);
+					// Kiểm tra nếu giá trị rỗng hoặc không hợp lệ
+					if (!paymentAmountStr || isNaN(paymentAmountStr.replace(/\D/g, ''))) {
+						Swal.fire({
+							icon: 'error',
+							title: 'Số tiền thanh toán chưa hợp lệ',
+							toast: true,
+							position: 'top-end',
+							showConfirmButton: false,
+							timer: 3000,
+							timerProgressBar: true
+						});
+						return;
 					}
-				},
-				error: function(err) {
-					console.error("FinalizePayment error:", err);
-					alert("Có lỗi xảy ra, vui lòng thử lại!");
+
+					// Chuyển đổi thành số
+					let finalTotal = parseFloat(paymentAmountStr.replace(/\D/g, '')) || 0;
+					console.log("finalTotal sau khi chuyển đổi: ", finalTotal);
+
+					if (finalTotal <= 0) {
+						console.log("Giá trị paymentAmountStr: ", paymentAmountStr);
+						return;
+					}
+
+					let requestData = {
+						InvoiceId: window.tempPaymentData.InvoiceId,
+						FinalTotal: finalTotal,
+						VoucherCodeString: window.tempPaymentData.VoucherCodeString,
+						VoucherId: null,
+						PaymentRows: window.tempPaymentData.PaymentRows
+					};
+
+					console.log("Request Data:", requestData);
+
+					$.ajax({
+						url: '/Admin/BHTQ/FinalizePayment',
+						type: 'POST',
+						contentType: 'application/json;charset=utf-8',
+						data: JSON.stringify(requestData),
+						success: function(res) {
+							if (res.success) {
+								Swal.fire({
+									icon: 'success',
+									title: 'Thanh toán thành công!',
+									toast: true,
+									position: 'top-end',
+									showConfirmButton: false,
+									timer: 3000,
+									timerProgressBar: true
+								});
+								window.tempPaymentData = null;
+							} else {
+								Swal.fire({
+									icon: 'error',
+									title: "Lỗi thanh toán",
+									text: res.message,
+									toast: true,
+									position: 'top-end',
+									showConfirmButton: false,
+									timer: 3000,
+									timerProgressBar: true
+								});
+							}
+						},
+						error: function(err) {
+							console.error("FinalizePayment error:", err);
+							Swal.fire({
+								icon: 'error',
+								title: "Có lỗi xảy ra, vui lòng thử lại!",
+								toast: true,
+								position: 'top-end',
+								showConfirmButton: false,
+								timer: 3000,
+								timerProgressBar: true
+							});
+						}
+					});
 				}
 			});
 		});
@@ -1537,7 +1874,6 @@
 
 			console.log("Temp Payment Data:", window.tempPaymentData);
 
-			alert("Thông tin thanh toán đã được lưu. Vui lòng nhấn nút 'Xác nhận thanh toán' bên ngoài để tiến hành thanh toán.");
 
 			let modalInstance = bootstrap.Modal.getInstance(document.getElementById('paymentModal'));
 			if (modalInstance) {
@@ -1584,43 +1920,43 @@
 			  } else if (currentMethod === 'CK') {
 				  $('#selectedMethod').text('Chuyển khoản');
 				  // Nếu là chuyển khoản, gọi hàm xử lý thanh toán VNPay
-				  processVNPayPayment();
+				  // processVNPayPayment();
 			  } else if (currentMethod === 'all') {
 				  $('#selectedMethod').text('Cả 2');
 			  }
 			});
 
-					function processVNPayPayment(){
-			// Lấy thông tin tổng tiền đơn hàng từ giao diện (giả sử được lưu trong input finalTotal)
-			let invoiceDom = $('#' + currentInvoiceId);
-			let orderTotal = parseFloat(invoiceDom.find('.finalTotal').val()) || 0;
+		// 			function processVNPayPayment(){
+		// 	Lấy thông tin tổng tiền đơn hàng từ giao diện (giả sử được lưu trong input finalTotal)
+		// 	let invoiceDom = $('#' + currentInvoiceId);
+		// 	let orderTotal = parseFloat(invoiceDom.find('.finalTotal').val()) || 0;
 
-			// Lấy thông tin mô tả đơn hàng nếu cần (có thể lấy từ một trường ẩn hoặc từ mã hóa đơn)
-			let orderInfo = invoiceDom.find('.orderInfo').text() || 'Thanh toán đơn hàng';
+		// 	Lấy thông tin mô tả đơn hàng nếu cần (có thể lấy từ một trường ẩn hoặc từ mã hóa đơn)
+		// 	let orderInfo = invoiceDom.find('.orderInfo').text() || 'Thanh toán đơn hàng';
 
-			// Gọi API tạo request thanh toán VNPay
-			$.ajax({
-					   url: '/Admin/VNPayPayment/CreatePayment',
+		// 	Gọi API tạo request thanh toán VNPay
+		// 	$.ajax({
+		// 			   url: '/Admin/VNPayPayment/CreatePayment',
 		// Endpoint cần được định nghĩa trên server
-				type: 'GET',
-				data: {
-					amount: orderTotal,
-					orderInfo: orderInfo
-				},
-				success: function(res){
-					if (res && res.redirectUrl) {
-						// Chuyển hướng trình duyệt sang URL VNPay
-						window.location.href = res.redirectUrl;
-					} else {
-						alert("Không thể tạo URL thanh toán VNPay");
-					}
-				},
-				error: function(err){
-					console.error(err);
-					alert("Có lỗi xảy ra khi tạo thanh toán VNPay");
-				}
-			});
-		}
+		// 		type: 'GET',
+		// 		data: {
+		// 			amount: orderTotal,
+		// 			orderInfo: orderInfo
+		// 		},
+		// 		success: function(res){
+		// 			if (res && res.redirectUrl) {
+		// 				Chuyển hướng trình duyệt sang URL VNPay
+		// 				window.location.href = res.redirectUrl;
+		// 			} else {
+		// 				alert("Không thể tạo URL thanh toán VNPay");
+		// 			}
+		// 		},
+		// 		error: function(err){
+		// 			console.error(err);
+		// 			alert("Có lỗi xảy ra khi tạo thanh toán VNPay");
+		// 		}
+		// 	});
+		// }
 
 
 

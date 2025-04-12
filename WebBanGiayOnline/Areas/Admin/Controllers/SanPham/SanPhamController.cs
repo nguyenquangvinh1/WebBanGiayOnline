@@ -12,6 +12,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using DocumentFormat.OpenXml.InkML;
 using System.Linq;
 using System.Diagnostics;
+using DocumentFormat.OpenXml.Office2010.ExcelAc;
 
 namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 {
@@ -101,7 +102,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 
 
         [HttpGet]
-        public IActionResult Filter(string tenSanPham, string chatLieu, string coGiay, string danhMuc, string deGiay, string muiGiay, string kieuDang, string loaiGiay,int? trangThai)
+        public async Task<IActionResult> Filter(string tenSanPham, string chatLieu, string coGiay, string danhMuc, string deGiay, string muiGiay, string kieuDang, string loaiGiay,int? trangThai)
         {
             Console.WriteLine($"📌 Nhận giá trị lọc: chatLieu={chatLieu}, coGiay={coGiay}, danhMuc={danhMuc}, deGiay={deGiay}, muiGiay={muiGiay}, kieuDang={kieuDang}, loaiGiay={loaiGiay}");
 
@@ -138,27 +139,33 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             if (!string.IsNullOrEmpty(loaiGiay))
                 query = query.Where(sp => sp.Loai_GiayID.ToString() == loaiGiay);
 
-            var result = query
-                .Include(x => x.Chat_Lieu)
-                .Include(x => x.Co_Giay)
-                .Include(x => x.Danh_Muc)
-                .Include(x => x.De_Giay)
-                .Include(x => x.Kieu_Dang)
-                .Include(x => x.Loai_Giay)
-                .Include(x => x.Mui_Giay)
+            var result = await query
                 .OrderByDescending(x => x.ngay_sua)
-                .AsNoTracking()
-                .ToList();
+                .Select(x => new San_PhamViewModel
+                {
+                    ID = x.ID,
+                    ten_san_pham = x.ten_san_pham,
+                    mo_ta = x.mo_ta,
+                    trang_thai = x.trang_thai,
+                    ngay_tao = x.ngay_tao,
+                })
+                .ToListAsync();
+            foreach (var item in result)
+            {
+                int tong = 0;
+                var spct = _context.san_Pham_Chi_Tiets.Where(x => x.San_PhamID == item.ID).ToList();
+                if (spct.Count != 0)
+                {
+                    foreach (var item1 in spct)
+                    {
+                        tong += item1.so_luong;
+                    }
+                }
+                item.so_luong_tong = tong;
+            }
 
             Console.WriteLine($"🔍 Tổng sản phẩm tìm thấy: {result.Count}");
 
-            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu");
-            ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.ToList(), "ID", "ten_loai_co_giay");
-            ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.ToList(), "ID", "ten_danh_muc");
-            ViewData["De_GiayID"] = new SelectList(_context.de_Giays.ToList(), "ID", "ten_de_giay");
-            ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.ToList(), "ID", "ten_mui_giay");
-            ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.ToList(), "ID", "ten_kieu_dang");
-            ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.ToList(), "ID", "ten_loai_giay");
 
             ViewData["SearchTerm"] = tenSanPham;
             ViewData["SelectedTrangThai"] = trangThai;

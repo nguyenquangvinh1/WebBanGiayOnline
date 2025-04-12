@@ -1,4 +1,6 @@
 ﻿@model ClssLib.Phieu_Giam_Gia
+@using X.PagedList.Mvc.Core;
+@using X.PagedList
 
 <div class="page-content-wrapper">
     <div class="container-fluid">
@@ -25,7 +27,10 @@
     @{
         ViewData["Title"] = "Create";
     }
-
+    @{
+        var taiKhoans = ViewBag.P as IPagedList<ClssLib.Phieu_Giam_Gia>;
+        string searchString = ViewBag.SearchString as string;
+    }
     <!DOCTYPE html>
     <html lang="vi">
     <head>
@@ -34,8 +39,6 @@
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
         <style>
-
-
             .card {
                 background: white;
                 padding: 10px;
@@ -191,7 +194,8 @@
                                         {
                                             foreach (var tai_khoan in ViewBag.tai_khoans)
                                             {
-                                                if (tai_khoan.Vai_TroID == new Guid("480C8612-4CE1-4473-9569-2E3FFC5BEC71"))
+
+                                                if (tai_khoan.Vai_TroID == new Guid("3E305210-60B7-42DB-B074-336A69A06747"))
                                                 {
                                                     <tr>
                                                         <td>
@@ -211,8 +215,26 @@
                                                 <td colspan="5">Không có khách hàng nào.</td>
                                             </tr>
                                         }
+
                                     </tbody>
+
                                 </table>
+                                <!-- Phân trang -->
+                                @Html.PagedListPager(taiKhoans, page => Url.Action("Create", new
+                                    {
+                                        page,
+                                        searchString
+                                    }),
+                                         new PagedListRenderOptions
+                                {
+                                    LiElementClasses = new[] { "page-item" },
+                                    PageClasses = new[] { "page-link" },
+                                    DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+                                    DisplayLinkToLastPage = PagedListDisplayMode.Always,
+                                    DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+                                    DisplayLinkToNextPage = PagedListDisplayMode.Always,
+                                    MaximumPageNumbersToDisplay = 5
+                                })
                             </div>
                         </div> <!-- Kết thúc .row chứa 2 cột -->
                         <!-- Nút Thêm mới ở dưới, canh phải -->

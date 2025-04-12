@@ -223,6 +223,8 @@
                 </button>
             </div>
             <div class="modal-body " id="colorModalBody">
+                <!-- Nút thêm màu mới -->
+                <button class="btn btn-primary mt-3" id="showColorPicker">Thêm Màu Mới</button>
                 @foreach (var item in (IEnumerable<SelectListItem>)ViewData["Mau_SacID"])
                 {
                     <div class="form-check d-flex align-items-center">
@@ -232,17 +234,13 @@
                     </div>
                 }
 
-                <!-- Nút thêm màu mới -->
-                <button class="btn btn-primary mt-3" id="showColorPicker">Thêm Màu Mới</button>
 
                 <!-- Chọn màu mới -->
                 <div id="colorPickerContainer" class="mt-3" style="display: none;">
                     <label>Color picker:</label>
                     <div class="input-group ">
                         <input type="text" class="form-control" id="newColor">
-                        <div class="input-group-append">
-                            <span class="input-group-text"><i class="fas fa-square"></i></span>
-                        </div>
+                        
                     </div>
 
                 </div>
@@ -265,6 +263,8 @@
                 </button>
             </div>
             <div class="modal-body " id="sizeModalBody">
+                <!-- Nút thêm kích cỡ mới -->
+                <button class="btn btn-primary mt-3" id="showSizePicker">Thêm kích cỡ Mới</button>
                 @foreach (var item in (IEnumerable<SelectListItem>)ViewData["Kich_ThuocID"])
                 {
                     <div class="form-check">
@@ -272,9 +272,6 @@
                         @item.Text
                     </div>
                 }
-
-                <!-- Nút thêm kích cỡ mới -->
-                <button class="btn btn-primary mt-3" id="showSizePicker">Thêm kích cỡ Mới</button>
 
                 <!-- Chọn kích cỡ mới -->
                 <div id="sizePickerContainer" class="mt-3" style="display: none;">
@@ -285,6 +282,7 @@
                     </div>
 
                 </div>
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-success" id="addSize">Thêm</button>
@@ -297,7 +295,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Thêm Nhanh Số Lượng & Giá</h5>
-                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <div >
@@ -394,18 +394,12 @@
                         contentType: 'application/json', // Chuyển về JSON
                         data: JSON.stringify(newColor), // Chuyển thành JSON
                         success: function (response) {
-                            $('#colorModalBody').append(`<div class="form-check">
-                                        <!-- Checkbox chọn màu -->
-                                            <input class="form-check-input color-checkbox me-2" type="checkbox" value="${response}" checked>
-                                        <!-- Nút hiển thị màu -->
-                                        <button class="btn text-white d-flex align-items-center justify-content-center"
-                                                    style="background-color: ${response};
-                                       border: 1px solid #ccc;
-                                       width: 50px; height: 50px;
-                                       border-radius: 8px;">
-                    ${response}
-                                        </button>
-                                    </div>`);
+                            $('#colorModalBody').append(`
+                                 <div class="form-check d-flex align-items-center">
+                                                            <input class="form-check-input color-checkbox me-2" type="checkbox" value="${response}" checked> ${response}
+                                                </div>
+                                `);
+                            
                             $('#colorPickerContainer').hide();
                             $('#newColor').val('');
                         },
@@ -726,7 +720,7 @@
                 if ($("#productTables").find(`#table-${color}`).length === 0) {
                     $('#productTables').append(`
                         <div class="row">
-                            <div class="card col-md-6" id="table-${color}">
+                            <div class="card col-12" id="table-${color}">
                                 <div class="card-header">
                                     <h3 class="card-title">Sản phẩm màu ${color}</h3>
                                     <div class="card-tools">
@@ -739,7 +733,6 @@
                                     <table class="table table-hover text-nowrap">
                                         <thead>
                                             <tr>
-                                                <th>Tên Sản Phẩm</th>
                                                 <th>Kích Cỡ</th>
                                                 <th>Số Lượng</th>
                                                 <th>Giá</th>
@@ -750,7 +743,7 @@
                                     </table>
                                 </div>
                             </div>
-                            <div class="card col-md-6" id="${color}">
+                            <div class="card col-12" id="${color}">
                                 <div class="card-header">
                                     <h3 class="card-title">Ảnh Sản Phẩm ${color}</h3>
                                 </div>
@@ -780,7 +773,6 @@
 
         // Thêm kích cỡ
         $(document).off("click", "#addSize").on("click", "#addSize", function () {
-            let tenSanPham = $("#ten_san_pham").val();
 
             const checkedSizes = $('.size-checkbox:checked').map(function () {
                 return $(this).val();
@@ -807,12 +799,10 @@
 
                 $("[id^='table-']").each(function () {
                     let color = $(this).attr("id").replace("table-", "");
-                    let tenSPCT = `${tenSanPham} [${color} - ${size}]`;
 
                     if ($(this).find(`tbody tr:has(td:contains('${size}'))`).length === 0) {
                         $(this).find("tbody").append(`
                             <tr>
-                                <td>${tenSPCT}</td>
                                 <td>${size}</td>
                                 <td><input type="number" class="form-control quantity" data-size="${size}"></td>
                                 <td><input type="number" class="form-control price" data-size="${size}"></td>
@@ -854,7 +844,7 @@
             }
         }
 
-        $('#saveProduct').click(function () {
+        $('#saveProduct').click(function (e) {
 
             let sanPhamCTList = [];
             let hasError = false; // Biến kiểm tra lỗi
@@ -922,7 +912,22 @@
 
             debugger;
             console.log("✅ Không có lỗi, gửi form...");
-            $('#formSanPham').submit();
+            e.preventDefault();
+            Swal.fire({
+                title: "Xác nhận",
+                text: "Bạn có chắc chắn muốn thêm sản phẩm này?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Có, thêm sản phẩm!",
+                cancelButtonText: "Hủy"
+            }).then(function (result) {
+                if (result.isConfirmed) {
+
+                    $('#formSanPham').submit();
+                }
+            });
         });
         let currentTable = null;
 

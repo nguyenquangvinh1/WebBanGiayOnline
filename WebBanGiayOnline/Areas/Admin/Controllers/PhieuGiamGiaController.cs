@@ -1,18 +1,13 @@
 ﻿using ClssLib;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Net.Mail;
-using System.Net;
-using WebBanGiay.Data;
-using X.PagedList.Extensions;
-
-using X.PagedList.Mvc.Core;
 // Sử dụng MailKit
-using MimeKit;
-using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using DocumentFormat.OpenXml.InkML;
+using Microsoft.EntityFrameworkCore;
+using System.Net;
+using System.Net.Mail;
+using WebBanGiay.Data;
+using X.PagedList;
+using X.PagedList.Extensions;
 
 
 
@@ -114,7 +109,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Phieu_Giam_Gia phieu_giam_gia, Guid[] customerIds)
+        public async Task<IActionResult> Create(Phieu_Giam_Gia phieu_giam_gia, Guid[] customerIds, int? page)
         {
             Console.WriteLine($"Số lượng customerIds: {customerIds?.Length}");
 
@@ -165,8 +160,17 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     }
                 }
                 // Truy vấn danh sách phiếu giảm giá
-                var query = _context.tai_Khoans.AsQueryable();
+                var query = _context.phieu_Giam_Gias.AsQueryable();
+                int pageSize = 5;
+                int pageNumber = page ?? 1;
+
                 // Lọc theo từ khóa (tìm theo mã hoặc tên)
+                // Truy vấn danh sách phiếu giảm giá
+
+
+                IPagedList<Phieu_Giam_Gia> pagedList = query.ToPagedList(pageNumber, pageSize);
+
+                ViewBag.TaiKhoans = pagedList;
 
                 // 🔥 Đặt thông báo thành công
                 TempData["SuccessMessage"] = "✅ Thêm thành công!";
@@ -183,11 +187,14 @@ namespace WebBanGiay.Areas.Admin.Controllers
         {
             try
             {
-                var fromEmail = new MailAddress("datnguyen24102002@gmail.com", "user");
+                var fromEmail = new MailAddress("datnguyen24102002@gmail.com", "Trang wed bán giầy thời trang AĐI");
                 var toAddress = new MailAddress(toEmail);
                 const string fromPassword = "btoz oley calg yjyc";
                 string subject = "Ưu đãi đặc biệt dành cho bạn!";
-                string body = $"Xin chào,\n\nBạn nhận được phiếu giảm giá: {phieu_giam_gia.ma} với giá trị: {phieu_giam_gia.gia_tri_giam}%!";
+                string link = "https://localhost:7243";
+                string body = $"Xin chào,\n\nBạn nhận được phiếu giảm giá: {phieu_giam_gia.ma} với giá trị: {phieu_giam_gia.gia_tri_giam}%!\n" +
+                              $"Áp dụng từ: {phieu_giam_gia.ngay_bat_dau:dd/MM/yyyy} đến {phieu_giam_gia.ngay_ket_thuc:dd/MM/yyyy}.\n\n" +
+                              $"Xem chi tiết tại: {link}";
 
                 var smtp = new SmtpClient
                 {
@@ -230,7 +237,10 @@ namespace WebBanGiay.Areas.Admin.Controllers
             if (id == null)
             {
                 return NotFound();
-            }
+            } // Gán danh sách khách hàng vào ViewBag
+            ViewBag.tai_khoans = await _context.tai_Khoans
+                .Where(tk => tk.Vai_TroID == new Guid("2a88a473-f243-4475-b648-457fde9301c4"))
+                .ToListAsync();
 
             var phieu_giam_gia = await _context.phieu_Giam_Gias.FindAsync(id);
             if (phieu_giam_gia == null)
@@ -247,9 +257,22 @@ namespace WebBanGiay.Areas.Admin.Controllers
         {
             var co = await _context.phieu_Giam_Gias.FindAsync(phieu_giam_gia.ID);
             if (co == null)
-                return NotFound();
+
+                if (!ModelState.IsValid)
+                {
+                    ViewBag.tai_khoans = await _context.tai_Khoans
+                        .Where(tk => tk.Vai_TroID == new Guid("2a88a473-f243-4475-b648-457fde9301c4"))
+                        .ToListAsync();
+
+                    return View(phieu_giam_gia); // quay lại view Edit để sửa lỗi
+                }
+
             _context.Entry(phieu_giam_gia).State = EntityState.Modified;
+
+
+
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -281,51 +304,6 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
             searchTerm = searchTerm.ToLower();
             return vouchers.Where(v => v.ma.ToLower().Contains(searchTerm) || v.ten_phieu_giam_gia.ToLower().Contains(searchTerm));
-        }
-
-        [HttpGet]
-        public IActionResult GetAvailableDiscounts(Guid? customerId, double orderTotal)
-        {
-            var now = DateTime.Now;
-            var query = _context.phieu_Giam_Gias.Where(pg => pg.trang_thai == 1  // Thay 1 -> 0 nếu active là 0
-                                                             && (pg.ngay_ket_thuc == null || pg.ngay_ket_thuc > now)
-                                                             && pg.so_luong > 0
-                                                             && (pg.gia_tri_toi_thieu == null || pg.gia_tri_toi_thieu <= orderTotal));
-
-            if (customerId == null)
-            {
-                // Khách lẻ: chỉ lấy voucher công khai
-                query = query.Where(pg => pg.kieu_giam_gia == 1);
-            }
-            else
-            {
-                // Nếu có khách hàng, lấy voucher công khai hoặc voucher cá nhân của họ
-                var personalVoucherIds = _context.phieu_Giam_Gia_Tai_Khoans
-                    .Where(x => x.Tai_KhoanID == customerId)
-                    .Select(x => x.Phieu_Giam_GiaID)
-                    .ToList();
-                query = query.Where(pg => pg.kieu_giam_gia == 1 || (pg.kieu_giam_gia == 0 && personalVoucherIds.Contains(pg.ID)));
-            }
-
-            var list = query.ToList();
-            //Console.WriteLine("Số phiếu giảm giá phù hợp: " + list.Count);
-
-            foreach (var pg in list)
-            {
-                pg.UpdateTrangThai();
-            }
-            _context.SaveChanges();
-
-            var result = list.Select(pg => new {
-                id = pg.ID,
-                ma = pg.ma,
-                ten = pg.ten_phieu_giam_gia,
-                loai = pg.loai_phieu_giam_gia,  // 0 => %, 1 => VND
-                kieu = pg.kieu_giam_gia,         // 0 => cá nhân, 1 => công khai
-                gia_tri = pg.gia_tri_giam,
-                so_tien_giam_toi_da = pg.so_tien_giam_toi_da,
-            });
-            return Json(result);
         }
     }
 }

@@ -19,8 +19,8 @@ namespace WebBanGiay.Controllers
 
         // Các thông số cấu hình VNPay (nên lấy từ appsettings.json để bảo mật)
         private readonly string vnpUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"; // URL cho môi trường test
-        private readonly string vnp_TmnCode = "ECXO3H9P";     // Thay YOUR_TMN_CODE bằng mã merchant của bạn
-        private readonly string vnp_HashSecret = "WREJ0806H5UJ63EFKZ87SZ6QWW3E20OP"; // Thay YOUR_SECRET_KEY bằng khóa bí mật của bạn
+        private readonly string vnp_TmnCode = "GSIGY0LR";     // Thay YOUR_TMN_CODE bằng mã merchant của bạn
+        private readonly string vnp_HashSecret = "W32ZCWCRDTAUN6RG27J1KG39ISHAYDST"; // Thay YOUR_SECRET_KEY bằng khóa bí mật của bạn
         private readonly string returnUrl = "https://localhost:7243/BHTQ/PaymentCallBack";
 
         /// <summary>
@@ -35,20 +35,23 @@ namespace WebBanGiay.Controllers
             try
             {
                 // Lấy cấu hình từ appsettings.json
-                var vnp_TmnCode = _config["VNPAY:TmnCode"];
-                var vnp_HashSecret = _config["VNPAY:HashSecret"];
-                var vnp_Url = _config["VNPAY:BaseUrl"];
-                var vnp_ReturnUrl = _config["VNPAY:PaymentBackReturnUrl"];
-                var vnp_Version = _config["VNPAY:Version"] ?? "2.1.0";
-                var vnp_Command = _config["VNPAY:Command"] ?? "pay";
-                var vnp_CurrCode = _config["VNPAY:CurrCode"] ?? "VND";
-                var vnp_Locale = _config["VNPAY:Locale"] ?? "vn";
+                var vnp_Version = _config["VnPay:Version"] ?? "2.1.0";
+                var vnp_Command = _config["VnPay:Command"] ?? "pay";
+
+                var vnp_TmnCode = _config["VnPay:TmnCode"];
+                var vnp_Amount = ((int)(amount * 100)).ToString(); // Đổi ra đơn vị VND * 100
+                var vnp_CreateDate = DateTime.Now.ToString("yyyyMMddHHmmss");
+                var vnp_CurrCode = _config["VnPay:CurrCode"] ?? "VND";
+                var vnp_IpAddr = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
+                var vnp_Locale = _config["VnPay:Locale"] ?? "vn";
+                var vnp_ReturnUrl = _config["VnPay:PaymentBackReturnUrl"];
+                var vnp_Url = _config["VnPay:BaseUrl"];
+
+                var vnp_HashSecret = _config["VnPay:HashSecret"];
+                
 
                 // Thông tin đơn hàng
                 var vnp_TxnRef = DateTime.Now.Ticks.ToString(); // Mã đơn hàng (duy nhất)
-                var vnp_Amount = ((int)(amount * 100)).ToString(); // Đổi ra đơn vị VND * 100
-                var vnp_CreateDate = DateTime.Now.ToString("yyyyMMddHHmmss");
-                var vnp_IpAddr = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
 
                 var vnp_Params = new SortedDictionary<string, string>
         {
@@ -56,21 +59,22 @@ namespace WebBanGiay.Controllers
             { "vnp_Command", vnp_Command },
             { "vnp_TmnCode", vnp_TmnCode },
             { "vnp_Amount", vnp_Amount },
+                     { "vnp_CreateDate", vnp_CreateDate },
             { "vnp_CurrCode", vnp_CurrCode },
-            { "vnp_TxnRef", vnp_TxnRef },
+                        { "vnp_IpAddr", vnp_IpAddr },
+                                    { "vnp_Locale", vnp_Locale },
             { "vnp_OrderInfo", orderInfo ?? "Thanh toan don hang" },
-            { "vnp_OrderType", "other" },
-            { "vnp_Locale", vnp_Locale },
+                        { "vnp_OrderType", "other" },
             { "vnp_ReturnUrl", vnp_ReturnUrl },
-            { "vnp_IpAddr", vnp_IpAddr },
-            { "vnp_CreateDate", vnp_CreateDate }
+
+            { "vnp_TxnRef", vnp_TxnRef }
+   
         };
 
                 // Bước 2: Tạo raw data từ vnp_Params để tạo chuỗi hash
-                var rawData = string.Join("&", vnp_Params.Select(kvp => $"{kvp.Key}={kvp.Value}"));
-
+                var rawData = string.Join("&", vnp_Params.Select(kvp => $"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value)}"));
                 // Bước 3: Tạo mã hash bảo mật SHA512
-                string vnp_SecureHash = CalculateHMACSHA512(vnp_HashSecret, rawData);
+                string vnp_SecureHash = CalculateVnpaySecureHash(vnp_HashSecret, vnp_Params);
 
                 // Bước 4: Gắn SecureHash vào tham số
                 vnp_Params.Add("vnp_SecureHash", vnp_SecureHash);
@@ -88,7 +92,22 @@ namespace WebBanGiay.Controllers
         }
 
 
+        private string CalculateVnpaySecureHash(string key, SortedDictionary<string, string> inputData)
+        {
+            // Bước 1: Tạo chuỗi dữ liệu raw (đã URL-encode, theo thứ tự key a-z)
+            var rawData = string.Join("&", inputData
+                .Where(kvp => !string.IsNullOrEmpty(kvp.Value)) // bỏ qua value rỗng
+                .Select(kvp => $"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value)}"));
 
+            // Bước 2: Tính HMAC SHA512 với secret key
+            byte[] keyBytes = Encoding.UTF8.GetBytes(key);
+            byte[] inputBytes = Encoding.UTF8.GetBytes(rawData);
+            using (var hmac = new HMACSHA512(keyBytes))
+            {
+                byte[] hashValue = hmac.ComputeHash(inputBytes);
+                return BitConverter.ToString(hashValue).Replace("-", "").ToUpper(); // chữ in hoa
+            }
+        }
 
 
 

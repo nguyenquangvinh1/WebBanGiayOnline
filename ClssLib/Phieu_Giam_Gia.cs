@@ -10,21 +10,21 @@ namespace ClssLib
 
     public class Phieu_Giam_Gia
     {
-        public Guid ID { get; set; }//
-        public string ma { get; set; }//
-        public string ten_phieu_giam_gia { get; set; }//
+        public Guid ID { get; set; }
+        public string ma { get; set; }
+        public string ten_phieu_giam_gia { get; set; }
         public int loai_phieu_giam_gia { get; set; }
-        public int kieu_giam_gia { get; set; }//
-        public int gia_tri_giam { get; set; }//
+        public int kieu_giam_gia { get; set; }
+        public int gia_tri_giam { get; set; }
         public double? gia_tri_toi_thieu { get; set; }
-        public int? so_tien_giam_toi_da { get; set; }//
-        public int so_luong { get; set; }//
-        public int trang_thai { get; set; }//
-        public DateTime ngay_bat_dau { get; set; }//
-        public DateTime? ngay_ket_thuc { get; set; }//
-        public DateTime ngay_tao { get; set; }//
+        public int? so_tien_giam_toi_da { get; set; }
+        public int so_luong { get; set; }
+        public int trang_thai { get; set; }
+        public DateTime ngay_bat_dau { get; set; }
+        public DateTime? ngay_ket_thuc { get; set; }
+        public DateTime ngay_tao { get; set; }
         public DateTime? ngay_sua { get; set; }
-        public string nguoi_tao { get; set; }//
+        public string nguoi_tao { get; set; }
         public string? nguoi_sua { get; set; }
         [JsonIgnore]
 
