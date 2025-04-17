@@ -9,7 +9,8 @@ namespace WebBanGiay.Models
         public string? Hinh { get; set; }
         public double? DonGia { get; set; }
         public string? MoTa { get; set; }
-    
+        public string mau {  get; set; }
+        public string size {  get; set; }
 
 
     }

@@ -304,8 +304,11 @@
                                 <div class="col-lg-12">
                                     <div class="mb-3">
                                         <h4 class="mb-2">Price</h4>
-                                        <input type="range" class="form-range w-100" id="rangeInput" name="rangeInput" min="0" max="500" value="0" oninput="amount.value=rangeInput.value">
-                                        <output id="amount" name="amount" min-velue="0" max-value="500" for="rangeInput">0</output>
+                                        <input type="range" class="form-range" id="rangeInput" min="0" max="2000000"
+                                               value="@ViewData["MaxPrice"] ?? 0"
+                                               oninput="amount.value=rangeInput.value">
+                                        <output id="amount">@ViewData["MaxPrice"] ?? 0</output>
+
                                     </div>
                                 </div>
                              
@@ -326,6 +329,9 @@
                                             <div class="p-4 border border-secondary border-top-0 rounded-bottom">
                                                 <h4>@item.TenHH</h4>
                                                 <p>@item.MoTa</p>
+                                                <p>Các màu hiện có: @item.mau</p>
+                                                <p>Các kích thước hiện có: @item.size</p>
+                                                
                                                 <div class="d-flex justify-content-between flex-lg-wrap">
                                                     <p class="text-dark fs-5 fw-bold mb-0">@item.DonGia?.ToString("#,##0 VNĐ")</p>
                                                     <a asp-controller="San_Pham_Chi_Tiet" asp-action="Details" asp-route-id="@item.ID" class="btn border border-secondary rounded-pill px-3 text-primary add-to-cart">
@@ -494,6 +500,15 @@
             console.log("📌 Hàm applyFilter đã chạy!");
 
             let filters = {};
+                let debounceTimer;
+
+                $('#rangeInput').on('input', function () {
+                    $('#amount').val($(this).val());
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => {
+                        window.applyFilter();
+                    }, 500); // Gọi sau 0.5 giây khi ngừng kéo
+                });
 
             // Lấy dữ liệu từ tất cả select box
             $('select.filter-select').each(function () {
@@ -511,6 +526,12 @@
                 if (searchValue !== '') {
                     filters.tenSanPham = searchValue;
                 }
+                // Lấy dữ liệu khoảng giá
+                let maxPrice = $('#rangeInput').val();
+                if (maxPrice && parseInt(maxPrice) > 0) {
+                    filters.maxPrice = maxPrice;
+                }
+
             console.log("📌 Dữ liệu lọc gửi đi:", filters);
 
             let queryString = $.param(filters);
