@@ -331,7 +331,7 @@
         $(document).on("click", ".anh_form", function () {
 
             console.log(`🔹 Chọn ảnh `);
-            $("#selectImages").hide(); // Ẩn nút "Chọn Ảnh" khi mở modal
+            $("#selectImages").hide();
             $("#imagePreviewContainer").html("");
             uploadedImages.forEach(url => {
                 $("#imagePreviewContainer").append(`
@@ -862,7 +862,7 @@
                 }
 
                 rows.each(function () {
-                    let size = $(this).find("td:nth-child(2)").text();
+                    let size = $(this).find("td:nth-child(1)").text();
                     let quantity = parseInt($(this).find(".quantity").val()) || 0;
                     let price = parseInt($(this).find(".price").val()) || 0;
                     let imgUrl = $(this).find(".lst_img").val();

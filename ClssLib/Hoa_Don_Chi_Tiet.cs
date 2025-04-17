@@ -12,6 +12,7 @@ namespace ClssLib
     {
         public Guid ID { get; set; } 
         public string? ma { get; set; }
+        public string? tensp { get; set; }
         public double gia { get; set; }
         public int? trang_thai { get; set; }
         public double? thanh_tien { get; set; }

@@ -249,6 +249,8 @@ namespace WebBanGiay.Migrations
                     dia_chi = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     sdt_nguoi_nhan = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     email_nguoi_nhan = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Ship = table.Column<double>(type: "float", nullable: true),
                     loai_hoa_don = table.Column<int>(type: "int", nullable: false),
                     ten_nguoi_nhan = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     thoi_gian_nhan_hang = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -571,6 +573,7 @@ namespace WebBanGiay.Migrations
                 {
                     ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ma = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    tensp = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     gia = table.Column<double>(type: "float", nullable: false),
                     trang_thai = table.Column<int>(type: "int", nullable: true),
                     thanh_tien = table.Column<double>(type: "float", nullable: true),
@@ -661,9 +664,9 @@ namespace WebBanGiay.Migrations
                 columns: new[] { "ID", "ma", "ten_phuong_thuc" },
                 values: new object[,]
                 {
-                    { new Guid("9493f4de-9351-4f42-9ce2-04f975cf447e"), "CK", "Chuyển khoản" },
-                    { new Guid("bd8e4cca-1005-4ea6-8337-d839a87d83dd"), "TTM", "Tiền mặt" },
-                    { new Guid("e8bcc29d-b625-4709-a28b-83ecd06f5ddc"), "ALL", "Cả 2" }
+                    { new Guid("1c5f236d-5c92-41a2-9c33-c3e635f03f9c"), "CK", "Chuyển khoản" },
+                    { new Guid("6a78fe7a-9e74-44f9-a33d-464a4091bcb7"), "TTM", "Tiền mặt" },
+                    { new Guid("cbb356c2-1344-4f3c-8862-79b1f5f7c9ac"), "ALL", "Cả 2" }
                 });
 
             migrationBuilder.InsertData(
@@ -671,10 +674,15 @@ namespace WebBanGiay.Migrations
                 columns: new[] { "ID", "ngay_sua", "ngay_tao", "ten_vai_tro", "trang_thai" },
                 values: new object[,]
                 {
-                    { new Guid("555051d3-587a-4ee9-8d2d-9b8e89cb282b"), null, new DateTime(2025, 4, 11, 20, 5, 17, 330, DateTimeKind.Local).AddTicks(5412), "Admin", 1 },
-                    { new Guid("aaeb57bc-7164-4e7e-a082-4ace4ce34d40"), null, new DateTime(2025, 4, 11, 20, 5, 17, 330, DateTimeKind.Local).AddTicks(5436), "Nhân Viên", 1 },
-                    { new Guid("e67e972b-e79c-4478-a1fd-a26ffac6e014"), null, new DateTime(2025, 4, 11, 20, 5, 17, 330, DateTimeKind.Local).AddTicks(5438), "Khách hàng", 1 }
+                    { new Guid("1fb4e686-57a7-4b0d-acb0-8eb56dfa5b68"), null, new DateTime(2025, 4, 15, 14, 53, 45, 685, DateTimeKind.Local).AddTicks(9096), "Nhân Viên", 1 },
+                    { new Guid("5db36228-5860-42aa-a4d3-9abe38e3697e"), null, new DateTime(2025, 4, 15, 14, 53, 45, 685, DateTimeKind.Local).AddTicks(9074), "Admin", 1 },
+                    { new Guid("8df5a305-aa0c-4138-97dd-08e7591ff4b1"), null, new DateTime(2025, 4, 15, 14, 53, 45, 685, DateTimeKind.Local).AddTicks(9098), "Khách hàng", 1 }
                 });
+
+            migrationBuilder.InsertData(
+                table: "tai_Khoans",
+                columns: new[] { "ID", "ResetToken", "TokenExpiry", "Vai_TroID", "cccd", "email", "gioi_tinh", "hinh_anh", "ho_ten", "ma", "ngay_sinh", "ngay_sua", "ngay_tao", "pass_word", "sdt", "trang_thai", "user_name" },
+                values: new object[] { new Guid("7ce009e4-b407-436b-84cb-e129cc9c2cc4"), null, null, new Guid("5db36228-5860-42aa-a4d3-9abe38e3697e"), "123456789012", "admin_tong@fpt.edu.vn", 1, "admin_tong.png", "Admin Tổng", "ADMIN01", new DateTime(1980, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, new DateTime(2025, 4, 15, 14, 53, 45, 685, DateTimeKind.Local).AddTicks(9293), "Admin123", "0123456789", 1, "admin_tong" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_anh_San_Pham_San_Pham_Chi_Tiets_Anh_San_PhamID",

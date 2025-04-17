@@ -134,6 +134,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
             return View(hoaDon);
         }
 
+
         [HttpPost]
         public IActionResult UpdateQuantity(Guid id, int quantity)
         {
@@ -174,9 +175,32 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
             return Json(new { success = false, message = "Không tìm thấy sản phẩm trong giỏ hàng!" });
         }
+        [HttpPost]
+        public IActionResult CapNhatThongTin(Hoa_Don model)
+        {
+            var hoaDon = _context.hoa_Dons.FirstOrDefault(h => h.ID == model.ID);
+            if (hoaDon == null)
+            {
+                return NotFound();
+            }
+
+            // Cập nhật thông tin
+            hoaDon.ten_nguoi_nhan = model.ten_nguoi_nhan;
+            hoaDon.sdt_nguoi_nhan = model.sdt_nguoi_nhan;
+            hoaDon.email_nguoi_nhan = model.email_nguoi_nhan;
+            hoaDon.dia_chi = model.dia_chi;
+            hoaDon.ngay_sua = DateTime.Now;
+            hoaDon.nguoi_sua = User.Identity?.Name ?? "Không xác định";
+            _context.Update(hoaDon);
+            _context.SaveChanges();
+
+            TempData["ThongBao"] = "Cập nhật thông tin thành công!";
+            return RedirectToAction("Details", new { id = model.ID });
+        }
 
 
-      
+
+
         [HttpPost]
         public JsonResult UpdateStatus(Guid? id, int newStatus)
         {
@@ -544,7 +568,13 @@ namespace WebBanGiay.Areas.Admin.Controllers
         //    });
         //}
 
-
+        [HttpPost]
+        public IActionResult Detial(Guid id, bool sua = false)
+        {
+            var hoaDon = _context.hoa_Dons.Find(id);
+            ViewBag.ShowForm = sua && hoaDon.trang_thai < 2 || hoaDon.trang_thai == -1;
+            return View(hoaDon);
+        }
 
 
 
