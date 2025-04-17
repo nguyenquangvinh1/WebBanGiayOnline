@@ -100,8 +100,9 @@ namespace WebBanGiay.Controllers
             {
                 foreach (var item in cart)
                 {
-                    item.ThanhTienGG = totalPrice;
+                    totalPrice = cart.Sum(x => x.ThanhTien);
                     item.Discount = nameDiscount;
+                    
                 }
 
                 HttpContext.Session.Set(MySetting.CART_KEY, cart);
@@ -231,8 +232,8 @@ namespace WebBanGiay.Controllers
                     sdt_nguoi_nhan = model.Sdt ?? khach.sdt,
                     email_nguoi_nhan = model.Email ?? khach.email,
                     tong_tien = Cart.Sum(x => x.ThanhTienGG) == 0
-               ? Cart.Sum(x => x.ThanhTien)
-               : Cart.Sum(x => x.ThanhTienGG),
+                    ? Cart.Sum(x => x.ThanhTien)
+                    : Cart.Sum(x => x.ThanhTienGG),
                     ngay_tao = DateTime.Now,
                     Ship = shippingFee,
                     discount = Cart.FirstOrDefault()?.Discount,
@@ -271,6 +272,7 @@ namespace WebBanGiay.Controllers
                             so_luong = item.SoLuong,
                             gia = item.DonGia,
                             thanh_tien = item.DonGia * item.SoLuong,
+                            discount = Cart.FirstOrDefault()?.Discount,
                             phuongThucthanhtoan = 2,
                             Hoa_DonID = hoadon.ID,
                             ngay_tao = DateTime.Now,

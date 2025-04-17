@@ -100,6 +100,21 @@ namespace WebBanGiay.Areas.Admin.Controllers
             return View("Index", pagedList); // Trả về View Index để dùng lại giao diện
         }
 
+        public IActionResult RemoveBill(Guid id)
+        {
+            var hoadon = _context.don_Chi_Tiets.FirstOrDefault(x => x.ID == id);
+            if (hoadon != null)
+            {
+                Guid? billId = hoadon.Hoa_DonID; 
+                _context.don_Chi_Tiets.Remove(hoadon);
+                _context.SaveChanges();
+
+                if (billId != null)
+                    return RedirectToAction("Details", new { id = billId });
+            }
+
+            return RedirectToAction("Index");
+        }
 
 
         // GET: Admin/HoaDon/Details/5
@@ -142,18 +157,18 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
             if (cart != null)
             {
-                // Cập nhật chi tiết đơn hàng
+             
                 cart.so_luong = quantity;
                 cart.thanh_tien = cart.gia * quantity;
 
                 _context.Update(cart);
-                _context.SaveChanges(); // Lưu tất cả
-                // Tìm hóa đơn tương ứng
+                _context.SaveChanges(); 
                 var hoaDon = _context.hoa_Dons.FirstOrDefault(h => h.MaHoaDon == cart.ma);
 
                 if (hoaDon != null)
                 {
-                    // Tính lại tổng tiền của hóa đơn từ tất cả chi tiết
+                    
+                   
                     var tongTienMoi = _context.don_Chi_Tiets
                                         .Where(z => z.ma == hoaDon.MaHoaDon)
                                         .Sum(z => z.gia * z.so_luong);
@@ -163,7 +178,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 }
 
                
-                _context.SaveChanges(); // Lưu tất cả
+                _context.SaveChanges(); 
 
                 return Json(new
                 {

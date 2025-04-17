@@ -70,6 +70,7 @@ namespace ClssLib
         public virtual De_Giay? De_Giay { get; set; }
         [JsonIgnore]
         public virtual Chat_Lieu? Chat_Lieu { get; set; }
+      
         [JsonIgnore]
         [IgnoreDataMember]
         public virtual Kich_Thuoc? Kich_Thuoc { get; set; }
