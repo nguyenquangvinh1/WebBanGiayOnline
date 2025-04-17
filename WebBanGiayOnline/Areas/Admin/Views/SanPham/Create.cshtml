@@ -862,7 +862,7 @@
                 }
 
                 rows.each(function () {
-                    let size = $(this).find("td:nth-child(2)").text();
+                    let size = $(this).find("td:nth-child(1)").text();
                     let quantity = parseInt($(this).find(".quantity").val()) || 0;
                     let price = parseInt($(this).find(".price").val()) || 0;
                     let imgUrl = $(this).find(".lst_img").val();
@@ -926,6 +926,7 @@
                 if (result.isConfirmed) {
 
                     $('#formSanPham').submit();
+                    
                 }
             });
         });
