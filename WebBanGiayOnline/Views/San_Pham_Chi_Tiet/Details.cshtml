@@ -291,9 +291,10 @@
                
             <h1 class="fw-bold mb-0">Sản phẩm tương tự</h1>
             <div class="vesitable">
-                @foreach(var item in Model.lstsp){
+
                 <div class="owl-carousel vegetable-carousel justify-content-center">
-                    
+                        @foreach (var item in Model.lstsp)
+                        {
                     <div class="border border-primary rounded position-relative vesitable-item">
                         <div class="vesitable-img">
                             <img src="@item.Hinh" class="img-fluid w-100 rounded-top" alt="">
@@ -302,16 +303,19 @@
                         <div class="p-4 pb-0 rounded-bottom">
                          
                             <p>@item.MoTa</p>
-                            <div class="d-flex justify-content-between flex-lg-wrap">
+                                    <div class="d-flex justify-content-between flex-lg-wrap">
+                                        <p class="text-dark fs-5 fw-bold mb-0">@item.DonGia?.ToString("#,##0 VNĐ")</p>
+                                        <a asp-controller="San_Pham_Chi_Tiet" asp-action="Details" asp-route-id="@item.ID" class="btn border border-secondary rounded-pill px-3 text-primary add-to-cart">
 
-                                <a asp-controller="Cart" asp-action="AddCart1" asp-route-id="@Model.ID" class="btn border border-secondary rounded-pill px-3 py-1 mb-4 text-primary"><i class="fa fa-shopping-bag me-2 text-primary"></i> Mua Hàng</a>
-                            </div>
+                                            <i class="fa fa-shopping-bag me-2 text-primary"></i> Xem chi tiết
+                                        </a>
+                                    </div>
                         </div>
                     </div>
-               
+                        }
               
                 </div>
-                }
+                
             </div>
         </div>
     </div>
@@ -548,6 +552,7 @@
                    }
                });
            });
+
          });
     </script>
 }
