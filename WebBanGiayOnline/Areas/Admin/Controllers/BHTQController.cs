@@ -50,7 +50,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     tong_tien = 0,
                     ghi_chu = "",
                     //(chờ thêm sản phẩm)
-                    trang_thai = 5,
+                    trang_thai = -1,
                     dia_chi = "Tại quầy",
                     sdt_nguoi_nhan = "",
                     email_nguoi_nhan = "",
@@ -403,7 +403,12 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 }
 
                 _context.SaveChanges();
+                var invoice = _context.hoa_Dons.FirstOrDefault(x => x.ID == invoiceItem.Hoa_DonID);
+                var listHDCT = _context.don_Chi_Tiets.Where(x => x.Hoa_DonID == invoice.ID).AsQueryable();
 
+                invoice.tong_tien = listHDCT.Select(x => (double)x.thanh_tien).Sum();
+                _context.hoa_Dons.Update(invoice);
+                _context.SaveChanges();
                 return Json(new { success = true, newQty = newQty, newTotal = invoiceItem.thanh_tien });
             }
             catch (Exception ex)
@@ -458,6 +463,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
         [HttpPost]
         public IActionResult AddProductToInvoice([FromBody] AddProductDto request)
         {
+
             try
             {
                 // Lấy hóa đơn hiện tại
@@ -523,15 +529,19 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     _context.don_Chi_Tiets.Add(newDetail);
                 }
 
+                _context.SaveChanges();
                 // Cập nhật số lượng tồn kho: trừ số lượng được bán
                 productDetail.so_luong -= request.Quantity;
                 _context.san_Pham_Chi_Tiets.Update(productDetail);
 
+                var listHDCT = _context.don_Chi_Tiets.Where(x => x.Hoa_DonID == request.InvoiceId).AsQueryable();
+
                 // Cập nhật tổng tiền hóa đơn
-                //invoice.tong_tien = _context.don_Chi_Tiets
-                //    .Where(x => x.Hoa_DonID == request.InvoiceId)
-                //    .Sum(x => (double?)x.thanh_tien) ?? 0;
-                invoice.tong_tien = _context.don_Chi_Tiets.Where(x => x.Hoa_DonID == request.InvoiceId).Sum(x => x.so_luong * x.gia);
+                invoice.tong_tien = listHDCT.Select(x => (double)x.thanh_tien).Sum();
+
+                //invoice.tong_tien = _context.don_Chi_Tiets.Where(x => x.Hoa_DonID == request.InvoiceId).Sum(x => x.so_luong * x.gia);
+                //List<Hoa_Don_Chi_Tiet> lst= _context.don_Chi_Tiets.Where(x=>x.)
+
                 _context.hoa_Dons.Update(invoice);
 
                 _context.SaveChanges();
@@ -657,11 +667,13 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
             _context.thanh_Toans.Add(newPayment);
             _context.SaveChanges();
-            invoice.tong_tien = _context.don_Chi_Tiets.Where(c => c.Hoa_DonID == model.Hoa_DonID).Sum(c => c.so_luong * c.gia);
+            invoice.tong_tien = _context.don_Chi_Tiets.Where(c => c.Hoa_DonID == model.Hoa_DonID).Select(x => (double)x.thanh_tien).Sum();
+
+            _context.SaveChanges();
             // 4. Tính tổng tiền đã thanh toán
             var totalPaid = _context.thanh_Toans
                 .Where(t => t.Hoa_DonID == model.Hoa_DonID)
-                .Sum(x => (double?)x.so_tien_thanh_toan) ?? 0;
+                .Sum(x => (double)x.so_tien_thanh_toan) ;
 
 
             // 5. Tính tiền còn thiếu (nếu bảng hoa_Dons có cột tong_tien)
@@ -676,6 +688,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 _context.hoa_Dons.Update(invoice);
                 _context.SaveChanges();
             }
+
 
             return Json(new
             {
@@ -763,7 +776,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
             }
 
             // 4. Đổi trạng thái hóa đơn thành 6 (Đã thanh toán)
-            invoice.trang_thai = 6;
+            invoice.trang_thai = -2;
             _context.hoa_Dons.Update(invoice);
             _context.SaveChanges();
 

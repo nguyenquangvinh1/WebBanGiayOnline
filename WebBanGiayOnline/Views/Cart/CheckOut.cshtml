@@ -8,7 +8,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Fruitables - Vegetable Website Template</title>
+    <title>Adidas_Shop Website</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -74,13 +74,8 @@
                         <a asp-controller="San_Pham_Chi_Tiet" asp-action="Index" class="nav-item nav-link active">Shop</a>
 
                         <div class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown">Pages</a>
-                            <div class="dropdown-menu m-0 bg-secondary rounded-0">
-                                <a href="cart.html" class="dropdown-item">Cart</a>
-                                <a href="chackout.html" class="dropdown-item active">Chackout</a>
-                                <a href="testimonial.html" class="dropdown-item">Testimonial</a>
-                                <a href="404.html" class="dropdown-item">404 Page</a>
-                            </div>
+                            <a  class="nav-link dropdown-toggle active" data-bs-toggle="dropdown">Pages</a>
+                          
                         </div>
                         <a href="contact.html" class="nav-item nav-link">Contact</a>
                     </div>
@@ -248,7 +243,7 @@
 
                                     <tr>
                                         <td colspan="4">Phí vận chuyển :</td>
-                                        <td  id="fee"></td>
+                                        <td>  <img src="~/coloshop-master/images/tải xuống.png" class="img-fluid" alt="" style="width: 30px; height: 30px; object-fit: contain;"> <a id="fee"></a> </td>
                                     </tr>
                                     <tr>
                                         <td colspan="4">Tổng Tiền :</td>
@@ -413,8 +408,10 @@
             var provinceId = $("#tinh").val();
             var districtId = $("#huyen").val();
             var wardCode = $("#xa").val();
-           
-            let subtotal = @Model.Sum(p => p.ThanhTien);
+
+            let subtotal =  @(Model.Sum(p => p.ThanhTienGG) > 0
+                                ? Model.Sum(p => p.ThanhTienGG)
+                                : Model.Sum(p => p.ThanhTien));
             if (provinceId =="" && districtId == "" && wardCode == "") {
                 alert("Vui lòng chọn đầy đủ địa chỉ.");
                 return;
@@ -438,7 +435,7 @@
 
             };
      
-            console.log("Gửi dữ liệu:", requestData); // Debug dữ liệu gửi đi
+            console.log("Gửi dữ liệu:", requestData);
 
             $.ajax({
                 url: '@Url.Action("GetShippingFee", "Cart")',
@@ -457,7 +454,7 @@
                        response.ship = 0;
                    }
                      let total = response.ship + subtotal;
-                    console.log("Nhận phản hồi:", response); // Debug phản hồi
+                    console.log("Nhận phản hồi:", response); 
                     if (response.success) {
                         $("#fee").text(response.ship.toLocaleString() + " VNĐ");
                         $("#totalWithFee").text( total.toLocaleString() + " VNĐ");

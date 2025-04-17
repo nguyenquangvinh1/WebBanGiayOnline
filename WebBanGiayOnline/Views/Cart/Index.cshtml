@@ -10,7 +10,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Fruitables - Vegetable Website Template</title>
+    <title>Adidas_Shop Website</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -409,7 +409,7 @@
                         data.forEach(discount => {
                             html += `<li class="list-group-item d-flex justify-content-between align-items-center">
                                         <span>${discount.ten_phieu_giam_gia} - Giảm ${discount.gia_tri_giam}% số tiền giảm tối thiểu ${discount.so_tien_giam_toi_da} </span>
-                                        <button class="btn btn-primary btn-sm applyDiscount" data-id="${discount.id}" data-value="${discount.gia_tri_giam}" data-giam="${discount.so_tien_giam_toi_da}">Chọn</button>
+                                        <button class="btn btn-primary btn-sm applyDiscount" data-id="${discount.id}" data-value="${discount.gia_tri_giam}" data-giam="${discount.so_tien_giam_toi_da}" data-ten="${discount.ten_phieu_giam_gia}" >Chọn</button>
                                     </li>`;
                         });
                         $('#discountList').html(html);
@@ -422,6 +422,7 @@
                 let discountValue = $(this).data('value');
                 let discountId = $(this).data('id');
                 let discount=$(this).data('giam');
+                let Name =$(this).data('ten');
              
                 $('.discountCodeInput').val(`Giảm ${discountValue}%`);
 
@@ -441,7 +442,7 @@
                  $.ajax({
             url: "/Cart/ApplyDiscount",
             type: "POST",
-            data: { totalPrice: newTotal },
+            data: { totalPrice: newTotal,nameDiscount: Name },
             success: function (response) {
                 if (response.success) {
                     console.log("Giảm giá áp dụng thành công!");

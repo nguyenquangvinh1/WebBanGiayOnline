@@ -1,4 +1,5 @@
 ﻿using ClssLib;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -26,12 +27,21 @@ namespace WebBanGiay.Areas.Admin.Controllers
             //this._httpClient = httpClient;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int page = 1)
         {
-            var tai_Khoans = _context.tai_Khoans
+            int pageSize = 3;
+
+            var query = _context.tai_Khoans
                 .Where(t => t.Vai_Tro.ten_vai_tro == "Khách hàng")
                 .Include(tk => tk.Dia_Chi)
-                .OrderByDescending(tk => tk.ngay_tao) // Sắp xếp theo ngày tạo mới nhất
+                .OrderByDescending(tk => tk.ngay_tao);
+
+            int totalItems = query.Count();
+            int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+
+            var tai_Khoans = query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToList()
                 .Select(customer => new CreateCustomerViewModel
                 {
@@ -49,6 +59,11 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     dia_chi = customer.Dia_Chi.FirstOrDefault(dc => dc.loai_dia_chi == 1)?.dia_chi_chi_tiet
                 })
                 .ToList();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalItems = totalItems;
+            ViewBag.TotalPages = totalPages;
 
             return View(tai_Khoans);
         }
@@ -94,10 +109,6 @@ namespace WebBanGiay.Areas.Admin.Controllers
             if (_context.tai_Khoans.Any(n => n.cccd == model.CCCD))
             {
                 ModelState.AddModelError("cccd", "Số CCCD đã tồn tại!");
-            }
-            if (_context.tai_Khoans.Any(n => n.sdt == model.PhoneNumber))
-            {
-                ModelState.AddModelError("sdt", "Số điện thoại đã tồn tại!");
             }
             if (ModelState.IsValid)
             {
@@ -157,6 +168,8 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 _context.dia_Chis.Add(diaChi);
                 await _context.SaveChangesAsync();
 
+                TempData["Success"] = "Thêm khách hàng thành công!";
+
                 return RedirectToAction("Index", "Khachhang");
             }
             return View(model);
@@ -207,165 +220,148 @@ namespace WebBanGiay.Areas.Admin.Controllers
             return Json(new { success = true });
         }
         //-----------------Cập nhật địa chỉ----------------------//
-
-        [HttpPost]
-        public JsonResult UpdateAddress(Dia_Chi model)
+        public IActionResult SaveAddress(Dia_Chi address)
         {
-            if (!ModelState.IsValid)
-            {
-                return Json(new { success = false, message = "Dữ liệu không hợp lệ!" });
-            }
-
-            if (model.Tai_KhoanID == null || !_context.tai_Khoans.Any(x => x.ID == model.Tai_KhoanID))
-            {
-                return Json(new { success = false, message = "Tài khoản không hợp lệ!" });
-            }
-
             try
             {
-
-                var existingAddress = _context.dia_Chis.Find(model.ID);
-                if (existingAddress == null)
+                // Kiểm tra nếu Tai_KhoanID không hợp lệ
+                if (address.Tai_KhoanID == null || address.Tai_KhoanID == Guid.Empty)
                 {
-                    return Json(new { success = false, message = "Không tìm thấy địa chỉ để cập nhật!" });
+                    return Json(new { success = false, message = "Taikhoan_id không hợp lệ." });
                 }
 
-                existingAddress.dia_chi_chi_tiet = model.dia_chi_chi_tiet;
-                existingAddress.tinh = model.tinh;
-                existingAddress.huyen = model.huyen;
-                existingAddress.xa = model.xa;
+                var hasDefaultAddress = _context.dia_Chis
+                    .Any(dc => dc.Tai_KhoanID == address.Tai_KhoanID && dc.loai_dia_chi == 1);
 
-
-
-                _context.dia_Chis.Update(existingAddress);
-
-
-                _context.SaveChanges();
-                return Json(new { success = true, message = "Cập nhật địa chỉ thành công!" });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = "Lỗi khi lưu dữ liệu: " + ex.Message });
-            }
-        }
-
-
-
-        //-----------------Thêm địa chỉ----------------------//
-        [HttpPost]
-        public JsonResult AddAddress(Dia_Chi model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return Json(new { success = false, message = "Dữ liệu không hợp lệ!" });
-            }
-
-            if (model.Tai_KhoanID == null || !_context.tai_Khoans.Any(x => x.ID == model.Tai_KhoanID))
-            {
-                return Json(new { success = false, message = "Tài khoản không hợp lệ!" });
-            }
-
-            try
-            {
-                // Kiểm tra xem tài khoản đã có địa chỉ mặc định chưa
-                bool hasDefaultAddress = _context.dia_Chis.Any(x => x.Tai_KhoanID == model.Tai_KhoanID && x.loai_dia_chi == 1);
-
-                var newAddress = new Dia_Chi
+                // Kiểm tra nếu ID là Guid.Empty (Thêm mới) hoặc không có ID
+                if (address.ID == Guid.Empty)
                 {
-                    ID = Guid.NewGuid(),
-                    Tai_KhoanID = model.Tai_KhoanID,
-                    dia_chi_chi_tiet = model.dia_chi_chi_tiet,
-                    tinh = model.tinh,
-                    huyen = model.huyen,
-                    xa = model.xa,
-                    loai_dia_chi = hasDefaultAddress ? 2 : 1 // Nếu chưa có mặc định thì đặt là 1, nếu có rồi thì đặt là 2
-                };
+                    address.ID = Guid.NewGuid(); // Tạo GUID mới cho địa chỉ
+                    address.ngay_tao = DateTime.Now; // Gán ngày tạo
+                    address.loai_dia_chi = hasDefaultAddress ? 2 : 1; // Nếu đã có địa chỉ mặc định thì loại địa chỉ mới là phụ
 
-                _context.dia_Chis.Add(newAddress);
-                _context.SaveChanges();
+                    _context.Add(address); // Thêm mới địa chỉ vào cơ sở dữ liệu
+                }
+                else // Nếu có ID thì thực hiện cập nhật
+                {
+                    var existingAddress = _context.dia_Chis.FirstOrDefault(dc => dc.ID == address.ID);
+                    if (existingAddress != null)
+                    {
+                        // Cập nhật thông tin địa chỉ
+                        existingAddress.dia_chi_chi_tiet = address.dia_chi_chi_tiet;
+                        existingAddress.tinh = address.tinh; // Cập nhật tên tỉnh
+                        existingAddress.huyen = address.huyen; // Cập nhật tên huyện
+                        existingAddress.xa = address.xa; // Cập nhật tên xã
+                        existingAddress.loai_dia_chi = address.loai_dia_chi;
+                        existingAddress.ngay_sua = DateTime.Now; // Gán ngày sửa
+                        _context.Update(existingAddress); // Cập nhật địa chỉ trong cơ sở dữ liệu
+                    }
+                    else
+                    {
+                        return Json(new { success = false, message = "Không tìm thấy địa chỉ để cập nhật." });
+                    }
+                }
 
-                return Json(new { success = true, message = "Thêm địa chỉ thành công!" });
+                _context.SaveChanges(); // Lưu thay đổi vào cơ sở dữ liệu
+
+                return Json(new
+                {
+                    success = true,
+                    id = address.ID,
+                    loai_dia_chi = address.loai_dia_chi
+                });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Lỗi khi lưu dữ liệu: " + ex.Message });
+                return Json(new { success = false, message = ex.Message });
             }
         }
 
-        //-----------------Xóa----------------------//
+
+
+        //---------------------------Sửa-----------------------//
+        // Controller action để lấy thông tin địa chỉ
+        [HttpGet]
+        public IActionResult GetAddressById(Guid id)
+        {
+            var address = _context.dia_Chis.FirstOrDefault(a => a.ID == id);
+            if (address == null)
+            {
+                return Json(new { success = false, message = "Không tìm thấy địa chỉ." });
+            }
+
+            return Json(new
+            {
+                success = true,
+                address = new
+                {
+                    address.ID,
+                    address.dia_chi_chi_tiet,
+                    address.tinh,
+                    address.huyen,
+                    address.xa,
+                    address.loai_dia_chi
+                }
+            });
+        }
+
+
+
 
         [HttpPost]
         public IActionResult DeleteAddress(Guid id)
         {
-            var address = _context.dia_Chis.FirstOrDefault(d => d.ID == id);
-
-            if (address == null)
+            var address = _context.dia_Chis.FirstOrDefault(a => a.ID == id);
+            if (address != null)
             {
-                return Json(new { success = false, message = "Địa chỉ không tồn tại!" });
+                _context.dia_Chis.Remove(address);
+                _context.SaveChanges();
+                return Json(new { success = true });
             }
-
-            // Kiểm tra nếu địa chỉ đang là mặc định (LoaiDiaChi = 1)
-            if (address.loai_dia_chi == 1)
-            {
-                return Json(new { success = false, message = "Không thể xóa địa chỉ mặc định!" });
-            }
-
-            _context.dia_Chis.Remove(address);
-            _context.SaveChanges();
-
-            return Json(new { success = true, message = "Xóa địa chỉ thành công!" });
+            return Json(new { success = false });
         }
 
 
-        //-----------------Chọn mặc đinh----------------------//
+        //---------------Chọn mặc định--------------------//
 
         [HttpPost]
-        public IActionResult SetDefaultAddress(Guid addressId, Guid customerId)
+        public IActionResult SetDefaultAddress(Guid id)
         {
-            var customer = _context.tai_Khoans
-                .Include(c => c.Dia_Chi)
-
-                .FirstOrDefault(c => c.ID == customerId);
-
-
-            if (customer == null)
-                return Json(new { success = false, message = "Khách hàng không tồn tại." });
-
-            // Kiểm tra địa chỉ có thuộc Khách hàng không
-            var selectedAddress = customer.Dia_Chi.FirstOrDefault(a => a.ID == addressId);
-            if (selectedAddress == null)
-                return Json(new { success = false, message = "Địa chỉ không tồn tại." });
-
-            // Cập nhật tất cả địa chỉ thành "Phụ"
-            foreach (var address in customer.Dia_Chi)
+            try
             {
-                address.loai_dia_chi = 2;
-                _context.Entry(address).State = EntityState.Modified; // Đánh dấu là đã sửa
-            }
-
-            // Cập nhật địa chỉ được chọn thành "Mặc định"
-            selectedAddress.loai_dia_chi = 1;
-            _context.Entry(selectedAddress).State = EntityState.Modified;
-
-            _context.SaveChanges(); // Lưu thay đổi vào CSDL
-
-            // Lấy lại danh sách địa chỉ đã cập nhật từ CSDL
-            var sortedAddresses = _context.dia_Chis
-                .Where(a => a.Tai_KhoanID == customerId)
-                .OrderBy(a => a.loai_dia_chi) // Mặc định lên đầu
-                .Select(a => new
+                // Tìm địa chỉ cần thay đổi thành mặc định
+                var address = _context.dia_Chis.FirstOrDefault(a => a.ID == id);
+                if (address == null)
                 {
-                    id = a.ID,
-                    dia_chi = a.dia_chi_chi_tiet,
-                    xa = a.xa,
-                    huyen = a.huyen,
-                    tinh = a.tinh,
-                    loai_dia_chi = a.loai_dia_chi
-                })
-                .ToList();
+                    return Json(new { success = false, message = "Không tìm thấy địa chỉ." });
+                }
 
-            return Json(new { success = true, message = "Cập nhật thành công!", sortedAddresses });
+                // Đặt tất cả địa chỉ của khách hàng thành "Phụ" (Chỉ cập nhật địa chỉ này)
+                var customerAddresses = _context.dia_Chis.Where(a => a.Tai_KhoanID == address.Tai_KhoanID).ToList();
+                foreach (var customerAddress in customerAddresses)
+                {
+                    if (customerAddress.ID != id) // Không thay đổi địa chỉ hiện tại
+                    {
+                        customerAddress.loai_dia_chi = 2; // Đặt loại địa chỉ thành "Phụ"
+                        _context.Attach(customerAddress).State = EntityState.Modified;
+                    }
+                }
+
+                // Đặt địa chỉ được chọn làm mặc định
+                address.loai_dia_chi = 1; // Đặt loại địa chỉ thành "Mặc định"
+                _context.Attach(address).State = EntityState.Modified;
+
+                // Lưu các thay đổi vào cơ sở dữ liệu
+                _context.SaveChanges();
+
+                return Json(new { success = true, message = "Địa chỉ đã được chọn làm mặc định." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Đã có lỗi xảy ra: " + ex.Message });
+            }
         }
+
 
 
         [HttpGet]

@@ -11,7 +11,7 @@ using Humanizer;
 using Newtonsoft.Json;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Authorization;
-
+    
 namespace WebBanGiay.Areas.Admin.Controllers
 {
     [Area("Admin")]
@@ -34,34 +34,38 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 .OrderByDescending(x => x.SoLuongSP)
                 .ToList();
 
+            // Lấy thông tin sản phẩm bán chạy
             var sanPhamBanChay = _context.san_Pham_Chi_Tiets
                 .Where(spct => spct.so_luong > 0)
                 .Select(spct => new
                 {
                     TenSanPham = spct.ten_SPCT,  // Tên sản phẩm
                     SoLuongBan = _context.don_Chi_Tiets
-                                         .Where(hdct => hdct.San_Pham_Chi_TietID == spct.ID && hdct.Hoa_Don.trang_thai == 3)
-                                         .Sum(hdct => hdct.so_luong)
+                                         .Where(hdct => hdct.San_Pham_Chi_TietID == spct.ID &&
+                                                        (hdct.Hoa_Don.trang_thai == 4 || hdct.Hoa_Don.trang_thai == 6)) // Trạng thái bán online (4) hoặc bán tại quầy (6)
+                                         .Sum(hdct => hdct.so_luong)  // Tính tổng số lượng bán cho sản phẩm
                 })
-                .OrderByDescending(sp => sp.SoLuongBan)
-                .Take(10)
+                .OrderByDescending(sp => sp.SoLuongBan)  // Sắp xếp theo số lượng bán
+                .Take(10)  // Lấy 10 sản phẩm bán chạy nhất
                 .ToList();
 
+            // Lấy thông tin số lượng tồn kho của sản phẩm và sắp xếp theo số lượng tồn giảm dần
             var sanPhamTonKho = _context.san_Pham_Chi_Tiets
                 .Select(spct => new
                 {
                     TenSanPham = spct.ten_SPCT,  // Tên sản phẩm
                     SoLuongTon = spct.so_luong -
                                  _context.don_Chi_Tiets
-                                         .Where(hdct => hdct.San_Pham_Chi_TietID == spct.ID && hdct.Hoa_Don.trang_thai == 3)
-                                         .Sum(hdct => hdct.so_luong)
+                                         .Where(hdct => hdct.San_Pham_Chi_TietID == spct.ID &&
+                                                        (hdct.Hoa_Don.trang_thai == 4 || hdct.Hoa_Don.trang_thai == 6)) // Trừ đi số lượng bán online (4) hoặc tại quầy (6)
+                                         .Sum(hdct => hdct.so_luong)  // Trừ đi số lượng bán
                 })
+                .OrderByDescending(sp => sp.SoLuongTon)  // Sắp xếp theo số lượng tồn kho giảm dần
                 .ToList();
 
-            // Gán kết quả vào ViewBag
+            // Kiểm tra dữ liệu và gán kết quả vào ViewBag
             ViewBag.SanPhamBanChay = sanPhamBanChay;
             ViewBag.SanPhamTonKho = sanPhamTonKho;
-
 
             var today = DateTime.Today;
             var startOfWeek = today.AddDays(-(int)today.DayOfWeek + (today.DayOfWeek == DayOfWeek.Sunday ? -6 : 1));
@@ -159,11 +163,14 @@ new ThongKe()
         {
 
             var thongKe = _context.hoa_Dons
+                .Where(x => x.trang_thai == 3 || x.trang_thai == 6)
                .GroupBy(x => x.ngay_tao)
+               
                 .Select(x => new
                 {
                     DoanhThu = x.Key,
-                    TongTien = x.Sum(x => x.tong_tien),
+                    TongTien =  x.Sum(x => x.tong_tien),
+
                     DonThanhCong = x.Sum(x => x.trang_thai == 3 ? 1 : 0),
                     DonHuy = x.Sum(x => x.trang_thai == 4 ? 1 : 0),
                 }).ToList();
@@ -182,7 +189,8 @@ new ThongKe()
                 .Select(g => new
                 {
                     doanhThu = g.Key.ToString("yyyy-MM-dd"), // Chuyển DateTime thành string
-                    tongTien = g.Sum(hd => hd.tong_tien),
+                    TongTien = g.Where(x => x.trang_thai == 3 || x.trang_thai == 6).Sum(x => x.tong_tien),
+
                     donThanhCong = g.Count(hd => hd.trang_thai == 3),
                     donHuy = g.Count(hd => hd.trang_thai == 4)
                 }).ToList();

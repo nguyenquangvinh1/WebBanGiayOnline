@@ -83,8 +83,7 @@ namespace ClssLib
         [JsonIgnore]
         public virtual ICollection<Hoa_Don_Chi_Tiet>? Hoa_Don_Chi_Tiets { get; set; }
 
-        [JsonIgnore]
-        public virtual ICollection<Gio_Hang_Chi_Tiet>? Gio_Hang_Chi_Tiets { get; set; }
+      
 
 
     }

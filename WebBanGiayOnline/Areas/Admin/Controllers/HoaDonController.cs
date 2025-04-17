@@ -20,6 +20,7 @@ using DocumentFormat.OpenXml.Drawing.Charts;
 using System.Net.Mail;
 using System.Net;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using WebBanGiay.Helpers;
 namespace WebBanGiay.Areas.Admin.Controllers
 {
     [Area("Admin")]
@@ -89,8 +90,8 @@ namespace WebBanGiay.Areas.Admin.Controllers
         new SelectListItem { Value = "2", Text = "Đang giao hàng" },
         new SelectListItem { Value = "3", Text = "Hoàn thành" },
         new SelectListItem { Value = "4", Text = "Đã hủy" },
-        new SelectListItem { Value = "5", Text = "Chưa thanh toán" },
-        new SelectListItem { Value = "6", Text = "Đã thanh toán" },
+        new SelectListItem { Value = "-1", Text = "Chưa thanh toán" },
+        new SelectListItem { Value = "-2", Text = "Đã thanh toán" },
     }, "Value", "Text", Category.ToString());
 
 
@@ -106,8 +107,10 @@ namespace WebBanGiay.Areas.Admin.Controllers
         {
             var hoaDon = _context.hoa_Dons
        .Include(h => h.Hoa_Don_Chi_Tiets)  
+      
        .FirstOrDefault(h => h.ID == id) ?? new Hoa_Don(); 
 
+           
             hoaDon.Hoa_Don_Chi_Tiets = hoaDon.Hoa_Don_Chi_Tiets ?? new List<Hoa_Don_Chi_Tiet>();
             ViewBag.TrangThaiList = new List<SelectListItem>
 {
@@ -116,8 +119,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
     new SelectListItem { Value = "2", Text = "Đang giao hàng" },
     new SelectListItem { Value = "3", Text = "Hoàn thành" },
     new SelectListItem { Value = "4", Text = "Đã hủy" },
-     new SelectListItem { Value = "5", Text = "Chưa thanh toán" },
-        new SelectListItem { Value = "6", Text = "Đã thanh toán" }
+    
 };
 
             if (hoaDon == null)
@@ -131,6 +133,73 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
             return View(hoaDon);
         }
+
+
+        [HttpPost]
+        public IActionResult UpdateQuantity(Guid id, int quantity)
+        {
+            var cart = _context.don_Chi_Tiets.FirstOrDefault(z => z.ID == id);
+
+            if (cart != null)
+            {
+                // Cập nhật chi tiết đơn hàng
+                cart.so_luong = quantity;
+                cart.thanh_tien = cart.gia * quantity;
+
+                _context.Update(cart);
+                _context.SaveChanges(); // Lưu tất cả
+                // Tìm hóa đơn tương ứng
+                var hoaDon = _context.hoa_Dons.FirstOrDefault(h => h.MaHoaDon == cart.ma);
+
+                if (hoaDon != null)
+                {
+                    // Tính lại tổng tiền của hóa đơn từ tất cả chi tiết
+                    var tongTienMoi = _context.don_Chi_Tiets
+                                        .Where(z => z.ma == hoaDon.MaHoaDon)
+                                        .Sum(z => z.gia * z.so_luong);
+
+                    hoaDon.tong_tien = tongTienMoi;
+                    _context.Update(hoaDon);
+                }
+
+               
+                _context.SaveChanges(); // Lưu tất cả
+
+                return Json(new
+                {
+                    success = true,
+                    newTotal = cart.thanh_tien,
+                    totalCart = hoaDon?.tong_tien ?? cart.thanh_tien
+                });
+            }
+
+            return Json(new { success = false, message = "Không tìm thấy sản phẩm trong giỏ hàng!" });
+        }
+        [HttpPost]
+        public IActionResult CapNhatThongTin(Hoa_Don model)
+        {
+            var hoaDon = _context.hoa_Dons.FirstOrDefault(h => h.ID == model.ID);
+            if (hoaDon == null)
+            {
+                return NotFound();
+            }
+
+            // Cập nhật thông tin
+            hoaDon.ten_nguoi_nhan = model.ten_nguoi_nhan;
+            hoaDon.sdt_nguoi_nhan = model.sdt_nguoi_nhan;
+            hoaDon.email_nguoi_nhan = model.email_nguoi_nhan;
+            hoaDon.dia_chi = model.dia_chi;
+            hoaDon.ngay_sua = DateTime.Now;
+            hoaDon.nguoi_sua = User.Identity?.Name ?? "Không xác định";
+            _context.Update(hoaDon);
+            _context.SaveChanges();
+
+            TempData["ThongBao"] = "Cập nhật thông tin thành công!";
+            return RedirectToAction("Details", new { id = model.ID });
+        }
+
+
+
 
         [HttpPost]
         public JsonResult UpdateStatus(Guid? id, int newStatus)
@@ -184,10 +253,11 @@ namespace WebBanGiay.Areas.Admin.Controllers
             string orderStatus = GetOrderStatusName(hoadon.trang_thai);
             string fromEmail = "trangthph44337@fpt.edu.vn";  // Thay bằng Gmail của bạn
             string fromPassword = "fdqe bzsy cscd kerv"; // Thay bằng App Password (16 ký tự)
-
+            var time = DateTime.Now;
             string subject = $@"Cập nhập trạng thái đơn hàng {ma} của bạn ";
             string body = $@"
             <p>Chào {username},</p>
+            <p>Vào lúc {time} </p>
             <p>Trạng thái đơn hàng của bạn {orderStatus}. </p>
             <p>Đơn hàng đang trong quá trính gửi đi hãy để ý đơn hàng nhé .</p>
              <p> Adidas Shop rất cảm ơn vì sự ủng hộ của bạn .</p>
@@ -498,7 +568,13 @@ namespace WebBanGiay.Areas.Admin.Controllers
         //    });
         //}
 
-
+        [HttpPost]
+        public IActionResult Detial(Guid id, bool sua = false)
+        {
+            var hoaDon = _context.hoa_Dons.Find(id);
+            ViewBag.ShowForm = sua && hoaDon.trang_thai < 2 || hoaDon.trang_thai == -1;
+            return View(hoaDon);
+        }
 
 
 

@@ -29,8 +29,9 @@ namespace ClssLib
         [Display(Name = "Email người nhận :")]
         public string email_nguoi_nhan { get; set; }
         [Display(Name = "Loại hóa đơn :")]
-
-
+        public string? Status { get; set; }
+        public string? discount { get; set; }
+        public double? Ship { get; set; }
         public int loai_hoa_don { get; set; }
         [Display(Name = "Người đặt :")]
         public string ten_nguoi_nhan { get; set; }

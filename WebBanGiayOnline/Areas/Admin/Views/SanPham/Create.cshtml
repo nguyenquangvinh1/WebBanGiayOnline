@@ -331,7 +331,7 @@
         $(document).on("click", ".anh_form", function () {
 
             console.log(`🔹 Chọn ảnh `);
-            $("#selectImages").hide(); // Ẩn nút "Chọn Ảnh" khi mở modal
+            $("#selectImages").hide();
             $("#imagePreviewContainer").html("");
             uploadedImages.forEach(url => {
                 $("#imagePreviewContainer").append(`
