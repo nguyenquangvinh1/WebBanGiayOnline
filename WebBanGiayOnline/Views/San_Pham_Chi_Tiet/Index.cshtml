@@ -502,12 +502,20 @@
             let filters = {};
                 let debounceTimer;
 
-                $('#rangeInput').on('input', function () {
-                    $('#amount').val($(this).val());
+                // Khi người dùng đang kéo thanh range (thay đổi tức thì)
+                // Khi kéo thanh range: cập nhật giá trị hiển thị ngay
+                $(document).on('input', '#rangeInput', function () {
+                    $('#amount').text($(this).val());
+                    console.log("📌 Cập nhật giá trị khi kéo:", $(this).val());
+                });
+
+                // Khi dừng kéo thanh range: thực hiện lọc
+                $(document).on('change', '#rangeInput', function () {
                     clearTimeout(debounceTimer);
                     debounceTimer = setTimeout(() => {
+                        console.log("📌 Gửi filter sau khi dừng kéo.");
                         window.applyFilter();
-                    }, 500); // Gọi sau 0.5 giây khi ngừng kéo
+                    }, 300);
                 });
 
             // Lấy dữ liệu từ tất cả select box

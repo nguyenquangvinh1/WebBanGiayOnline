@@ -120,13 +120,22 @@
 <div class="card">
     <div class="card-header">
         <h3 class="card-title">Bảng Sản Phẩm</h3>
+        <div class="card-tools">
+
+            <button type="button" class="btn btn-secondary ms-2" id="updateAll">Update All</button>
+        </div>
     </div>
+    
     <div class="card-body">
 
         <table class="table table-bordered table-striped" id="sanPhamTable">
             <thead>
                 <tr>
+                    <th>
+                        <input type="checkbox" id="selectAllCheckbox" title="Cho phép sửa tất cả">
+                    </th>
                     <th>STT</th>
+                    <th class="d-none">ID</th> <!-- Ô ẩn cho ID -->
                     <th class="filterable">Ảnh</th>
                     <th class="filterable">Tên Sản Phẩm :</th>
                     <th class="filterable">Kích Thước :</th>
@@ -139,8 +148,8 @@
                     <th class="filterable">Tên đế giày</th>
                     <th class="filterable">Tên chất liệu</th>
                     <th class="filterable">Số Lượng :</th>
-                    <th class="filterable">Trạng Thái :</th>
                     <th class="filterable">Giá :</th>
+                    <th class="filterable">Trạng Thái :</th>
                     <th>Thao Tác</th>
                 </tr>
             </thead>
@@ -151,7 +160,11 @@
                 @foreach (var item in Model)
                 {
                     <tr>
+                        <td>
+                            <input type="checkbox" class="row-checkbox" title="Cho phép sửa dòng này">
+                        </td>
                         <td>@stt</td>
+                        <td class='d-none'>@item.ID</td>
                         <td>
                             @if (!string.IsNullOrEmpty(item.imgUrl))
                             {
@@ -170,41 +183,21 @@
                                 <span>Không có ảnh</span>
                             }
                         </td>
+                        <td>@item.Ten</td>
+                        <td>@item.Kich_Thuoc</td>
+                        <td>@item.Mau_Sac</td>
+                        <td>@item.Kieu_Dang</td>
+                        <td>@item.Danh_Muc</td>
+                        <td>@item.Loai_Giay</td>
+                        <td>@item.Mui_Giay</td>
+                        <td>@item.Co_Giay</td>
+                        <td>@item.De_Giay</td>
+                        <td>@item.Chat_Lieu</td>
                         <td>
-                            @Html.DisplayFor(modelItem => item.Ten)
+                            <input type="number" class="quantity form-control form-control-sm so-luong-input text-end" style="width: 70px;" value="@item.so_luong" disabled />
                         </td>
                         <td>
-                            @Html.DisplayFor(modelItem => item.Kich_Thuoc)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Mau_Sac)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Kieu_Dang)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Danh_Muc)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Loai_Giay)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Mui_Giay)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Co_Giay)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.De_Giay)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Chat_Lieu)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.so_luong)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.gia)
+                            <input type="number" class="price form-control form-control-sm gia-input text-end" style="width: 90px;" value="@item.gia" disabled />
                         </td>
                         <td>
                             <span id="status-badge" class="@(item.trang_thai == 1 ? "trang-thai-dang-dien-ra" : "trang-thai-het-han")" style='width: 150px; height: 30px; line-height: 18px; white-space: nowrap;'>@(item.trang_thai == 1 ? "Hoạt động" : "Ngừng hoạt động")</span>
@@ -218,13 +211,13 @@
                                 <i class="fa fa-xs fa-pen"></i>
                             </a>
                             <a class='toggle-status btn btn-secondary' data-id='@item.ID' data-status='@item.trang_thai'><i class="fa fa-sync"></i></a>
-
                         </td>
                     </tr>
                     stt++;
                 }
             </tbody>
         </table>
+
 
 
     </div>
@@ -307,6 +300,19 @@
         $(document).off("click", "#themAnhVaoSanPham").on("click", "#themAnhVaoSanPham", function (e) {
             e.preventDefault(); // Ngăn form submit nếu trong thẻ <form>
             $("#chonAnhSanPham").toggle(); // Hiện/ẩn phần chọn ảnh
+        });
+
+        // Bật/tắt tất cả dòng
+        $('#selectAllCheckbox').on('change', function () {
+            const isChecked = $(this).is(':checked');
+            $('.row-checkbox').prop('checked', isChecked).trigger('change');
+        });
+
+        // Bật/tắt dòng riêng
+        $(document).on('change', '.row-checkbox', function () {
+            const row = $(this).closest('tr');
+            const enabled = $(this).is(':checked');
+            row.find('.so-luong-input, .gia-input').prop('disabled', !enabled);
         });
 
         let productImages = [];
@@ -444,20 +450,16 @@
             }
 
 
-            // Gửi AJAX lấy danh sách ảnh từ server
             $.ajax({
-                url: "/Admin/SanPhamChiTiet/GetProductImages",
+                url: '/Admin/SanPhamChiTiet/GetProductImages',
                 type: "GET",
                 data: { id: id },
-                dataType: "json",
                 success: function (imageUrls) {
                     console.log("✅ Ảnh nhận được:", imageUrls);
-
                     $('#chonAnhSanPham').empty();
 
                     if (Array.isArray(imageUrls) && imageUrls.length > 0) {
                         $('#editAnhSanPham').val(imageUrls.join(","));
-
                         imageUrls.forEach(url => {
                             $('#chonAnhSanPham').append(`
                         <div class="m-1">
@@ -470,11 +472,11 @@
                         $('#chonAnhSanPham').append("<p>Không có ảnh</p>");
                     }
                 },
-                error: function () {
-                    console.error("❌ Lỗi khi lấy ảnh sản phẩm!");
-                    alert("Không thể lấy ảnh sản phẩm, vui lòng thử lại!");
+                error: function (xhr) {
+                    console.error("❌ Lỗi khi lấy ảnh sản phẩm! Status:", xhr.status, xhr.statusText);
                 }
             });
+
 
 
             // Hiển thị modal
@@ -506,7 +508,40 @@
             });
         });
 
+        // Nút cập nhật tất cả
+        $("#updateAll").on("click", function () {
+            let updatedData = [];
 
+            $("#sanPhamTable tbody tr").each(function () {
+                let row = $(this);
+                let quantity = $(this).find(".quantity").val();
+                let price = $(this).find(".price").val();
+                let id = $(this).find("td:nth-child(3)").text(); // Lấy ID từ ô ẩn
+                if (quantity > 0) {
+                    let item = {
+                        ID: id,
+                        gia: price,
+                        so_luong: quantity
+                    };
+                    updatedData.push(item);
+                }
+
+
+            });
+
+            $.ajax({
+                url: "/Admin/SanPhamChiTiet/UpdateSPCTALL",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(updatedData),
+                success: function (response) {
+                    alert("Cập nhật thành công!");
+                },
+                error: function (xhr, status, error) {
+                    alert("Cập nhật thất bại: " + error);
+                }
+            });
+        });
 
     });
 </script>
