@@ -247,7 +247,9 @@
             let id = button.data("id");
             let currentStatus = button.data("status");
             let newStatus = currentStatus === 1 ? 0 : 1;
-            let badge = $('#status-badge');
+
+            let row = button.closest('tr'); // lấy dòng hiện tại
+            let badge = row.find('#status-badge'); // chỉ badge trong dòng này
 
             $.ajax({
                 url: '/Admin/SanPham/ChangeStatus',
