@@ -9,6 +9,7 @@ namespace WebBanGiay.ViewModel
     public class San_PhamCTView
     {
         public Guid? ID { get; set; }
+        public string ma {  get; set; }
         public double gia { get; set; }
         public int so_luong { get; set; }
         public string? imgUrl { get; set; }

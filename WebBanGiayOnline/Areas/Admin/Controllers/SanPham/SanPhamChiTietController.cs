@@ -44,6 +44,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 .Select(x => new San_PhamCTView
                 {
                     ID = x.ID,
+                    ma = x.ma,
                     Ten = x.ten_SPCT,
                     gia = (int)x.gia,
                     so_luong = x.so_luong,
@@ -126,6 +127,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 .Select(x => new San_PhamCTView
                 {
                     ID = x.ID,
+                    ma = x.ma,
                     Ten = x.ten_SPCT,
                     gia = (int)x.gia,
                     so_luong = x.so_luong,

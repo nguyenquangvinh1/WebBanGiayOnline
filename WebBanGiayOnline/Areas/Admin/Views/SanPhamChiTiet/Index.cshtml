@@ -136,20 +136,21 @@
                     </th>
                     <th>STT</th>
                     <th class="d-none">ID</th> <!-- Ô ẩn cho ID -->
-                    <th class="filterable">Ảnh</th>
-                    <th class="filterable">Tên Sản Phẩm :</th>
-                    <th class="filterable">Kích Thước :</th>
-                    <th class="filterable">Màu Sắc :</th>
-                    <th class="filterable">Tên kiểu dáng</th>
-                    <th class="filterable">Tên danh mục</th>
-                    <th class="filterable">Tên loại giày</th>
-                    <th class="filterable">Tên mũi giày</th>
-                    <th class="filterable">Tên cổ giày</th>
-                    <th class="filterable">Tên đế giày</th>
-                    <th class="filterable">Tên chất liệu</th>
-                    <th class="filterable">Số Lượng :</th>
-                    <th class="filterable">Giá :</th>
-                    <th class="filterable">Trạng Thái :</th>
+                    <th class="filterable">Mã:</th>
+                    <th class="filterable">Ảnh:</th>
+                    <th class="filterable">Tên Sản Phẩm:</th>
+                    <th class="filterable">Kích Thước:</th>
+                    <th class="filterable">Màu Sắc:</th>
+                    <th class="filterable">Tên kiểu dáng:</th>
+                    <th class="filterable">Tên danh mục:</th>
+                    <th class="filterable">Tên loại giày:</th>
+                    <th class="filterable">Tên mũi giày:</th>
+                    <th class="filterable">Tên cổ giày:</th>
+                    <th class="filterable">Tên đế giày:</th>
+                    <th class="filterable">Tên chất liệu:</th>
+                    <th class="filterable">Số Lượng:</th>
+                    <th class="filterable">Giá:</th>
+                    <th class="filterable">Trạng Thái:</th>
                     <th>Thao Tác</th>
                 </tr>
             </thead>
@@ -165,6 +166,7 @@
                         </td>
                         <td>@stt</td>
                         <td class='d-none'>@item.ID</td>
+                        <td>@item.ma</td>
                         <td>
                             @if (!string.IsNullOrEmpty(item.imgUrl))
                             {
