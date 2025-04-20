@@ -16,9 +16,11 @@ using NuGet.Common;
 using System.Drawing;
 using ClosedXML.Excel;
 using WebBanGiay.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 namespace WebBanGiay.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Policy = "AdminOrEmployeePolicy")]
     public class HoaDonController : Controller
     {
         private readonly AppDbContext _context;

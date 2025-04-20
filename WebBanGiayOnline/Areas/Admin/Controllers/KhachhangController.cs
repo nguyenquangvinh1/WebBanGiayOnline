@@ -498,6 +498,74 @@ namespace WebBanGiay.Areas.Admin.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult SearchCustomers(string keyword, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                // Nếu keyword rỗng, trả về danh sách khách hàng mặc định
+                var query = _context.tai_Khoans
+                    .Where(t => t.Vai_Tro.ten_vai_tro == "Khách hàng");
+
+                if (!string.IsNullOrWhiteSpace(keyword))
+                {
+                    // Tìm kiếm theo tên, số điện thoại hoặc email (có thể mở rộng theo yêu cầu)
+                    query = query.Where(t =>
+                        t.ho_ten.Contains(keyword) ||
+                        t.sdt.Contains(keyword) ||
+                        t.email.Contains(keyword));
+                }
+
+                query = query.Include(tk => tk.Dia_Chi).OrderByDescending(tk => tk.ngay_tao);
+
+                int totalItems = query.Count();
+
+                var customers = query
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(customer => new {
+                        id = customer.ID,
+                        ho_ten = customer.ho_ten,
+                        phoneNumber = customer.sdt,
+                        email = customer.email,
+                        createdate = customer.ngay_tao,
+                        tinh = customer.Dia_Chi
+                                 .Where(dc => dc.loai_dia_chi == 1)
+                                 .Select(dc => dc.tinh)
+                                 .FirstOrDefault(),
+                        huyen = customer.Dia_Chi
+                                 .Where(dc => dc.loai_dia_chi == 1)
+                                 .Select(dc => dc.huyen)
+                                 .FirstOrDefault(),
+                        xa = customer.Dia_Chi
+                                 .Where(dc => dc.loai_dia_chi == 1)
+                                 .Select(dc => dc.xa)
+                                 .FirstOrDefault(),
+                        dia_chi = customer.Dia_Chi
+                                 .Where(dc => dc.loai_dia_chi == 1)
+                                 .Select(dc => dc.dia_chi_chi_tiet)
+                                 .FirstOrDefault()
+                    })
+                    .ToList();
+
+                return Json(new
+                {
+                    success = true,
+                    data = customers,
+                    pagination = new
+                    {
+                        pageNumber,
+                        pageSize,
+                        totalItems,
+                        totalPages = (int)Math.Ceiling((double)totalItems / pageSize)
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
 
 
 
