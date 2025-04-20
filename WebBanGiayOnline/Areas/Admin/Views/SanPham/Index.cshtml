@@ -106,7 +106,6 @@
                             <span id="status-badge" class="@(item.trang_thai == 1 ? "trang-thai-dang-dien-ra" : "trang-thai-het-han")" style='width: 150px; height: 30px; line-height: 18px; white-space: nowrap;'>@(item.trang_thai == 1 ? "Hoạt động" : "Ngừng hoạt động")</span>
                                 </td>
                                 <td>
-                                    <a asp-area="Admin" asp-action="Edit" asp-route-id="@item.ID" class="btn btn-warning"><i class="fa fa-xs fa-pen"></i></a>
                                     <a asp-area="Admin" asp-controller="SanPhamChiTiet" asp-action="Index" class="btn btn-warning"><i class="fa-solid fa-eye"></i></a>
                                     <a class='toggle-status btn btn-secondary' data-id='@item.ID' data-status='@item.trang_thai'><i class="fa fa-sync"></i></a>
                                 </td>
