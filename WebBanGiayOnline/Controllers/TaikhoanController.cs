@@ -75,14 +75,14 @@ namespace WebBanGiay.Controllers
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
-            // Điều hướng dựa trên vai trò
+            
             if (isAdminOrEmployee)
             {
-                return RedirectToAction("Index", "Home", new { area = "Admin" }); // Chuyển hướng đến Admin
+                return RedirectToAction("Index", "Home", new { area = "Admin" }); 
             }
             else if (isCustomer)
             {
-                return RedirectToAction("Index", "Home"); // Chuyển hướng đến trang chủ khách hàng
+                return RedirectToAction("Index", "Home");
             }
 
             return returnUrl != null ? Redirect(returnUrl) : RedirectToAction("Index", "Home");

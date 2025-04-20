@@ -21,6 +21,7 @@ namespace ClssLib
         [Display(Name = "Số Lượng :")]
         public int so_luong { get; set; }
         [Display(Name = "Trạng Thái :")]
+        public string ma { get; set; }
         public int trang_thai { get; set; }
         public DateTime ngay_tao { get; set; }
         public DateTime? ngay_sua { get; set; }
@@ -70,6 +71,7 @@ namespace ClssLib
         public virtual De_Giay? De_Giay { get; set; }
         [JsonIgnore]
         public virtual Chat_Lieu? Chat_Lieu { get; set; }
+      
         [JsonIgnore]
         [IgnoreDataMember]
         public virtual Kich_Thuoc? Kich_Thuoc { get; set; }
@@ -82,10 +84,5 @@ namespace ClssLib
         public virtual ICollection<Anh_San_Pham_San_Pham_Chi_Tiet>? Anh_San_Pham_San_Pham_Chi_Tiets { get; set; }
         [JsonIgnore]
         public virtual ICollection<Hoa_Don_Chi_Tiet>? Hoa_Don_Chi_Tiets { get; set; }
-
-        [JsonIgnore]
-        public virtual ICollection<Gio_Hang_Chi_Tiet>? Gio_Hang_Chi_Tiets { get; set; }
-
-
     }
 }

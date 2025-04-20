@@ -10,6 +10,7 @@ using WebBanGiay.Data;
 using WebBanGiay.Models;
 using System.ComponentModel;
 using DocumentFormat.OpenXml.Drawing.Diagrams;
+using System.Drawing;
 
 namespace WebBanGiay.Controllers
 {
@@ -25,32 +26,63 @@ namespace WebBanGiay.Controllers
         // GET: San_Pham_Chi_Tiet
         public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 12)
         {
-         
+
+            var kich = await _context.kich_Thuocs.ToListAsync();
+            var mau = await _context.mau_Sacs.ToListAsync();
+
             var sanPham = _context.san_Phams
-                .Where(sp=>sp.trang_thai==1)
-           .Where(sp => sp.San_Pham_Chi_Tiets.Any(ct => ct.so_luong > 0))
-           // Chỉ lấy sản phẩm có số lượng > 0
-           .AsQueryable();
+                .Where(sp => sp.trang_thai == 1)
+                .Where(sp => sp.San_Pham_Chi_Tiets.Any(ct => ct.so_luong > 0))
+                .AsQueryable();
 
-            var result = sanPham.Select(x => new HangHoaVM
-            {
-                ID = x.ID,
-                TenHH = x.ten_san_pham,
-                DonGia = _context.san_Pham_Chi_Tiets
-                    .Where(z => z.San_PhamID == x.ID)
-                    .Select(x => x.gia)
-                    .Min(), // Nếu không có giá, trả về 0
-                MoTa = x.mo_ta ?? "",
-                Hinh = _context.anh_San_Phams.FirstOrDefault(z => z.San_PhamID == x.ID).anh_url ?? "/img/default.png",
-              
-            });
-
-            // Đếm tổng số sản phẩm
-            int totalItems = await result.CountAsync();
-            var paginatedResult = await result
+            var resultRaw = await sanPham
+                .Select(x => new
+                {
+                    ID = x.ID,
+                    TenHH = x.ten_san_pham,
+                    DonGia = _context.san_Pham_Chi_Tiets
+                        .Where(z => z.San_PhamID == x.ID)
+                        .Select(x => x.gia)
+                        .Min(),
+                    MoTa = x.mo_ta ?? "",
+                    Hinh = _context.anh_San_Phams
+                        .Where(z => z.San_PhamID == x.ID)
+                        .Select(z => z.anh_url)
+                        .FirstOrDefault() ?? "/img/default.png",
+                    SanPhamChiTiet = x.San_Pham_Chi_Tiets.ToList()
+                })
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+
+            var result = resultRaw.Select(x => new HangHoaVM
+            {
+                ID = x.ID,
+                TenHH = x.TenHH,
+                DonGia = x.DonGia,
+                MoTa = x.MoTa,
+                Hinh = x.Hinh,
+
+                size = string.Join(", ",
+        x.SanPhamChiTiet
+            .Select(ct => ct.Kich_ThuocID)
+            .Distinct()
+            .Select(id => kich.FirstOrDefault(k => k.ID == id)?.ten_kich_thuoc)
+            .Where(ten => !string.IsNullOrEmpty(ten))
+    ),
+
+                mau = string.Join(", ",
+        x.SanPhamChiTiet
+            .Select(ct => ct.Mau_SacID)
+            .Distinct()
+            .Select(id => mau.FirstOrDefault(m => m.ID == id)?.ma_mau)
+            .Where(ma => !string.IsNullOrEmpty(ma))
+    )
+            }).ToList();
+
+
+
+            int totalItems = await sanPham.CountAsync();
 
             ViewData["TotalItems"] = totalItems;
             ViewData["PageNumber"] = pageNumber;
@@ -64,21 +96,23 @@ namespace WebBanGiay.Controllers
             ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.ToList(), "ID", "ten_kieu_dang");
             ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.ToList(), "ID", "ten_loai_giay");
 
-            return View(paginatedResult);
+            return View(result);
         }
+
         [HttpGet]
         public async Task<IActionResult> Filter(
-string chatLieu, string coGiay, string danhMuc, string deGiay,
-string muiGiay, string kieuDang, string loaiGiay, string tenSanPham,
-int pageNumber = 1, int pageSize = 12)
+    string chatLieu, string coGiay, string danhMuc, string deGiay,
+    string muiGiay, string kieuDang, string loaiGiay, string tenSanPham, int? maxPrice,
+    int pageNumber = 1, int pageSize = 12)
         {
-            Console.WriteLine($"📌 Nhận giá trị lọc: chatLieu={chatLieu}, coGiay={coGiay}, danhMuc={danhMuc}, deGiay={deGiay}, muiGiay={muiGiay}, kieuDang={kieuDang}, loaiGiay={loaiGiay}");
+            var kich = await _context.kich_Thuocs.ToListAsync();
+            var mau = await _context.mau_Sacs.ToListAsync();
 
             var query = _context.san_Phams
-                .Where(sp => sp.San_Pham_Chi_Tiets.Any(ct => ct.so_luong > 0 && ct.trang_thai ==1)) // Chỉ lấy sản phẩm có số lượng > 0
+                .Where(sp => sp.trang_thai == 1)
+                .Where(sp => sp.San_Pham_Chi_Tiets.Any(ct => ct.so_luong > 0))
                 .AsQueryable();
 
-            // Áp dụng bộ lọc
             if (!string.IsNullOrEmpty(chatLieu))
                 query = query.Where(sp => sp.Chat_LieuID.ToString() == chatLieu);
             if (!string.IsNullOrEmpty(coGiay))
@@ -93,43 +127,62 @@ int pageNumber = 1, int pageSize = 12)
                 query = query.Where(sp => sp.Kieu_DangID.ToString() == kieuDang);
             if (!string.IsNullOrEmpty(loaiGiay))
                 query = query.Where(sp => sp.Loai_GiayID.ToString() == loaiGiay);
-            // Tìm kiếm theo tên sản phẩm (không phân biệt chữ hoa/thường)
             if (!string.IsNullOrEmpty(tenSanPham))
                 query = query.Where(sp => sp.ten_san_pham.Contains(tenSanPham));
 
-
-            // Truy vấn dữ liệu sản phẩm
-            var result = query.Select(x => new HangHoaVM
-            {
-                ID = x.ID,
-                TenHH = x.ten_san_pham,
-                DonGia = _context.san_Pham_Chi_Tiets
-                    .Where(z => z.San_PhamID == x.ID)
-                    .Select(x => x.gia)
-                    .Min(), // Nếu không có giá, trả về 0
-                MoTa = x.mo_ta ?? "",
-                Hinh = _context.anh_San_Phams
-                    .Where(z => z.San_PhamID == x.ID)
-                    .Select(z => z.anh_url)
-                    .FirstOrDefault() ?? "/img/default.png",
             
-            });
 
-            // Đếm tổng số sản phẩm và áp dụng phân trang
-            int totalItems = await result.CountAsync();
-            var paginatedResult = await result
+            var resultRaw = await query
+                .Select(x => new
+                {
+                    ID = x.ID,
+                    TenHH = x.ten_san_pham,
+                    DonGia = _context.san_Pham_Chi_Tiets
+                        .Where(z => z.San_PhamID == x.ID)
+                        .Select(z => z.gia)
+                        .Min(),
+                    MoTa = x.mo_ta ?? "",
+                    Hinh = _context.anh_San_Phams
+                        .Where(z => z.San_PhamID == x.ID)
+                        .Select(z => z.anh_url)
+                        .FirstOrDefault() ?? "/img/default.png",
+                    San_Pham_Chi_Tiets = x.San_Pham_Chi_Tiets.ToList()
+                })
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+            // Lọc theo maxPrice sau khi có DonGia
+            if (maxPrice.HasValue)
+            {
+                resultRaw = resultRaw.Where(x => x.DonGia <= maxPrice.Value).ToList();
+            }
 
-            Console.WriteLine($"🔍 Tổng sản phẩm tìm thấy: {totalItems}");
+            var result = resultRaw.Select(x => new HangHoaVM
+            {
+                ID = x.ID,
+                TenHH = x.TenHH,
+                DonGia = x.DonGia,
+                MoTa = x.MoTa,
+                Hinh = x.Hinh,
+                size = string.Join(", ", x.San_Pham_Chi_Tiets
+                    .Select(ct => ct.Kich_ThuocID)
+                    .Distinct()
+                    .Select(id => kich.FirstOrDefault(k => k.ID == id)?.ten_kich_thuoc)
+                    .Where(ten => !string.IsNullOrEmpty(ten))),
 
-            // Lưu thông tin phân trang
+                mau = string.Join(", ", x.San_Pham_Chi_Tiets
+                    .Select(ct => ct.Mau_SacID)
+                    .Distinct()
+                    .Select(id => mau.FirstOrDefault(m => m.ID == id)?.ma_mau)
+                    .Where(ma => !string.IsNullOrEmpty(ma)))
+            }).ToList();
+
+            int totalItems = await query.CountAsync();
+
             ViewData["TotalItems"] = totalItems;
             ViewData["PageNumber"] = pageNumber;
             ViewData["PageSize"] = pageSize;
 
-            // Lưu giá trị bộ lọc vào ViewData để giữ lại khi tải trang
             ViewData["SelectedChatLieu"] = chatLieu;
             ViewData["SelectedCoGiay"] = coGiay;
             ViewData["SelectedDanhMuc"] = danhMuc;
@@ -137,9 +190,8 @@ int pageNumber = 1, int pageSize = 12)
             ViewData["SelectedMuiGiay"] = muiGiay;
             ViewData["SelectedKieuDang"] = kieuDang;
             ViewData["SelectedLoaiGiay"] = loaiGiay;
-            ViewData["SelectedTenSanPham"] = tenSanPham;
+            ViewData["SelectedMaxPrice"] = maxPrice;
 
-            // Truyền dữ liệu dropdown
             ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu", chatLieu);
             ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.ToList(), "ID", "ten_loai_co_giay", coGiay);
             ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.ToList(), "ID", "ten_danh_muc", danhMuc);
@@ -148,8 +200,10 @@ int pageNumber = 1, int pageSize = 12)
             ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.ToList(), "ID", "ten_kieu_dang", kieuDang);
             ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.ToList(), "ID", "ten_loai_giay", loaiGiay);
 
-            return View("Index", paginatedResult); // Trả về danh sách đã lọc
+            return View("Index", result);
         }
+
+
 
         // GET: San_Pham_Chi_Tiet/Details/5
         public async Task<IActionResult> Details(Guid? id)
@@ -190,7 +244,7 @@ int pageNumber = 1, int pageSize = 12)
                 string url1 = imgUrls.anh_url;
                 item.hinh = url1;
             }
-            var sp = _context.san_Phams.Where(x => x.San_Pham_Chi_Tiets.Any(ct => ct.so_luong > 0)&& x.trang_thai == 1).AsQueryable();
+            var sp = _context.san_Phams.Where(x => x.San_Pham_Chi_Tiets.Any(ct => ct.so_luong > 0)&& x.trang_thai == 1 && x.Loai_GiayID == data1.Loai_GiayID).AsQueryable();
             if (data1 == null)
             {
                 TempData["Message"] = $"Không tìm thấy {id}";
@@ -219,25 +273,29 @@ int pageNumber = 1, int pageSize = 12)
                 lstspct = lsSPCT
 
             };
-            var kichThuoc = new List<Kich_Thuoc>();
-            var mauSac = new List<Mau_Sac>();
-            var lstSpct = spct.Include(x => x.Mau_Sac).Include(x => x.Kich_Thuoc).ToList();
-            if (spct != null)
-            {
-                foreach (var item in lstSpct)
-                {
-                    if (item.Kich_Thuoc != null && !kichThuoc.Contains(item.Kich_Thuoc))
-                        kichThuoc.Add(item.Kich_Thuoc);
 
-                    if (item.Mau_Sac != null && !mauSac.Contains(item.Mau_Sac))
-                        mauSac.Add(item.Mau_Sac);
-                }
-            }
+            var lstSpct = spct.Include(x => x.Mau_Sac).Include(x => x.Kich_Thuoc).ToList();
+
+            var kichThuoc = lstSpct
+                .Where(x => x.Kich_Thuoc != null)
+                .Select(x => x.Kich_Thuoc)
+                .DistinctBy(k => k.ID)
+                .ToList();
+
+            var mauSac = lstSpct
+                .Where(x => x.Mau_Sac != null)
+                .Select(x => x.Mau_Sac)
+                .DistinctBy(m => m.ID)
+                .ToList();
+
+            // Không cần foreach phía dưới nữa!
 
             ViewData["Kich_ThuocID"] = new SelectList(kichThuoc, "ID", "ten_kich_thuoc");
             ViewData["Mau_SacID"] = new SelectList(mauSac, "ID", "ma_mau");
 
             return View(result);
+
+           
         }
         // GET: San_Pham_Chi_Tiet/Create
         public IActionResult Create()

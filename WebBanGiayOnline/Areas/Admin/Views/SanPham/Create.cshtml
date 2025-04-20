@@ -61,7 +61,7 @@
 
 
                     <div class="form-group">
-                        <label asp-for="Loai_Giay" class="control-label"></label>
+                        <label asp-for="Loai_GiayID" class="control-label"></label>
                         <select id="Loai_GiayID" name="Loai_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddLoaiGiay">
                             <option value="">-- Nhập hoặc chọn Loại Giày --</option>
                             @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Loai_GiayID)
@@ -331,7 +331,7 @@
         $(document).on("click", ".anh_form", function () {
 
             console.log(`🔹 Chọn ảnh `);
-            $("#selectImages").hide(); // Ẩn nút "Chọn Ảnh" khi mở modal
+            $("#selectImages").hide();
             $("#imagePreviewContainer").html("");
             uploadedImages.forEach(url => {
                 $("#imagePreviewContainer").append(`
@@ -926,6 +926,7 @@
                 if (result.isConfirmed) {
 
                     $('#formSanPham').submit();
+                    
                 }
             });
         });

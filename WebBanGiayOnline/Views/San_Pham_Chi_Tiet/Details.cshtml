@@ -10,7 +10,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Fruitables - Vegetable Website Template</title>
+    <title>Adidas_Shop Website</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -115,19 +115,12 @@
                 </button>
                 <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
                     <div class="navbar-nav mx-auto">
-                        <a href="index.html" class="nav-item nav-link">Home</a>
-                        <a asp-controller="San_Pham_Chi_Tiet" asp-action="Index" class="nav-item nav-link">Shop</a>
-                        <a asp-controller="San_Pham_Chi_Tiet" asp-action="Details" class="nav-item nav-link active">Shop Detail</a>
-                        <div class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
-                            <div class="dropdown-menu m-0 bg-secondary rounded-0">
-                                <a href="cart.html" class="dropdown-item">Cart</a>
-                                <a href="chackout.html" class="dropdown-item">Chackout</a>
-                                <a href="testimonial.html" class="dropdown-item">Testimonial</a>
-                                <a href="404.html" class="dropdown-item">404 Page</a>
-                            </div>
-                        </div>
-                        <a href="contact.html" class="nav-item nav-link">Contact</a>
+                        <a href="https://localhost:7243" class="nav-item nav-link">Trang chủ</a>
+                        <a asp-controller="San_Pham_Chi_Tiet" asp-action="Index" class="nav-item nav-link active">Cửa hàng</a>
+
+                        <a class="nav-item nav-link active">Tra cứu</a>
+
+                        <a href="contact.html" class="nav-item nav-link">Liên hệ</a>
                     </div>
                     <div class="d-flex m-3 me-0">
                         <button class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fas fa-search text-primary"></i></button>
@@ -298,9 +291,10 @@
                
             <h1 class="fw-bold mb-0">Sản phẩm tương tự</h1>
             <div class="vesitable">
-                @foreach(var item in Model.lstsp){
+
                 <div class="owl-carousel vegetable-carousel justify-content-center">
-                    
+                        @foreach (var item in Model.lstsp)
+                        {
                     <div class="border border-primary rounded position-relative vesitable-item">
                         <div class="vesitable-img">
                             <img src="@item.Hinh" class="img-fluid w-100 rounded-top" alt="">
@@ -309,16 +303,19 @@
                         <div class="p-4 pb-0 rounded-bottom">
                          
                             <p>@item.MoTa</p>
-                            <div class="d-flex justify-content-between flex-lg-wrap">
+                                    <div class="d-flex justify-content-between flex-lg-wrap">
+                                        <p class="text-dark fs-5 fw-bold mb-0">@item.DonGia?.ToString("#,##0 VNĐ")</p>
+                                        <a asp-controller="San_Pham_Chi_Tiet" asp-action="Details" asp-route-id="@item.ID" class="btn border border-secondary rounded-pill px-3 text-primary add-to-cart">
 
-                                <a asp-controller="Cart" asp-action="AddCart1" asp-route-id="@Model.ID" class="btn border border-secondary rounded-pill px-3 py-1 mb-4 text-primary"><i class="fa fa-shopping-bag me-2 text-primary"></i> Mua Hàng</a>
-                            </div>
+                                            <i class="fa fa-shopping-bag me-2 text-primary"></i> Xem chi tiết
+                                        </a>
+                                    </div>
                         </div>
                     </div>
-               
+                        }
               
                 </div>
-                }
+                
             </div>
         </div>
     </div>
@@ -555,6 +552,7 @@
                    }
                });
            });
+
          });
     </script>
 }

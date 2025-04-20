@@ -1,6 +1,7 @@
 ﻿using ClssLib;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using WebBanGiay.Data;
@@ -18,9 +19,19 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         {
             _context = context;
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(Guid? id)
         {
-            var list = await _context.san_Pham_Chi_Tiets
+            var query = _context.san_Pham_Chi_Tiets.AsQueryable();
+            if (id != null)
+            {
+                var exist = await _context.san_Phams.FirstOrDefaultAsync(x => x.ID == id);
+                if (exist == null)
+                {
+                    ViewBag["message"] = "Sản phẩm không tồn tại";
+                }
+                query = query.Where(x => x.San_PhamID == id);
+            }
+            var list = await query
                 .Include(x => x.Chat_Lieu)
                 .Include(x => x.Co_Giay)
                 .Include(x => x.Danh_Muc)
@@ -33,6 +44,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 .Select(x => new San_PhamCTView
                 {
                     ID = x.ID,
+                    ma = x.ma,
                     Ten = x.ten_SPCT,
                     gia = (int)x.gia,
                     so_luong = x.so_luong,
@@ -115,6 +127,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 .Select(x => new San_PhamCTView
                 {
                     ID = x.ID,
+                    ma = x.ma,
                     Ten = x.ten_SPCT,
                     gia = (int)x.gia,
                     so_luong = x.so_luong,
@@ -220,14 +233,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 // Cập nhật dữ liệu sản phẩm
                 sanPham.gia = model.gia;
                 sanPham.so_luong = model.so_luong;
-                sanPham.trang_thai = (int)model.trang_thai;
-                sanPham.Chat_LieuID = Guid.Parse(model.Chat_Lieu);
-                sanPham.Co_GiayID = Guid.Parse(model.Co_Giay);
-                sanPham.Danh_MucID = Guid.Parse(model.Danh_Muc);
-                sanPham.De_GiayID = Guid.Parse(model.De_Giay);
-                sanPham.Mui_GiayID = Guid.Parse(model.Mui_Giay);
-                sanPham.Kieu_DangID = Guid.Parse(model.Kieu_Dang);
-                sanPham.Loai_GiayID = Guid.Parse(model.Loai_Giay);
+                
                 sanPham.ngay_sua = DateTime.Now;
 
                 // Lưu thay đổi vào database
@@ -241,8 +247,33 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 return StatusCode(500, new { message = "Lỗi server", error = ex.Message });
             }
         }
+        [HttpPost]
+        public IActionResult UpdateSPCTALL([FromBody] List<San_PhamCTView> updatedSPCT)
+        {
+            if (updatedSPCT == null || !updatedSPCT.Any())
+            {
+                return BadRequest(new { success = false, message = "Dữ liệu không hợp lệ" });
+            }
 
-        [HttpGet("GetProductImages")]
+            foreach (var spct in updatedSPCT)
+            {
+                var existingSPCT = _context.san_Pham_Chi_Tiets.FirstOrDefault(x => x.ID == spct.ID);
+
+                if (existingSPCT != null)
+                {
+                    existingSPCT.so_luong = spct.so_luong;
+                    existingSPCT.gia = spct.gia;
+                    existingSPCT.ngay_sua = DateTime.Now;
+
+                    _context.san_Pham_Chi_Tiets.Update(existingSPCT);
+                }
+            }
+
+            _context.SaveChanges();
+            return Ok(new { success = true, message = "Cập nhật thành công", updatedCount = updatedSPCT.Count });
+        }
+
+        [HttpGet]
         public IActionResult GetProductImages(Guid id)
         {
             var product = _context.san_Pham_Chi_Tiets.Find(id);

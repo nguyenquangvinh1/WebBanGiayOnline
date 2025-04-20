@@ -563,6 +563,30 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                         anhSP.Add(anh);
                     }
                 }
+                int newNumber = 1;
+                try
+                {
+                    var maList = _context.san_Pham_Chi_Tiets
+                    .Where(x => x.ma != null && x.ma.StartsWith("SP"))
+                    .Select(x => x.ma)
+                    .ToList();
+
+                    int lastNumber = 0;
+                    foreach (var m in maList)
+                    {
+                        if (m.Length > 2 && int.TryParse(m.Substring(2), out int num))
+                        {
+                            if (num > lastNumber)
+                                lastNumber = num;
+                        }
+                    }
+                    newNumber = lastNumber + 1;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error generating newMa: " + ex.Message);
+                    newNumber = 1;
+                }
                 if (!lstSPCT.IsNullOrEmpty())
                 {
 
@@ -578,6 +602,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                             continue;
                         }
 
+                        string newMa = "SP" + newNumber.ToString("D2");
                         var sp = new San_Pham_Chi_Tiet()
                         {
                             ID = new Guid(),
@@ -596,9 +621,10 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                             Mui_GiayID = SP.Mui_GiayID,
                             Co_GiayID = SP.Co_GiayID,
                             De_GiayID = SP.De_GiayID,
-                            Chat_LieuID = SP.Chat_LieuID
+                            Chat_LieuID = SP.Chat_LieuID,
+                            ma = newMa
                         };
-
+                        newNumber++;
                         _context.san_Pham_Chi_Tiets.Add(sp);
 
                         if (!string.IsNullOrEmpty(item.imgUrl))
