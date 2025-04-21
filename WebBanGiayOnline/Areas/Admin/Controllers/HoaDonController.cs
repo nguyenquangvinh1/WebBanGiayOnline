@@ -39,7 +39,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
         {
 
             int pageNumber = page ?? 1;
-            int pageSize = 5; // Số hóa đơn trên mỗi trang
+            int pageSize = 10; // Số hóa đơn trên mỗi trang
 
             var hoaDons = _context.hoa_Dons.AsQueryable();
             if (fromDate.HasValue)
@@ -134,6 +134,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
     new SelectListItem { Value = "2", Text = "Đang giao hàng" },
     new SelectListItem { Value = "3", Text = "Hoàn thành" },
     new SelectListItem { Value = "4", Text = "Đã hủy" },
+
     
 };
 
@@ -454,11 +455,11 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
                 worksheet.Cell(currentRow, 1).Value = "Mã Hóa Đơn";
                 worksheet.Cell(currentRow, 2).Value = "Người Đặt";
-                worksheet.Cell(currentRow, 3).Value = "Số điện thoại";
-                worksheet.Cell(currentRow, 4).Value = "Ngày tạo";
-                worksheet.Cell(currentRow, 5).Value = "Loại Hóa Đơn";
-                worksheet.Cell(currentRow, 6).Value = "Trang thại";
-                worksheet.Cell(currentRow, 7).Value = "Tổng Tiền";
+                worksheet.Cell(currentRow, 3).Value = "Số điện thoại"; worksheet.Cell(currentRow, 4).Value = "Nhân viên";
+                worksheet.Cell(currentRow, 5).Value = "Ngày tạo";
+                worksheet.Cell(currentRow, 6).Value = "Loại Hóa Đơn";
+                worksheet.Cell(currentRow, 7).Value = "Trang thại";
+                worksheet.Cell(currentRow, 8).Value = "Tổng Tiền";
 
                 // Định dạng tiêu đề
                 worksheet.Row(currentRow).Style.Font.Bold = true;
@@ -472,9 +473,10 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     worksheet.Cell(currentRow, 1).Value = hoaDon.MaHoaDon;
                     worksheet.Cell(currentRow, 2).Value = hoaDon.ten_nguoi_nhan;
                     worksheet.Cell(currentRow, 3).Value = hoaDon.sdt_nguoi_nhan;
-                    worksheet.Cell(currentRow, 4).Value = hoaDon.ngay_tao.ToString("dd/MM/yyyy");
-                    string loaiHoaDonText = hoaDon.loai_hoa_don == 1 ? "Tại Quầy" : "Giao Hàng";
-                    worksheet.Cell(currentRow, 5).Value = loaiHoaDonText;
+                    worksheet.Cell(currentRow, 4).Value = hoaDon.nguoi_tao;
+                    worksheet.Cell(currentRow, 5).Value = hoaDon.ngay_tao.ToString("dd/MM/yyyy");
+                    string loaiHoaDonText = hoaDon.loai_hoa_don == 1 ? "Tại Quầy" : "Online";
+                    worksheet.Cell(currentRow, 6).Value = loaiHoaDonText;
                     string trangThaiText = hoaDon.trang_thai switch
                     {
                         0 => "Chờ Xử Lý",
@@ -484,8 +486,8 @@ namespace WebBanGiay.Areas.Admin.Controllers
                         4 => "Đã Hủy",
                         _ => "Không Xác Định"
                     };
-                    worksheet.Cell(currentRow, 6).Value = trangThaiText;
-                    worksheet.Cell(currentRow, 7).Value = hoaDon.tong_tien;
+                    worksheet.Cell(currentRow, 7).Value = trangThaiText;
+                    worksheet.Cell(currentRow, 8).Value = hoaDon.tong_tien;
                 }
 
 

@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Net.Mail;
+using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using WebBanGiay.Areas.Admin.Models.ViewModel;
@@ -224,6 +226,7 @@ namespace WebBanGiay.Controllers
                 Random TenBienRanDom = new Random();
                 int soNgauNhien = TenBienRanDom.Next(10000, 99999);
                 string newMa = $"HD{soNgauNhien}";
+
                 var hoadon = new Hoa_Don
                 {
                     MaHoaDon = newMa,
@@ -241,9 +244,11 @@ namespace WebBanGiay.Controllers
                     loai_hoa_don = 2,
                     ghi_chu = model.GhiChu,
                 };
+                SendEmail(hoadon.email_nguoi_nhan, hoadon.trang_thai, hoadon.ten_nguoi_nhan, hoadon.MaHoaDon);
                 db.Database.BeginTransaction();
                 try
                 {
+                 
                     db.Database.CommitTransaction();
                     db.Add(hoadon);
                     db.SaveChanges();
@@ -298,6 +303,41 @@ namespace WebBanGiay.Controllers
 
             return View(Cart);
 
+        }
+        private void SendEmail(string toEmail, int status, string username, string ma)
+        {
+            var hoadon = db.hoa_Dons.FirstOrDefault(x => x.trang_thai == status);
+          
+       
+            string fromEmail = "trangthph44337@fpt.edu.vn";  // Thay bằng Gmail của bạn
+            string fromPassword = "fdqe bzsy cscd kerv"; // Thay bằng App Password (16 ký tự)
+            var time = DateTime.Now;
+            string subject = $@"Cập nhập trạng thái đơn hàng {ma} của bạn ";
+            string body = $@"
+            <p>Chào {username},</p>
+            <p>Vào lúc {time} </p>
+            <p>Trạng thái đơn hàng của bạn đang Chờ xử lý. </p>
+            <p>Đơn hàng đang trong quá trính gửi đi hãy để ý đơn hàng nhé .</p>
+             <p> Adidas Shop rất cảm ơn vì sự ủng hộ của bạn .</p>
+ <p>Nếu có thắc mắc hay muốn thay đổi đơn hàng hãy goi Hotline : <strong> 0865884051 </strong> </p>";
+
+
+            using (MailMessage mail = new MailMessage())
+            {
+                mail.From = new MailAddress(fromEmail);
+                mail.To.Add(toEmail);
+                mail.Subject = subject;
+                mail.Body = body;
+                mail.IsBodyHtml = true;
+
+                using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                {
+                    smtp.UseDefaultCredentials = false; // Bắt buộc phải đặt false
+                    smtp.Credentials = new NetworkCredential(fromEmail, fromPassword);
+                    smtp.EnableSsl = true;
+                    smtp.Send(mail);
+                }
+            }
         }
         [HttpPost]
         public IActionResult PayMent(CheckoutVM model)
