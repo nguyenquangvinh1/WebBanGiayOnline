@@ -130,13 +130,7 @@ namespace WebBanGiay.Controllers
             if (!string.IsNullOrEmpty(tenSanPham))
                 query = query.Where(sp => sp.ten_san_pham.Contains(tenSanPham));
 
-            if (maxPrice.HasValue)
-            {
-                query = query.Where(sp => _context.san_Pham_Chi_Tiets
-                    .Where(ct => ct.San_PhamID == sp.ID)
-                    .Select(ct => ct.gia)
-                    .Min() <= maxPrice.Value);
-            }
+            
 
             var resultRaw = await query
                 .Select(x => new
@@ -157,6 +151,11 @@ namespace WebBanGiay.Controllers
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+            // Lọc theo maxPrice sau khi có DonGia
+            if (maxPrice.HasValue)
+            {
+                resultRaw = resultRaw.Where(x => x.DonGia <= maxPrice.Value).ToList();
+            }
 
             var result = resultRaw.Select(x => new HangHoaVM
             {

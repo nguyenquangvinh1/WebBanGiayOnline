@@ -171,7 +171,8 @@
                                         {
                                             foreach (var tai_khoan in ViewBag.tai_khoans)
                                             {
-                                                if (tai_khoan.Vai_TroID == new Guid("3E305210-60B7-42DB-B074-336A69A06747"))
+
+                                                if (tai_khoan.Vai_TroID == new Guid("71F43FA2-9C49-4908-BA16-A47CB3245CB7"))
                                                 {
                                                     <tr>
                                                         <td>
@@ -180,6 +181,7 @@
                                                         <td>@tai_khoan.ho_ten</td>
                                                         <td>@tai_khoan.sdt</td>
                                                         <td>@tai_khoan.email</td>
+
                                                     </tr>
                                                 }
                                             }
@@ -187,9 +189,10 @@
                                         else
                                         {
                                             <tr>
-                                                <td colspan="4">Không có khách hàng nào.</td>
+                                                <td colspan="5">Không có khách hàng nào.</td>
                                             </tr>
                                         }
+
                                     </tbody>
                                 </table>
                             </div>

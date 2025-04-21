@@ -322,8 +322,8 @@
                                             <div class="p-4 border border-secondary border-top-0 rounded-bottom">
                                                 <h4>@item.TenHH</h4>
                                                 <p>@item.MoTa</p>
-                                                <p>Các màu hiện có: @item.mau</p>
-                                                <p>Các kích thước hiện có: @item.size</p>
+                                                <p> <strong>Color:</strong> @item.mau</p>
+                                                <p><strong>Size:</strong> @item.size</p>
                                                 
                                                 <div class="d-flex justify-content-between flex-lg-wrap">
                                                     <p class="text-dark fs-5 fw-bold mb-0">@item.DonGia?.ToString("#,##0 VNĐ")</p>
@@ -495,12 +495,20 @@
             let filters = {};
                 let debounceTimer;
 
-                $('#rangeInput').on('input', function () {
-                    $('#amount').val($(this).val());
+                // Khi người dùng đang kéo thanh range (thay đổi tức thì)
+                // Khi kéo thanh range: cập nhật giá trị hiển thị ngay
+                $(document).on('input', '#rangeInput', function () {
+                    $('#amount').text($(this).val());
+                    console.log("📌 Cập nhật giá trị khi kéo:", $(this).val());
+                });
+
+                // Khi dừng kéo thanh range: thực hiện lọc
+                $(document).on('change', '#rangeInput', function () {
                     clearTimeout(debounceTimer);
                     debounceTimer = setTimeout(() => {
+                        console.log("📌 Gửi filter sau khi dừng kéo.");
                         window.applyFilter();
-                    }, 500); // Gọi sau 0.5 giây khi ngừng kéo
+                    }, 300);
                 });
 
             // Lấy dữ liệu từ tất cả select box
