@@ -75,7 +75,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
         public IActionResult GetHoaDonTaiQuay()
         {
             var invoices = _context.hoa_Dons
-                .Where(hd => hd.trang_thai == 5
+                .Where(hd => hd.trang_thai == -1
                              && hd.dia_chi == "Tại quầy"
                              && hd.loai_hoa_don == 1)  // chỉ lấy hóa đơn tại quầy
                 .OrderBy(hd => hd.ngay_tao)
@@ -459,7 +459,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
             }
         }
 
-      
+
         [HttpPost]
         public IActionResult AddProductToInvoice([FromBody] AddProductDto request)
         {
@@ -523,8 +523,10 @@ namespace WebBanGiay.Areas.Admin.Controllers
                         gia = finalPrice,
                         thanh_tien = finalPrice * request.Quantity,
                         ngay_tao = DateTime.Now,
+
                         nguoi_tao = "system",  // Bạn có thể lấy thông tin người tạo từ Claims nếu cần
-                        trang_thai = 0
+                        trang_thai = 0,
+                        
                     };
                     _context.don_Chi_Tiets.Add(newDetail);
                 }

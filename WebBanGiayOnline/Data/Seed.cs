@@ -65,7 +65,25 @@ namespace WebBanGiay.Data
                     ID = Guid.NewGuid(),
 ma = "ALL", // Hoặc "ca2" tùy theo quy ước của bạn
                     ten_phuong_thuc = "Cả 2"
-                }
+                },
+                 new Phuong_Thuc_Thanh_Toan
+                {
+                    ID = Guid.NewGuid(),
+                    ma = "TTNH",
+                    ten_phuong_thuc = "Thanh toán khi nhận hàng"
+                },
+                  new Phuong_Thuc_Thanh_Toan
+                {
+                    ID = Guid.NewGuid(),
+                    ma = "VNPAY",
+                    ten_phuong_thuc = "Thanh toán VNPAY"
+                },
+                   new Phuong_Thuc_Thanh_Toan
+                {
+                    ID = Guid.NewGuid(),
+                    ma = "MoMo",
+                    ten_phuong_thuc = "Thanh toán MoMo"
+                },
             };
             builder.Entity<Phuong_Thuc_Thanh_Toan>().HasData(paymentMethods);
         }

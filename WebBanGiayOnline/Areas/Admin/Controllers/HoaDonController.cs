@@ -121,11 +121,13 @@ namespace WebBanGiay.Areas.Admin.Controllers
         public async Task<IActionResult> Details(Guid? id)
         {
             var hoaDon = _context.hoa_Dons
-       .Include(h => h.Hoa_Don_Chi_Tiets)  
-      
-       .FirstOrDefault(h => h.ID == id) ?? new Hoa_Don(); 
+       .Include(h => h.Hoa_Don_Chi_Tiets)
+      .Include(h => h.Thanh_Toans)
+      .Include(h =>h.Giam_Gia)
+       .FirstOrDefault(h => h.ID == id) ?? new Hoa_Don();
 
-           
+          
+
             hoaDon.Hoa_Don_Chi_Tiets = hoaDon.Hoa_Don_Chi_Tiets ?? new List<Hoa_Don_Chi_Tiet>();
             ViewBag.TrangThaiList = new List<SelectListItem>
 {

@@ -16,7 +16,7 @@ namespace ClssLib
         public DateTime ngay_thanh_toan { get; set; }
         public string mo_ta { get; set; }
         [ForeignKey("Hoa_Don")]
-        public Guid Hoa_DonID { get; set; }
+        public Guid ? Hoa_DonID { get; set; }
         [ForeignKey("Phuong_Thuc_Thanh_Toan")]
         public Guid? Phuong_Thuc_Thanh_ToanID { get; set; }
         [JsonIgnore]
