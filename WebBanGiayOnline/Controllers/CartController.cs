@@ -80,7 +80,7 @@ namespace WebBanGiay.Controllers
         {
             var totalPrice = Cart.Sum(x => x.ThanhTien);
             var discounts = db.phieu_Giam_Gias
-                .Where(x => x.kieu_giam_gia == 1 && x.trang_thai == 1 && x.gia_tri_toi_thieu <= totalPrice)
+                .Where(x => x.kieu_giam_gia == 1 && x.trang_thai == 1 && x.gia_tri_toi_thieu <= totalPrice && x.so_luong > 0)
                 .Select(x => new {
                     id = x.ID,
                     ten_phieu_giam_gia = x.ten_phieu_giam_gia,
@@ -172,8 +172,10 @@ namespace WebBanGiay.Controllers
             foreach (var item in Cart)
             {
                 var sanpham = db.san_Pham_Chi_Tiets.SingleOrDefault(x => x.ID == item.id);
-                if (sanpham.so_luong < item.SoLuong)
+          
+                if (sanpham.so_luong < item.SoLuong )
                 {
+                   
                     TempData["ErrorMessage"] = "Sản phẩm "+sanpham.ten_SPCT + " trong kho chỉ còn"  +  sanpham.so_luong + " sản phẩm " ;
                     return RedirectToAction("Index");
                 }
@@ -192,6 +194,14 @@ namespace WebBanGiay.Controllers
             try
             {
                 var ship = await _ghnService.CalculateFeeAsync(request);
+                if (request.provinceId != 201)
+                {
+                    ship = 50000;
+                }
+                if(request.subtotal > 2000000)
+                {
+                    ship = 0;
+                }
                 HttpContext.Session.SetInt32("ShippingFee", ship);
                 return Json(new { success = true, ship });
 
@@ -224,9 +234,15 @@ namespace WebBanGiay.Controllers
                 Random TenBienRanDom = new Random();
                 int soNgauNhien = TenBienRanDom.Next(10000, 99999);
                 string newMa = $"HD{soNgauNhien}";
-               
-               
-                
+
+                var giamgia = db.phieu_Giam_Gias.FirstOrDefault(x => x.ID == discount);
+                if (giamgia != null )
+                {
+
+                    giamgia.so_luong -= 1;
+                    db.Update(giamgia);
+                }
+
                 var hoadon = new Hoa_Don
                 {
                  
@@ -240,7 +256,7 @@ namespace WebBanGiay.Controllers
                     : Cart.Sum(x => x.ThanhTienGG),
                     ngay_tao = DateTime.Now,
                     Ship = shippingFee,
-                    Giam_GiaID = discount,
+                    Giam_GiaID = discount == Guid.Empty ? null : (Guid?)discount,
                     trang_thai = 0,
                     loai_hoa_don = 2,
                     ghi_chu = model.GhiChu,
@@ -283,6 +299,7 @@ namespace WebBanGiay.Controllers
                             spChiTiet.so_luong -= item.SoLuong;
                             db.Update(spChiTiet);
                         }
+                 
 
 
 
@@ -417,7 +434,7 @@ namespace WebBanGiay.Controllers
 
                 int soNgauNhien = new Random().Next(10000, 99999);
                 string newMa = $"HD{soNgauNhien}";
-
+                var discount = Cart.FirstOrDefault()?.Discount;
                 var khach = new Tai_Khoan();
 
                 var hoadon = new Hoa_Don
@@ -433,7 +450,7 @@ namespace WebBanGiay.Controllers
                      : Cart.Sum(x => x.ThanhTienGG),
                     ngay_tao = DateTime.Now,
                     Ship = shippingFee,
-                    Giam_GiaID = Cart.FirstOrDefault()?.Discount,
+                    Giam_GiaID = discount == Guid.Empty ? null : (Guid?)discount,
                     trang_thai = 0,
                     loai_hoa_don = 2,
                     ghi_chu = model.GhiChu,

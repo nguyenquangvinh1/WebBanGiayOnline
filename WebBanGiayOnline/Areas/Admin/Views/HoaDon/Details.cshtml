@@ -301,7 +301,9 @@
                                 @item.so_luong
                             </td>
                             <td>
-                              @Model.Giam_Gia.ten_phieu_giam_gia
+                                @(Model.Giam_Gia != null
+                                    ? $"{Model.Giam_Gia.ten_phieu_giam_gia}"
+                                    : "Không áp dụng")
                             </td>
                             <td>
                                 @{
@@ -431,6 +433,7 @@
         var tongTienHang = Model.tong_tien;
         var phiShip = Model.Ship ?? 0; // Nếu Ship là null thì gán 0
         var tongCong = tongTienHang + phiShip;
+
     }
 <br />
     <div class="row payment-summary">

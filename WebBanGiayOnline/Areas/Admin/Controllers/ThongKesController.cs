@@ -163,7 +163,7 @@ new ThongKe()
         {
 
             var thongKe = _context.hoa_Dons
-                .Where(x => x.trang_thai == 3 || x.trang_thai == 6)
+                .Where(x => x.trang_thai == 3 || x.trang_thai == -2)
                .GroupBy(x => x.ngay_tao)
                
                 .Select(x => new
@@ -189,7 +189,7 @@ new ThongKe()
                 .Select(g => new
                 {
                     doanhThu = g.Key.ToString("yyyy-MM-dd"), // Chuyển DateTime thành string
-                    TongTien = g.Where(x => x.trang_thai == 3 || x.trang_thai == 6).Sum(x => x.tong_tien),
+                    TongTien = g.Where(x => x.trang_thai == 3 || x.trang_thai == -2).Sum(x => x.tong_tien),
 
                     donThanhCong = g.Count(hd => hd.trang_thai == 3),
                     donHuy = g.Count(hd => hd.trang_thai == 4)
