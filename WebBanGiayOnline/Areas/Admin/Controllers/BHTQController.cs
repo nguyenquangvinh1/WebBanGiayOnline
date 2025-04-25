@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Security.Claims;
 using ClssLib;
 using DocumentFormat.OpenXml.Math;
 using Microsoft.AspNetCore.Authorization;
@@ -60,8 +61,24 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     ngay_tao = DateTime.Now,
                     nguoi_tao = ma
                 };
-
                 _context.hoa_Dons.Add(newInvoice);
+
+                string id = User.FindFirst("userid")?.Value ?? "Unknown";
+                string name = User.Identity?.Name ?? "Unknown";
+                string role = User.FindFirstValue(ClaimTypes.Role) ?? "Unknown";
+                var link = new Tai_Khoan_Hoa_Don
+                {
+                    ID = Guid.NewGuid(),
+                    Tai_KhoanID = Guid.Parse(id),
+                    Hoa_DonID = newInvoice.ID,
+                    ngay_tao = DateTime.Now,
+                    Ten = name,           // Gán tên NV
+                    vai_tro = role, // Gán vai trò
+                    thao_tac ="Tạo Hóa Đơn",
+                    ghi_chu = "không"
+                };
+                _context.tai_Khoan_Hoa_Dons.Add(link);
+
                 _context.SaveChanges();
 
                 return Json(new { success = true, invoiceId = newInvoice.ID,data = newInvoice, message = "Tạo hóa đơn mới thành công!" });
@@ -776,6 +793,22 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     newTotal = 0;
                 invoice.tong_tien = newTotal;
             }
+
+            string id = User.FindFirst("userid")?.Value ?? "Unknown";
+            string name = User.Identity?.Name ?? "Unknown";
+            string role = User.FindFirstValue(ClaimTypes.Role) ?? "Unknown";
+            var link = new Tai_Khoan_Hoa_Don
+            {
+                ID = Guid.NewGuid(),
+                Tai_KhoanID = Guid.Parse(id),
+                Hoa_DonID = invoice.ID,
+                ngay_tao = DateTime.Now,
+                Ten = name,           // Gán tên khách hàng
+                vai_tro = role, // Gán vai trò
+                thao_tac = "Thanh Toán Hóa Đơn",
+                ghi_chu = "Bán tại quầy"
+            };
+            _context.tai_Khoan_Hoa_Dons.Add(link);
 
             // 4. Đổi trạng thái hóa đơn thành 6 (Đã thanh toán)
             invoice.trang_thai = -2;

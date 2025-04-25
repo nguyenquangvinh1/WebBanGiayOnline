@@ -21,17 +21,29 @@ using System.Net.Mail;
 using System.Net;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using WebBanGiay.Helpers;
+using WebBanGiay.Models;
+using System.Security.Claims;
+
+
 namespace WebBanGiay.Areas.Admin.Controllers
 {
     [Area("Admin")]
     public class HoaDonController : Controller
     {
         private readonly AppDbContext _context;
-   
+        private readonly List<TTHD> tthd = new List<TTHD> { 
+            new TTHD{ ID = 0, Name = "Chờ xử lý"},
+            new TTHD{ ID = 1, Name = "Đã xác nhận"},
+            new TTHD{ ID = 2, Name = "Đang giao hàng"},
+            new TTHD{ ID = 3, Name = "Hoàn thành"},
+            new TTHD{ ID = 4, Name = "Đã hủy"},
+            new TTHD{ ID = -1, Name = "Đã Thanh Toán"},
+            new TTHD{ ID = -2, Name = "Chưa Thanh Toán"}
+        };
+
         public HoaDonController(AppDbContext context)
         {
             _context = context;
-           
         }
 
         // GET: Admin/HoaDon
@@ -124,6 +136,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
        .Include(h => h.Hoa_Don_Chi_Tiets)
       .Include(h => h.Thanh_Toans)
       .Include(h =>h.Giam_Gia)
+      .Include( h => h.Tai_Khoan_Hoa_Dons)
        .FirstOrDefault(h => h.ID == id) ?? new Hoa_Don();
 
           
@@ -222,11 +235,30 @@ namespace WebBanGiay.Areas.Admin.Controllers
         [HttpPost]
         public JsonResult UpdateStatus(Guid? id, int newStatus)
         {
+            
             var hoaDon = _context.hoa_Dons.FirstOrDefault(h => h.ID == id);
             if (hoaDon != null) 
             {
                 hoaDon.trang_thai = newStatus;
                 _context.Update(hoaDon);
+
+                string Id = User.FindFirst("userid")?.Value ?? "Unknown";
+                string name = User.Identity?.Name ?? "Unknown";
+                string role = User.FindFirstValue(ClaimTypes.Role) ?? "Unknown";
+                TTHD tTHD = tthd.FirstOrDefault(x => x.ID == newStatus);
+                var link = new Tai_Khoan_Hoa_Don
+                {
+                    ID = Guid.NewGuid(),
+                    Tai_KhoanID = Guid.Parse(Id),
+                    Hoa_DonID = hoaDon.ID,
+                    ngay_tao = DateTime.Now,
+                    Ten = name,           // Gán tên NV
+                    vai_tro = role, // Gán vai trò
+                    thao_tac = "Chuyển trạng thái Hóa Đơn thành: " + tTHD.Name,
+                    ghi_chu = "không"
+                };
+                _context.tai_Khoan_Hoa_Dons.Add(link);
+
                 _context.SaveChanges();
 
 

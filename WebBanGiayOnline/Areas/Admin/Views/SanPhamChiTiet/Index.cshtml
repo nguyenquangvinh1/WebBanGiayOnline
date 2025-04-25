@@ -246,6 +246,7 @@
             <div class="modal-body">
                 <form id="editForm">
                     <input type="hidden" id="editID">
+                    <input type="hidden" id="ImagesUpload" name="ImagesUpload">
                     <div class="form-group">
                         <label class="control-label">Loại Giày :</label>
                         <select id="editLoaiGiay" name="Loai_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddLoaiGiay">
@@ -357,10 +358,14 @@
 
                     <div class="mb-3">
                         <label class="form-label">Ảnh sản phẩm</label>
-                        <button id="themAnhVaoSanPham" hidden>thêm ảnh vào sản phẩm</button>
-                        <div id="editImages" class="d-flex flex-wrap"></div>
+                        <button id="themAnhVaoSanPham" >thêm ảnh vào sản phẩm</button>
+                        <div class ="d-flex flex-wrap">
+                            <div id="editImages" class="d-flex flex-wrap"></div>
+                        </div>
                     </div>
-                    <div id="chonAnhSanPham">
+                    <input type="file" id="uploadProductImage" class="form-control">
+                    <div class="row" id="chonAnhSanPham">
+                        
                     </div>
                     <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
                 </form>
@@ -373,7 +378,11 @@
 
 <script>
     $(document).ready(function () {
+        let images = [];
+
+
         $("#chonAnhSanPham").hide();
+        $("#uploadProductImage").hide();
         if ($('#sanPhamTable').length > 0) {
             try {
                 $("#sanPhamTable").DataTable({
@@ -424,7 +433,9 @@
         // Khi bấm vào nút "Thêm ảnh vào sản phẩm"
         $(document).off("click", "#themAnhVaoSanPham").on("click", "#themAnhVaoSanPham", function (e) {
             e.preventDefault(); // Ngăn form submit nếu trong thẻ <form>
-            $("#chonAnhSanPham").toggle(); // Hiện/ẩn phần chọn ảnh
+            // $("#chonAnhSanPham").toggle(); // Hiện/ẩn phần chọn ảnh
+            $("#uploadProductImage").toggle(); // Hiện/ẩn phần chọn ảnh
+            
         });
 
         // Toggle tất cả dòng
@@ -448,7 +459,6 @@
         });
 
 
-        let productImages = [];
 
         window.applyFilter = function () {
             console.log("📌 Hàm applyFilter đã chạy!");
@@ -568,7 +578,6 @@
             if (typeof imgUrl !== "string") imgUrl = String(imgUrl);
 
             if (imgUrl && imgUrl.trim() !== "") {
-                let images = [];
                 try {
                     if (imgUrl.trim().startsWith("[") && imgUrl.trim().endsWith("]")) {
                         images = JSON.parse(imgUrl);
@@ -583,7 +592,11 @@
 
                 if (images.length > 0) {
                     images.forEach(url => {
-                        $('#editImages').append(`<img src="${url}" class="m-1 border rounded" width="80" height="80">`);
+                        $('#editImages').append(`
+                        <div>
+                        <img src="${url}" class="m-1 border rounded" width="80" height="80">
+                            </div>
+                        `);
                     });
                 } else {
                     $('#editImages').append("<p>Không có ảnh</p>");
@@ -604,7 +617,7 @@
                         $('#editAnhSanPham').val(imageUrls.join(","));
                         imageUrls.forEach(url => {
                             $('#chonAnhSanPham').append(`
-                            <div class="m-1">
+                                <div class="col-md-3 mt-2">
                                 <img src="${url}" class="border rounded" width="80" height="80">
                             </div>
                         `);
@@ -630,7 +643,15 @@
             let data = {
                 ID: $('#editID').val(),
                 gia: $('#editGia').val(),
-                so_luong: $('#editSoLuong').val()
+                so_luong: $('#editSoLuong').val(),
+                imgUrl: $('#ImagesUpload').val(),
+                Loai_Giay: $('#editLoaiGiay option:selected').text(),
+                Chat_Lieu: $('#editChatLieu option:selected').text(),
+                Co_Giay: $('#editCoGiay option:selected').text(),
+                Danh_Muc: $('#editDanhMuc option:selected').text(),
+                De_Giay: $('#editDeGiay option:selected').text(),
+                Mui_Giay: $('#editMuiGiay option:selected').text(),
+                Kieu_Dang: $('#editKieuDang option:selected').text(),
             };
 
             $.ajax({
@@ -679,6 +700,47 @@
                 },
                 error: function (xhr, status, error) {
                     alert("Cập nhật thất bại: " + error);
+                }
+            });
+        });
+        
+        $("#uploadProductImage").change(function () {
+            let fileInput = this;
+            let formData = new FormData();
+            let id = $('#editID').val();
+            let file = fileInput.files[0];
+
+            if (!file) return;
+
+            formData.append("id", id);       // Thêm ID vào FormData
+            formData.append("file", file);   // Thêm file vào FormData
+
+            $.ajax({
+                url: "/Admin/SanPhamChiTiet/UploadImage",
+                type: "POST",
+                data: formData,               // Gửi trực tiếp FormData
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success) {
+                        images.push(response.filePath);
+                        $("#editImages").append(`
+                        <div class="col-md-3 mt-2">
+                                <img src="${response.filePath}" class="m-1 border rounded" width="80" height="80">
+                        </div>
+                    `);
+                        $("#chonAnhSanPham").append(`
+                        <div class="col-md-3 mt-2">
+                            <img src="${response.filePath}" class="img-thumbnail" width="100">
+                        </div>
+                    `);
+                        $("#ImagesUpload").val(JSON.stringify(images));
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    alert("⚠️ Có lỗi xảy ra khi tải ảnh!");
                 }
             });
         });
