@@ -75,7 +75,7 @@
                         <a href="https://localhost:7243" class="nav-item nav-link">Trang chủ</a>
                         <a asp-controller="San_Pham_Chi_Tiet" asp-action="Index" class="nav-item nav-link active">Cửa hàng</a>
 
-                        <a class="nav-item nav-link active">Tra cứu</a>
+                        <a asp_controller="HoaDon1" asp-action="Index" class="nav-item nav-link active">Tra cứu</a>
 
                         <a href="contact.html" class="nav-item nav-link">Liên hệ</a>
                     </div>
@@ -402,7 +402,7 @@
                         data.forEach(discount => {
                             html += `<li class="list-group-item d-flex justify-content-between align-items-center">
                                         <span>${discount.ten_phieu_giam_gia} - Giảm ${discount.gia_tri_giam}% số tiền giảm tối thiểu ${discount.so_tien_giam_toi_da} </span>
-                                        <button class="btn btn-primary btn-sm applyDiscount" data-id="${discount.id}" data-value="${discount.gia_tri_giam}" data-giam="${discount.so_tien_giam_toi_da}" data-ten="${discount.ten_phieu_giam_gia}" >Chọn</button>
+                                        <button class="btn btn-primary btn-sm applyDiscount" data-id="${discount.id}" data-value="${discount.gia_tri_giam}" data-giam="${discount.so_tien_giam_toi_da}"  >Chọn</button>
                                     </li>`;
                         });
                         $('#discountList').html(html);
@@ -415,7 +415,7 @@
                 let discountValue = $(this).data('value');
                 let discountId = $(this).data('id');
                 let discount=$(this).data('giam');
-                let Name =$(this).data('ten');
+             
              
                 $('.discountCodeInput').val(`Giảm ${discountValue}%`);
 
@@ -435,7 +435,7 @@
                  $.ajax({
             url: "/Cart/ApplyDiscount",
             type: "POST",
-            data: { totalPrice: newTotal,nameDiscount: Name },
+            data: { totalPrice: newTotal,nameDiscount: discountId },
             success: function (response) {
                 if (response.success) {
                     console.log("Giảm giá áp dụng thành công!");

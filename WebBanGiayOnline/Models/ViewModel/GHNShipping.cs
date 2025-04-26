@@ -12,6 +12,8 @@
         public int weight { get; set; }
         public int width { get; set; }
         public int? insurance_value { get; set; }
+        public int provinceId { get; set; }
+        public double subtotal { get; set; }
         public string? coupon { get; set; }
     }
 

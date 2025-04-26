@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Net.Mail;
+using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using WebBanGiay.Areas.Admin.Models.ViewModel;
@@ -78,7 +80,7 @@ namespace WebBanGiay.Controllers
         {
             var totalPrice = Cart.Sum(x => x.ThanhTien);
             var discounts = db.phieu_Giam_Gias
-                .Where(x => x.kieu_giam_gia == 1 && x.trang_thai == 1 && x.gia_tri_toi_thieu <= totalPrice)
+                .Where(x => x.kieu_giam_gia == 1 && x.trang_thai == 1 && x.gia_tri_toi_thieu <= totalPrice && x.so_luong > 0)
                 .Select(x => new {
                     id = x.ID,
                     ten_phieu_giam_gia = x.ten_phieu_giam_gia,
@@ -93,14 +95,14 @@ namespace WebBanGiay.Controllers
 
 
         [HttpPost]
-        public IActionResult ApplyDiscount(double totalPrice , string nameDiscount)
+        public IActionResult ApplyDiscount(double totalPrice , Guid nameDiscount)
         {
             var cart = HttpContext.Session.Get<List<CartItem>>(MySetting.CART_KEY);
             if (cart != null && cart.Any())
             {
                 foreach (var item in cart)
                 {
-                    totalPrice = cart.Sum(x => x.ThanhTien);
+                    item.ThanhTienGG = totalPrice;
                     item.Discount = nameDiscount;
                     
                 }
@@ -170,8 +172,10 @@ namespace WebBanGiay.Controllers
             foreach (var item in Cart)
             {
                 var sanpham = db.san_Pham_Chi_Tiets.SingleOrDefault(x => x.ID == item.id);
-                if (sanpham.so_luong < item.SoLuong)
+          
+                if (sanpham.so_luong < item.SoLuong )
                 {
+                   
                     TempData["ErrorMessage"] = "Sản phẩm "+sanpham.ten_SPCT + " trong kho chỉ còn"  +  sanpham.so_luong + " sản phẩm " ;
                     return RedirectToAction("Index");
                 }
@@ -190,6 +194,14 @@ namespace WebBanGiay.Controllers
             try
             {
                 var ship = await _ghnService.CalculateFeeAsync(request);
+                if (request.provinceId != 201)
+                {
+                    ship = 50000;
+                }
+                if(request.subtotal > 2000000)
+                {
+                    ship = 0;
+                }
                 HttpContext.Session.SetInt32("ShippingFee", ship);
                 return Json(new { success = true, ship });
 
@@ -209,23 +221,31 @@ namespace WebBanGiay.Controllers
                 var shippingFee = HttpContext.Session.GetInt32("ShippingFee") ?? 0;
                 var khach = new Tai_Khoan();
                 var tien = new CartItem();            
-                var lastHoaDon = db.hoa_Dons
-                .OrderByDescending(h => h.MaHoaDon)
-                .FirstOrDefault();
+            
                 if (model.GiongKhachHang)
                 {
                     var khachhang = db.tai_Khoans
                         .Include(x => x.Vai_Tro)
                         .Where(x => x.Vai_Tro.ten_vai_tro == "Khách hàng");
                 }
-           
-              
 
+                var phuongthucthanhtoan = db.phuong_Thuc_Thanh_Toans.FirstOrDefault(x => x.ma == "TTNH");
+                var discount = Cart.FirstOrDefault()?.Discount;
                 Random TenBienRanDom = new Random();
                 int soNgauNhien = TenBienRanDom.Next(10000, 99999);
                 string newMa = $"HD{soNgauNhien}";
+
+                var giamgia = db.phieu_Giam_Gias.FirstOrDefault(x => x.ID == discount);
+                if (giamgia != null )
+                {
+
+                    giamgia.so_luong -= 1;
+                    db.Update(giamgia);
+                }
+
                 var hoadon = new Hoa_Don
                 {
+                 
                     MaHoaDon = newMa,
                     ten_nguoi_nhan = model.TenKhachHang ?? khach.ho_ten,
                     dia_chi = model.fulldiachi,
@@ -236,22 +256,42 @@ namespace WebBanGiay.Controllers
                     : Cart.Sum(x => x.ThanhTienGG),
                     ngay_tao = DateTime.Now,
                     Ship = shippingFee,
-                    discount = Cart.FirstOrDefault()?.Discount,
+                    Giam_GiaID = discount == Guid.Empty ? null : (Guid?)discount,
                     trang_thai = 0,
                     loai_hoa_don = 2,
                     ghi_chu = model.GhiChu,
                 };
+                db.Add(hoadon);
+                db.SaveChanges();
+                SendEmail(hoadon.email_nguoi_nhan, hoadon.trang_thai, hoadon.ten_nguoi_nhan, hoadon.MaHoaDon);
+                var lastHoaDon = db.hoa_Dons.FirstOrDefault(x => x.MaHoaDon == newMa);
                 db.Database.BeginTransaction();
+               
+                var thanhtoan = new Thanh_Toan
+                {
+                    trang_thai = 0,
+                    so_tien_thanh_toan = Cart.Sum(x => x.ThanhTienGG) == 0
+                    ? Cart.Sum(x => x.ThanhTien)
+                    : Cart.Sum(x => x.ThanhTienGG),
+                    mo_ta = "Thanh toán",
+                    Phuong_Thuc_Thanh_ToanID = phuongthucthanhtoan.ID,
+                    Hoa_DonID = lastHoaDon.ID
+
+
+                };
+                db.Add(thanhtoan);
+                db.SaveChanges();
                 try
                 {
+                 
                     db.Database.CommitTransaction();
-                    db.Add(hoadon);
-                    db.SaveChanges();
+               
                     var cthd = new List<Hoa_Don_Chi_Tiet>();
                     foreach (var item in Cart)
                     {
                         var spChiTiet = db.san_Pham_Chi_Tiets
                                 .SingleOrDefault(X => X.ID == item.id);
+                     
 
                         if (spChiTiet != null && spChiTiet.so_luong >= item.SoLuong)
                         {
@@ -259,6 +299,7 @@ namespace WebBanGiay.Controllers
                             spChiTiet.so_luong -= item.SoLuong;
                             db.Update(spChiTiet);
                         }
+                 
 
 
 
@@ -272,8 +313,8 @@ namespace WebBanGiay.Controllers
                             so_luong = item.SoLuong,
                             gia = item.DonGia,
                             thanh_tien = item.DonGia * item.SoLuong,
-                            discount = Cart.FirstOrDefault()?.Discount,
-                            phuongThucthanhtoan = 2,
+                         
+                            Phuong_Thuc_Thanh_ToanID = phuongthucthanhtoan.ID,
                             Hoa_DonID = hoadon.ID,
                             ngay_tao = DateTime.Now,
 
@@ -298,6 +339,41 @@ namespace WebBanGiay.Controllers
 
             return View(Cart);
 
+        }
+        private void SendEmail(string toEmail, int status, string username, string ma)
+        {
+            var hoadon = db.hoa_Dons.FirstOrDefault(x => x.trang_thai == status);
+          
+       
+            string fromEmail = "trangthph44337@fpt.edu.vn";  // Thay bằng Gmail của bạn
+            string fromPassword = "fdqe bzsy cscd kerv"; // Thay bằng App Password (16 ký tự)
+            var time = DateTime.Now;
+            string subject = $@"Cập nhập trạng thái đơn hàng {ma} của bạn ";
+            string body = $@"
+            <p>Chào {username},</p>
+            <p>Vào lúc {time} </p>
+            <p>Trạng thái đơn hàng của bạn đang Chờ xử lý. </p>
+            <p>Đơn hàng đang trong quá trính gửi đi hãy để ý đơn hàng nhé .</p>
+             <p> Adidas Shop rất cảm ơn vì sự ủng hộ của bạn .</p>
+ <p>Nếu có thắc mắc hay muốn thay đổi đơn hàng hãy goi Hotline : <strong> 0865884051 </strong> </p>";
+
+
+            using (MailMessage mail = new MailMessage())
+            {
+                mail.From = new MailAddress(fromEmail);
+                mail.To.Add(toEmail);
+                mail.Subject = subject;
+                mail.Body = body;
+                mail.IsBodyHtml = true;
+
+                using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                {
+                    smtp.UseDefaultCredentials = false; // Bắt buộc phải đặt false
+                    smtp.Credentials = new NetworkCredential(fromEmail, fromPassword);
+                    smtp.EnableSsl = true;
+                    smtp.Send(mail);
+                }
+            }
         }
         [HttpPost]
         public IActionResult PayMent(CheckoutVM model)
@@ -351,44 +427,63 @@ namespace WebBanGiay.Controllers
             {
                 var shippingFee = HttpContext.Session.GetInt32("ShippingFee") ?? 0;
                 var model = HttpContext.Session.Get<CheckoutVM>("CheckoutInfo");
-            
+
+
+                var phuongthucthanhtoan = db.phuong_Thuc_Thanh_Toans.FirstOrDefault(x => x.ma == "VNPAY");
+                var phuongthucthanhtoan1 = db.phuong_Thuc_Thanh_Toans.FirstOrDefault(x => x.ma == "MoMo");
 
                 int soNgauNhien = new Random().Next(10000, 99999);
                 string newMa = $"HD{soNgauNhien}";
-
+                var discount = Cart.FirstOrDefault()?.Discount;
                 var khach = new Tai_Khoan();
 
                 var hoadon = new Hoa_Don
                 {
+
                     MaHoaDon = newMa,
                     ten_nguoi_nhan = model.TenKhachHang ?? khach.ho_ten,
                     dia_chi = model.fulldiachi,
                     sdt_nguoi_nhan = model.Sdt ?? khach.sdt,
                     email_nguoi_nhan = model.Email ?? khach.email,
                     tong_tien = Cart.Sum(x => x.ThanhTienGG) == 0
-                        ? Cart.Sum(x => x.ThanhTien)
-                        : Cart.Sum(x => x.ThanhTienGG),
-                    Ship = shippingFee,
-                    discount = Cart.FirstOrDefault()?.Discount,
-
+                     ? Cart.Sum(x => x.ThanhTien)
+                     : Cart.Sum(x => x.ThanhTienGG),
                     ngay_tao = DateTime.Now,
+                    Ship = shippingFee,
+                    Giam_GiaID = discount == Guid.Empty ? null : (Guid?)discount,
                     trang_thai = 0,
                     loai_hoa_don = 2,
                     ghi_chu = model.GhiChu,
                 };
-
+                db.Add(hoadon);
+                db.SaveChanges();
+                SendEmail(hoadon.email_nguoi_nhan, hoadon.trang_thai, hoadon.ten_nguoi_nhan, hoadon.MaHoaDon);
+                var lastHoaDon = db.hoa_Dons.FirstOrDefault(x => x.MaHoaDon == newMa);
                 db.Database.BeginTransaction();
+
+                var thanhtoan = new Thanh_Toan
+                {
+                    trang_thai = 0,
+                    so_tien_thanh_toan = Cart.Sum(x => x.ThanhTienGG) == 0
+                    ? Cart.Sum(x => x.ThanhTien)
+                    : Cart.Sum(x => x.ThanhTienGG),
+                    mo_ta = "Thanh toán",
+                    Phuong_Thuc_Thanh_ToanID = phuongthucthanhtoan.ID,
+                    Hoa_DonID = lastHoaDon.ID
+
+
+                };
+                db.Add(thanhtoan);
+                db.SaveChanges();
                 try
                 {
-                    db.Add(hoadon);
-                    db.SaveChanges();
+                 
 
                     var cthd = new List<Hoa_Don_Chi_Tiet>();
                     foreach (var item in Cart)
                     {
                         var spChiTiet = db.san_Pham_Chi_Tiets
                             .SingleOrDefault(X => X.ID == item.id);
-
                         if (spChiTiet != null && spChiTiet.so_luong >= item.SoLuong)
                         {
                             spChiTiet.so_luong -= item.SoLuong;
@@ -402,7 +497,8 @@ namespace WebBanGiay.Controllers
                             so_luong = item.SoLuong,
                             gia = item.DonGia,
                             thanh_tien = item.DonGia * item.SoLuong,
-                            phuongThucthanhtoan = 3,
+                            phuongThucthanhtoan = phuongthucthanhtoan.ten_phuong_thuc ?? phuongthucthanhtoan1.ten_phuong_thuc ,
+                          
                             Hoa_DonID = hoadon.ID,
                             ngay_tao = DateTime.Now,
                         });

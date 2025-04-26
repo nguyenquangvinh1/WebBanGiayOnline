@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Security.Policy;
 using WebBanGiay.Data;
 using WebBanGiay.ViewModel;
 
@@ -181,6 +182,45 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             return View("Index", result);
         }
         [HttpPost]
+        public async Task<IActionResult> UploadImage(Guid id ,IFormFile file)
+        {
+
+            if (file == null || file.Length == 0)
+                return Json(new { success = false, message = "⚠️ Không có file nào được tải lên!" });
+
+            // Danh sách định dạng ảnh hợp lệ
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".jfif" };
+            var fileExtension = Path.GetExtension(file.FileName).ToLower();
+
+            if (!allowedExtensions.Contains(fileExtension))
+                return Json(new { success = false, message = "❌ Định dạng ảnh không hợp lệ! Chỉ chấp nhận JPG, PNG, GIF." });
+
+            try
+            {
+                string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/img");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                string uniqueFileName = Guid.NewGuid().ToString() + fileExtension;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(fileStream);
+                }
+
+                string relativePath = $"/img/{uniqueFileName}"; // Đường dẫn ảnh
+
+                return Json(new { success = true, filePath = relativePath });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "❌ Lỗi khi tải ảnh!", error = ex.Message });
+            }
+        }
+        [HttpPost]
         public IActionResult ChangeStatus(Guid id, int trang_thai)
         {
             var sanPham = _context.san_Pham_Chi_Tiets.FirstOrDefault(sp => sp.ID == id);
@@ -217,6 +257,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         [HttpPost]
         public async Task<IActionResult> UpdateSpct([FromBody] San_PhamCTView model)
         {
+            
             if (model == null || model.ID == null)
             {
                 return BadRequest(new { message = "Dữ liệu không hợp lệ" });
@@ -233,11 +274,77 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 // Cập nhật dữ liệu sản phẩm
                 sanPham.gia = model.gia;
                 sanPham.so_luong = model.so_luong;
-                
                 sanPham.ngay_sua = DateTime.Now;
+                sanPham.Kieu_DangID =  _context.kieu_Dangs.FirstOrDefault(x => x.ten_kieu_dang == model.Kieu_Dang).ID;
+                sanPham.Danh_MucID =  _context.danh_Mucs.FirstOrDefault(x => x.ten_danh_muc == model.Danh_Muc).ID;
+                sanPham.Loai_GiayID =  _context.loai_Giays.FirstOrDefault(x => x.ten_loai_giay == model.Loai_Giay).ID;
+                sanPham.Mui_GiayID =  _context.mui_Giays.FirstOrDefault(x => x.ten_mui_giay == model.Mui_Giay).ID;
+                sanPham.Co_GiayID =  _context.co_Giays.FirstOrDefault(x => x.ten_loai_co_giay == model.Co_Giay).ID;
+                sanPham.De_GiayID =  _context.de_Giays.FirstOrDefault(x => x.ten_de_giay == model.De_Giay).ID;
+                sanPham.Chat_LieuID =  _context.chat_Lieus.FirstOrDefault(x => x.ten_chat_lieu == model.Chat_Lieu).ID;
 
                 // Lưu thay đổi vào database
                 _context.san_Pham_Chi_Tiets.Update(sanPham);
+
+                List<Anh_San_Pham> anh = new List<Anh_San_Pham>();
+                List<string> lis = JsonConvert.DeserializeObject<List<string>>(model.imgUrl);
+                if (lis == null)
+                {
+                    await _context.SaveChangesAsync();
+                    return Ok(new { message = "Cập nhật thành công, Không có ảnh nào được thêm vào sản phẩm!" });
+                }
+                for (int i = 0; i < lis.Count; i++)
+                {
+                    var exist = _context.anh_San_Phams.FirstOrDefault(x => x.anh_url == lis[i]);
+                    if (exist == null)
+                    {
+                        var anhMoi = new Anh_San_Pham
+                        {
+                            ID = Guid.NewGuid(),
+                            anh_url = lis[i],
+                            San_PhamID = sanPham.San_PhamID
+                        };
+                        await _context.anh_San_Phams.AddAsync(anhMoi);
+                        anh.Add(anhMoi);
+                        continue;
+                    }
+                    anh.Add(_context.anh_San_Phams.First(x => x.anh_url == lis[i]));
+                }
+
+                // Lấy danh sách ID của các ảnh đã được lưu trong bảng liên kết với San_Pham_Chi_TietID == spct.ID
+                var existingAnhIds = _context.anh_San_Pham_San_Pham_Chi_Tiets
+                    .Where(x => x.San_Pham_Chi_TietID == model.ID)
+                    .Select(x => x.Anh_San_PhamID)
+                    .ToList();
+
+
+                // Lấy danh sách ID của các ảnh cần bỏ qua
+                var anhIds = anh.Select(a => a.ID).ToList();
+
+                // Lọc danh sách, bỏ qua các mục có Anh_San_PhamID trùng với danh sách anhIds
+                var imgdel = _context.anh_San_Pham_San_Pham_Chi_Tiets
+                    .Where(x => !anhIds.Contains(x.Anh_San_PhamID) && x.San_Pham_Chi_TietID == model.ID)
+                    .ToList();
+                foreach (var item in imgdel)
+                {
+                    _context.anh_San_Pham_San_Pham_Chi_Tiets.Remove(item);
+                }
+
+
+                // Lọc danh sách anh, chỉ giữ lại các ảnh chưa tồn tại trong bảng liên kết
+                anh = anh.Where(a => !existingAnhIds.Contains(a.ID)).ToList();
+                foreach (var item in anh)
+                {
+                    var link = new Anh_San_Pham_San_Pham_Chi_Tiet()
+                    {
+                        ID = Guid.NewGuid(),
+                        Anh_San_PhamID = item.ID,
+                        San_Pham_Chi_TietID = (Guid)model.ID
+                    };
+                    _context.anh_San_Pham_San_Pham_Chi_Tiets.Add(link);
+                }
+
+
                 await _context.SaveChangesAsync();
 
                 return Ok(new { message = "Cập nhật thành công" });

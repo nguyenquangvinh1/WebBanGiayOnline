@@ -10,7 +10,7 @@ namespace WebBanGiay.Models.ViewModel
         public double DonGia { get; set; }
         public string? Hinh { get; set; }
 
-        public string? Discount { get; set; }
+        public Guid Discount { get; set; }
         public int SoLuong { get; set; }
         [Required(ErrorMessage = "Vui lòng nhập họ và tên.")]
         public string? TenKhachHang { get; set; }

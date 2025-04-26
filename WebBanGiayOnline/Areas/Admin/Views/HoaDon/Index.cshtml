@@ -191,6 +191,7 @@
                                     <option value="@item.Value" selected="@(item.Value == Context.Request.Query["Category"] ? "selected" : null)">
                                         @item.Text
                                     </option>
+                                  <p>  @Model.Sum(x =>x.trang_thai) </p>
                                 }
                             </select>
                         </form>

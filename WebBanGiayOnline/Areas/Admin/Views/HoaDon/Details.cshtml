@@ -6,74 +6,74 @@
 }
 <style>
     .payment-summary {
-        background: #ffffff;
-        padding: 15px;
-        border-radius: 8px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        font-size: 16px;
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
     }
 
-        .payment-summary p {
-            margin: 5px 0;
-            font-weight: 500;
-            color: #333;
-        }
+    .payment-summary p {
+    margin: 5px 0;
+    font-weight: 500;
+    color: #333;
+    }
 
-        .payment-summary strong {
-            color: #d9534f;
-        }
+    .payment-summary strong {
+    color: #d9534f;
+    }
 
     .total-price {
-        border-top: 2px solid #ddd;
-        padding-top: 10px;
-        margin-top: 10px;
-        text-align: left;
+    border-top: 2px solid #ddd;
+    padding-top: 10px;
+    margin-top: 10px;
+    text-align: left;
     }
     .total-price h4 {
-        color: #d9534f;
-        font-weight: bold;
-        font-size: 22px;
-        text-align: right;
+    color: #d9534f;
+    font-weight: bold;
+    font-size: 22px;
+    text-align: right;
     }
 
     .progress-container {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        position: relative;
-        margin: 22px 0;
-        
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    margin: 22px 0;
+
     }
 
     .progress-bar {
-        position: absolute;
-        top: 50%;
-        left: 0;
-        width: 0%;
-        height: 5px;
-        background-color: #007bff;
-        transition: width 0.4s ease-in-out;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 0%;
+    height: 5px;
+    background-color: #007bff;
+    transition: width 0.4s ease-in-out;
     }
 
     .progress-steps {
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
     }
 
     .step {
-        position: relative;
-        padding: 10px 15px;
-        background-color: #ccc;
-        border-radius: 20px;
-        font-size: 14px;
-        color: white;
-        transition: background-color 0.3s ease;
+    position: relative;
+    padding: 10px 15px;
+    background-color: #ccc;
+    border-radius: 20px;
+    font-size: 14px;
+    color: white;
+    transition: background-color 0.3s ease;
     }
 
-        .step.active {
-            background-color: #28a745;
-        }
+    .step.active {
+    background-color: #28a745;
+    }
 
 </style>
 
@@ -83,7 +83,7 @@
 
 
 
-  
+
     @{
         var trangThaiText = "";
         switch (Model.trang_thai)
@@ -93,7 +93,7 @@
             case 2: trangThaiText = "Đang giao hàng"; break;
             case 3: trangThaiText = "Hoàn thành"; break;
             case 4: trangThaiText = "Đã hủy"; break;
-        
+
             default: trangThaiText = "Không xác định"; break;
         }
     }
@@ -127,11 +127,11 @@
         <button id="prevBtn" class="btn btn-primary me-2">⬅ Sửa trang thái </button>
         <button id="nextBtn" class="btn btn-primary me-2">Cập nhập trạng thái ➡</button>
         <button class="btn btn-danger btnCancelOrder" data-id="@Model.ID" id="huy">❌ Hủy Đơn</button>
-        
+
 
     </div>
     <!-- Nút mở modal -->
-    <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#modalLichSu">
+    <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#modalLichSu">
         <i class="bi bi-clock-history"></i> Lịch sử
     </button>
     <!-- Modal -->
@@ -140,12 +140,13 @@
             <div class="modal-content rounded-4">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalLichSuLabel">Lịch sử trạng thái hóa đơn</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Đóng"></button>
                 </div>
                 <div class="modal-body">
                     <table class="table table-bordered table-hover">
                         <thead class="table-primary">
                             <tr>
+                                <th>Ten nguoi</th>
                                 <th>Trạng thái</th>
                                 <th>Thời gian</th>
                                 <th>Người xác nhận</th>
@@ -153,19 +154,24 @@
                             </tr>
                         </thead>
                         <tbody>
-                           
+
+                            @foreach (var item1 in Model.Tai_Khoan_Hoa_Dons)
+                            {
                                 <tr>
-                                    <td>@Model.trang_thai</td>
-                                <td>@Model.ngay_sua</td>
-                                <td>@Model.nguoi_sua</td>
-                                <td>@Model.Status</td>
+                                    <td>@item1.Ten</td>
+                                    <td>@item1.vai_tro</td>
+                                    <td>@item1.thao_tac</td>
+                                    <td>@item1.ghi_chu</td>
+                                    <td>@item1.ngay_tao</td>
                                 </tr>
-                           
+                            }
+
+
                         </tbody>
                     </table>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-dismiss="modal">Đóng</button>
                 </div>
             </div>
         </div>
@@ -177,7 +183,7 @@
         <input type="text" id="txtCancelReason" class="form-control" placeholder="Nhập lý do hủy đơn..." />
         <button id="btnConfirmCancel" class="btn btn-warning" style="margin-top: 5px;">Xác nhận hủy</button>
     </div>
-        <br />
+    <br />
     <div class="row">
         <!-- Cột trái: Thông tin hóa đơn -->
         <div class="col-md-6">
@@ -194,9 +200,9 @@
             </div>
         </div>
         <div class="col-md-6" id="viewThongTin">
-        <!-- Cột phải: Thông tin khách hàng -->
-          
-        
+            <!-- Cột phải: Thông tin khách hàng -->
+
+
             <div class="card p-3 h-100">
                 <h5 class="text-danger">Thông tin nhận hàng</h5>
                 <p><strong>Tên người nhận:</strong> @Model.ten_nguoi_nhan</p>
@@ -208,46 +214,46 @@
                     <button class="btn btn-primary" onclick="toggleForm(true)">Sửa</button>
                 }
             </div>
-         
+
         </div>
-        
+
     </div>
-      @if (Model.trang_thai < 2 || Model.trang_thai == -1)
+    @if (Model.trang_thai < 2 || Model.trang_thai == -1)
     {
-    <div id="formCapNhat" style="display:none">
-        @using (Html.BeginForm("CapNhatThongTin", "HoaDon", FormMethod.Post))
-        {
-            @Html.HiddenFor(m => m.ID)
-            <!-- các input cập nhật -->
-            <div>
-                <label>Tên người nhận:</label>
-                @Html.TextBoxFor(m => m.ten_nguoi_nhan, new { @class = "form-control" })
-            </div>
-            <div>
-                <label>SĐT người nhận:</label>
-                @Html.TextBoxFor(m => m.sdt_nguoi_nhan, new { @class = "form-control" })
-            </div>
-            <div>
-                <label>Email người nhận:</label>
-                @Html.TextBoxFor(m => m.email_nguoi_nhan, new { @class = "form-control" })
-            </div>
-            <div>
-                <label>Địa chỉ người nhận:</label>
-                @Html.TextBoxFor(m => m.dia_chi, new { @class = "form-control" })
-            </div>
-           
-        <button type = "submit" class="btn btn-success">Cập nhật</button>
-        <button type = "button" class="btn btn-secondary" onclick="toggleForm(false)">Hủy</button>
+        <div id="formCapNhat" style="display:none">
+            @using (Html.BeginForm("CapNhatThongTin", "HoaDon", FormMethod.Post))
+            {
+                @Html.HiddenFor(m => m.ID)
+                <!-- các input cập nhật -->
+                <div>
+                    <label>Tên người nhận:</label>
+                    @Html.TextBoxFor(m => m.ten_nguoi_nhan, new { @class = "form-control" })
+                </div>
+                <div>
+                    <label>SĐT người nhận:</label>
+                    @Html.TextBoxFor(m => m.sdt_nguoi_nhan, new { @class = "form-control" })
+                </div>
+                <div>
+                    <label>Email người nhận:</label>
+                    @Html.TextBoxFor(m => m.email_nguoi_nhan, new { @class = "form-control" })
+                </div>
+                <div>
+                    <label>Địa chỉ người nhận:</label>
+                    @Html.TextBoxFor(m => m.dia_chi, new { @class = "form-control" })
+                </div>
+
+                <button type = "submit" class="btn btn-success">Cập nhật</button>
+                <button type = "button" class="btn btn-secondary" onclick="toggleForm(false)">Hủy</button>
+            }
+        </div>
     }
-    </div>
-    }
-
-  
 
 
-   
+
+
+
     @* <p>@Model.Tai_Khoan_Hoa_Dons.FirstOrDefault()?.ID - @Model.Tai_Khoan_Hoa_Dons.FirstOrDefault()?.Ten </p> *@
-  @*   @foreach (var tk in Model.Tai_Khoan_Hoa_Dons.Select(tkh => tkh.Tai_Khoan))
+    @*   @foreach (var tk in Model.Tai_Khoan_Hoa_Dons.Select(tkh => tkh.Tai_Khoan))
     {
         <div class="card p-3 mb-4">
             <h5 class="text-danger">Thông tin nhận hàng</h5>
@@ -257,39 +263,39 @@
             <p><strong>Địa chỉ người nhận:</strong> @tk.Dia_Chi</p>
         </div> *@
 
-       
-    
- 
-  <br />
 
-<div class="container">
-    <h3 class="text-center">Lịch sử thanh toán</h3>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-               
-                <th>Mã</th>
-               @*  <th>Tên Sản Phẩm</th> *@
-                <th>Số Tiền</th>
-                <th>Số lượng</th>
+
+
+    <br />
+
+    <div class="container">
+        <h3 class="text-center">Lịch sử thanh toán</h3>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+
+                    <th>Mã</th>
+                    @*  <th>Tên Sản Phẩm</th> *@
+                    <th>Số Tiền</th>
+                    <th>Số lượng</th>
                     <th>Tên phiếu giảm giá</th>
-                <th>Phương thức thanh toán</th>
-                 <th>Tổng tiền</th>
-                <th>Thời Gian</th>
-                 
-            
-            </tr>
-        </thead>
-   @*      <tbody>
+                    <th>Phương thức thanh toán</th>
+                    <th>Tổng tiền</th>
+                    <th>Thời Gian</th>
+
+
+                </tr>
+            </thead>
+            @*      <tbody>
                 <tr>
                     <td>Không có dữ liệu</td>
                 </tr>
         </tbody> *@
-        <tbody>
+            <tbody>
                 @if (Model.Hoa_Don_Chi_Tiets != null && Model.Hoa_Don_Chi_Tiets.Any())
 
-            {
-                var hoadon = Model.Hoa_Don_Chi_Tiets;
+                {
+                    var hoadon = Model.Hoa_Don_Chi_Tiets;
 
                     @foreach (var item in hoadon)
                     {
@@ -298,25 +304,32 @@
 
                             <td>@item.gia.ToString("#,##0 VNĐ")</td>
                             <td>
-                               @item.so_luong
+                                @item.so_luong
                             </td>
                             <td>
-                                @item.discount
+                                @(Model.Giam_Gia != null
+                                    ? $"{Model.Giam_Gia.ten_phieu_giam_gia}"
+                                    : "Không áp dụng")
                             </td>
                             <td>
                                 @{
-                                    string phuongthuc = item.phuongThucthanhtoan switch
+                                    foreach (var item1 in Model.Thanh_Toans)
                                     {
-                                        0 => "Tiền mặt",
-                                        1 => "Chuyển khoản",
-                                        2 => "Thanh toán khi nhận hàng",
-                                        3 => "Thanh toán VnPay",
-                                        4 => "Thanh toán MoMo",
-                                        _ => "Không xác định"
-                                    };
+                                        string phuongthuc = item1.Phuong_Thuc_Thanh_ToanID switch
+                                        {
+                                            var id when id == Guid.Parse("D04A3590-610E-4686-9E6E-CF0C2770B148") => "Tiền mặt",
+                                            var id when id == Guid.Parse("32B17115-037E-4893-81FD-E9F5F07B18F6") => "Chuyển khoản",
+                                            var id when id == Guid.Parse("5B24F60D-3C23-467B-8F37-B186B30BC4F4") => "Cả 2",
+                                            var id when id == Guid.Parse("7A1828C2-E64C-4ECA-B632-D210C5352F33") => "Thanh toán khi nhận hàng",
+                                            var id when id == Guid.Parse("B34A2747-2008-4F5F-A2A3-7220F3A656F6") => "Thanh toán VnPay",
+                                            var id when id == Guid.Parse("C4D5897D-DC1C-4FA1-BE28-DDEAF5985F04") => "Thanh toán MoMo",
+                                            _ => "Không xác định"
+                                        };
+                                        <div>@phuongthuc</div>
+                                    }
                                 }
-                                @phuongthuc
                             </td>
+
                             <td >@item.thanh_tien?.ToString("#,##0 VNĐ")</td>
                             <td>@item.ngay_tao.ToString("dd/MM/yyyy HH:mm")</td>
                         </tr>
@@ -426,13 +439,21 @@
         var tongTienHang = Model.tong_tien;
         var phiShip = Model.Ship ?? 0; // Nếu Ship là null thì gán 0
         var tongCong = tongTienHang + phiShip;
+
     }
 <br />
     <div class="row payment-summary">
         <div class="col-md-6">
             <p><strong>Tổng tiền hàng:</strong> @Model.tong_tien.ToString("#,##0 VNĐ")</p>
-            <p><strong>Phí vận chuyển:</strong> @Model.Ship?.ToString("#,##0 VNĐ")</p>
-            <p><strong>Mã giảm giá:</strong>@Model.discount</p>
+            <p><strong>Phí vận chuyển:</strong> @(Model.Ship != null
+                ? Model.Ship.Value.ToString("#,##0 VNĐ")
+                : "0 VNĐ")
+            </p>
+            <p>
+                <strong>Mã giảm giá:</strong> @(Model.Giam_Gia != null
+                ? $"{Model.Giam_Gia.ten_phieu_giam_gia}"
+                : "Không áp dụng")
+            </p>
         </div>
         <div class="col-md-6 text-right total-price" >
             <h4>
@@ -565,7 +586,7 @@
                     updateStatus(currentStep, reason);
                 });
             }
-        });
+            });
 
         prevBtn.addEventListener("click", () => {
             if (currentStep > 0) {
