@@ -448,7 +448,10 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                     dbQuantity = x.so_luong,
                     size = x.Kich_Thuoc != null ? x.Kich_Thuoc.ten_kich_thuoc : "Không xác định",
                     color = x.Mau_Sac != null ? x.Mau_Sac.ma_mau : "Không xác định",
-                    status = x.trang_thai == 1 ? "Hoạt động" : "Không hoạt động"
+                    status = x.trang_thai == 1 ? "Hoạt động" : "Không hoạt động",
+                    chatlieu = x.Chat_Lieu != null ? x.Chat_Lieu.ten_chat_lieu : "Chưa có",
+                    cogiay = x.Co_Giay != null ? x.Co_Giay.ten_loai_co_giay : "Chưa có",
+                    degiay = x.De_Giay != null ? x.De_Giay.ten_de_giay : "Chưa có"
                 })
                 .ToListAsync();
 
