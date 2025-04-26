@@ -131,7 +131,7 @@
 
     </div>
     <!-- Nút mở modal -->
-    <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#modalLichSu">
+    <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#modalLichSu">
         <i class="bi bi-clock-history"></i> Lịch sử
     </button>
     <!-- Modal -->
@@ -140,12 +140,13 @@
             <div class="modal-content rounded-4">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalLichSuLabel">Lịch sử trạng thái hóa đơn</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Đóng"></button>
                 </div>
                 <div class="modal-body">
                     <table class="table table-bordered table-hover">
                         <thead class="table-primary">
                             <tr>
+                                <th>Ten nguoi</th>
                                 <th>Trạng thái</th>
                                 <th>Thời gian</th>
                                 <th>Người xác nhận</th>
@@ -154,18 +155,23 @@
                         </thead>
                         <tbody>
 
-                            <tr>
-                                <td>@Model.trang_thai</td>
-                                <td>@Model.ngay_sua</td>
-                                <td>@Model.nguoi_sua</td>
-                               
-                            </tr>
+                            @foreach (var item1 in Model.Tai_Khoan_Hoa_Dons)
+                            {
+                                <tr>
+                                    <td>@item1.Ten</td>
+                                    <td>@item1.vai_tro</td>
+                                    <td>@item1.thao_tac</td>
+                                    <td>@item1.ghi_chu</td>
+                                    <td>@item1.ngay_tao</td>
+                                </tr>
+                            }
+
 
                         </tbody>
                     </table>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-dismiss="modal">Đóng</button>
                 </div>
             </div>
         </div>
@@ -311,12 +317,12 @@
                                     {
                                         string phuongthuc = item1.Phuong_Thuc_Thanh_ToanID switch
                                         {
-                                            var id when id == Guid.Parse("F2CE82C6-3373-4EDE-9746-4DA4F9144E08") => "Tiền mặt",
-                                            var id when id == Guid.Parse("441B95FF-F542-40F5-AFE6-C721EEAEF0F2") => "Chuyển khoản",
-                                            var id when id == Guid.Parse("C8C26B54-1014-47BE-9EA1-4EACE195DC80") => "Cả 2",
-                                            var id when id == Guid.Parse("7C3AEF27-EA71-4E64-A72B-1DF815680EB4") => "Thanh toán khi nhận hàng",
-                                            var id when id == Guid.Parse("7F90BE50-54DA-4F9F-B6A1-442A095FEA69") => "Thanh toán VnPay",
-                                            var id when id == Guid.Parse("80DCCCC8-D392-4805-A4F7-831A7F02529D") => "Thanh toán MoMo",
+                                            var id when id == Guid.Parse("D04A3590-610E-4686-9E6E-CF0C2770B148") => "Tiền mặt",
+                                            var id when id == Guid.Parse("32B17115-037E-4893-81FD-E9F5F07B18F6") => "Chuyển khoản",
+                                            var id when id == Guid.Parse("5B24F60D-3C23-467B-8F37-B186B30BC4F4") => "Cả 2",
+                                            var id when id == Guid.Parse("7A1828C2-E64C-4ECA-B632-D210C5352F33") => "Thanh toán khi nhận hàng",
+                                            var id when id == Guid.Parse("B34A2747-2008-4F5F-A2A3-7220F3A656F6") => "Thanh toán VnPay",
+                                            var id when id == Guid.Parse("C4D5897D-DC1C-4FA1-BE28-DDEAF5985F04") => "Thanh toán MoMo",
                                             _ => "Không xác định"
                                         };
                                         <div>@phuongthuc</div>
