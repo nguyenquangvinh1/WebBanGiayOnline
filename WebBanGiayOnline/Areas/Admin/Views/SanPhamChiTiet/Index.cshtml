@@ -197,11 +197,11 @@
                         <td>@item.Chat_Lieu</td>
                         <td>
                             <span class="text-view">@item.so_luong</span>
-                            <input type="text" id="number" class="form-control form-control-sm so-luong-input d-none text-center" style="width: 70px;" value="@item.so_luong" />
+                            <input type="text" id="number" class="form-control form-control-sm so-luong-input d-none text-center quantity" style="width: 70px;" value="@item.so_luong" />
                         </td>
                         <td>
                             <span class="text-view">@item.gia</span>
-                            <input type="text" id="number" class="form-control form-control-sm gia-input d-none text-center" style="width: 90px;" value="@item.gia" />
+                            <input type="text" id="number" class="form-control form-control-sm gia-input d-none text-center price" style="width: 90px;" value="@item.gia" />
                         </td>
                         <td>
                             <span id="status-badge" class="@(item.trang_thai == 1 ? "trang-thai-dang-dien-ra" : "trang-thai-het-han")" style='width: 150px; height: 30px; line-height: 18px; white-space: nowrap;'>@(item.trang_thai == 1 ? "Hoạt động" : "Ngừng hoạt động")</span>
