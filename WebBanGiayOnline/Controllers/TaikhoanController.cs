@@ -30,13 +30,13 @@ namespace WebBanGiay.Controllers
         {
             return View("Login");
         }
+
         [HttpPost]
         public async Task<IActionResult> LoginAdmin(LoginViewmodel model, string? returnUrl = null)
         {
             if (!ModelState.IsValid)
                 return View("Login", model);
 
-            // Lấy thông tin người dùng từ database
             var user = _context.tai_Khoans
                 .Include(u => u.Vai_Tro)
                 .FirstOrDefault(u => u.user_name == model.Username);
@@ -47,33 +47,45 @@ namespace WebBanGiay.Controllers
                 return View("Login", model);
             }
 
-            // Kiểm tra nếu URL chứa "/Admin"
             bool isAdminArea = !string.IsNullOrEmpty(returnUrl) && returnUrl.ToLower().Contains("/admin");
 
-            // Kiểm tra vai trò người dùng
             bool isAdminOrEmployee = user.Vai_Tro.ten_vai_tro == "Admin" || user.Vai_Tro.ten_vai_tro == "Nhân Viên";
             bool isCustomer = user.Vai_Tro.ten_vai_tro == "Khách hàng";
 
-            // Trường hợp vào trang Admin mà không có quyền Admin hoặc Nhân viên
             if (isAdminArea && !isAdminOrEmployee)
             {
                 ModelState.AddModelError("", "Bạn không có quyền truy cập vào khu vực quản trị.");
                 return View("Login", model);
             }
 
-            // Đăng nhập thành công - Tạo claims
+            // Lấy địa chỉ của người dùng (nếu có)
+            var diaChi = _context.dia_Chis.FirstOrDefault(dc => dc.Tai_KhoanID == user.ID);
+
             var claims = new List<Claim>
-    {
-        new Claim("userid", user.ID.ToString()),
-        new Claim(ClaimTypes.Name, user.user_name),
-        new Claim(ClaimTypes.Role, user.Vai_Tro.ten_vai_tro),
-        new Claim(ClaimTypes.Email, user.email ?? "")
-    };
+            {
+                new Claim("userid", user.ID.ToString()),
+                new Claim(ClaimTypes.Name, user.user_name),
+                new Claim(ClaimTypes.Role, user.Vai_Tro.ten_vai_tro),
+                new Claim(ClaimTypes.Email, user.email ?? ""),
+                new Claim("province", diaChi?.tinh ?? ""),
+                new Claim("district", diaChi?.huyen ?? ""),
+                new Claim("ward", diaChi?.xa ?? ""),
+                new Claim("address", diaChi?.dia_chi_chi_tiet ?? "")
+            };
+
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
-            // Điều hướng sau khi đăng nhập thành công
+            if (isAdminOrEmployee)
+            {
+                return RedirectToAction("Index", "Home", new { area = "Admin" });
+            }
+            else if (isCustomer)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             return returnUrl != null ? Redirect(returnUrl) : RedirectToAction("Index", "Home");
         }
 
