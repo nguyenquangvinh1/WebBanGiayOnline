@@ -525,8 +525,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                         ngay_tao = DateTime.Now,
 
                         nguoi_tao = "system",  // Bạn có thể lấy thông tin người tạo từ Claims nếu cần
-                        trang_thai = 0,
-                        discount="null"
+                        trang_thai = 0
                     };
                     _context.don_Chi_Tiets.Add(newDetail);
                 }
