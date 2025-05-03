@@ -1,29 +1,83 @@
 ﻿@model IEnumerable<ClssLib.De_Giay>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ten_de_giay)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ten_de_giay)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+
+
+
+<div class="card">
+    <div class="card-header">
+        <a asp-action="Create" class="btn btn-outline-orange" style="border: 1px solid #e0e0e0;">
+            <i class="fas fa-plus"></i> Tạo Đế Giày
+        </a>
+    </div>
+
+    <div class="card-body table-responsive p-0">
+        <table class="table table-bordered table-hover" id="sanPhamTable">
+
+            <thead>
+                <tr>
+                    <th>
+                        Tên Đế Giày
+                    </th>
+                    <th>Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ten_de_giay)
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.ID"><i class="fa fa-xs fa-pen"></i></a> |
+                            <a asp-action="Details" asp-route-id="@item.ID"><i class="fa-solid fa-eye"></i></a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+
+    </div>
+</div>
+
+
+
+<script>
+    $(document).ready(function () {
+
+        if ($('#sanPhamTable').length > 0) {
+            try {
+                $("#sanPhamTable").DataTable({
+                    "paging": true,
+                    "lengthChange": false,
+                    "searching": false,
+                    "ordering": false,
+                    "info": true,
+                    "autoWidth": false,
+                    "responsive": true,
+                    language: {
+                        info: "Tổng số nhân viên: _TOTAL_ | Hiển thị từ _START_  đến _END_ ",
+                        infoEmpty: " Tổng số nhân viên: 0 | Hiển thị từ 0 đến 0 ",
+                        infoPostFix: "| Hiển thị 10 nục/trang",
+                        loadingRecords: "",
+                        zeroRecords: "Không có dữ liệu phù hợp",
+                        emptyTable: "Không có dữ liệu",
+                        paginate: {
+                            first: '<i class="fas fa-angle-double-left"></i>',
+                            previous: '<i class="fas fa-angle-left"></i>',
+                            next: '<i class="fas fa-angle-right"></i>',
+                            last: '<i class="fas fa-angle-double-right"></i>'
+                        },
+                    },
+                });
+                console.log("✅ DataTables đã khởi tạo thành công!");
+            } catch (error) {
+                console.error("❌ Lỗi khi khởi tạo DataTables:", error);
+            }
+        } else {
+            console.warn("⚠️ Không tìm thấy bảng DataTables!");
+        }
+    });
+</script>
+
