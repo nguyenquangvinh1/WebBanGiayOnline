@@ -1,0 +1,66 @@
+﻿@model IEnumerable<ClssLib.Tai_Khoan_Hoa_Don>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_LayoutCustomer.cshtml";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <div class="table-responsive">
+            <table class="table">
+    <thead>
+        <tr>
+            <th>
+                Ngày mua:
+            </th>
+            <th>
+                Phương thức mua:
+            </th>
+            <th>
+                Ghi Chú
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Hoa_Don.MaHoaDon)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Hoa_Don.tong_tien)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Hoa_Don.thoi_gian_nhan_hang)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ngay_tao)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.thao_tac)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ghi_chu)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Hoa_Don.MaHoaDon)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Hoa_Don.tong_tien)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Hoa_Don.thoi_gian_nhan_hang)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+</div>
+</div>
+</div>
