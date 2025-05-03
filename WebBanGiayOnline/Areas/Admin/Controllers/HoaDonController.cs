@@ -134,6 +134,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
         {
             var hoaDon = _context.hoa_Dons
        .Include(h => h.Hoa_Don_Chi_Tiets)
+       .ThenInclude(H =>H.San_Pham_Chi_Tiet)
       .Include(h => h.Thanh_Toans)
       .Include(h =>h.Giam_Gia)
       .Include( h => h.Tai_Khoan_Hoa_Dons)
