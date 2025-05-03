@@ -16,6 +16,7 @@ using WebBanGiay.Helpers;
 using WebBanGiay.Models.ViewModel;
 using WebBanGiay.Service;
 using static WebBanGiay.Models.ViewModel.GHNShipping;
+using System.Security.Claims;
 
 namespace WebBanGiay.Controllers
 {
@@ -245,7 +246,7 @@ namespace WebBanGiay.Controllers
 
                 var hoadon = new Hoa_Don
                 {
-                 
+                    
                     MaHoaDon = newMa,
                     ten_nguoi_nhan = model.TenKhachHang ?? khach.ho_ten,
                     dia_chi = model.fulldiachi,
@@ -261,12 +262,32 @@ namespace WebBanGiay.Controllers
                     loai_hoa_don = 2,
                     ghi_chu = model.GhiChu,
                 };
+                
                 db.Add(hoadon);
                 db.SaveChanges();
                 SendEmail(hoadon.email_nguoi_nhan, hoadon.trang_thai, hoadon.ten_nguoi_nhan, hoadon.MaHoaDon);
                 var lastHoaDon = db.hoa_Dons.FirstOrDefault(x => x.MaHoaDon == newMa);
                 db.Database.BeginTransaction();
-               
+                if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    string userId = User.FindFirst("userid").Value;
+
+                    Guid Id = Guid.Parse(userId);
+
+                    var TK_HD = new Tai_Khoan_Hoa_Don
+                    {
+                        ID = Guid.NewGuid(),
+                        Ten = User.FindFirst("name").Value,
+                        vai_tro = User.FindFirst(ClaimTypes.Role)?.Value,
+                        thao_tac = "Mua Hàng Online",
+                        ghi_chu = "Tạo tự động",
+                        ngay_tao = DateTime.Now,
+                        Tai_KhoanID = Id,
+                        Hoa_DonID = lastHoaDon.ID
+                    };
+                    db.tai_Khoan_Hoa_Dons.Add(TK_HD);
+                    db.SaveChanges();
+                }
                 var thanhtoan = new Thanh_Toan
                 {
                     trang_thai = 0,
