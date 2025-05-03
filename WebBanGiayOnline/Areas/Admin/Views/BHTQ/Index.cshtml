@@ -90,7 +90,7 @@
 				<div class="invoice-header d-flex justify-content-between align-items-center">
 					<div class="invoice-actions">
 						@* <button class="btn btn-info qrCode" data-id="INVOICE_ID">📷 QR Code</button> *@
-					<button  class="btn btn-outline-warning selectProduct" data-id="INVOICE_ID">+ Thêm sản phẩm</button>
+					<button class="btn btn-outline-warning selectProduct " data-id="INVOICE_ID">+ Thêm sản phẩm</button>
 					</div>
 					
 				</div>
@@ -762,6 +762,9 @@
 									<td>${product.dbQuantity}</td>
 									<td>${product.size}</td>
 									<td>${product.color}</td>
+									<td>${product.cogiay}</td>
+									<td>${product.degiay}</td>
+									<td>${product.chatlieu}</td>
 									<td>
 										<button class="btn btn-success btn-sm add-product"
 											data-id="${product.id}"

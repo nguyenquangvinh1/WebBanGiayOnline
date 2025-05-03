@@ -515,7 +515,8 @@
                 alert("Vui lòng chọn đầy đủ Màu Sắc và Kích Thước trước khi mua hàng!");
             }
             var productId = $(this).data("id");
-            var quantity = $('input[name="quantity"]').val();
+                var quantity = $('input[name="quantity"]').val();
+                debugger;
                 $.ajax({
                     url: "/Cart/AddCart1",
                     type: "POST",
@@ -528,7 +529,7 @@
                         alert("Có lỗi xảy ra, vui lòng thử lại.");
                     }
                 });
-                
+             debugger;
             });
 
              $("#add-to-cart").click(function () {

@@ -148,10 +148,13 @@
             <form asp-action="Checkout" asp-controller="Cart" >
                 <div class="row g-5">
                     <div class="col-md-12 col-lg-6 col-xl-7">
-                        <div class="form-check my-3">
-                            <input type="checkbox" name="GiongKhachHang" class="form-check-input" id="GiongKhachHang" value="false">
-                            <label class="form-check-label" for="GiongKhachHang">Lấy thông tin khách hàng?</label>
-                        </div>
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            <div class="form-check my-3">
+                                <input type="checkbox" name="GiongKhachHang" class="form-check-input" id="GiongKhachHang" value="false">
+                                <label class="form-check-label" for="GiongKhachHang">Lấy thông tin khách hàng?</label>
+                            </div>
+                        }
                         <div class="form-item delivery-info">
                             <label class="form-label my-2">Người nhận hàng<sup>*</sup></label>
                             <input name="TenKhachHang" class="form-control">
@@ -374,6 +377,8 @@
 </html>
 @section Scripts {
     <script>
+
+
               document.addEventListener("DOMContentLoaded", function () {
             let tenKhachHangInput = document.querySelector("input[name='TenKhachHang']");
             if (tenKhachHangInput) {
@@ -401,6 +406,24 @@
         });
 
 
+        const stripPrefix = str => str?.replace(/^Tỉnh\s+|^Thành phố\s+/i, '').trim();
+        const userClaims = {
+            name: '@User.FindFirst("name")?.Value',
+            email: '@User.FindFirst("email")?.Value',
+            phone: '@User.FindFirst("SDT")?.Value',
+            province: stripPrefix(@Html.Raw(Json.Serialize(User.FindFirst("province")?.Value))),
+            district: @Html.Raw(Json.Serialize(User.FindFirst("district")?.Value)),
+            ward: stripPrefix(@Html.Raw(Json.Serialize(User.FindFirst("ward")?.Value))),
+            address: '@User.FindFirst("address")?.Value'
+
+
+        };
+        console.log(userClaims);
+        // Gọi hàm khi trang tải
+        $(document).ready(function () {
+           
+            loadProvinces();
+        });
 
               function calculateFee() {
             var provinceId = $("#tinh").val();
@@ -491,10 +514,6 @@
             });
         }
 
-        // Gọi hàm khi trang tải
-        $(document).ready(function() {
-            loadProvinces();
-        });
 
               $("#tinh").change(function () {
             var provinceId = $(this).val();
@@ -542,7 +561,58 @@
 
 
 
-       
+
+        $('#GiongKhachHang').on('change', function () {
+            const checked = $(this).is(':checked');
+
+            if (checked) {
+                $('input[name="TenKhachHang"]').val(userClaims.name);
+                $('input[name="Email"]').val(userClaims.email);
+                $('input[name="Sdt"]').val(userClaims.phone);
+                $('input[name="fulldiachi"]').val(userClaims.address);
+
+                const cleanName = (str) => str.replace(/^Tỉnh\s+|^Thành phố\s+/i, "").trim();
+
+                const userProvince = cleanName(userClaims.province);
+                const userDistrict = userClaims.district;
+                const userWard = userClaims.ward;
+
+                // Chọn tỉnh theo text
+                $('#tinh option').each(function () {
+                    if ($(this).text().trim() === userProvince) {
+                        $('#tinh').val($(this).val()).trigger('change');
+
+                        // Delay đợi load quận/huyện
+                        setTimeout(() => {
+                            $('#huyen option').each(function () {
+                                if ($(this).text().trim() === userDistrict) {
+                                    $('#huyen').val($(this).val()).trigger('change');
+
+                                    // Delay đợi load xã/phường
+                                    setTimeout(() => {
+                                        $('#xa option').each(function () {
+                                            if ($(this).text().trim() === userWard) {
+                                                $('#xa').val($(this).val()).trigger('change');
+                                            }
+                                        });
+                                    }, 500);
+                                }
+                            });
+                        }, 500);
+                    }
+                });
+
+            } else {
+                $('input[name="TenKhachHang"]').val('');
+                $('input[name="Email"]').val('');
+                $('input[name="Sdt"]').val('');
+                $('input[name="fulldiachi"]').val('');
+                $('#tinh').val('').trigger('change');
+                $('#huyen').val('').trigger('change');
+                $('#xa').val('').trigger('change');
+            }
+        });
+
    
 
 

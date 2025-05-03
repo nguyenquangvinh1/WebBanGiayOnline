@@ -476,6 +476,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
             ViewData["Vai_TroID"] = new SelectList(_context.vai_Tros.ToList(), "ID", "ten_vai_tro");
             return View(model);
         }
+
         [HttpPost]
 
         public IActionResult Create(NhanVien_Model nv, IFormFile HinhAnh)
