@@ -134,8 +134,9 @@
 							<div class="khachLe">
 								<p>Khách lẻ</p>
 						</div>
-						<div class="customerForm mb-6" style="display: none;">
-							<div class="p-3 border rounded bg-white  mt-3">
+						<button class="btn btn-primary mb-3" onclick="toggleCustomerForm()">Giao hàng</button>
+						<div class="customerForm mb-6">
+							<div class="p-3 border rounded bg-white  mt-3" id="customerForm" style="display: none;" >
 									<div class="col-12 mt-3.8.6">
 										<label class="form-label">Họ và tên</label>
 										<input type="text" class="form-control customerName" placeholder="Họ tên">
@@ -148,9 +149,33 @@
 										<label class="form-label">Email</label>
 									<input type="email" class="form-control customerEmail " placeholder="Email">
 									</div>
+								<div class="form-item my-3" onchange="calculateFee()">
+									<div class="row">
+										<div class="col-md-4 mb-3">
+											<label>* Tỉnh/Thành phố</label>
+											<select class="form-control mt-2" id="tinh" name="tinh">
+												<option value="">Chọn tỉnh/thành phố</option>
+											</select>
+										</div>
+										<div class="col-md-4 mb-3">
+											<label>* Quận/Huyện</label>
+											<select class="form-control mt-2" id="huyen" name="huyen">
+												<option value="">Chọn quận/huyện</option>
+											</select>
+										</div>
+										<div class="col-md-4 mb-3">
+											<label>* Xã/Phường</label>
+											<select class="form-control mt-2" id="xa" name="xa">
+												<option value="">Chọn xã/phường</option>
+											</select>
+										</div>
+									</div>
+								</div>
 
 								</div>
+							
 								</div>
+
 							
 						</div>
 
@@ -170,7 +195,7 @@
 												<input type="text"
 												   class="form-control discountCodeInput  text-start" id="discountCodeInput"
 													   placeholder="Mã tốt nhất"
-													   readonly>
+													   readonly> 
 												<button class="btn btn-outline-secondary selectDiscount"
 														data-id="INVOICE_ID">
 													Chọn
@@ -184,6 +209,10 @@
 										<div class="col-12">
 											<label class="form-label">Giảm giá</label>
 											<input type="text" class="form-control discountAmount text-start" readonly>
+										</div>
+										<div class="col-12">
+										<label class="form-label">Phí vận chuyển</label>
+										  <img src="~/coloshop-master/images/tải xuống.png" class="img-fluid" alt="" style="width: 30px; height: 30px; object-fit: contain;"> <a id="fee"></a> 0 VNĐ
 										</div>
 										<div class="col-12">
 											<label class="form-label">Tổng tiền</label>
@@ -654,6 +683,7 @@
 		 
 
 						$(document).ready(function () {
+								loadProvinces();
 			$(".filter-select, #searchProduct").on("change keyup", function () {
 				filterProducts(); // Gọi hàm lọc sản phẩm
 			});
@@ -718,6 +748,17 @@
 				}
 			});
 		});
+
+			 function toggleCustomerForm() {
+			var form = document.getElementById("customerForm");
+			if (form.style.display === "none") {
+				form.style.display = "block";
+			} else {
+				form.style.display = "none";
+			}
+		}
+
+
 
 
 				function filterProducts() {
@@ -2290,9 +2331,141 @@
 		// 	});
 		// }
 
-
+		   // Gọi hàm khi trang tải
+	
 
 		
+	
+
+			  function calculateFee() {
+			var provinceId = $("#tinh").val();
+			var districtId = $("#huyen").val();
+			var wardCode = $("#xa").val();
+
+			if (provinceId =="" && districtId == "" && wardCode == "") {
+				alert("Vui lòng chọn đầy đủ địa chỉ.");
+				return;
+			}
+
+		   var requestData = {
+		from_district_id: 3440,
+		from_ward_code: "13009",
+		service_id: 53320,
+		service_type_id: null,
+		to_district_id: parseInt(districtId),
+		to_ward_code: wardCode,
+		height: 50,
+		length: 20,
+		weight: 200,
+		width: 20,
+		provinceId: provinceId,
+		subtotal: subtotal,
+		insurance_value: 10000,
+		cod_failed_amount: 2000,
+		coupon: null,
+
+
+			};
+
+			console.log("Gửi dữ liệu:", requestData);
+
+			$.ajax({
+				url: '@Url.Action("GetShippingFee", "Cart")',
+				type: "POST",
+				contentType: "application/json; charset=utf-8",
+				data: JSON.stringify(requestData),
+				dataType: "json",
+				success: function(response) {
+
+					if(provinceId !=  201){
+
+						response.ship = 50000;
+					}
+					if(subtotal > 2000000)
+				   {
+					   response.ship = 0;
+				   }
+					 let total = response.ship + subtotal;
+					console.log("Nhận phản hồi:", response);
+					if (response.success) {
+						$("#fee").text(response.ship.toLocaleString() + " VNĐ");
+						$("#totalWithFee").text( total.toLocaleString() + " VNĐ");
+					} else {
+						alert(response.message);
+					}
+				},
+				error: function(xhr) {
+					console.error("Lỗi chi tiết:", xhr.responseText);
+					alert("Có lỗi xảy ra khi tính phí vận chuyển.");
+				}
+			});
+		}
+
+
+
+		// Load danh sách tỉnh/huyện/xã
+
+				   function loadProvinces() {
+			$.ajax({
+				url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/province",
+				type: "GET",
+				headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
+				success: function (response) {
+					var provinces = response.data;
+					$("#tinh").empty().append('<option value="">Chọn Tỉnh/Thành phố</option>');
+					provinces.forEach(function (province) {
+						$("#tinh").append(`<option value="${province.ProvinceID}">${province.ProvinceName}</option>`);
+					});
+				},
+				error: function () {
+					alert("Lỗi khi tải danh sách tỉnh/thành phố.");
+				}
+			});
+		}
+
+
+			  $("#tinh").change(function () {
+			var provinceId = $(this).val();
+			if (!provinceId) return;
+
+			$.ajax({
+				url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/district",
+				type: "GET",
+				headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
+				data: { "province_id": provinceId },
+				success: function (response) {
+					var districts = response.data;
+					$("#huyen").empty().append('<option value="">Chọn Quận/Huyện</option>');
+					districts.forEach(function (district) {
+						$("#huyen").append(`<option value="${district.DistrictID}">${district.DistrictName}</option>`);
+					});
+				},
+				error: function () {
+					alert("Lỗi khi tải danh sách quận/huyện.");
+				}
+			});
+		});
+				$("#huyen").change(function () {
+			var districtId = $(this).val();
+			if (!districtId) return;
+
+			$.ajax({
+						url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?districtId",
+				type: "GET",
+				headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
+				data: { "district_id": districtId },
+				success: function (response) {
+					var wards = response.data;
+					$("#xa").empty().append('<option value="">Chọn Xã/Phường</option>');
+					wards.forEach(function (ward) {
+						$("#xa").append(`<option value="${ward.WardCode}">${ward.WardName}</option>`);
+					});
+				},
+				error: function () {
+					alert("Lỗi khi tải danh sách xã/phường.");
+				}
+			});
+		});
 
 
 

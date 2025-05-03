@@ -8,6 +8,8 @@ using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using WebBanGiay.Data;
+using WebBanGiay.Models.ViewModel;
+using WebBanGiay.Service;
 using WebBanGiay.ViewModel;
 
 namespace WebBanGiay.Areas.Admin.Controllers
@@ -19,9 +21,11 @@ namespace WebBanGiay.Areas.Admin.Controllers
     public class BHTQController : Controller
     {
         private readonly AppDbContext _context;
-        public BHTQController(AppDbContext context)
+        private readonly IGhnService _ghnService;
+        public BHTQController(AppDbContext context, IGhnService ghnService)
         {
             _context = context;
+            _ghnService = ghnService;
         }
         public IActionResult Index()
         {
@@ -706,6 +710,30 @@ namespace WebBanGiay.Areas.Admin.Controllers
             });
         }
 
+        [HttpPost]
+        [Route("GetShippingFee")]
+        public async Task<IActionResult> GetShippingFee([FromBody] GHNShipping request)
+        {
+            try
+            {
+                var ship = await _ghnService.CalculateFeeAsync(request);
+                if (request.provinceId != 201)
+                {
+                    ship = 50000;
+                }
+                if (request.subtotal > 2000000)
+                {
+                    ship = 0;
+                }
+          
+                return Json(new { success = true, ship });
+
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi vận chuyển: " + ex.Message });
+            }
+        }
         [HttpPost]
         public IActionResult FinalizePayment([FromBody] FinalizePaymentRequest model)
         {
