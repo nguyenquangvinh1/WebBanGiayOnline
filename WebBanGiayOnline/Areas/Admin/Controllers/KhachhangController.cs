@@ -578,5 +578,32 @@ namespace WebBanGiay.Areas.Admin.Controllers
         {
             return _context.tai_Khoans.Any(e => e.ID == id);
         }
+
+        [HttpGet]
+        public IActionResult GetAddressCustomer(Guid? customerId)
+        {
+            if (customerId == null)
+            {
+				return Json(new { success = false, message = "chưa có ID khách hàng! " });
+			}
+            try
+            {
+				var query = _context.dia_Chis.Where(x => x.Tai_KhoanID == customerId).AsQueryable();
+                var result = query.Select(x => new
+                {
+                    tinh = x.tinh,
+                    huyen = x.huyen,
+                    xa = x.xa,
+                    chi_tiet = x.dia_chi_chi_tiet
+                }).ToList();
+                return Json(result);
+			}
+			catch (Exception ex)
+            {
+
+				return Json(new { success = false, message = "Lỗi địa chỉ: " + ex.Message });
+			}
+
+		}
     }
 }

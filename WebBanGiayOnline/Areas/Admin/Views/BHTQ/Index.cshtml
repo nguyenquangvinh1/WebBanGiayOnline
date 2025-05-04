@@ -135,6 +135,7 @@
 								<p>Khách lẻ</p>
 						</div>
 						<button class="btn btn-primary mb-3" onclick="toggleCustomerForm()">Giao hàng</button>
+						<button class="btn btn-primary mb-3 openAddress">Chọn địa chỉ</button>
 						<div class="customerForm mb-6">
 							<div class="p-3 border rounded bg-white  mt-3" id="customerForm" style="display: none;" >
 									<div class="col-12 mt-3.8.6">
@@ -583,6 +584,35 @@
 			</div>
 		</div>
 	</div>
+	
+	<!-- Modal Địa chỉ -->
+	<div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="addressModalLabel">Chọn địa chỉ</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<table class="table table-bordered">
+						<thead>
+							<tr>
+								<th>Stt</th>
+								<th>Tỉnh</th>
+								<th>Huyện</th>
+								<th>Xã</th>
+								<th>chi tiết</th>
+								<th>Hành động</th>
+							</tr>
+						</thead>
+						<tbody>
+							<!-- Sẽ được fill bằng JS -->
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	<!-- Modal Thanh toán -->
 <!-- Modal Thanh toán -->
@@ -692,6 +722,8 @@
 			e.preventDefault();  // Ngăn hành vi mặc định của link nếu cần
 			getDataInvoices();
 		});
+			$('.openAddress').hide();
+
 
 		});
 			 // 1. Tạo hóa đơn mới
@@ -1550,7 +1582,7 @@
 
 
 		//chọn khách hàng 
-			$(document).on('click', '.choose-customer', function () {
+		$(document).on('click', '.choose-customer', function () {
 			let customerId = $(this).data('id');
 			let name = $(this).data('name');
 			let phone = $(this).data('phone');
@@ -1585,6 +1617,10 @@
 				customerForm.find('.customerPhone').val(phone);
 				customerForm.find('.customerEmail').val(email);
 			}
+
+			// Xử lý nút openAddress
+			let addressBtn = container.find('.openAddress');
+			addressBtn.attr('data-id', customerId).show();
 
 			// Gửi request liên kết khách hàng với hóa đơn
 			let invoiceId = container.attr('data-db-invoice-id');
@@ -2474,6 +2510,88 @@
 
 
 
+		$(document).on('click', '.openAddress', function () {
+			const customerId = $(this).data('id'); // giả định nút có data-id
+
+			if (!customerId) {
+				alert("Không tìm thấy ID khách hàng!");
+				return;
+			}
+
+			$.ajax({
+				url: `/Admin/Khachhang/GetAddressCustomer?customerId=${customerId}`,
+				type: 'GET',
+				success: function (res) {
+					const $tbody = $('#addressModal tbody');
+					$tbody.empty();
+
+					if (!res || res.length === 0 || res.success === false) {
+						$tbody.append(`<tr><td colspan="6">${res.message || "Không có địa chỉ nào!"}</td></tr>`);
+						return;
+					}
+
+					res.forEach((item, index) => {
+						$tbody.append(`
+							<tr>
+								<td>${index + 1}</td>
+								<td>${item.tinh}</td>
+								<td>${item.huyen}</td>
+								<td>${item.xa}</td>
+								<td>${item.chi_tiet}</td>
+								<td><button class="btn btn-sm btn-primary select-address"
+									data-tinh="${item.tinh}"
+									data-huyen="${item.huyen}"
+									data-xa="${item.xa}"
+									data-chitiet="${item.chi_tiet}">Chọn</button></td>
+							</tr>
+						`);
+					});
+
+					$('#addressModal').modal('show');
+				},
+				error: function (err) {
+					alert("Lỗi khi lấy địa chỉ!");
+				}
+			});
+		});
+
+		$(document).on('click', '.select-address', function () {
+			const btn = $(this);
+			const cleanName = (str) => str.replace(/^Tỉnh\s+|^Thành phố\s+/i, "").trim();
+
+			const tenTinh = cleanName(btn.data('tinh'));
+			const tenHuyen = btn.data('huyen');
+			const tenXa = btn.data('xa');
+			console.log(tenTinh);
+			console.log(tenHuyen);
+			console.log(tenXa);
+
+			// Chọn tỉnh theo text
+			$('#tinh option').each(function () {
+				if ($(this).text().trim() === tenTinh) {
+					$('#tinh').val($(this).val()).trigger('change');
+
+					// Delay đợi load quận/huyện
+					setTimeout(() => {
+						$('#huyen option').each(function () {
+							if ($(this).text().trim() === tenHuyen) {
+								$('#huyen').val($(this).val()).trigger('change');
+
+								// Delay đợi load xã/phường
+								setTimeout(() => {
+									$('#xa option').each(function () {
+										if ($(this).text().trim() === tenXa) {
+											$('#xa').val($(this).val()).trigger('change');
+										}
+									});
+								}, 500);
+							}
+						});
+					}, 500);
+				}
+			});
+
+		});
 		
 	</script>
 
