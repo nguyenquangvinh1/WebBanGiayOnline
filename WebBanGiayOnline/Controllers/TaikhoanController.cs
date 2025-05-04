@@ -14,7 +14,7 @@ using System.Net;
 using WebBanGiay.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using WebBanGiay.Models.ViewModel;
-using static WebBanGiay.Models.ViewModel.UpdateAccountViewModel;
+
 
 namespace WebBanGiay.Controllers
 {
@@ -36,7 +36,7 @@ namespace WebBanGiay.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewmodel model, string? returnUrl = null)
+        public async Task<IActionResult> Login(Models.ViewModel.LoginViewmodel model, string? returnUrl = null)
         {
             if (!ModelState.IsValid)
                 return View("Login", model);
@@ -197,7 +197,7 @@ namespace WebBanGiay.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterViewModel model)
+        public async Task<IActionResult> Register(Models.ViewModel.RegisterViewModel model)
         {
             if (!ModelState.IsValid)
                 return View(model);
@@ -266,7 +266,7 @@ namespace WebBanGiay.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
             if (role == "Admin" || role == "Nhân Viên")
-                return RedirectToAction("LoginAdmin", "Account", new { area = "Admin" }); 
+                return RedirectToAction("LoginAdmin", "Account", new { area = "Admin" });
 
             return RedirectToAction("Login", "TaiKhoan");
         }
