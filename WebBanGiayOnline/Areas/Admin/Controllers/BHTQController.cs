@@ -743,8 +743,8 @@ namespace WebBanGiay.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [Route("GetShippingFee")]
-        public async Task<IActionResult> GetShippingFee([FromBody] GHNShipping request)
+        //[Route("GetShippingFee1")]
+        public async Task<IActionResult> GetShippingFee1([FromBody] GHNShipping request)
         {
             try
             {
@@ -753,10 +753,10 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 {
                     ship = 50000;
                 }
-                if (request.subtotal > 2000000)
-                {
-                    ship = 0;
-                }
+                //if (request.subtotal > 2000000)
+                //{
+                //    ship = 0;
+                //}
           
                 return Json(new { success = true, ship });
 
