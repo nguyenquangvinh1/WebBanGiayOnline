@@ -2,12 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using WebBanGiay.Areas.Admin.config;
 using WebBanGiay.Data;
 using WebBanGiay.Helpers;
 using WebBanGiay.ViewModel;
-using WebBanGiay.Areas.Admin.comon;
-using WebBanGiay.Areas.Admin.config;
+
 using System.Configuration;
 
 namespace WebBanGiay.Areas.Admin.Controllers
