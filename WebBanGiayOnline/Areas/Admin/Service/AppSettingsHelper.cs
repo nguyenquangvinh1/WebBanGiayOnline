@@ -6,7 +6,7 @@ namespace WebBanGiay.Areas.Admin.Service
     public class AppSettingsHelper
     {
         //private static readonly JObject _config;
-
+        //
         //static AppSettingsHelper()
         //{
         //    string jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appsettings.json");

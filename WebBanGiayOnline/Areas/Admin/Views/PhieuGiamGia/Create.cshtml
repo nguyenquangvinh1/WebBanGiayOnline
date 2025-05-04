@@ -195,8 +195,8 @@
                                             foreach (var tai_khoan in ViewBag.tai_khoans)
                                             {
 
-                                                if (tai_khoan.Vai_TroID == new Guid("7C9A079B-6226-470C-8C58-73749E336A8B"))
-                                                {
+                                                if (tai_khoan.Vai_Tro.ten_vai_tro == "Khách hàng")
+                                                                    {
                                                     <tr>
                                                         <td>
                                                             <input type="checkbox" name="customerIds" value="@tai_khoan.ID" class="customer-checkbox" />

@@ -134,8 +134,9 @@
 							<div class="khachLe">
 								<p>Khách lẻ</p>
 						</div>
-						<div class="customerForm mb-6" style="display: none;">
-							<div class="p-3 border rounded bg-white  mt-3">
+						<button class="btn btn-primary mb-3" onclick="toggleCustomerForm()">Giao hàng</button>
+						<div class="customerForm mb-6">
+							<div class="p-3 border rounded bg-white  mt-3" id="customerForm" style="display: none;" >
 									<div class="col-12 mt-3.8.6">
 										<label class="form-label">Họ và tên</label>
 										<input type="text" class="form-control customerName" placeholder="Họ tên">
@@ -147,30 +148,44 @@
 								<div class="col-12 mb-6 ">
 										<label class="form-label">Email</label>
 									<input type="email" class="form-control customerEmail " placeholder="Email">
+									</div>
+								<div class="form-item my-3" onchange="calculateFee()">
+									<div class="row">
+										<div class="col-md-4 mb-3">
+											<label>* Tỉnh/Thành phố</label>
+											<select class="form-control mt-2" id="tinh" name="tinh">
+												<option value="">Chọn tỉnh/thành phố</option>
+											</select>
+										</div>
+										<div class="col-md-4 mb-3">
+											<label>* Quận/Huyện</label>
+											<select class="form-control mt-2" id="huyen" name="huyen">
+												<option value="">Chọn quận/huyện</option>
+											</select>
+										</div>
+										<div class="col-md-4 mb-3">
+											<label>* Xã/Phường</label>
+											<select class="form-control mt-2" id="xa" name="xa">
+												<option value="">Chọn xã/phường</option>
+											</select>
+										</div>
+									</div>
 								</div>
 
-							</div>
-							
-
-							
-
-
 								</div>
-						
+							
+								</div>
+
 							
 						</div>
 
 						<!-- THÔNG TIN THANH TOÁN -->
 						<div class="col-md-6 mb-4">
 							<h6 class="fw-bold mb-3">Thanh toán</h6>
-						
-
 						<div class="p-3 border rounded bg-white">
 								<button class="btn btn-outline-primary openPayment" data-id="INVOICE_ID">
 									<i class="fa fa-credit-card"></i> Mở thanh toán
-								</button>
-
-						
+								</button> 
 								<!-- Phần tóm tắt hóa đơn & voucher -->
 								<div class="invoice-summary text-start">
 									<div class="row g-2">
@@ -180,14 +195,13 @@
 												<input type="text"
 												   class="form-control discountCodeInput  text-start" id="discountCodeInput"
 													   placeholder="Mã tốt nhất"
-													   readonly>
+													   readonly> 
 												<button class="btn btn-outline-secondary selectDiscount"
 														data-id="INVOICE_ID">
 													Chọn
 												</button>
 											</div>
 										</div>
-									
 										<div class="col-12">
 											<label class="form-label">Giá gốc</label>
 											<input type="text" class="form-control basePrice text-start" readonly>
@@ -195,6 +209,10 @@
 										<div class="col-12">
 											<label class="form-label">Giảm giá</label>
 											<input type="text" class="form-control discountAmount text-start" readonly>
+										</div>
+										<div class="col-12">
+										<label class="form-label">Phí vận chuyển</label>
+										  <img src="~/coloshop-master/images/tải xuống.png" class="img-fluid" alt="" style="width: 30px; height: 30px; object-fit: contain;"> <a id="fee"></a> 0 VNĐ
 										</div>
 										<div class="col-12">
 											<label class="form-label">Tổng tiền</label>
@@ -214,7 +232,79 @@
 				</div>
 
 
-					
+					@* <div class="row"> *@
+					@* 	<!-- Khách hàng --> *@
+					@* 	<div class="col-md-6 mb-4 customer-section"> *@
+					@* 		<h6>Khách hàng</h6> *@
+					@* 		<div class="khachLe"> *@
+					@* 			<p>Khách lẻ</p> *@
+					@* 		</div> *@
+					@* 		<div class="customerForm" style="display: none;"> *@
+					@* 			<div class="row g-2 mt-5"> *@
+					@* 				<div class="col-12 mt-3.8.6"> *@
+					@* 					<label class="form-label">Họ và tên</label> *@
+					@* 					<input type="text" class="form-control customerName" placeholder="Họ tên"> *@
+					@* 				</div> *@
+					@* 				<div class="col-12 mt-3.8.6"> *@
+					@* 					<label class="form-label">Số điện thoại</label> *@
+					@* 					<input type="text" class="form-control customerPhone" placeholder="Số điện thoại"> *@
+					@* 				</div> *@
+					@* 				<div class="col-12 mt-3.8.6"> *@
+					@* 					<label class="form-label">Email</label> *@
+					@* 					<input type="email" class="form-control customerEmail" placeholder="Email"> *@
+					@* 				</div> *@
+					@* 			</div> *@
+					@* 		</div> *@
+					@* 	</div> *@
+
+
+					@* 	<!-- Thanh toán --> *@
+					@* 	<div class="col-md-6 mb-4 payment-section"> *@
+					@* 		<h6>Thanh toán</h6> *@
+					@* 		<div class="mb-3"> *@
+					@* 			<button class="btn btn-outline-primary openPayment" data-id="INVOICE_ID"> *@
+					@* 				<i class="fa fa-credit-card"></i> Mở thanh toán *@
+					@* 			</button> *@
+					@* 		</div> *@
+
+					@* 		<!-- Phần tóm tắt hóa đơn & voucher --> *@
+					@* 		<div class="invoice-summary text-start"> *@
+					@* 			<div class="row g-2"> *@
+					@* 				<div class="col-12"> *@
+					@* 					<label class="form-label">Mã giảm giá</label> *@
+					@* 					<div class="input-group"> *@
+					@* 						<input type="text" *@
+					@* 							   class="form-control discountCodeInput text-start" *@
+					@* 							   placeholder="Mã tốt nhất" *@
+					@* 							   readonly> *@
+					@* 						<button class="btn btn-outline-secondary selectDiscount" *@
+					@* 								data-id="INVOICE_ID"> *@
+					@* 							Chọn *@
+					@* 						</button> *@
+					@* 					</div> *@
+					@* 				</div> *@
+					@* 				<div class="col-12"> *@
+					@* 					<label class="form-label">Giá gốc</label> *@
+					@* 					<input type="text" class="form-control basePrice text-start" readonly> *@
+					@* 				</div> *@
+					@* 				<div class="col-12"> *@
+					@* 					<label class="form-label">Giảm giá</label> *@
+					@* 					<input type="text" class="form-control discountAmount text-start" readonly> *@
+					@* 				</div> *@
+					@* 				<div class="col-12"> *@
+					@* 					<label class="form-label">Tổng tiền</label> *@
+					@* 					<input type="text" class="form-control finalTotal text-start" readonly> *@
+					@* 				</div> *@
+					@* 				<div class="col-12"> *@
+					@* 					<button class="btn btn-success w-100" id="finalConfirmBtn"> *@
+					@* 						Xác nhận thanh toán *@
+					@* 					</button> *@
+					@* 				</div> *@
+					@* 			</div> *@
+					@* 		</div> *@
+					@* 	</div> *@
+					@* </div> *@
+
 			</div>
 		</div>
 	</div>
@@ -546,7 +636,20 @@
 					</tbody>
 				</table>
 
-				
+				<!-- Tóm tắt -->
+				@* <div class="text-end"> *@
+				@* 	<p>Khách thanh toán: <span id="totalPaid">0</span></p> *@
+				@* 	<p>Còn thiếu: <span id="remaining">0</span></p> *@
+				@* </div> *@
+
+				<!-- Chọn phiếu giảm giá (nếu có) -->
+				@* <div class="mb-3"> *@
+				@* 	<label for="voucherSelect" class="form-label">Mã giảm giá</label> *@
+				@* 	<select class="form-select" id="voucherSelect"> *@
+				@* 		<option value="">Không dùng</option> *@
+				@* 		<!-- Sẽ load phiếu giảm giá qua JS --> *@
+				@* 	</select> *@
+				@* </div> *@
 			</div>
 
 			<div class="modal-footer">
@@ -568,7 +671,7 @@
 @section Scripts {
 
 	<script>
-		
+
 
 			 const MAX_INVOICE = 6;
 
@@ -580,6 +683,7 @@
 		 
 
 						$(document).ready(function () {
+								loadProvinces();
 			$(".filter-select, #searchProduct").on("change keyup", function () {
 				filterProducts(); // Gọi hàm lọc sản phẩm
 			});
@@ -588,8 +692,6 @@
 			e.preventDefault();  // Ngăn hành vi mặc định của link nếu cần
 			getDataInvoices();
 		});
-
-
 
 		});
 			 // 1. Tạo hóa đơn mới
@@ -646,6 +748,17 @@
 				}
 			});
 		});
+
+			 function toggleCustomerForm() {
+			var form = document.getElementById("customerForm");
+			if (form.style.display === "none") {
+				form.style.display = "block";
+			} else {
+				form.style.display = "none";
+			}
+		}
+
+
 
 
 				function filterProducts() {
@@ -840,6 +953,29 @@
 				
 
 
+
+		  // 3. Hiển thị danh sách sản phẩm trong hóa đơn
+		// 				function loadInvoiceDetails() {
+		// 	let dbInvoiceId = $(`#${currentInvoiceId}`).attr('data-db-invoice-id');
+		
+
+		// 	$.getJSON('/Admin/BHTQ/GetInvoiceDetails', { invoiceId: dbInvoiceId }, function(res) {
+		// 		if (res && res.success) {
+		// 			let html = "";
+		// 			if (res.data) {
+		// 				res.data.forEach((item, index) => {
+		// 					html += renderDetailInvoice(item, index);
+		// 				});
+						
+		// 				Giả sử bảng sản phẩm chi tiết có id là invoiceTable-{currentInvoiceId}
+		// 				$(`#invoiceTable-${currentInvoiceId} tbody`).html(html);
+		// 				recalcInvoiceTotal();
+		// 			} else {
+		// 				console.log('Không có dữ liệu chi tiết hóa đơn!');
+		// 			}
+		// 		}
+		// 	});
+		// }
 				function loadInvoiceDetails() {
 			let dbInvoiceId = $(`#${currentInvoiceId}`).attr('data-db-invoice-id');
 
@@ -871,8 +1007,6 @@
 		}
 
 
-		//giao hang
-				
 
 
 		 /**
@@ -1489,7 +1623,68 @@
 
 		//API GetAvailableDiscounts để lấy danh sách voucher
 				let bestDiscountAmount = 0;
-		
+		// let bestVoucherCode = null; ban đầu là null
+		// 			 function autoSelectDiscountCode(invoiceDomId) {
+		// 	let container = $('#' + invoiceDomId);
+		// 	Lấy orderTotal từ span
+
+		// 		 let totalText = $('#totalPrice-' + invoiceDomId).text();
+		// 		console.log('Total price text for', invoiceDomId, ':', totalText);
+		// 		let orderTotal = parseFloat(totalText) || 0;
+		// 		console.log('Computed orderTotal:', orderTotal);
+
+		// 	Lấy customerId đã lưu (nếu có); nếu chưa có, customerId sẽ là null
+		// 	let customerId = container.attr('data-customer-id') || null;
+		// 	console.log('Ctmid:',customerId);
+		// 	$.ajax({
+		// 		url: '/Admin/PhieuGiamGia/GetAvailableDiscounts',
+		// 		type: 'GET',
+		// 		data: { customerId: customerId, orderTotal: orderTotal },
+		// 		success: function(vouchers) {
+		// 			if (!vouchers || vouchers.length === 0) {
+		// 				Không có voucher phù hợp, không fill gì
+		// 				return;
+		// 			}
+		// 			Tìm voucher tốt nhất
+		// 			let bestVoucher = null, maxDiscount = 0;
+		// 			vouchers.forEach(function(voucher) {
+		// 				let discount = 0;
+		// 				if(voucher.loai === 0){ giảm theo VND
+		// 					discount = voucher.gia_tri;
+		// 				} else if(voucher.loai === 1){ giảm theo %
+		// 					discount = orderTotal * (voucher.gia_tri / 100);
+		// 					if(voucher.so_tien_giam_toi_da && discount > voucher.so_tien_giam_toi_da){
+		// 						discount = voucher.so_tien_giam_toi_da;
+		// 					}
+		// 				}
+		// 				if(discount > maxDiscount){
+		// 					maxDiscount = discount;
+		// 					bestVoucher = voucher;
+		// 				}
+		// 			});
+		// 			if(bestVoucher){
+		// 			bestDiscountAmount=maxDiscount;
+		// 			bestVoucherCode=bestVoucher.ma;
+		// 				container.find('.discountCodeInput').val(bestVoucher.ma);
+		// 				container.find('.discountAmount').val(maxDiscount);
+		// 				container.find('.finalTotal').val(orderTotal - maxDiscount);
+		// 				hien thi thong bao ma giam gia toot nhat
+		// 						container.find('#bestVoucherMessage').show();	
+		// 					} else {
+		// 				Không tìm được voucher tốt nhất
+		// 				container.find('#bestVoucherMessage').hide();
+		// 				bestVoucherCode=null;
+		// 				bestDiscountAmount=0;
+		// 			}
+		// 		},
+		// 		error: function(err) {
+		// 			console.error("Lỗi autoSelectDiscountCode:", err);
+		// 					 container.find('#bestVoucherMessage').hide();
+		// 					 bestVoucherCode=null;
+		// 						bestDiscountAmount=0;
+		// 		}
+		// 	});
+		// }
 
 						function autoSelectDiscountCode(invoiceDomId) {
 			let container = $('#' + invoiceDomId);
@@ -1658,6 +1853,7 @@
 			console.log("Voucher applied:", { voucherId, voucherCode, discount, finalTotal: orderTotal - discount });
 		});
 
+		////////
 
 		   function loadPaymentMethods(){
 			  // Gọi API (nếu bạn có) hoặc load sẵn
@@ -1698,6 +1894,65 @@
 		});
 		
 
+							  // Nút "Thêm" => thêm dòng vào table
+		// 		$('#addPaymentRowBtn').on('click', function(){
+		//   let amount = parseFloat($('#paymentAmount').val().replace(/\D/g,'')) || 0;
+		//   if (!amount || amount <= 0) {
+		// 	alert("Vui lòng nhập số tiền > 0");
+		// 	return;
+		//   }
+		//   if (!currentMethod) {
+		// 	alert("Vui lòng chọn phương thức thanh toán (Tiền mặt / Chuyển khoản / Cả 2)");
+		// 	return;
+		//   }
+		//   let methodText = "";
+		//   if (currentMethod === 'TTM') methodText = "Tiền mặt";
+		//   else if (currentMethod === 'CK') methodText = "Chuyển khoản";
+		//   else if (currentMethod === 'all') methodText = "Cả 2";
+
+		//   Thêm dòng vào mảng paymentRows
+		//   paymentRows.push({ amount: amount, method: currentMethod });
+
+		//   Thêm dòng vào table
+		//   let rowIndex = $('#paymentDetailsTable tbody tr').length + 1;
+		//   let newRow = `
+		// 	<tr>
+		// 	  <td>${rowIndex}</td>
+		// 	  <td>${amount.toLocaleString()}</td>
+		// 	  <td>${methodText}</td>
+		// 	  <td><button class="btn btn-danger btn-sm deletePaymentRow">X</button></td>
+		// 	</tr>
+		//   `;
+		//   $('#paymentDetailsTable tbody').append(newRow);
+
+		//   Cập nhật tổng thanh toán
+		//   let totalPaid = paymentRows.reduce((sum, row) => sum + row.amount, 0);
+		//   let invoiceTotal = parseFloat($('#invoiceTotal').text().replace(/,/g, '')) || 0;
+		//   let remain = invoiceTotal - totalPaid;
+		//   if(remain < 0) remain = 0;
+		//   $('#paidAmount').text(totalPaid.toLocaleString());
+		//   $('#remaining').text(remain.toLocaleString());
+		// });
+		// Xóa dòng (nếu user sai)
+
+		// Nút "X" để xóa dòng
+		// 	   Xóa dòng thanh toán
+		// $(document).on('click', '.deletePaymentRow', function(){
+		//   let row = $(this).closest('tr');
+		//   let index = row.index();
+		//   row.remove();
+		//   paymentRows.splice(index, 1);
+		//   Cập nhật lại STT
+		//   $('#paymentDetailsTable tbody tr').each(function(i){
+		// 	$(this).find('td:first').text(i+1);
+		//   });
+		//   let totalPaid = paymentRows.reduce((sum, row) => sum + row.amount, 0);
+		//   let invoiceTotal = parseFloat($('#invoiceTotal').text().replace(/,/g, '')) || 0;
+		//   let remain = invoiceTotal - totalPaid;
+		//   if(remain < 0) remain = 0;
+		//   $('#paidAmount').text(totalPaid.toLocaleString());
+		//   $('#remaining').text(remain.toLocaleString());
+		// });
 
 				$('#addPaymentRowBtn').on('click', function(){
 					debugger;
@@ -1886,7 +2141,53 @@
 
 
 
-	
+		//thêm phương thức thanh toán 
+		// $('#confirmPaymentBtn').on('click', function(){
+		// 	let amount = parseFloat($('#paymentAmount').val().replace(/\D/g,'')) || 0;
+		// 	let methodId = $('#paymentMethodSelect').val();
+		// 	let note = $('#paymentNote').val() || '';
+
+		// 	if (!amount || amount <= 0) {
+		// 	  alert("Vui lòng nhập số tiền > 0");
+		// 	  return;
+		// 	}
+		// 	if (!methodId) {
+		// 	  alert("Vui lòng chọn phương thức thanh toán");
+		// 	  return;
+		// 	}
+
+		// 	Gọi API AddPayment
+		// 	let invoiceDom = $('#' + currentInvoiceId);
+		// 	let invoiceId = invoiceDom.attr('data-db-invoice-id');
+
+		// 	let requestData = {
+		// 	  Hoa_DonID: invoiceId,
+		// 	  Phuong_Thuc_Thanh_ToanID: methodId,
+		// 	  SoTien: amount,
+		// 	  MoTa: note
+		// 	};
+
+		// 	$.ajax({
+		// 	  url: '/Admin/BHTQ/AddPayment',
+		// 	  type: 'POST',
+		// 	  contentType: 'application/json;charset=utf-8',
+		// 	  data: JSON.stringify(requestData),
+		// 	  success: function(res) {
+		// 		  if (res.success) {
+		// 			  alert("Thanh toán thành công!");
+		// 			  Cập nhật hiển thị
+		// 			  updatePaymentUI(res.data);
+		// 		  } else {
+		// 			  alert("Lỗi: " + res.message);
+		// 		  }
+		// 	  },
+		// 	  error: function(err) {
+		// 		  console.error("Lỗi thanh toán:", err);
+		// 		  alert("Có lỗi xảy ra, vui lòng thử lại!");
+		// 	  }
+		// 	});
+		// });
+
 
 				$(document).on('click', '#confirmPaymentInModal', function () {
 		  let finalTotalStr = $('#finalTotal').val() || '0';
@@ -1910,7 +2211,60 @@
 		  }
 		});
 
+		////
+		// 	$(document).on('click', '#confirmPaymentInModal', function () {
+		// 	let finalTotalStr = $('#finalTotal').val() || '0';
+		// 	let finalTotal = parseFloat(finalTotalStr.replace(/\D/g, '')) || 0;
 
+		// 	let paymentAmount = $('#paymentAmount').val() || '0';
+		// 	let paymentMethod = currentMethod || '';
+		// 	let paymentNote = $('#paymentNote').val() || '';
+		// 	let voucherCode = $('#discountCodeInput').val() || '';
+
+		// 	window.tempPaymentData = {
+		// 		InvoiceId: $('#invoiceContent .active').data('db-invoice-id'),
+		// 		FinalTotal: finalTotal,
+		// 		PaymentRows: paymentRows,
+		// 		VoucherCodeString: voucherCode,
+		// 		SoTien: paymentAmount,
+		// 		Phuong_Thuc: paymentMethod,
+		// 		MoTa: paymentNote
+		// 	};
+
+		// 	console.log("Temp Payment Data:", window.tempPaymentData);
+
+
+		// 	let modalInstance = bootstrap.Modal.getInstance(document.getElementById('paymentModal'));
+		// 	if (modalInstance) {
+		// 		modalInstance.hide();
+		// 	}
+		// });
+
+
+
+
+		// 	  function updatePaymentUI(data){
+		// 	data gồm PaymentID, SoTien, PhuongThuc, TotalPaid, Remaining
+		// 	let newRow = `
+		// 	  <tr>
+		// 		<td>${$('#paymentHistoryTable tbody tr').length + 1}</td>
+		// 		<td>${data.SoTien.toLocaleString()}</td>
+		// 		<td>${data.PhuongThuc}</td>
+		// 		<td>...</td>
+		// 	  </tr>
+		// 	`;
+		// 	$('#paymentHistoryTable tbody').append(newRow);
+		// 	$('#paidAmount').text(data.TotalPaid.toLocaleString());
+		// 	$('#remainingAmount').text(data.Remaining.toLocaleString());
+
+		// 	Nếu còn thiếu = 0 => có thể đóng modal
+		// 	if (data.Remaining <= 0) {
+		// 	  let modal = bootstrap.Modal.getInstance(document.getElementById('paymentModal'));
+		// 	  if (modal) {
+		// 		  modal.hide();
+		// 	  }
+		// 	}
+		// }
 
 				let currentMethod = null;  // Lưu mã phương thức (TTM / CK / all)
 				let paymentRows = [];
@@ -1929,7 +2283,192 @@
 		  }
 		});
 
+			// $(document).on('click', '.payment-method', function(){
+			//   Lấy mã từ data-method
+			//   currentMethod = $(this).data('method'); "TTM", "CK", "all"
+
+			//   Hiển thị text cho #selectedMethod
+			//   if (currentMethod === 'TTM') {
+			// 	  $('#selectedMethod').text('Tiền mặt');
+			//   } else if (currentMethod === 'CK') {
+			// 	  $('#selectedMethod').text('Chuyển khoản');
+			// 	  Nếu là chuyển khoản, gọi hàm xử lý thanh toán VNPay
+			// 	  processVNPayPayment();
+			//   } else if (currentMethod === 'all') {
+			// 	  $('#selectedMethod').text('Cả 2');
+			//   }
+			// });
+
+		// 			function processVNPayPayment(){
+		// 	Lấy thông tin tổng tiền đơn hàng từ giao diện (giả sử được lưu trong input finalTotal)
+		// 	let invoiceDom = $('#' + currentInvoiceId);
+		// 	let orderTotal = parseFloat(invoiceDom.find('.finalTotal').val()) || 0;
+
+		// 	Lấy thông tin mô tả đơn hàng nếu cần (có thể lấy từ một trường ẩn hoặc từ mã hóa đơn)
+		// 	let orderInfo = invoiceDom.find('.orderInfo').text() || 'Thanh toán đơn hàng';
+
+		// 	Gọi API tạo request thanh toán VNPay
+		// 	$.ajax({
+		// 			   url: '/Admin/VNPayPayment/CreatePayment',
+		// Endpoint cần được định nghĩa trên server
+		// 		type: 'GET',
+		// 		data: {
+		// 			amount: orderTotal,
+		// 			orderInfo: orderInfo
+		// 		},
+		// 		success: function(res){
+		// 			if (res && res.redirectUrl) {
+		// 				Chuyển hướng trình duyệt sang URL VNPay
+		// 				window.location.href = res.redirectUrl;
+		// 			} else {
+		// 				alert("Không thể tạo URL thanh toán VNPay");
+		// 			}
+		// 		},
+		// 		error: function(err){
+		// 			console.error(err);
+		// 			alert("Có lỗi xảy ra khi tạo thanh toán VNPay");
+		// 		}
+		// 	});
+		// }
+
+		   // Gọi hàm khi trang tải
+	
+
 		
+	
+
+			  function calculateFee() {
+			var provinceId = $("#tinh").val();
+			var districtId = $("#huyen").val();
+			var wardCode = $("#xa").val();
+
+			if (provinceId =="" && districtId == "" && wardCode == "") {
+				alert("Vui lòng chọn đầy đủ địa chỉ.");
+				return;
+			}
+
+		   var requestData = {
+		from_district_id: 3440,
+		from_ward_code: "13009",
+		service_id: 53320,
+		service_type_id: null,
+		to_district_id: parseInt(districtId),
+		to_ward_code: wardCode,
+		height: 50,
+		length: 20,
+		weight: 200,
+		width: 20,
+		provinceId: provinceId,
+		subtotal: subtotal,
+		insurance_value: 10000,
+		cod_failed_amount: 2000,
+		coupon: null,
+
+
+			};
+
+			console.log("Gửi dữ liệu:", requestData);
+
+			$.ajax({
+				url: '@Url.Action("GetShippingFee", "Cart")',
+				type: "POST",
+				contentType: "application/json; charset=utf-8",
+				data: JSON.stringify(requestData),
+				dataType: "json",
+				success: function(response) {
+
+					if(provinceId !=  201){
+
+						response.ship = 50000;
+					}
+					if(subtotal > 2000000)
+				   {
+					   response.ship = 0;
+				   }
+					 let total = response.ship + subtotal;
+					console.log("Nhận phản hồi:", response);
+					if (response.success) {
+						$("#fee").text(response.ship.toLocaleString() + " VNĐ");
+						$("#totalWithFee").text( total.toLocaleString() + " VNĐ");
+					} else {
+						alert(response.message);
+					}
+				},
+				error: function(xhr) {
+					console.error("Lỗi chi tiết:", xhr.responseText);
+					alert("Có lỗi xảy ra khi tính phí vận chuyển.");
+				}
+			});
+		}
+
+
+
+		// Load danh sách tỉnh/huyện/xã
+
+				   function loadProvinces() {
+			$.ajax({
+				url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/province",
+				type: "GET",
+				headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
+				success: function (response) {
+					var provinces = response.data;
+					$("#tinh").empty().append('<option value="">Chọn Tỉnh/Thành phố</option>');
+					provinces.forEach(function (province) {
+						$("#tinh").append(`<option value="${province.ProvinceID}">${province.ProvinceName}</option>`);
+					});
+				},
+				error: function () {
+					alert("Lỗi khi tải danh sách tỉnh/thành phố.");
+				}
+			});
+		}
+
+
+			  $("#tinh").change(function () {
+			var provinceId = $(this).val();
+			if (!provinceId) return;
+
+			$.ajax({
+				url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/district",
+				type: "GET",
+				headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
+				data: { "province_id": provinceId },
+				success: function (response) {
+					var districts = response.data;
+					$("#huyen").empty().append('<option value="">Chọn Quận/Huyện</option>');
+					districts.forEach(function (district) {
+						$("#huyen").append(`<option value="${district.DistrictID}">${district.DistrictName}</option>`);
+					});
+				},
+				error: function () {
+					alert("Lỗi khi tải danh sách quận/huyện.");
+				}
+			});
+		});
+				$("#huyen").change(function () {
+			var districtId = $(this).val();
+			if (!districtId) return;
+
+			$.ajax({
+						url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?districtId",
+				type: "GET",
+				headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
+				data: { "district_id": districtId },
+				success: function (response) {
+					var wards = response.data;
+					$("#xa").empty().append('<option value="">Chọn Xã/Phường</option>');
+					wards.forEach(function (ward) {
+						$("#xa").append(`<option value="${ward.WardCode}">${ward.WardName}</option>`);
+					});
+				},
+				error: function () {
+					alert("Lỗi khi tải danh sách xã/phường.");
+				}
+			});
+		});
+
+
+
 		
 	</script>
 

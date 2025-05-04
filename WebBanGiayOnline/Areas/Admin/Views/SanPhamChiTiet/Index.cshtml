@@ -197,7 +197,7 @@
                         <td>@item.Chat_Lieu</td>
                         <td>
                             <span class="text-view">@item.so_luong</span>
-                            <input type="text" id="number" class=" form-control form-control-sm so-luong-input d-none text-center quantity" style="width: 70px; " value="@item.so_luong" />
+                            <input type="text" id="number" class="form-control form-control-sm so-luong-input d-none text-center quantity" style="width: 70px;" value="@item.so_luong" />
                         </td>
                         <td>
                             <span class="text-view">@item.gia</span>
@@ -207,7 +207,7 @@
                             <span id="status-badge" class="@(item.trang_thai == 1 ? "trang-thai-dang-dien-ra" : "trang-thai-het-han")" style='width: 150px; height: 30px; line-height: 18px; white-space: nowrap;'>@(item.trang_thai == 1 ? "Hoạt động" : "Ngừng hoạt động")</span>
                         </td>
                         <td>
-                            <a  class="btn btn-warning btn-edit"
+                            <a href="#" class="btn btn-warning btn-edit"
                                data-id="@item.ID"
                                data-gia="@item.gia"
                                data-kieu-dang="@item.Kieu_Dang"
@@ -537,10 +537,8 @@
     });
 });
 
-                    $(document).on('click', '.btn-edit', function () {
 
-       
-            console.log("da chay btn edit");
+        $('.btn-edit').click(function () {
             let id = $(this).data('id');
             let gia = $(this).data('gia');
             let soLuong = $(this).data('so-luong');
@@ -568,7 +566,6 @@
                 if (value && select.length) {
                     select.find('option').each(function () {
                         if ($(this).text().trim() === value.toString().trim()) {
-                            $(this).prop('selected', true);
                             $(this).prop('selected', true);
                             select.trigger('change'); // Cho select2 cập nhật
                         }

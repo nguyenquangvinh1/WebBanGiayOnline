@@ -63,7 +63,7 @@ namespace WebBanGiay.Data
                 new Phuong_Thuc_Thanh_Toan
                 {
                     ID = Guid.NewGuid(),
-ma = "ALL", // Hoặc "ca2" tùy theo quy ước của bạn
+                    ma = "ALL", // Hoặc "ca2" tùy theo quy ước của bạn
                     ten_phuong_thuc = "Cả 2"
                 },
                  new Phuong_Thuc_Thanh_Toan

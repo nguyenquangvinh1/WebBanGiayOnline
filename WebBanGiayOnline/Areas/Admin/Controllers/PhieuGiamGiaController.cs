@@ -101,7 +101,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
         public IActionResult Create()
         {
 
-            var tai_khoan = _context.tai_Khoans.ToList();
+            var tai_khoan = _context.tai_Khoans.Include(x => x.Vai_Tro).ToList();
             Console.WriteLine($"Số lượng tài khoản: {tai_khoan.Count}");
             ViewBag.tai_khoans = tai_khoan ?? new List<Tai_Khoan>();
             return View();
@@ -239,7 +239,8 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 return NotFound();
             } // Gán danh sách khách hàng vào ViewBag
             ViewBag.tai_khoans = await _context.tai_Khoans
-                .Where(tk => tk.Vai_TroID == new Guid("2a88a473-f243-4475-b648-457fde9301c4"))
+                .Include(x => x.Vai_Tro)
+                .Where(tk => tk.Vai_Tro.ten_vai_tro == "Khách hàng")
                 .ToListAsync();
 
             var phieu_giam_gia = await _context.phieu_Giam_Gias.FindAsync(id);
@@ -261,7 +262,8 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 if (!ModelState.IsValid)
                 {
                     ViewBag.tai_khoans = await _context.tai_Khoans
-                        .Where(tk => tk.Vai_TroID == new Guid("2a88a473-f243-4475-b648-457fde9301c4"))
+                .Include(x => x.Vai_Tro)
+                .Where(tk => tk.Vai_Tro.ten_vai_tro == "Khách hàng")
                         .ToListAsync();
 
                     return View(phieu_giam_gia); // quay lại view Edit để sửa lỗi
