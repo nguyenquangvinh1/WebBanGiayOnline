@@ -16,11 +16,10 @@ namespace ClssLib
         public string MaHoaDon { get; set; }
 
         [Display(Name = "Tổng tiền đơn hàng :")]
-        public decimal tong_tien { get; set; }
+        public double tong_tien { get; set; }
         [Display(Name = "Ghi chú :")]
         public string ghi_chu { get; set; }
-        [Display(Name = "Sô lượng:")]
-        public int SoLuongSP { get; set; }
+       
         [Display(Name = "Trạng thái :")]
         public int trang_thai { get; set; }
         [Display(Name = "Địa chỉ :")]
@@ -30,6 +29,8 @@ namespace ClssLib
         [Display(Name = "Email người nhận :")]
         public string email_nguoi_nhan { get; set; }
         [Display(Name = "Loại hóa đơn :")]
+  
+        public double? Ship { get; set; }
         public int loai_hoa_don { get; set; }
         [Display(Name = "Người đặt :")]
         public string ten_nguoi_nhan { get; set; }
@@ -40,11 +41,15 @@ namespace ClssLib
         [Display(Name = "Ngày thay đổi :")]
         public DateTime? ngay_sua { get; set; }
         [Display(Name = "Nhân viên :")]
-        public string nguoi_tao { get; set; }
+        public string? nguoi_tao { get; set; }
         [Display(Name = "Người sửa :")]
         public string? nguoi_sua { get; set; }
         [JsonIgnore]
         public virtual ICollection<Tai_Khoan_Hoa_Don> Tai_Khoan_Hoa_Dons { get; set; }
+
+        [ForeignKey("Giam_Gia")]
+        public Guid? Giam_GiaID { get; set; }
+
         [JsonIgnore]
         public virtual Phieu_Giam_Gia? Giam_Gia { get; set;}
         [JsonIgnore]

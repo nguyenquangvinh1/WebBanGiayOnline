@@ -1,108 +1,294 @@
 ﻿@model ClssLib.Phieu_Giam_Gia
+<div class="page-content-wrapper">
+    <div class="container-fluid">
+        <!-- Tiêu đề trang -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="page-title-box">
+                    <div class="btn-group float-right">
+                        <ol class="breadcrumb hide-phone p-0 m-0">
+                            <li class="breadcrumb-item">
+                                <a href="#">Adidas</a>
+                            </li>
+                            <li class="breadcrumb-item active">Giảm giá</li>
+                        </ol>
+                    </div>
+                    <h4 class="page-title">Phiếu giảm giá</h4>
+                </div>
+            </div>
+        </div>
 
-@{
-    ViewData["Title"] = "Edit";
-}
 
-<h1>Edit</h1>
 
-<h4>Phieu_Giam_Gia</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="ID" class="control-label"></label>
-                <input asp-for="ID" class="form-control" />
-                <span asp-validation-for="ID" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ma" class="control-label"></label>
-                <input asp-for="ma" class="form-control" />
-                <span asp-validation-for="ma" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ten_phieu_giam_gia" class="control-label"></label>
-                <input asp-for="ten_phieu_giam_gia" class="form-control" />
-                <span asp-validation-for="ten_phieu_giam_gia" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="loai_phieu_giam_gia" class="control-label"></label>
-                <input asp-for="loai_phieu_giam_gia" class="form-control" />
-                <span asp-validation-for="loai_phieu_giam_gia" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="kieu_giam_gia" class="control-label"></label>
-                <input asp-for="kieu_giam_gia" class="form-control" />
-                <span asp-validation-for="kieu_giam_gia" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="gia_tri_giam" class="control-label"></label>
-                <input asp-for="gia_tri_giam" class="form-control" />
-                <span asp-validation-for="gia_tri_giam" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="gia_tri_toi_thieu" class="control-label"></label>
-                <input asp-for="gia_tri_toi_thieu" class="form-control" />
-                <span asp-validation-for="gia_tri_toi_thieu" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="so_tien_giam_toi_da" class="control-label"></label>
-                <input asp-for="so_tien_giam_toi_da" class="form-control" />
-                <span asp-validation-for="so_tien_giam_toi_da" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="so_luong" class="control-label"></label>
-                <input asp-for="so_luong" class="form-control" />
-                <span asp-validation-for="so_luong" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="trang_thai" class="control-label"></label>
-                <input asp-for="trang_thai" class="form-control" />
-                <span asp-validation-for="trang_thai" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ngay_bat_dau" class="control-label"></label>
-                <input asp-for="ngay_bat_dau" class="form-control" />
-                <span asp-validation-for="ngay_bat_dau" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ngay_ket_thuc" class="control-label"></label>
-                <input asp-for="ngay_ket_thuc" class="form-control" />
-                <span asp-validation-for="ngay_ket_thuc" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ngay_tao" class="control-label"></label>
-                <input asp-for="ngay_tao" class="form-control" />
-                <span asp-validation-for="ngay_tao" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ngay_sua" class="control-label"></label>
-                <input asp-for="ngay_sua" class="form-control" />
-                <span asp-validation-for="ngay_sua" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="nguoi_tao" class="control-label"></label>
-                <input asp-for="nguoi_tao" class="form-control" />
-                <span asp-validation-for="nguoi_tao" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="nguoi_sua" class="control-label"></label>
-                <input asp-for="nguoi_sua" class="form-control" />
-                <span asp-validation-for="nguoi_sua" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
     </div>
-</div>
+    @{
+        ViewData["Title"] = "Edit";
+    }
+    <!DOCTYPE html>
+    <html lang="vi">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Phiếu Giảm Giá/ Edit</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+        <style>
+            body1 {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                background-color: #f4f4f4;
+            }
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+            .container {
+                background: white;
+                padding: 20px;
+                border-radius: 5px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+
+            .page-header {
+                font-size: 24px;
+                font-weight: bold;
+                margin-bottom: 20px;
+                color: black;
+            }
+
+            }
+        </style>
+    </head>
+    <hr />
+    <body1>
+
+        <div class="container mt-12">
+
+            <hr />
+            <div class="row">
+                <div class="col-md-12">
+                    @{
+                        var kieu = Model.kieu_giam_gia; // "CongKhai" hoặc "CaNhan"
+                    }
+
+                    @if (kieu == 0)
+                    {
+                        <div class="row">
+                            <!-- BÊN TRÁI: FORM PHIẾU GIẢM GIÁ -->
+                            <div class="col-md-6">
+                                <form asp-action="Edit" asp-controller="PhieuGiamGia" method="post" id="PhieuGiamGia">
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label asp-for="ten_phieu_giam_gia" class="control-label">Tên</label>
+                                            <input asp-for="ten_phieu_giam_gia" class="form-control" />
+                                            <span asp-validation-for="ten_phieu_giam_gia" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group col-md-6" hidden>
+                                            <label asp-for="nguoi_tao" class="control-label">Tên</label>
+                                            <input asp-for="nguoi_tao" class="form-control" />
+                                            <span asp-validation-for="nguoi_tao" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group col-md-6" hidden>
+                                            <label asp-for="gia_tri_toi_thieu" class="control-label">Tên</label>
+                                            <input asp-for="gia_tri_toi_thieu" class="form-control" />
+                                            <span asp-validation-for="gia_tri_toi_thieu" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label asp-for="ma" class="control-label">Mã</label>
+                                            <input asp-for="ma" class="form-control" />
+                                            <span asp-validation-for="ma" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label asp-for="so_tien_giam_toi_da" class="control-label">Số tiền giảm tối đa</label>
+                                            <input asp-for="so_tien_giam_toi_da" class="form-control" />
+                                            <span asp-validation-for="so_tien_giam_toi_da" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label asp-for="so_luong" class="control-label">Số lượng</label>
+                                            <input asp-for="so_luong" class="form-control" />
+                                            <span asp-validation-for="so_luong" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label asp-for="gia_tri_giam" class="control-label">Giá trị giảm</label>
+                                            <input asp-for="gia_tri_giam" class="form-control" />
+                                            <span asp-validation-for="gia_tri_giam" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label asp-for="ngay_bat_dau" class="control-label">Ngày bắt đầu</label>
+                                            <input asp-for="ngay_bat_dau" class="form-control" />
+                                            <span asp-validation-for="ngay_bat_dau" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label asp-for="ngay_ket_thuc" class="control-label">Ngày kết thúc</label>
+                                            <input asp-for="ngay_ket_thuc" class="form-control" />
+                                            <span asp-validation-for="ngay_ket_thuc" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <input class="form-check-input" type="radio" id="cong_khai"
+                                           name="kieu_giam_gia" value="1"
+                                    @(Model.kieu_giam_gia == 1 ? "checked" : "") onchange="toggleForm()" />
+                                    <label class="form-check-label" for="cong_khai">Công khai</label>
+
+                                    <input class="form-check-input" type="radio" id="ca_nhan"
+                                           name="kieu_giam_gia" value="0"
+                                    @(Model.kieu_giam_gia == 0 ? "checked" : "") onchange="toggleForm()" />
+                                    <label class="form-check-label" for="ca_nhan">Cá nhân</label>
+
+                                    <div class="form-group">
+                                        <input type="submit" value="Sửa" class="btn btn-primary" />
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- BÊN PHẢI: TÌM KIẾM + DANH SÁCH KHÁCH HÀNG -->
+                            <div class="col-md-6">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-search text-orange"></i>
+                                    </span>
+                                    <input type="text" id="searchInput" class="form-control" placeholder="Tên, SĐT hoặc Email">
+                                </div>
+
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)" />
+                                            </th>
+                                            <th>Tên</th>
+                                            <th>Số điện thoại</th>
+                                            <th>Email</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (ViewBag.tai_khoans != null && ((List<ClssLib.Tai_Khoan>)ViewBag.tai_khoans).Count > 0)
+                                        {
+                                            foreach (var tai_khoan in (List<ClssLib.Tai_Khoan>)ViewBag.tai_khoans)
+                                            {
+
+                                                if (tai_khoan.Vai_Tro.ten_vai_tro == "Khách hàng")
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <input type="checkbox" name="customerIds" value="@tai_khoan.ID" class="customer-checkbox" />
+                                                        </td>
+                                                        <td>@tai_khoan.ho_ten</td>
+                                                        <td>@tai_khoan.sdt</td>
+                                                        <td>@tai_khoan.email</td>
+
+                                                    </tr>
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="5">Không có khách hàng nào.</td>
+                                            </tr>
+                                        }
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    }
+                    else if (kieu == 1)
+                    {
+                        <form asp-action="Edit" asp-controller="PhieuGiamGia" method="post" id="PhieuGiamGia">
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label asp-for="ten_phieu_giam_gia" class="control-label">Tên</label>
+                                    <input asp-for="ten_phieu_giam_gia" class="form-control" />
+                                    <span asp-validation-for="ten_phieu_giam_gia" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-md-6" hidden>
+                                    <label asp-for="nguoi_tao" class="control-label">Tên</label>
+                                    <input asp-for="nguoi_tao" class="form-control" />
+                                    <span asp-validation-for="nguoi_tao" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-md-6" hidden>
+                                    <label asp-for="gia_tri_toi_thieu" class="control-label">Tên</label>
+                                    <input asp-for="gia_tri_toi_thieu" class="form-control" />
+                                    <span asp-validation-for="gia_tri_toi_thieu" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label asp-for="ma" class="control-label">Mã</label>
+                                    <input asp-for="ma" class="form-control" />
+                                    <span asp-validation-for="ma" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label asp-for="so_tien_giam_toi_da" class="control-label">Số tiền giảm tối đa</label>
+                                    <input asp-for="so_tien_giam_toi_da" class="form-control" />
+                                    <span asp-validation-for="so_tien_giam_toi_da" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label asp-for="so_luong" class="control-label">Số lượng</label>
+                                    <input asp-for="so_luong" class="form-control" />
+                                    <span asp-validation-for="so_luong" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label asp-for="gia_tri_giam" class="control-label">Giá trị giảm</label>
+                                    <input asp-for="gia_tri_giam" class="form-control" />
+                                    <span asp-validation-for="gia_tri_giam" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label asp-for="ngay_bat_dau" class="control-label">Ngày bắt đầu</label>
+                                    <input asp-for="ngay_bat_dau" class="form-control" />
+                                    <span asp-validation-for="ngay_bat_dau" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label asp-for="ngay_ket_thuc" class="control-label">Ngày kết thúc</label>
+                                    <input asp-for="ngay_ket_thuc" class="form-control" />
+                                    <span asp-validation-for="ngay_ket_thuc" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-check form-check-inline">
+                                    <input asp-for="kieu_giam_gia" class="form-check-input" type="radio" id="cong_khai"
+                                           value="1" checked onchange="toggleForm()" />
+                                    <label class="form-check-label" for="cong_khai">Công khai</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input asp-for="kieu_giam_gia" class="form-check-input" type="radio" id="ca_nhan"
+                                           value="0" onchange="toggleForm()" />
+                                    <label class="form-check-label" for="ca_nhan">Cá nhân</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <input type="submit" value="Sửa" class="btn btn-primary" />
+                            </div>
+                        </form>
+                    }
+
+                </div>
+            </div>
+        </div>
+        <div>
+            <a asp-action="Index">Back to List</a>
+        </div>
+    </body1>
+
+
+
+
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+    }

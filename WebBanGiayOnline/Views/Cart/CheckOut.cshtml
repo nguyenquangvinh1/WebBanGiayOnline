@@ -1,0 +1,626 @@
+﻿@model IEnumerable<WebBanGiay.Models.ViewModel.CartItem>
+@{
+   var pattern = @"^[^\s@]+@[^\s@]+\.[^\s@]+$";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Adidas_Shop Website</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="~/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+    <link href="~/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="~/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="~/css/style.css" rel="stylesheet">
+
+    <style>
+        .container-fluid.page-header {
+            background-image: url(/coloshop-master/images/anhdep1.jpg); 
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Spinner Start -->
+
+    <!-- Spinner End -->
+    <!-- Navbar start -->
+    <div class="container-fluid fixed-top">
+        <div class="container topbar bg-primary d-none d-lg-block">
+            <div class="d-flex justify-content-between">
+                <div class="top-info ps-2">
+                    <small class="me-3"><i class="fas fa-map-marker-alt me-2 text-secondary"></i> <a href="#" class="text-white">Số 28 Trung Văn,Nam Từ Liêm ,Hà Nội</a></small>
+                    <small class="me-3"><i class="fas fa-envelope me-2 text-secondary"></i><a href="#" class="text-white">vinhnq041003@gmail.com</a></small>
+                </div>
+                <div class="top-link pe-2">
+                    <a href="#" class="text-white"><small class="text-white mx-2">Chính sách bảo mật</small>/</a>
+                    <a href="#" class="text-white"><small class="text-white mx-2">Điểu khoản sử dung</small>/</a>
+                    <a href="#" class="text-white"><small class="text-white ms-2">Bán hàng và hoàn tiền</small></a>
+                </div>
+            </div>
+        </div>
+        <div class="container px-0">
+            <nav class="navbar navbar-light bg-white navbar-expand-xl">
+                <a asp-controller="San_Pham_Chi_Tiet" asp-action="Index" class="navbar-brand"><h1 class="text-primary display-6">Adidas Shop</h1></a>
+                <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                    <span class="fa fa-bars text-primary"></span>
+                </button>
+                <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
+                    <div class="navbar-nav mx-auto">
+                        <a href="https://localhost:7243" class="nav-item nav-link">Trang chủ</a>
+                        <a asp-controller="San_Pham_Chi_Tiet" asp-action="Index" class="nav-item nav-link active">Cửa hàng</a>
+
+                        <a class="nav-item nav-link active">Tra cứu</a>
+
+                        <a href="contact.html" class="nav-item nav-link">Liên hệ</a>
+                    </div>
+                    <div class="d-flex m-3 me-0">
+                        <button class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fas fa-search text-primary"></i></button>
+                        @await Component.InvokeAsync("Cart")
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <div class="dropdown my-auto">
+                                <a class="dropdown-toggle text-dark" data-bs-toggle="dropdown">
+                                    <i class="fas fa-user fa-2x"></i> @User.Identity.Name
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" asp-controller="TaiKhoan" asp-action="Logout">Đăng xuất</a></li>
+                                    <li><a class="dropdown-item" asp-controller="TaiKhoan" asp-action="ThongTinKhachHang">Thông tin</a></li>
+
+                                </ul>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="dropdown my-auto">
+                                <a class="dropdown-toggle text-dark" data-bs-toggle="dropdown">
+                                    <i class="fas fa-user fa-2x"></i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" asp-controller="TaiKhoan" asp-action="Login">Đăng nhập</a></li>
+                                    <li><a class="dropdown-item" asp-controller="TaiKhoan" asp-action="Register">Đăng ký</a></li>
+                                </ul>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <!-- Navbar End -->
+    <!-- Modal Search Start -->
+    <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content rounded-0">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Search by keyword</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body d-flex align-items-center">
+                    <div class="input-group w-75 mx-auto d-flex">
+                        <input type="search" class="form-control p-3" placeholder="keywords" aria-describedby="search-icon-1">
+                        <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Search End -->
+    <!-- Single Page Header start -->
+    <div class="container-fluid page-header py-5">
+        <h1 class="text-center text-white display-6">Checkout</h1>
+        <ol class="breadcrumb justify-content-center mb-0">
+            <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="#">Gỉo hàng</a></li>
+            <li class="breadcrumb-item active text-white">Thanh toán</li>
+        </ol>
+    </div>
+    <!-- Single Page Header End -->
+    <!-- Checkout Page Start -->
+    <div class="container-fluid py-5">
+        <div class="container py-5">
+            <h1 class="mb-4">Thanh toán</h1>
+            
+            <form asp-action="Checkout" asp-controller="Cart" >
+                <div class="row g-5">
+                    <div class="col-md-12 col-lg-6 col-xl-7">
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            <div class="form-check my-3">
+                                <input type="checkbox" name="GiongKhachHang" class="form-check-input" id="GiongKhachHang" value="false">
+                                <label class="form-check-label" for="GiongKhachHang">Lấy thông tin khách hàng?</label>
+                            </div>
+                        }
+                        <div class="form-item delivery-info">
+                            <label class="form-label my-2">Người nhận hàng<sup>*</sup></label>
+                            <input name="TenKhachHang" class="form-control">
+                         
+                           
+
+                            
+                        </div>
+                        <div class="form-item delivery-info">
+                            <label class="form-label my-2">Email<sup>*</sup></label>
+                            <input type="@pattern" name="Email" class="form-control">
+                          
+                        </div>
+                     
+
+                        <div class="form-item my-3" onchange="calculateFee()">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label>* Tỉnh/Thành phố</label>
+                                    <select class="form-control mt-2" id="tinh" name="tinh">
+                                        <option value="">Chọn tỉnh/thành phố</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label>* Quận/Huyện</label>
+                                    <select class="form-control mt-2" id="huyen" name="huyen">
+                                        <option value="">Chọn quận/huyện</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label>* Xã/Phường</label>
+                                    <select class="form-control mt-2" id="xa" name="xa">
+                                        <option value="">Chọn xã/phường</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-item delivery-info">
+                            <label class="form-label my-2">Địa chỉ chi tiết<sup>*</sup></label>
+                            <input name="fulldiachi" class="form-control">
+
+                        </div>
+
+                        <div class="form-item delivery-info">
+                            <label class="form-label my-2">Điện thoại<sup>*</sup></label>
+                            <input name="Sdt" class="form-control">
+                            <span id="phoneError" style="color: red; font-size: 14px;"></span>
+                           
+                        </div>
+                        <div class="form-item mt-4">
+                            <textarea name="GhiChu" class="form-control" spellcheck="false" cols="30" rows="11" placeholder="Ghi chú"></textarea>
+                        </div>
+
+                        <input type="submit" name="payment" class="btn border-secondary text-uppercase text-primary w-100 mt-2" value="Thanh toán khi nhận hàng">
+                        <button asp-action="PayMent" asp-controller="Cart" class="btn border-secondary text-uppercase text-primary w-100 mt-2">Thanh Toán với VNPAY</button>
+                        <button asp-action="PaymentMoMo" asp-controller="Cart" class="btn border-secondary text-uppercase text-primary w-100 mt-2">Thanh Toán với MoMo</button>
+                    </div>
+
+                    <div class="col-md-12 col-lg-6 col-xl-5">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Ảnh</th>
+                                        <th scope="col">Tên</th>
+                                        <th scope="col">Giá</th>
+                                        <th scope="col">Số lượng</th>
+                                        <th scope="col">Tổng tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <th scope="row">
+                                                <div class="d-flex align-items-center mt-2">
+                                                    <img src="@item.Hinh" class="img-fluid rounded-circle" style="width: 90px, height: 90px; " >
+                                                </div>
+                                            </th>
+                                            <td class="py-5">@item.TenHH</td>
+                                            <td class="py-5">@item.DonGia.ToString("#,##0 VNĐ")</td>
+                                            <td class="py-5">@item.SoLuong</td>
+                                            <td class="py-5">@item.ThanhTien.ToString("#,##0 VNĐ")</td>
+                                        </tr>
+                                    }
+                                    
+
+                                    <tr>
+                                        <td colspan="4">Phí vận chuyển :</td>
+                                        <td>  <img src="~/coloshop-master/images/tải xuống.png" class="img-fluid" alt="" style="width: 30px; height: 30px; object-fit: contain;"> <a id="fee"></a> 0VN </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">Tổng Tiền :</td>
+                                        <td id="totalWithFee">
+                                            @(Model.Sum(p => p.ThanhTienGG) > 0
+                                                ? Model.Sum(p => p.ThanhTienGG).ToString("#,##0 VNĐ")
+                                                : Model.Sum(p => p.ThanhTien).ToString("#,##0 VNĐ"))
+                                        </td>
+                                    </tr>
+
+
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Checkout Page End -->
+    <!-- Footer Start -->
+    <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
+
+        <div class="container py-5">
+            <div class="pb-4 mb-4" style="border-bottom: 1px solid rgba(226, 175, 24, 0.5) ;">
+                <div class="row g-4">
+                    <div class="col-lg-3">
+                        <a href="#">
+                            <h1 class="text-primary mb-0">Fruitables</h1>
+                            <p class="text-secondary mb-0">Fresh products</p>
+                        </a>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="position-relative mx-auto">
+                            <input class="form-control border-0 w-100 py-3 px-4 rounded-pill" type="number" placeholder="Your Email">
+                            <button type="submit" class="btn btn-primary border-0 border-secondary py-3 px-4 position-absolute rounded-pill text-white" style="top: 0; right: 0;">Subscribe Now</button>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="d-flex justify-content-end pt-3">
+                            <a class="btn  btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i class="fab fa-twitter"></i></a>
+                            <a class="btn btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i class="fab fa-facebook-f"></i></a>
+                            <a class="btn btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i class="fab fa-youtube"></i></a>
+                            <a class="btn btn-outline-secondary btn-md-square rounded-circle" href=""><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-5">
+                <div class="col-lg-3 col-md-6">
+                    <div class="footer-item">
+                        <h4 class="text-light mb-3">Why People Like us!</h4>
+                        <p class="mb-4">
+                            typesetting, remaining essentially unchanged. It was
+                            popularised in the 1960s with the like Aldus PageMaker including of Lorem Ipsum.
+                        </p>
+                        <a href="" class="btn border-secondary py-2 px-4 rounded-pill text-primary">Read More</a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="d-flex flex-column text-start footer-item">
+                        <h4 class="text-light mb-3">Shop Info</h4>
+                        <a class="btn-link" href="">About Us</a>
+                        <a class="btn-link" href="">Contact Us</a>
+                        <a class="btn-link" href="">Privacy Policy</a>
+                        <a class="btn-link" href="">Terms & Condition</a>
+                        <a class="btn-link" href="">Return Policy</a>
+                        <a class="btn-link" href="">FAQs & Help</a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="d-flex flex-column text-start footer-item">
+                        <h4 class="text-light mb-3">Account</h4>
+                        <a class="btn-link" href="">My Account</a>
+                        <a class="btn-link" href="">Shop details</a>
+                        <a class="btn-link" href="">Shopping Cart</a>
+                        <a class="btn-link" href="">Wishlist</a>
+                        <a class="btn-link" href="">Order History</a>
+                        <a class="btn-link" href="">International Orders</a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="footer-item">
+                        <h4 class="text-light mb-3">Contact</h4>
+                        <p>Address: 1429 Netus Rd, NY 48247</p>
+                        <p>Email: Example@gmail.com</p>
+                        <p>Phone: +0123 4567 8910</p>
+                        <p>Payment Accepted</p>
+                        <img src="~/img/payment.png" class="img-fluid" alt="">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer End -->
+    <!-- Copyright Start -->
+    <div class="container-fluid copyright bg-dark py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    <span class="text-light"><a href="#"><i class="fas fa-copyright text-light me-2"></i>Your Site Name</a>, All right reserved.</span>
+                </div>
+                <div class="col-md-6 my-auto text-center text-md-end text-white">
+                    <!--/*** This template is free as long as you keep the below author’s credit link/attribution link/backlink. ***/-->
+                    <!--/*** If you'd like to use the template without the below author’s credit link/attribution link/backlink, ***/-->
+                    <!--/*** you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". ***/-->
+                    Designed By <a class="border-bottom" href="https://htmlcodex.com">HTML Codex</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Copyright End -->
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i class="fa fa-arrow-up"></i></a>
+
+
+    <!-- JavaScript Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/easing/easing.min.js"></script>
+    <script src="~/lib/waypoints/waypoints.min.js"></script>
+    <script src="~/lib/lightbox/js/lightbox.min.js"></script>
+    <script src="~/lib/owlcarousel/owl.carousel.min.js"></script>
+                 
+    <!-- Template~/ Javascript -->
+    <script src="~/js/main.js"></script>
+</body>
+</html>
+@section Scripts {
+    <script>
+
+
+              document.addEventListener("DOMContentLoaded", function () {
+            let tenKhachHangInput = document.querySelector("input[name='TenKhachHang']");
+            if (tenKhachHangInput) {
+                tenKhachHangInput.addEventListener("blur", function () {
+                    if (this.value.trim() === "") {
+                        alert("Tên khách hàng không được để trống!");
+                        setTimeout(() => { this.focus(); }, 3);
+                    }
+                });
+            }
+
+            let phoneInput = document.querySelector("input[name='Sdt']");
+            if (phoneInput) {
+                phoneInput.addEventListener("blur", function () {
+                    let phonePattern = /^[0-9]{10,11}$/;
+                    let errorSpan = document.getElementById("phoneError");
+
+                    if (!phonePattern.test(this.value.trim())) {
+                        errorSpan.textContent = "Số điện thoại không hợp lệ! (10-11 số)";
+                    } else {
+                        errorSpan.textContent = "";
+                    }
+                });
+            }
+        });
+
+
+        const stripPrefix = str => str?.replace(/^Tỉnh\s+|^Thành phố\s+/i, '').trim();
+        const userClaims = {
+            name: '@User.FindFirst("name")?.Value',
+            email: '@User.FindFirst("email")?.Value',
+            phone: '@User.FindFirst("SDT")?.Value',
+            province: stripPrefix(@Html.Raw(Json.Serialize(User.FindFirst("province")?.Value))),
+            district: @Html.Raw(Json.Serialize(User.FindFirst("district")?.Value)),
+            ward: stripPrefix(@Html.Raw(Json.Serialize(User.FindFirst("ward")?.Value))),
+            address: '@User.FindFirst("address")?.Value'
+
+
+        };
+        console.log(userClaims);
+        // Gọi hàm khi trang tải
+        $(document).ready(function () {
+           
+            loadProvinces();
+        });
+
+              function calculateFee() {
+            var provinceId = $("#tinh").val();
+            var districtId = $("#huyen").val();
+            var wardCode = $("#xa").val();
+
+            let subtotal =  @(Model.Sum(p => p.ThanhTienGG) > 0
+                                ? Model.Sum(p => p.ThanhTienGG)
+                                : Model.Sum(p => p.ThanhTien));
+            if (provinceId =="" && districtId == "" && wardCode == "") {
+                alert("Vui lòng chọn đầy đủ địa chỉ.");
+                return;
+            }
+
+           var requestData = {
+        from_district_id: 3440,
+        from_ward_code: "13009",
+        service_id: 53320,
+        service_type_id: null,
+        to_district_id: parseInt(districtId),
+        to_ward_code: wardCode,
+        height: 50,
+        length: 20,
+        weight: 200,
+        width: 20,
+        provinceId: provinceId,
+        subtotal: subtotal,
+        insurance_value: 10000,
+        cod_failed_amount: 2000,
+        coupon: null,
+       
+
+            };
+     
+            console.log("Gửi dữ liệu:", requestData);
+
+            $.ajax({
+                url: '@Url.Action("GetShippingFee", "Cart")',
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(requestData),
+                dataType: "json",
+                success: function(response) {
+
+                    if(provinceId !=  201){
+                         
+                        response.ship = 50000;
+                    }
+                    if(subtotal > 2000000)
+                   {
+                       response.ship = 0;
+                   }
+                     let total = response.ship + subtotal;
+                    console.log("Nhận phản hồi:", response); 
+                    if (response.success) {
+                        $("#fee").text(response.ship.toLocaleString() + " VNĐ");
+                        $("#totalWithFee").text( total.toLocaleString() + " VNĐ");
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr) {
+                    console.error("Lỗi chi tiết:", xhr.responseText);
+                    alert("Có lỗi xảy ra khi tính phí vận chuyển.");
+                }
+            });
+        }
+
+       
+
+        // Load danh sách tỉnh/huyện/xã
+       
+                   function loadProvinces() {
+            $.ajax({
+                url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/province",
+                type: "GET",
+                headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
+                success: function (response) {
+                    var provinces = response.data;
+                    $("#tinh").empty().append('<option value="">Chọn Tỉnh/Thành phố</option>');
+                    provinces.forEach(function (province) {
+                        $("#tinh").append(`<option value="${province.ProvinceID}">${province.ProvinceName}</option>`);
+                    });
+                },
+                error: function () {
+                    alert("Lỗi khi tải danh sách tỉnh/thành phố.");
+                }
+            });
+        }
+
+
+              $("#tinh").change(function () {
+            var provinceId = $(this).val();
+            if (!provinceId) return;
+
+            $.ajax({
+                url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/district",
+                type: "GET",
+                headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
+                data: { "province_id": provinceId },
+                success: function (response) {
+                    var districts = response.data;
+                    $("#huyen").empty().append('<option value="">Chọn Quận/Huyện</option>');
+                    districts.forEach(function (district) {
+                        $("#huyen").append(`<option value="${district.DistrictID}">${district.DistrictName}</option>`);
+                    });
+                },
+                error: function () {
+                    alert("Lỗi khi tải danh sách quận/huyện.");
+                }
+            });
+        });
+                $("#huyen").change(function () {
+            var districtId = $(this).val();
+            if (!districtId) return;
+
+            $.ajax({
+                        url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?districtId",
+                type: "GET",
+                headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
+                data: { "district_id": districtId },
+                success: function (response) {
+                    var wards = response.data;
+                    $("#xa").empty().append('<option value="">Chọn Xã/Phường</option>');
+                    wards.forEach(function (ward) {
+                        $("#xa").append(`<option value="${ward.WardCode}">${ward.WardName}</option>`);
+                    });
+                },
+                error: function () {
+                    alert("Lỗi khi tải danh sách xã/phường.");
+                }
+            });
+        });
+
+
+
+
+
+        $('#GiongKhachHang').on('change', function () {
+            const checked = $(this).is(':checked');
+
+            if (checked) {
+                $('input[name="TenKhachHang"]').val(userClaims.name);
+                $('input[name="Email"]').val(userClaims.email);
+                $('input[name="Sdt"]').val(userClaims.phone);
+                $('input[name="fulldiachi"]').val(userClaims.address);
+
+                const cleanName = (str) => str.replace(/^Tỉnh\s+|^Thành phố\s+/i, "").trim();
+
+                const userProvince = cleanName(userClaims.province);
+                const userDistrict = userClaims.district;
+                const userWard = userClaims.ward;
+
+                // Chọn tỉnh theo text
+                $('#tinh option').each(function () {
+                    if ($(this).text().trim() === userProvince) {
+                        $('#tinh').val($(this).val()).trigger('change');
+
+                        // Delay đợi load quận/huyện
+                        setTimeout(() => {
+                            $('#huyen option').each(function () {
+                                if ($(this).text().trim() === userDistrict) {
+                                    $('#huyen').val($(this).val()).trigger('change');
+
+                                    // Delay đợi load xã/phường
+                                    setTimeout(() => {
+                                        $('#xa option').each(function () {
+                                            if ($(this).text().trim() === userWard) {
+                                                $('#xa').val($(this).val()).trigger('change');
+                                            }
+                                        });
+                                    }, 500);
+                                }
+                            });
+                        }, 500);
+                    }
+                });
+
+            } else {
+                $('input[name="TenKhachHang"]').val('');
+                $('input[name="Email"]').val('');
+                $('input[name="Sdt"]').val('');
+                $('input[name="fulldiachi"]').val('');
+                $('#tinh').val('').trigger('change');
+                $('#huyen').val('').trigger('change');
+                $('#xa').val('').trigger('change');
+            }
+        });
+
+   
+
+
+    </script>
+
+ }
+
+
+
+
+

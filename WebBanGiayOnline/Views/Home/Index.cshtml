@@ -1,8 +1,43 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿ 
+<div style="min-height:1000px;" class="hero-header">
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+	<div class="main_slider" style="background-image:url(/coloshop-master/images/anhdep.jpg)">
+		<div class="container fill_height">
+			<div class="row align-items-center fill_height">
+				<div class="col">
+					<div class="main_slider_content">
+						<h6>Spring / Summer Collection 2017</h6>
+						<h1>Get up to 30% Off New Arrivals</h1>
+						<button class="red_button shop_now_button"><a href="#">Shop now</a></button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
 </div>
+@section Scripts {
+    <script>
+		const stripPrefix = str => str?.replace(/^Tỉnh\s+|^Thành phố\s+/i, '').trim();
+
+		// Sau khi trang load
+		$(document).ready(function () {
+			const userClaims = {
+				name: '@User.FindFirst("name")?.Value',
+				email: '@User.FindFirst("email")?.Value',
+				phone: '@User.FindFirst("SDT")?.Value',
+				province: stripPrefix(@Html.Raw(Json.Serialize(User.FindFirst("province")?.Value))),
+				district: @Html.Raw(Json.Serialize(User.FindFirst("district")?.Value)),
+				ward: stripPrefix(@Html.Raw(Json.Serialize(User.FindFirst("ward")?.Value))),
+				address: '@User.FindFirst("address")?.Value'
+
+				
+			};
+
+			console.log("✅ userClaims:", userClaims);
+		});
+
+	</script>
+
+}

@@ -28,7 +28,6 @@ namespace ClssLib
         public string? hinh_anh { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int EmployeeNumber { get; set; }
         public DateTime ngay_tao { get; set; }
         public DateTime? ngay_sua { get; set; }
         [ForeignKey("Vai_Tro")]
@@ -41,9 +40,9 @@ namespace ClssLib
         public virtual ICollection<Tai_Khoan_Hoa_Don>? Tai_Khoan_Hoa_Don { get; set; }
         [JsonIgnore]
         public virtual ICollection<Phieu_Giam_Gia_Tai_Khoan>? Phieu_Giam_Gia_Tai_Khoans { get; set; }
-
         public string? ResetToken { get; set; }  // Token reset mật khẩu (có thể null)
         public DateTime? TokenExpiry { get; set; }  // Thời gian hết hạn token (có thể null)
+
 
 
     }

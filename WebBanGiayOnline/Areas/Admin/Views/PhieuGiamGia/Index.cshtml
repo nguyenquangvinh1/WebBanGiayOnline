@@ -1,38 +1,30 @@
-﻿@model IEnumerable<ClssLib.Phieu_Giam_Gia>
-
-
-<h1>Phiếu Giảm Giá</h1>
+﻿@using X.PagedList.Mvc.Core;
+@model X.PagedList.IPagedList<ClssLib.Phieu_Giam_Gia>
 
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Phiếu giảm giá";
 }
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">
-        @TempData["SuccessMessage"]
-    </div>
-}
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phiếu Giảm Giá</title>
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
-        body {
+        body1 {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 70px;
             background-color: #f4f4f4;
         }
 
-        .container {
+
+        .card {
             background: white;
             padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .page-header {
@@ -56,20 +48,11 @@
                 margin-right: 10px;
             }
 
-        .btn {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-        }
 
-            .btn:hover {
-                background-color: #0056b3;
-            }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
 
         .filter {
             display: flex;
@@ -136,7 +119,8 @@
             border-radius: 5px;
             z-index: 1;
         }
-.dropdown button {
+
+            .dropdown button {
                 display: block;
                 padding: 10px;
                 width: 100%;
@@ -149,7 +133,7 @@
                 .dropdown button:hover {
                     background-color: #f1f1f1;
                 }
-                
+
         .icon-container1 {
             position: relative;
         }
@@ -159,7 +143,7 @@
             color: #000; /* Màu của biểu tượng con mắt */
         }
 
-        .action-icons1{
+        .action-icons1 {
             display: none; /* Ẩn các biểu tượng hành động */
             margin-top: 5px;
         }
@@ -173,6 +157,7 @@
                 .action-icons1 a:hover {
                     color: #007bff; /* Thay đổi màu khi di chuột vào */
                 }
+
         .pagination {
             margin-top: 20px;
             display: flex;
@@ -189,13 +174,59 @@
                 cursor: pointer;
             }
 
-                .pagination button:hover {
-                    background-color: #007bff;
-                    color: white;
-                }
+        .badge-cong-khai {
+            color: #CC33CC;
+            background-color: #fff;
+            border: 1px solid #CC33CC;
+            border-radius: 20px;
+            padding: 4px 10px;
+            white-space: nowrap; /* Không cho xuống dòng */
+        }
+
+        .badge-ca-nhan {
+            color: #2196F3;
+            background-color: #fff;
+            border: 1px solid #2196F3;
+            border-radius: 20px;
+            padding: 4px 10px;
+            white-space: nowrap; /* Không cho xuống dòng */
+        }
+
+        .trang-thai-dang-dien-ra {
+            color: #4CAF50; /* Chữ xanh lá */
+            background-color: #fff; /* Nền trắng */
+            border: 1px solid #4CAF50; /* Viền xanh lá */
+            border-radius: 20px; /* Bo tròn kiểu pill */
+            padding: 4px 10px; /* Khoảng cách trong */
+            white-space: nowrap; /* Giữ text trên 1 dòng */
+        }
+
+        .pagination-container1 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .trang-thai-het-han {
+            color: #FF0000; /* Chữ đỏ */
+            background-color: #fff;
+            border: 1px solid #FF0000; /* Viền đỏ (nếu muốn) */
+            border-radius: 20px;
+            padding: 4px 10px;
+            white-space: nowrap;
+        }
+
+        .pagination button:hover {
+            background-color: #007bff;
+            color: white;
+        }
     </style>
     <script>
-        
+
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
@@ -205,185 +236,278 @@
                 $(this).siblings('.action-icons').toggle(); // Hiển thị hoặc ẩn các biểu tượng hành động
             });
         });
+                $("#searchInput").on("input", function () {
+            let keyword = $(this).val().trim();
+            fetch(`/Admin/NhanVien/Search?keyword=${encodeURIComponent(keyword)}`)
+                .then(response => response.json())
+                .then(data => {
+                    let tableBody = $("#nhanVienTableBody");
+                    tableBody.empty();
+
+                    data.forEach((item, index) => {
+                        // Badge hiển thị trạng thái
+                        let statusBadge = "";
+                        if (item.trang_thai == 0) {
+                            statusBadge = '<span class="badge bg-success">Hoạt động</span>';
+                        } else {
+                            statusBadge = '<span class="badge bg-danger">Không hoạt động</span>';
+                        }
     </script>
 </head>
-<body>
+<div class="page-content-wrapper">
+    <div class="container-fluid">
+        <!-- Tiêu đề trang -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="page-title-box">
+                    <div class="btn-group float-right">
+                        <ol class="breadcrumb hide-phone p-0 m-0">
+                            <li class="breadcrumb-item">
+                                <a href="#">Adidas</a>
+                            </li>
+                            <li class="breadcrumb-item active">Giảm giá</li>
+                        </ol>
+                    </div>
+                    <h4 class="page-title">Phiếu giảm giá</h4>
+                </div>
+            </div>
+        </div>
 
-    <div class="container">      
-        <div class="search-bar">
-            <input type="text" placeholder="Tìm phiếu giảm giá theo mã học viên...">
-            
-            <a asp-action="Create" class="btn">
-                <i class="fa fa-plus"></i> Thêm mới
+
+
+    </div>
+
+
+
+
+    <div class="card mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <!-- Ô tìm kiếm bên trái -->
+            <div class="col-md-4">
+                <form action="@Url.Action("Index", "PhieuGiamGia")" method="get" class="d-flex">
+                    <div class="input-group">
+                        <button type="submit" class="input-group-text">
+                            <i class="fa fa-search text-orange"></i>
+                        </button>
+                        <input type="text" name="searchString" class="form-control" placeholder="Nhập mã hoặc tên phiếu giảm giá ..." />
+                    </div>
+                </form>
+            </div>
+
+            <!-- Nút Tạo Phiếu giảm giá bên phải -->
+            <a asp-action="Create" class="btn btn-outline-secondary">
+                <i class="fas fa-plus"></i> Tạo Phiếu giảm giá
             </a>
         </div>
 
+
         <div class="filter">
-            <div class="date-input">
-                <input type="date" placeholder="Từ ngày">
-            </div>
-            <div class="date-input">
-                <input type="date" placeholder="Đến ngày">
-            </div>
-            <div class="input-group me-2">
-                <select class="form-select" name="type">
-                    <option value="">Chọn kiểu</option>
+            <div class="col-md-6">
 
-                    @if (ViewData["CurrentType"]?.ToString() == "Công khai")
-                    {
-                        <option value="Công khai" selected>Công khai</option>
-                    }
-                    else
-                    {
-                        <option value="Công khai">Công khai</option>
-                    }
-
-                    @if (ViewData["CurrentType"]?.ToString() == "Cá nhân")
-                    {
-                        <option value="Cá nhân" selected>Cá nhân</option>
-                    }
-                    else
-                    {
-                        <option value="Cá nhân">Cá nhân</option>
-                    }
-                </select>
-
-            </div>
-            <select>
-                <option value="">Loại</option>
-                <option value="giam_gia">Giảm giá</option>
-                <option value="khuyen_mai">Khuyến mãi</option>
-            </select>
-            
-            <div class="input-group me-2">
-                        <select class="form-select" name="status">
-                            <option value="">Chọn trạng thái</option>
-
-                            @if (ViewData["CurrentStatus"]?.ToString() == "true")
-                            {
-                                <option value="true" selected>Active</option>
-                            }
-                            else
-                            {
-                                <option value="true">Active</option>
-                            }
-
-                            @if (ViewData["CurrentStatus"]?.ToString() == "false")
-                            {
-                                <option value="false" selected>Inactive</option>
-                            }
-                            else
-                            {
-                                <option value="false">Inactive</option>
-                            }
-                        </select>
+                <form method="get" action="@Url.Action("Index")" class="row g-3 d-flex align-items-end">
+                    <div class="">
+                        <label for="fromDate" class="form-label fw-bold">Từ ngày:</label>
+                        <input type="date" id="fromDate" name="fromDate" class="form-control" value="Request.Query[fromDate]">
                     </div>
-            <!-- Xuất Excel -->
-            <form asp-action="ExportExcel" method="get" class="d-inline">
-                <button type="submit" class="btn btn-outline-success">
-                    <i class="fas fa-file-excel"></i>
-                </button>
-            </form>
-        </div>
+                    <div class="col-md-4">
+                        <label for="toDate" class="form-label fw-bold">Đến ngày:</label>
+                        <input type="date" id="toDate" name="toDate" class="form-control" value="Request.Query[toDate]">
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class=" input-group-text">
+                            <!-- Thay "fas fa-filter" bằng "fa fa-search text-orange" -->
+                            <i class="fa fa-filter text-orange"></i> Lọc
+                        </button>
+                    </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>STT</th>
-                    <th>Mã</th>
-                    <th>Tên</th>
-                    <th>Kiểu</th>
-                    
-                    <th>Số lượng</th>
-                    <th>Ngày bắt đầu</th>
-                    <th>Ngày kết thúc</th>
-                    <th>Trạng thái</th>
-                    <th>Hành động</th>
-                </tr>
-            </thead>
-            <tbody>
-                @{
-                    int stt = 1; // Khởi tạo biến STT
-                }
-                @foreach (var item in Model)
+
+
+                    <asp:Label ID="lblMessage" runat="server" ForeColor="Red"></asp:Label>
+
+                </form>
+                @if (!string.IsNullOrEmpty(ViewBag.ThongBao))
                 {
-                   
-                    <tr>
-                        <td>
-                            @stt <!-- Hiển thị số thứ tự và tăng biến STT -->
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.ma)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.ten_phieu_giam_gia)
-                        </td>
-                        <td>
-                            @if (item.kieu_giam_gia == 1)
-                            {
-                                @:Công khai
-                            }
-                            else if (item.kieu_giam_gia == 0)
-                            {
-                                @:Cá nhân
-                            }
-                        </td>
-                                               
-                        <td>
-                            @Html.DisplayFor(modelItem => item.so_luong)
-                        </td>
-                       
-                        <td>
-                            @Html.DisplayFor(modelItem => item.ngay_bat_dau)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.ngay_ket_thuc)
-                        </td>
-                        <td>
-                            @if (item.trang_thai == 1)
-                            {
-                                @:Còn hiệu lực
-                            }
-                            else
-                            {
-                                @:Hết hạn
-                            }
-                        </td>
-
-
-                        <td>
-                            <i class="fas fa-eye" title="Xem chi tiết"></i>
-                            
-                        
-                        </td>
-                        
-                    </tr>
-                    stt++; // Tăng biến STT sau mỗi lần lặp
+                    <p style="color: red;">@ViewBag.ThongBao</p>
                 }
-            </tbody>
-        </table>
 
-        <div class="pagination">
-            <div>
-                <label for="itemsPerPage">Hiển thị:</label>
-                <select id="itemsPerPage">
-                    <option value="5">5</option>
-                    <option value="10" selected>10</option>
-                    <option value="20">20</option>
-                </select>
-                <span>sản phẩm trên trang</span>
+
             </div>
+            <div class="input-group me-2">
+            </div>
+
+            <!-- Bộ lọc danh mục -->
+            <div class="input-group me-2">
+                <form id="filterForm" action="@Url.Action("Index", "PhieuGiamGia")" method="get">
+                    <label for="Category" class="fw-bold">Trạng thái:</label>
+                    <select name="Category" id="Category" class="form-select" onchange="document.getElementById('filterForm').submit()">
+                        <option value="">-- Chọn trạng thái --</option>
+                        @foreach (var item in ViewBag.TrangThaiList)
+                        {
+                            <option value="@item.Value" selected="@(item.Value == Context.Request.Query["Category"] ? "selected" : null)">
+                                @item.Text
+                            </option>
+                        }
+                    </select>
+                </form>
+            </div>
+
+
+        </div>
+        <form id="filterForm" action="@Url.Action("Index", "PhieuGiamGia")" method="get">
+            <table>
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Mã</th>
+                        <th>Tên</th>
+                        <th>Kiểu</th>
+                        <th>Loại</th>
+                        <th>Số lượng</th>
+                        <th>Ngày bắt đầu</th>
+                        <th>Ngày kết thúc</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int stt = (Model.PageNumber - 1) * Model.PageSize + 1;
+                        var danhSachGiamGia = Model.OrderByDescending(x => x.ngay_tao);
+                    }
+                    @foreach (var item in danhSachGiamGia)
+                    {
+
+                        <tr>
+                            <td>
+                                @stt <!-- Hiển thị số thứ tự và tăng biến STT -->
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ma)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ten_phieu_giam_gia)
+                            </td>
+                            <td>
+                                @if (item.kieu_giam_gia == 1)
+                                {
+                                    <span class="badge-cong-khai">Công khai</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-ca-nhan">Cá nhân</span>
+                                }
+                            </td>
+
+
+
+                            <td style="text-align:center;" class="text-nowrap">
+                                @if (item.loai_phieu_giam_gia == 1)
+                                {
+                                    @($"{item.gia_tri_giam}%")
+                                }
+                                else
+                                {
+                                    @($"{item.gia_tri_giam:N0} vnđ")
+                                }
+                            </td>
+
+
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.so_luong)
+                            </td>
+
+                            <td>@item.ngay_bat_dau.ToString("yyyy-MM-dd HH:mm")</td>
+
+                            <td>@item.ngay_ket_thuc.GetValueOrDefault().ToString("yyyy-MM-dd HH:mm")</td>
+
+                            <td>
+                                @if (item.trang_thai == 1)
+                                {
+                                    <span class="trang-thai-dang-dien-ra">Đang diễn ra</span>
+                                }
+                                else
+                                {
+                                    <span class="trang-thai-het-han">Hết hiệu lực</span>
+                                }
+                            </td>
+
+                            <td>
+                                <div class="btn-group btn-group-xs">
+                                    <a asp-area="Admin" asp-action="Edit" asp-route-id="@item.ID" class="btn btn-warning">
+                                        <i class="fa fa-xs fa-pen"></i>
+                                    </a>
+
+                                </div>
+
+
+
+
+                            </td>
+
+                        </tr>
+                        stt++; // Tăng biến STT sau mỗi lần lặp
+                    }
+                </tbody>
+            </table>
+        </form>
+
+        <div class="pagination-container1">
+
+            <span class="pagination-info">
+                Tổng số phiếu giảm giá: <strong>@Model.TotalItemCount</strong> |
+                Hiển thị: <strong>@Model.PageSize</strong> mục/trang
+            </span>
             <div>
-                <button>&laquo; Trước</button>
-                <button>1</button>
-                <button>2</button>
-                <button>3</button>
-                <button>Tiếp &raquo;</button>
+                @Html.PagedListPager(Model, page => Url.Action("Index", new
+                    {
+                        page,
+                        searchString = Context.Request.Query["searchString"],
+                        Category = Context.Request.Query["Category"]
+                    }),
+                         new PagedListRenderOptions
+                {
+                    LiElementClasses = new[] { "page-item" },
+                    PageClasses = new[] { "page-link" },
+                    DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+                    DisplayLinkToLastPage = PagedListDisplayMode.Always,
+                    DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+                    DisplayLinkToNextPage = PagedListDisplayMode.Always,
+                    MaximumPageNumbersToDisplay = 5
+                })
             </div>
         </div>
-    </div>
-
-</body>
 </html>
 
+</div>
 
+
+
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<script src="~/lib/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+<script src="~/js/core.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            Swal.fire({
+                toast: true,
+                position: "top-end",
+                icon: "success",
+                title: "@TempData["SuccessMessage"]",
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true
+            });
+        });
+    </script>
+}

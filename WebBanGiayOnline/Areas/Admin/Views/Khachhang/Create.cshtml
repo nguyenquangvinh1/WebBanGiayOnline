@@ -2,168 +2,139 @@
 @{
     ViewData["Title"] = "Khách Hàng";
 }
-<style>
-    /* Tạo hiệu ứng nổi cho form */
-    .row {
-        background: white; /* Màu nền sáng */
-        border-radius: 12px; /* Bo tròn góc */
-        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2); /* Hiệu ứng nổi */
 
-        margin: 40px auto; /* Căn giữa form */
-    }
+<div class="container mt-4">
+    <h4 class="mb-3">Thông Tin Khách hàng</h4>
+    <form asp-action="Create" asp-controller="Khachhang" method="post" id="Themkhachhang" enctype="multipart/form-data">
+        <div class="row">
 
-    /* Nền trang web */
-    body {
-   
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-    }
-
-    /* Viền đen cho input */
-    .form-control {
-        border: 2px solid #CCCCCC !important;
-        border-radius: 8px;
-        padding: 10px;
-    }
-
-    /* Nút lưu */
-/*     .btn-primary {
-        width: 100%;
-        padding: 12px;
-        font-size: 18px;
-        border-radius: 8px;
-        transition: 0.3s;
-    }
-
-        .btn-primary:hover {
-            background: #0056b3;
-        } */
-</style>
-
-
-<h2>Thêm Khách Hàng</h2>
-
-<form method="post" asp-action="Create">
-    <div class="row">
-        <!-- Dòng 1: User Name & Họ tên -->
-        <div class="col-md-6">
-            <div class="form-group">
-                <label for="UserName">User Name</label>
-                <input type="text" class="form-control custom-input" id="UserName" name="UserName" value="@Model.UserName" required />
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <label for="Ho_ten">Họ tên</label>
-                <input type="text" class="form-control custom-input" id="Ho_ten" name="Ho_ten" value="@Model.Ho_ten" required />
-            </div>
-        </div>
-
-@*         <div class="col-md-12">
-            <div class="form-group">
-                <label for="PhoneNumber">Mật khẩu</label>
-                <input type="text" class="form-control custom-input" id="Password" name="Password" value="@Model.PassWord" required />
-            </div>
-        </div> *@
-        <!-- Dòng 2: Số điện thoại -->
-@*         <div class="col-md-12">
-            <div class="form-group">
-                <label for="PhoneNumber">Phone Number</label>
-                <input type="text" class="form-control custom-input" id="PhoneNumber" name="PhoneNumber" value="@Model.PhoneNumber" required />
-            </div>
-        </div> *@
-        <input type="text" class="form-control custom-input" id="Makh" name="Makh" value="@Model.Makh" hidden />
-
-        <!-- Dòng 3: Email -->
-        <div class="col-md-12">
-            <div class="form-group">
-                <label for="Email">Email</label>
-                <input type="email" class="form-control custom-input" id="Email" name="Email" value="@Model.Email" required />
-            </div>
-        </div>
-
-        <!-- Dòng 4: Căn cước & Số điện thoại -->
-        <div class="col-md-6">
-            <div class="form-group">
-                <label for="CCCD">Căn Cước</label>
-                <input type="text" class="form-control custom-input" id="CCCD" name="CCCD" value="@Model.CCCD" required />
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <label for="PhoneNumber">Phone Number</label>
-                <input type="text" class="form-control custom-input" id="PhoneNumber" name="PhoneNumber" value="@Model.PhoneNumber" required />
-            </div>
-        </div>
-
-        <!-- Dòng 5: Ngày sinh & Giới tính -->
-        <div class="col-md-6">
-            <div class="form-group">
-                <label for="DateOfBirth">Date of Birth</label>
-                <input type="date" class="form-control custom-input" id="DateOfBirth" name="DateOfBirth" value="@Model.DateOfBirth.ToString("yyyy-MM-dd")" required />
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <label>Gender</label>
-                <div class="gender-group">
-                    <input type="radio" id="Male" name="Gender" value="1" @(Model.Gender == 1 ? "checked" : "") />
-                    <label for="Male">Nam</label>
-                    <input type="radio" id="Female" name="Gender" value="0" @(Model.Gender == 0 ? "checked" : "") />
-                    <label for="Female">Nữ</label>
+            <!-- Cột phải: Các trường nhập liệu -->
+            <div class="col-md-9">
+                <!-- Row 1: Tên nhân viên - Username -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>* Tên Khách hàng</label>
+                        <input type="text" class="form-control" asp-for="Ho_ten" placeholder="Nhập tên nhân viên" />
+                        <span asp-validation-for="Ho_ten" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>* Username</label>
+                        <input type="text" class="form-control" asp-for="UserName" placeholder="Nhập username" />
+                        <span asp-validation-for="UserName" class="text-danger"></span>
+                    </div>
                 </div>
+
+                <!-- Row 2: Số CCCD - Ngày sinh -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>* Số CCCD</label>
+                        <input type="text" class="form-control" asp-for="CCCD" placeholder="Nhập số CCCD" />
+                        <span asp-validation-for="CCCD" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>* Ngày sinh</label>
+                        <input type="date" class="form-control" asp-for="DateOfBirth" />
+                        <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Row 3: Email - Số điện thoại -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>* Email</label>
+                        <input type="email" class="form-control" asp-for="Email" placeholder="Nhập email" />
+
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>* Số điện thoại</label>
+                        <input type="text" class="form-control" asp-for="PhoneNumber" placeholder="Nhập số điện thoại" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Row 4: Tỉnh/Thành phố - Quận/Huyện - Xã/Phường -->
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label>* Tỉnh/Thành phố</label>
+                        <select class="form-control" id="tinh" name="tinh">
+                            <option value="">Chọn tỉnh/thành phố</option>
+                        </select>
+                        <span asp-validation-for="tinh" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>* Quận/Huyện</label>
+                        <select class="form-control" id="huyen" name="huyen">
+                            <option value="">Chọn quận/huyện</option>
+                        </select>
+                        <span asp-validation-for="huyen" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>* Xã/Phường</label>
+                        <select class="form-control" id="xa" name="xa">
+                            <option value="">Chọn xã/phường</option>
+                        </select>
+                        <span asp-validation-for="xa" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Row 5: Giới tính -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>* Giới tính</label>
+                        <div class="d-flex align-items-center">
+                            <div class="form-check me-3">
+                                <input class="form-check-input" type="radio" id="Male" asp-for="Gender" value="1" />
+                                <label class="form-check-label" for="Male">Nam</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="Female" asp-for="Gender" value="0" />
+                                <label class="form-check-label" for="Female">Nữ</label>
+                            </div>
+                        </div>
+                        <span asp-validation-for="Gender" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>* Địa chỉ chi tiết</label>
+                        <input type="text" class="form-control" asp-for="dia_chi" placeholder="Nhập địa chỉ chi tiết (số nhà, đường phố,...)" />
+                        <span asp-validation-for="dia_chi" class="text-danger"></span>
+
+
+                    </div>
+                </div>
+
+                <!-- Nút Thêm Mới -->
+                <button type="submit" class="btn btn-primary  mt-3" id="saveKH">Thêm Mới</button>
             </div>
         </div>
-
-        <!-- Dòng 6: Thành phố - Huyện - Xã -->
-        <div class="col-md-4">
-            <div class="form-group">
-                <label for="tinh">Thành phố</label>
-                <select class="form-control custom-input" id="tinh" name="tinh">
-                    <option value="">Chọn thành phố</option>
-                </select>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="form-group">
-                <label for="huyen">Huyện</label>
-                <select class="form-control custom-input" id="huyen" name="huyen">
-                    <option value="">Chọn huyện</option>
-                </select>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="form-group">
-                <label for="xa">Xã</label>
-                <select class="form-control custom-input" id="xa" name="xa">
-                    <option value="">Chọn xã</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Dòng 7: Địa chỉ -->
-        <div class="col-md-12">
-            <div class="form-group">
-                <label for="dia_chi">Address</label>
-                <input type="text" class="form-control custom-input" id="dia_chi" name="dia_chi" value="@Model.dia_chi" required />
-            </div>
-        </div>
-    </div>
-
-    <div class="form-group text-center mt-3">
-        <input type="submit" value="Save" class="btn btn-primary" />
-    </div>
-
-</form>
-
-<div>
-    <a asp-action="Index">Back to List</a>
+    </form>
 </div>
- 
+
 @section Scripts {
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#Themkhachhang").on("submit", function (event) {
+                event.preventDefault();
+                Swal.fire({
+                    title: "Xác nhận",
+                    text: "Bạn có chắc chắn muốn thêm khách hàng này?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Có",
+                    cancelButtonText: "Hủy"
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        event.target.submit();
+                    }
+                });
+            });
+        });
+
+    </script>
     <script>
         $(document).ready(function () {
             // Load danh sách tỉnh

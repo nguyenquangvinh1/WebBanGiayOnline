@@ -6,168 +6,197 @@
 	Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
+<style>
+	.border-box-wrapper {
+		border: 1px solid #ddd;
+		border-radius: 8px;
+		padding: 20px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+		background-color: #fff;
+		#datatable-buttons th
+
+	{
+		text-align: center;
+		vertical-align: middle;
+	}
+
+	.pagination-container {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 12px;
+		border-top: 1px solid #eee;
+		font-family: Arial, sans-serif;
+		font-size: 14px;
+	}
+
+	.pagination-info {
+		color: #333;
+	}
+
+	.pagination-buttons {
+		display: flex;
+		gap: 4px;
+	}
+
+	.page-btn {
+		padding: 4px 10px;
+		border: 1px solid #ccc;
+		background-color: white;
+		color: #333;
+		text-decoration: none;
+		border-radius: 4px;
+		transition: background-color 0.2s;
+	}
+
+		.page-btn:hover {
+			background-color: #f0f0f0;
+		}
+
+</style>
 <div class="page-content-wrapper">
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-sm-12">
 				<div class="page-title-box">
-					<div class="btn-group float-right">
-					
-					</div>
-					<h4 class="page-title">Khách Hàng</h4>
+					<div class="btn-group float-right"></div>
+					<h4 class="page-title"> Quản lý khách hàng</h4>
 				</div>
 			</div>
 		</div>
+
 		<nav>
 			<div class="nav nav-tabs" id="nav-tab" role="tablist">
-				<!-- <a href="javascript:(0);" class="nav-link" data-toggle="tab" data-target="#edit" type="button"
-					role="tab" aria-selected="false">Thêm Khách hàng</a>
-				<a href="javascript:(0);" class="nav-link active" data-toggle="tab" data-target="#list" type="button"
-					role="tab" aria-selected="true">Danh Sách Khách hàng</a> -->
+				<!-- Tabs (bị ẩn) -->
 			</div>
 		</nav>
+
 		<div class="row mx-0 bg-white" ng-if="items">
 			<div class="col-12 py-3">
-				<div class="container-fluid py-3">
-					<div class="row align-items-center">
-						<!-- Ô tìm kiếm bên trái -->
-						<div class="col-md-4 d-flex align-items-center">
-							<div class="input-group" style="max-width: 300px;">
-								<span class="input-group-text">
-									<i class="fas fa-search text-orange"></i>
-								</span>
-								<input type="text" class="form-control" placeholder="Tên hoặc SĐT hoặc Email">
+
+				<!-- BẮT ĐẦU HỘP CÓ VIỀN -->
+				<div class="border-box-wrapper p-3">
+
+					<div class="container-fluid py-3">
+						<div class="row align-items-center">
+							<!-- Ô tìm kiếm -->
+							<div class="col-md-4 d-flex align-items-center">
+								<div class="input-group" style="max-width: 300px;">
+									<span class="input-group-text">
+										<i class="fas fa-search text-orange"></i>
+									</span>
+									<input type="text" id="searchInput" class="form-control" placeholder="Tên hoặc SĐT hoặc Email">
+								</div>
+							</div>
+
+							<!-- Bộ lọc -->
+							<div class="col-md-6 d-flex align-items-center gap-3">
+								<!-- Để trống hoặc bổ sung -->
+							</div>
+
+							<!-- Nút thêm -->
+							<div class="col-md-2 text-end">
+								<a asp-action="Create" class="btn btn-outline-orange" style="border: 1px solid #e0e0e0;">
+									<i class="fas fa-plus"></i> Thêm
+								</a>
 							</div>
 						</div>
-
-						<!-- bộ lọc bên trái -->
-						<div class="col-md-6 d-flex align-items-center gap-3">
-
-@* 							<!-- nút quét cccd -->
-							<button class="btn btn-outline-primary">
-								<i class="fas fa-id-card"></i>
-							</button>
-
-							<!-- nút xuất excel -->
-							<button class="btn btn-outline-success">
-								<i class="fas fa-file-excel"></i>
-							</button>
-
-							<!-- nút tải template excel -->
-							<button class="btn btn-outline-warning">
-								<i class="fas fa-download"></i>
-							</button>
-
-							<!-- nút nhập excel -->
-							<button class="btn btn-outline-info">
-								<i class="fas fa-upload"></i>
-							</button> *@
-						</div>
-
-						<!-- Nút tạo nhân viên bên phải -->
-						<div class="col-md-2 text-end">
-							<a asp-action="Create" class="btn btn-outline-orange"
-							   style="border: 1px solid #e0e0e0;">
-								<i class="fas fa-plus"></i> Thêm 
-							</a>
-						</div>
-
 					</div>
-				</div>
 
-				<table id="datatable-buttons" class="table table-collapse table-bordered dt-responsive">
-					<thead>
-						<tr>
-							<td>STT</td>
-							<th class="d-none">ID</th> <!-- Ô ẩn cho ID -->
-							<td>Mã Khách Hàng</td>
-							<th>Tên Khách hàng</th>
-							<th>Email</th>
-							<th>SĐT</th>
-							<th>Địa chỉ </th>						
-							<th>Tùy Chỉnh</th>
-						</tr>
-					</thead>
-					<tbody>
-						@foreach (var (item, index) in Model.Select((value, i) => (value, i + 1)))
-
-						{
+					<table id="datatable-buttons" class="table table-collapse table-bordered dt-responsive">
+						<thead>
 							<tr>
-								<td>@index</td> <!-- STT tự động -->
-								<td class='d-none'>@item.Id</td>
-								<td class="align-center">@item.Makh</td>
-								<td class="align-center">@item.Ho_ten</td>
-								<td class="align-center">@item.Email</td>
-								<td class="align-center">@item.PhoneNumber</td>
-								<td class="align-center">@item.FullAddress</td>
-
-								<td class="align-center">
-									<div class="btn-group btn-group-xs">
-										<a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">
-											<i class="fa fa-xs fa-pen"></i>
-										</a>
-									</div>
-								</td>
+								<td>STT</td>
+								<th class="d-none">ID</th>
+								<th>Mã Khách Hàng</th>
+								<th>Tên Khách hàng</th>
+								<th>Email</th>
+								<th>SĐT</th>
+								<th>Địa chỉ</th>
+								<th>Tùy Chỉnh</th>
 							</tr>
-						}
-					</tbody>
+						</thead>
+						<tbody>
+							@foreach (var (item, index) in Model.Select((value, i) => (value, i + 1)))
+							{
+								<tr>
+									<td>@index</td>
+									<td class='d-none'>@item.Id</td>
+									<td class="align-center">@item.Makh</td>
+									<td class="align-center">@item.Ho_ten</td>
+									<td class="align-center">@item.Email</td>
+									<td class="align-center">@item.PhoneNumber</td>
+									<td class="align-center">@item.FullAddress</td>
+									<td class="align-center">
+										<div class="btn-group btn-group-xs">
+											<a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">
+												<i class="fa fa-xs fa-pen"></i>
+											</a>
+										</div>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
 
+					@{
+						int currentPage = ViewBag.CurrentPage ?? 1;
+						int totalPages = ViewBag.TotalPages ?? 1;
+						int pageSize = ViewBag.PageSize ?? 3;
+						int totalItems = ViewBag.TotalItems ?? 0;
+					}
+					<div class="pagination-container">
+						<div class="pagination-info">
+							Tổng số nhân viên: <strong>@totalItems</strong> |
+							Hiển thị: <strong>@pageSize</strong> mục/trang
+						</div>
+						<div class="pagination-buttons">
+							<a class="page-btn" href="@Url.Action("Index", new { page = 1 })">&laquo;</a>
+							<a class="page-btn" href="@Url.Action("Index", new { page = currentPage > 1 ? currentPage - 1 : 1 })">&lsaquo;</a>
+							<a class="page-btn" href="@Url.Action("Index", new { page = currentPage < totalPages ? currentPage + 1 : totalPages })">&rsaquo;</a>
+							<a class="page-btn" href="@Url.Action("Index", new { page = totalPages })">&raquo;</a>
+						</div>
+					</div>
 
-				</table>
-				<div id="pagination" class="d-flex justify-content-end mt-3">
-					<button id="prevBtn" class="btn btn-secondary me-2" onclick="changePage(-1) " style="border: 2px solid black; color: black; background-color: transparent; font-weight: bold;">Trước</button>
-					<span id="pageNumbers" class="d-flex align-items-center">1</span>
-					<button id="nextBtn" class="btn btn-secondary ms-2" onclick="changePage(1)" style="border: 2px solid black; color: black; background-color: transparent; font-weight: bold;">Sau</button>
 				</div>
-			</div>
-		</div>
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+				<!-- KẾT THÚC HỘP CÓ VIỀN -->
 
-		<!-- <script src="/assetss/js/init.js"></script> -->
-		<div class="tab-content" id="nav-tabcontent">
-			<div class="tab-pane fade" id="edit" role="tabpanel">
-				<div ng-include="'/admin/account/_form.html'"></div>
-			</div>
-			<div class="tab-pane fade show active" id="list" role="tabpanel">
-				<div ng-include="'/admin/account/_table.html'"></div>
 			</div>
 		</div>
 	</div>
 </div>
 
-	<script>
-		document.addEventListener("DOMContentLoaded", function () {
-			let rowsPerPage = 5; // Số khách hàng trên mỗi trang
-		let table = document.getElementById("datatable-buttons").getElementsByTagName("tbody")[0];
-			let rows = table.getElementsByTagName("tr");
-			let currentPage = 1;
-			let totalPages = Math.ceil(rows.length / rowsPerPage);
 
-			function showPage(page) {
-				for (let i = 0; i < rows.length; i++) {
-					rows[i].style.display = (i >= (page - 1) * rowsPerPage && i < page * rowsPerPage) ? "" : "none";
-				}
-				document.getElementById("pageNumbers").innerText = `${page} / ${totalPages}`;
-			}
 
-			function changePage(step) {
-				let newPage = currentPage + step;
-				if (newPage >= 1 && newPage <= totalPages) {
-					currentPage = newPage;
-					showPage(currentPage);
-				}
-			}
+<script>
 
-			// Gán sự kiện cho các nút bấm
-			document.getElementById("prevBtn").addEventListener("click", function () {
-				changePage(-1);
-			});
-
-			document.getElementById("nextBtn").addEventListener("click", function () {
-				changePage(1);
-			});
-
-			// Hiển thị trang đầu tiên
-			showPage(currentPage);
+	 $(document).ready(function () {
+			// Hiển thị toast nếu có TempData["Success"]
+	@if (TempData["Success"] != null)
+	{
+		<text>
+						Swal.fire({
+							toast: true,
+							position: 'top-end',
+							icon: 'success',
+							title: '@TempData["Success"]',
+							showConfirmButton: false,
+							timer: 3000,
+							timerProgressBar: true
+						});
+		</text>
+	}
 		});
-	</script>
+
+	// Chức năng lọc dữ liệu theo Mã hoặc Tên khách hàng
+	$(document).ready(function () {
+		$("#searchInput").on("input", function () {
+			let value = $(this).val().toLowerCase().trim(); // Lấy giá trị ô input và loại bỏ khoảng trắng
+			$("#datatable-buttons tbody tr").filter(function () {
+				let name = $(this).find("td:eq(3)").text().toLowerCase(); // Cột Họ tên
+				let code = $(this).find("td:eq(2)").text().toLowerCase(); // Cột Mã khách hàng
+				$(this).toggle(name.includes(value) || code.includes(value)); // Hiển thị nếu khớp
+			});
+		});
+	});
+</script>

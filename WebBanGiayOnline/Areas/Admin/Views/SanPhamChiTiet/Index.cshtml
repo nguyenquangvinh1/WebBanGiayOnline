@@ -1,72 +1,749 @@
-﻿@model IEnumerable<ClssLib.San_Pham_Chi_Tiet>
-
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.gia)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.so_luong)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.trang_thai)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ngay_tao)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ngay_sua)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Kich_ThuocID)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Mau_SacID)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.San_PhamID)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.gia)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.so_luong)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.trang_thai)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ngay_tao)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ngay_sua)
-            </td>
-            <td>
-                    @Html.DisplayFor(modelItem => item.Kich_ThuocID)
-            </td>
-            <td>
-                    @Html.DisplayFor(modelItem => item.Mau_SacID)
-            </td>
-            <td>
-                    @Html.DisplayFor(modelItem => item.San_PhamID)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
-            </td>
-        </tr>
+﻿@using Newtonsoft.Json
+@model IEnumerable<WebBanGiay.ViewModel.San_PhamCTView>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
-    </tbody>
-</table>
+
+
+
+
+<div class="card">
+    <div class="card-header">
+        
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <label for="searchProduct">Tìm kiếm sản phẩm:</label>
+                <input type="text" id="searchProduct" class="form-control" placeholder="Nhập tên sản phẩm...">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <label for="filterChatLieu">Chất liệu:</label>
+                <select id="filterChatLieu" class="form-control filter-select">
+                    <option value="">Tất cả</option>
+                    @foreach (var item in (SelectList)ViewData["Chat_LieuID"])
+                    {
+                        <option value="@item.Value" selected="@(ViewData["SelectedChatLieu"]?.ToString() == item.Value ? "selected" : null)">
+                            @item.Text
+                        </option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+
+                <label for="filterCoGiay">Cổ giày:</label>
+                <select id="filterCoGiay" class="form-control filter-select">
+                    <option value="">Tất cả</option>
+                    @foreach (var item in (SelectList)ViewData["Co_GiayID"])
+                    {
+                        <option value="@item.Value" selected="@(ViewData["SelectedCoGiay"]?.ToString() == item.Value ? "selected" : null)">
+                            @item.Text
+                        </option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+
+                <label for="filterDanhMuc">Danh mục:</label>
+                <select id="filterDanhMuc" class="form-control filter-select">
+                    <option value="">Tất cả</option>
+                    @foreach (var item in (SelectList)ViewData["Danh_MucID"])
+                    {
+                        <option value="@item.Value" selected="@(ViewData["SelectedDanhMuc"]?.ToString() == item.Value ? "selected" : null)">
+                            @item.Text
+                        </option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+
+
+                <label for="filterDeGiay">Đế giày:</label>
+                <select id="filterDeGiay" class="form-control filter-select">
+                    <option value="">Tất cả</option>
+                    @foreach (var item in (SelectList)ViewData["De_GiayID"])
+                    {
+                        <option value="@item.Value" selected="@(ViewData["SelectedDeGiay"]?.ToString() == item.Value ? "selected" : null)">
+                            @item.Text
+                        </option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <label for="filterMuiGiay">Mũi giày:</label>
+                <select id="filterMuiGiay" class="form-control filter-select">
+                    <option value="">Tất cả</option>
+                    @foreach (var item in (SelectList)ViewData["Mui_GiayID"])
+                    {
+                        <option value="@item.Value" selected="@(ViewData["SelectedMuiGiay"]?.ToString() == item.Value ? "selected" : null)">
+                            @item.Text
+                        </option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+
+                <label for="filterKieuDang">Kiểu dáng:</label>
+                <select id="filterKieuDang" class="form-control filter-select">
+                    <option value="">Tất cả</option>
+                    @foreach (var item in (SelectList)ViewData["Kieu_DangID"])
+                    {
+                        <option value="@item.Value" selected="@(ViewData["SelectedKieuDang"]?.ToString() == item.Value ? "selected" : null)">
+                            @item.Text
+                        </option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="filterLoaiGiay">Loại giày:</label>
+                <select id="filterLoaiGiay" class="form-control filter-select">
+                    <option value="">Tất cả</option>
+                    @foreach (var item in (SelectList)ViewData["Loai_GiayID"])
+                    {
+                        <option value="@item.Value" selected="@(ViewData["SelectedLoaiGiay"]?.ToString() == item.Value ? "selected" : null)">
+                            @item.Text
+                        </option>
+                    }
+                </select>
+            </div>
+            
+        </div>
+        
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Bảng Sản Phẩm</h3>
+        <div class="card-tools">
+
+            <button type="button" class="btn btn-secondary ms-2" id="updateAll">Update All</button>
+        </div>
+    </div>
+    
+    <div class="card-body">
+
+        <table class="table table-bordered table-hover text-center" id="sanPhamTable">
+            <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" id="selectAllCheckbox" title="Cho phép sửa tất cả">
+                    </th>
+                    <th>STT</th>
+                    <th class="d-none">ID</th> <!-- Ô ẩn cho ID -->
+                    <th class="filterable">Mã:</th>
+                    <th class="filterable">Ảnh:</th>
+                    <th class="filterable">Tên Sản Phẩm:</th>
+                    <th class="filterable">Kích Thước:</th>
+                    <th class="filterable">Màu Sắc:</th>
+                    <th class="filterable">Tên kiểu dáng:</th>
+                    <th class="filterable">Tên danh mục:</th>
+                    <th class="filterable">Tên loại giày:</th>
+                    <th class="filterable">Tên mũi giày:</th>
+                    <th class="filterable">Tên cổ giày:</th>
+                    <th class="filterable">Tên đế giày:</th>
+                    <th class="filterable">Tên chất liệu:</th>
+                    <th class="filterable">Số Lượng:</th>
+                    <th class="filterable">Giá:</th>
+                    <th class="filterable">Trạng Thái:</th>
+                    <th>Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int stt = 1;
+                }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <input type="checkbox" class="row-checkbox" title="Cho phép sửa dòng này">
+                        </td>
+                        <td>@stt</td>
+                        <td class='d-none'>@item.ID</td>
+                        <td>@item.ma</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.imgUrl))
+                            {
+                                var images = JsonConvert.DeserializeObject<List<string>>(item.imgUrl);
+                                if (images != null && images.Count > 0)
+                                {
+                                    <img src="@images.First()" alt="Ảnh sản phẩm" width="80" height="80" />
+                                }
+                                else
+                                {
+                                    <span>Không có ảnh</span>
+                                }
+                            }
+                            else
+                            {
+                                <span>Không có ảnh</span>
+                            }
+                        </td>
+                        <td>@item.Ten</td>
+                        <td>@item.Kich_Thuoc</td>
+                        <td>@item.Mau_Sac</td>
+                        <td>@item.Kieu_Dang</td>
+                        <td>@item.Danh_Muc</td>
+                        <td>@item.Loai_Giay</td>
+                        <td>@item.Mui_Giay</td>
+                        <td>@item.Co_Giay</td>
+                        <td>@item.De_Giay</td>
+                        <td>@item.Chat_Lieu</td>
+                        <td>
+                            <span class="text-view">@item.so_luong</span>
+                            <input type="text" id="number" class="form-control form-control-sm so-luong-input d-none text-center quantity" style="width: 70px;" value="@item.so_luong" />
+                        </td>
+                        <td>
+                            <span class="text-view">@item.gia</span>
+                            <input type="text" id="number" class="form-control form-control-sm gia-input d-none text-center price" style="width: 90px;" value="@item.gia" />
+                        </td>
+                        <td>
+                            <span id="status-badge" class="@(item.trang_thai == 1 ? "trang-thai-dang-dien-ra" : "trang-thai-het-han")" style='width: 150px; height: 30px; line-height: 18px; white-space: nowrap;'>@(item.trang_thai == 1 ? "Hoạt động" : "Ngừng hoạt động")</span>
+                        </td>
+                        <td>
+                            <a href="#" class="btn btn-warning btn-edit"
+                               data-id="@item.ID"
+                               data-gia="@item.gia"
+                               data-kieu-dang="@item.Kieu_Dang"
+                               data-danh-muc="@item.Danh_Muc"
+                               data-loai-giay="@item.Loai_Giay"
+                               data-mui-giay="@item.Mui_Giay"
+                               data-co-giay="@item.Co_Giay"
+                               data-de-giay="@item.De_Giay"
+                               data-chat-lieu="@item.Chat_Lieu"
+                               data-so-luong="@item.so_luong"
+                               data-img-url="@item.imgUrl">
+                                <i class="fa fa-xs fa-pen"></i>
+                            </a>
+                            <a class='toggle-status btn btn-secondary' data-id='@item.ID' data-status='@item.trang_thai'><i class="fa fa-sync"></i></a>
+                        </td>
+                    </tr>
+                    stt++;
+                }
+            </tbody>
+        </table>
+
+
+
+    </div>
+</div>
+
+
+<!-- Modal chỉnh sửa sản phẩm -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Chỉnh sửa sản phẩm</h5>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <input type="hidden" id="editID">
+                    <input type="hidden" id="ImagesUpload" name="ImagesUpload">
+                    <div class="form-group">
+                        <label class="control-label">Loại Giày :</label>
+                        <select id="editLoaiGiay" name="Loai_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddLoaiGiay">
+                            <option value="">-- Nhập hoặc chọn Loại Giày --</option>
+                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Loai_GiayID)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label">Chất Liệu :</label>
+                                <select id="editChatLieu" name="Chat_LieuID" class="form-control select2" data-api="/Admin/SanPham/AddChatLieu">
+                                    <option value="">-- Nhập hoặc chọn Chất Liệu --</option>
+                                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Chat_LieuID)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+
+                            <div class="form-group">
+                                <label class="control-label">Cổ Giày :</label>
+
+                                <select id="editCoGiay" name="Co_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddCoGiay">
+                                    <option value="">-- Nhập hoặc chọn Cổ Giày --</option>
+                                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Co_GiayID)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+
+                            <div class="form-group">
+                                <label class="control-label">Danh mục :</label>
+                                <select id="editDanhMuc" name="Danh_MucID" class="form-control select2" data-api="/Admin/SanPham/AddDanhMuc">
+                                    <option value="">-- Nhập hoặc chọn Danh Mục --</option>
+                                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Danh_MucID)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label">Đế Giày :</label>
+
+                                <select id="editDeGiay" name="De_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddDeGiay">
+                                    <option value="">-- Nhập hoặc chọn Đế Giày --</option>
+                                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.De_GiayID)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+
+                            <div class="form-group">
+                                <label class="control-label">Mũi Giày :</label>
+
+                                <select id="editMuiGiay" name="Mui_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddMuiGiay">
+                                    <option value="">-- Nhập hoặc chọn Mũi Giày --</option>
+                                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Mui_GiayID)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+
+                            <div class="form-group">
+                                <label class="control-label">Kiểu Dáng :</label>
+
+                                <select id="editKieuDang" name="Kieu_DangID" class="form-control select2" data-api="/Admin/SanPham/AddKieuDang">
+                                    <option value="">-- Nhập hoặc chọn Kiểu Dáng --</option>
+                                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Kieu_DangID)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="mb-3 col-sm-6">
+                            <label for="editGia" class="form-label">Giá</label>
+                            <input type="number" class="form-control" id="editGia">
+                        </div>
+                        <div class="mb-3 col-sm-6">
+                            <label for="editSoLuong" class="form-label">Số lượng</label>
+                            <input type="number" class="form-control" id="editSoLuong">
+                        </div>
+                    </div>
+                    
+
+                    <div class="mb-3">
+                        <label class="form-label">Ảnh sản phẩm</label>
+                        <button id="themAnhVaoSanPham" >thêm ảnh vào sản phẩm</button>
+                        <div class ="d-flex flex-wrap">
+                            <div id="editImages" class="d-flex flex-wrap"></div>
+                        </div>
+                    </div>
+                    <input type="file" id="uploadProductImage" class="form-control">
+                    <div class="row" id="chonAnhSanPham">
+                        
+                    </div>
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    $(document).ready(function () {
+        let images = [];
+
+
+        $("#chonAnhSanPham").hide();
+        $("#uploadProductImage").hide();
+        if ($('#sanPhamTable').length > 0) {
+            try {
+                $("#sanPhamTable").DataTable({
+                    "paging": true,
+                    "lengthChange": false,
+                    "searching": false,
+                    "ordering": false,
+                    "info": true,
+                    "autoWidth": false,
+                    "responsive": true,
+                    language: {
+                        info: "Tổng số nhân viên: _TOTAL_ | Hiển thị từ _START_  đến _END_ ",
+                        infoEmpty: " Tổng số nhân viên: 0 | Hiển thị từ 0 đến 0 ",
+                        infoPostFix: "| Hiển thị 10 nục/trang",
+                        loadingRecords: "",
+                        zeroRecords: "Không có dữ liệu phù hợp",
+                        emptyTable: "Không có dữ liệu",
+                        paginate: {
+                            first: '<i class="fas fa-angle-double-left"></i>',
+                            previous: '<i class="fas fa-angle-left"></i>',
+                            next: '<i class="fas fa-angle-right"></i>',
+                            last: '<i class="fas fa-angle-double-right"></i>'
+                        },
+                    },
+                });
+                console.log("✅ DataTables đã khởi tạo thành công!");
+            } catch (error) {
+                console.error("❌ Lỗi khi khởi tạo DataTables:", error);
+            }
+        } else {
+            console.warn("⚠️ Không tìm thấy bảng DataTables!");
+        }
+
+        function isNumber(event) {
+            var allowed = "";
+            if (event.target.value.includes(".")) {
+                allowed = "0123456789";
+            } else {
+                allowed = "0123456789.";
+            }
+            if (!allowed.includes(event.key)) {
+                event.preventDefault();
+            }
+        }
+
+        document.getElementById('number').addEventListener('keypress', isNumber);
+
+        // Khi bấm vào nút "Thêm ảnh vào sản phẩm"
+        $(document).off("click", "#themAnhVaoSanPham").on("click", "#themAnhVaoSanPham", function (e) {
+            e.preventDefault(); // Ngăn form submit nếu trong thẻ <form>
+            // $("#chonAnhSanPham").toggle(); // Hiện/ẩn phần chọn ảnh
+            $("#uploadProductImage").toggle(); // Hiện/ẩn phần chọn ảnh
+            
+        });
+
+        // Toggle tất cả dòng
+        $('#selectAllCheckbox').on('change', function () {
+            const isChecked = $(this).is(':checked');
+            $('.row-checkbox').prop('checked', isChecked).trigger('change');
+        });
+
+        // Toggle dòng riêng
+        $(document).on('change', '.row-checkbox', function () {
+            const row = $(this).closest('tr');
+            const enabled = $(this).is(':checked');
+
+            if (enabled) {
+                row.find('.so-luong-input, .gia-input').removeClass('d-none');
+                row.find('.text-view').addClass('d-none');
+            } else {
+                row.find('.so-luong-input, .gia-input').addClass('d-none');
+                row.find('.text-view').removeClass('d-none');
+            }
+        });
+
+
+
+        window.applyFilter = function () {
+            console.log("📌 Hàm applyFilter đã chạy!");
+
+            let filters = {};
+
+            // Lấy dữ liệu từ các dropdown
+            $('select.filter-select').each(function () {
+                let id = $(this).attr('id');
+                let value = $(this).val();
+                if (value && value !== '') {
+                    let paramName = id.replace("filter", "").charAt(0).toLowerCase() + id.replace("filter", "").slice(1);
+                    filters[paramName] = value;
+                }
+            });
+
+            // Lấy dữ liệu từ ô tìm kiếm
+            let searchValue = $('#searchProduct').val().trim();
+            if (searchValue !== '') {
+                filters.tenSanPham = searchValue;
+            }
+
+            console.log("📌 Dữ liệu lọc gửi đi:", filters);
+
+            let queryString = $.param(filters);
+            console.log("🔗 URL lọc: /Admin/SanPhamChiTiet/Filter?" + queryString);
+
+            window.location.href = '/Admin/SanPhamChiTiet/Filter?' + queryString;
+        };
+
+
+
+        // Bắt sự kiện khi nhấn Enter trong ô tìm kiếm
+        $('#searchProduct').keypress(function (e) {
+            if (e.which === 13) { // 13 = Enter key
+                e.preventDefault();
+                applyFilter();
+            }
+        });
+
+        // Bắt sự kiện khi thay đổi giá trị của select box
+        $('select.filter-select').change(function () {
+            applyFilter();
+        });
+
+
+
+
+
+        $(document).on('click', '.toggle-status', function () {
+    let button = $(this);
+    let id = button.data("id");
+    let currentStatus = button.data("status");
+    let newStatus = currentStatus === 1 ? 0 : 1;
+
+    let row = button.closest('tr'); // lấy dòng hiện tại
+    let badge = row.find('#status-badge'); // chỉ badge trong dòng này
+
+    $.ajax({
+        url: '/Admin/SanPhamChiTiet/ChangeStatus',
+        type: 'POST',
+        data: { id: id, trang_thai: newStatus },
+        success: function () {
+            button.data("status", newStatus);
+            badge
+                .toggleClass('trang-thai-dang-dien-ra trang-thai-het-han')
+                .text(newStatus === 1 ? 'Hoạt động' : 'Ngừng hoạt động');
+        },
+        error: function (xhr, status, error) {
+            console.error("❌ AJAX error:", status, error);
+            alert("Có lỗi xảy ra khi thay đổi trạng thái.");
+        },
+        complete: function () {
+            console.log("✅ Yêu cầu thay đổi trạng thái hoàn tất.");
+        }
+    });
+});
+
+
+        $('.btn-edit').click(function () {
+            let id = $(this).data('id');
+            let gia = $(this).data('gia');
+            let soLuong = $(this).data('so-luong');
+            let imgUrl = $(this).data('img-url');
+
+            $('#editID').val(id);
+            $('#editGia').val(gia);
+            $('#editSoLuong').val(soLuong);
+
+            // Map giữa data-* và id của select
+            const selects = {
+                "kieu-dang": "#editKieuDang",
+                "danh-muc": "#editDanhMuc",
+                "loai-giay": "#editLoaiGiay",
+                "mui-giay": "#editMuiGiay",
+                "co-giay": "#editCoGiay",
+                "de-giay": "#editDeGiay",
+                "chat-lieu": "#editChatLieu"
+            };
+
+            Object.entries(selects).forEach(([key, selector]) => {
+                const value = $(this).data(key);
+                const select = $(selector);
+
+                if (value && select.length) {
+                    select.find('option').each(function () {
+                        if ($(this).text().trim() === value.toString().trim()) {
+                            $(this).prop('selected', true);
+                            select.trigger('change'); // Cho select2 cập nhật
+                        }
+                    });
+                }
+            });
+
+            // Xử lý hiển thị ảnh
+            $('#editImages').empty();
+            if (typeof imgUrl !== "string") imgUrl = String(imgUrl);
+
+            if (imgUrl && imgUrl.trim() !== "") {
+                try {
+                    if (imgUrl.trim().startsWith("[") && imgUrl.trim().endsWith("]")) {
+                        images = JSON.parse(imgUrl);
+                    } else if (imgUrl.includes(",")) {
+                        images = imgUrl.split(",").map(url => url.trim());
+                    } else {
+                        images = [imgUrl.trim()];
+                    }
+                } catch (e) {
+                    console.error("❌ Lỗi parse JSON imgUrl:", e);
+                }
+
+                if (images.length > 0) {
+                    images.forEach(url => {
+                        $('#editImages').append(`
+                        <div>
+                        <img src="${url}" class="m-1 border rounded" width="80" height="80">
+                            </div>
+                        `);
+                    });
+                } else {
+                    $('#editImages').append("<p>Không có ảnh</p>");
+                }
+            } else {
+                $('#editImages').append("<p>Không có ảnh</p>");
+            }
+
+            // Lấy ảnh thêm (AJAX)
+            $.ajax({
+                url: '/Admin/SanPhamChiTiet/GetProductImages',
+                type: "GET",
+                data: { id: id },
+                success: function (imageUrls) {
+                    $('#chonAnhSanPham').empty();
+
+                    if (Array.isArray(imageUrls) && imageUrls.length > 0) {
+                        $('#editAnhSanPham').val(imageUrls.join(","));
+                        imageUrls.forEach(url => {
+                            $('#chonAnhSanPham').append(`
+                                <div class="col-md-3 mt-2">
+                                <img src="${url}" class="border rounded" width="80" height="80">
+                            </div>
+                        `);
+                        });
+                    } else {
+                        $('#editAnhSanPham').val("");
+                        $('#chonAnhSanPham').append("<p>Không có ảnh</p>");
+                    }
+                },
+                error: function (xhr) {
+                    console.error("❌ Lỗi khi lấy ảnh sản phẩm! Status:", xhr.status, xhr.statusText);
+                }
+            });
+
+            $('#editModal').modal('show');
+        });
+
+
+        // Xử lý submit form cập nhật sản phẩm
+        $('#editForm').submit(function (e) {
+            e.preventDefault();
+
+            let data = {
+                ID: $('#editID').val(),
+                gia: $('#editGia').val(),
+                so_luong: $('#editSoLuong').val(),
+                imgUrl: $('#ImagesUpload').val(),
+                Loai_Giay: $('#editLoaiGiay option:selected').text(),
+                Chat_Lieu: $('#editChatLieu option:selected').text(),
+                Co_Giay: $('#editCoGiay option:selected').text(),
+                Danh_Muc: $('#editDanhMuc option:selected').text(),
+                De_Giay: $('#editDeGiay option:selected').text(),
+                Mui_Giay: $('#editMuiGiay option:selected').text(),
+                Kieu_Dang: $('#editKieuDang option:selected').text(),
+            };
+
+            $.ajax({
+                url: '/Admin/SanPhamChiTiet/UpdateSpct',
+                type: 'POST',
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                success: function (response) {
+                    alert("Cập nhật thành công!");
+                    location.reload(); // Refresh trang sau khi cập nhật
+                },
+                error: function () {
+                    alert("Lỗi khi cập nhật!");
+                }
+            });
+        });
+
+        // Nút cập nhật tất cả
+        $("#updateAll").on("click", function () {
+            let updatedData = [];
+
+            $("#sanPhamTable tbody tr").each(function () {
+                let row = $(this);
+                let quantity = $(this).find(".quantity").val();
+                let price = $(this).find(".price").val();
+                let id = $(this).find("td:nth-child(3)").text(); // Lấy ID từ ô ẩn
+                if (quantity > 0) {
+                    let item = {
+                        ID: id,
+                        gia: price,
+                        so_luong: quantity
+                    };
+                    updatedData.push(item);
+                }
+
+
+            });
+
+            $.ajax({
+                url: "/Admin/SanPhamChiTiet/UpdateSPCTALL",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(updatedData),
+                success: function (response) {
+                    alert("Cập nhật thành công!");
+                },
+                error: function (xhr, status, error) {
+                    alert("Cập nhật thất bại: " + error);
+                }
+            });
+        });
+        
+        $("#uploadProductImage").change(function () {
+            let fileInput = this;
+            let formData = new FormData();
+            let id = $('#editID').val();
+            let file = fileInput.files[0];
+
+            if (!file) return;
+
+            formData.append("id", id);       // Thêm ID vào FormData
+            formData.append("file", file);   // Thêm file vào FormData
+
+            $.ajax({
+                url: "/Admin/SanPhamChiTiet/UploadImage",
+                type: "POST",
+                data: formData,               // Gửi trực tiếp FormData
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success) {
+                        images.push(response.filePath);
+                        $("#editImages").append(`
+                        <div class="col-md-3 mt-2">
+                                <img src="${response.filePath}" class="m-1 border rounded" width="80" height="80">
+                        </div>
+                    `);
+                        $("#chonAnhSanPham").append(`
+                        <div class="col-md-3 mt-2">
+                            <img src="${response.filePath}" class="img-thumbnail" width="100">
+                        </div>
+                    `);
+                        $("#ImagesUpload").val(JSON.stringify(images));
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    alert("⚠️ Có lỗi xảy ra khi tải ảnh!");
+                }
+            });
+        });
+
+    });
+</script>

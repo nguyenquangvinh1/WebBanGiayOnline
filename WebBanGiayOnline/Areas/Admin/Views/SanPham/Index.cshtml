@@ -1,199 +1,174 @@
-﻿@model IEnumerable<ClssLib.San_Pham>
+﻿@using WebBanGiay.ViewModel
+@model IEnumerable<San_PhamViewModel>
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-@* <h1>Index</h1> *@
+<h1>Sản Phẩm</h1>
 
-
-<!-- Nút mở modal lọc -->
-
-<!-- Modal lọc -->
-<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="filterModalLabel">Lọc sản phẩm</h5>
-                <button type="button" class="btn-close" id="closeFilterModal" aria-label="Close">
-                    <span aria-hidden="true">x</span>
-                </button>
-
+<!-- Thẻ "Bộ lọc" -->
+<div class="card mb-3">
+    <div class="card-header">
+        <h5 class="mb-0">Bộ lọc</h5>
+    </div>
+    <div class="card-body">
+        <div class="row align-items-center">
+            <!-- Ô tìm kiếm -->
+            <div class="col-md-4 d-flex align-items-center mb-2">
+                <div class="input-group" style="max-width: 300px;">
+                    <span class="input-group-text">
+                        <i class="fas fa-search text-orange"></i>
+                    </span>
+                    <input type="text" id="searchProduct" class="form-control" placeholder="Tìm kiếm sản phẩm..." value="@Context.Request.Query["tenSanPham"]">
+                </div>
             </div>
-            <div class="modal-body">
-                <label for="filterChatLieu">Chất liệu:</label>
-                <select id="filterChatLieu" class="form-control filter-select">
-                    <option value="">Tất cả</option>
-                    @foreach (var item in (SelectList)ViewData["Chat_LieuID"])
-                    {
-                        <option value="@item.Value">@item.Text</option>
-                    }
-                </select>
+
+            <!-- Bộ lọc trạng thái + Xuất Excel -->
+            <div class="col-md-6 d-flex align-items-center gap-3 mb-2">
+                <span class="fw-bold">Trạng thái:</span>
+                <div class="dropdown me-2">
+                    
+                    <select id="filterTrangThai" class="form-control filter-select">
+                        <option value=null>Tất cả</option>
+
+                        <option value="1" selected="@(ViewData["SelectedTrangThai"]?.ToString() == "1" ? "checked" : null)">
+                            <label class="form-check-label" for="trangThaiHoatDong">Hoạt động</label>
+                        </option>
+                        <option value="0" selected="@(ViewData["SelectedTrangThai"]?.ToString() == "0" ? "checked" : null)">
+                            <label class="form-check-label" for="trangThaiKhongHoatDong">Không hoạt động</label>
+                        </option>
+
+                    </select>
+                </div>
                 
-                <label for="filterCoGiay">Cổ giày:</label>
-                <select id="filterCoGiay" class="form-control filter-select">
-                    <option value="">Tất cả</option>
-                    @foreach (var item in (SelectList)ViewData["Co_GiayID"])
-                    {
-                        <option value="@item.Value">@item.Text</option>
-                    }
-                </select>
                 
-                <label for="filterDanhMuc">Danh mục:</label>
-                <select id="filterDanhMuc" class="form-control filter-select">
-                    <option value="">Tất cả</option>
-                    @foreach (var item in (SelectList)ViewData["Danh_MucID"])
-                    {
-                        <option value="@item.Value">@item.Text</option>
-                    }
-                </select>
+
+                <!-- Xuất Excel -->
                 
-                <label for="filterDeGiay">Đế giày:</label>
-                <select id="filterDeGiay" class="form-control filter-select">
-                    <option value="">Tất cả</option>
-                    @foreach (var item in (SelectList)ViewData["De_GiayID"])
-                    {
-                        <option value="@item.Value">@item.Text</option>
-                    }
-                </select>
+                    <button id="exportExcel" type="submit" class="btn btn-outline-success">
+                        <i class="fas fa-file-excel"></i>
+                    </button>
                 
-                <label for="filterMuiGiay">Mũi giày:</label>
-                <select id="filterMuiGiay" class="form-control filter-select">
-                    <option value="">Tất cả</option>
-                    @foreach (var item in (SelectList)ViewData["Mui_GiayID"])
-                    {
-                        <option value="@item.Value">@item.Text</option>
-                    }
-                </select>
-                
-                <label for="filterKieuDang">Kiểu dáng:</label>
-                <select id="filterKieuDang" class="form-control filter-select">
-                    <option value="">Tất cả</option>
-                    @foreach (var item in (SelectList)ViewData["Kieu_DangID"])
-                    {
-                        <option value="@item.Value">@item.Text</option>
-                    }
-                </select>
-                
-                <label for="filterLoaiGiay">Loại giày:</label>
-                <select id="filterLoaiGiay" class="form-control filter-select">
-                    <option value="">Tất cả</option>
-                    @foreach (var item in (SelectList)ViewData["Loai_GiayID"])
-                    {
-                        <option value="@item.Value">@item.Text</option>
-                    }
-                </select>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                <button type="button" class="btn btn-primary" id="applyFilter">Lọc</button>
+
+            <!-- Nút tạo nhân viên -->
+            <div class="col-md-2 text-end mb-2">
+                <a asp-action="Create" class="btn btn-outline-orange" style="border: 1px solid #e0e0e0;">
+                    <i class="fas fa-plus"></i> Tạo Sản Phẩm
+                </a>
             </div>
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="col-12">
+
+
+
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Bảng Sản Phẩm</h3>
+                
             </div>
-            <div class="row">
-                <div class="col-sm-12 col-md-10">
-                    <div class="dt-button btn-group flex-wrap">
-                        <button type="button" class="btn btn-primary buttons-html5" id="openFilterModal" tabindex="0" type="button">
-                            Lọc sản phẩm
-                        </button>
+            
+            <div class="card-body table-responsive p-0">
 
-                        <button type="button" class="btn btn-primary buttons-html5" tabindex="0" type="button">
-                            <a asp-action="Create" style="color:white">Tạo mới</a>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body">
-                    
-                            <table class="table table-bordered table-striped" id="sanPhamTable">
-                                <thead>
-                                    <tr>
-                                        <th>STT</th>
-                                        <th>@Html.DisplayNameFor(model => model.First().ten_san_pham)</th>
-                                        <th>@Html.DisplayNameFor(model => model.First().mo_ta)</th>
-                                        <th>@Html.DisplayNameFor(model => model.First().trang_thai)</th>
-                                        <th>@Html.DisplayNameFor(model => model.First().ngay_tao)</th>
-                                        <th class="filterable">Tên kiểu dáng</th>
-                                        <th class="filterable">Tên danh mục</th>
-                                        <th class="filterable">Tên loại giày</th>
-                                        <th class="filterable">Tên mũi giày</th>
-                                        <th class="filterable">Tên cổ giày</th>
-                                        <th class="filterable">Tên đế giày</th>
-                                        <th class="filterable">Tên chất liệu</th>
-                                        <th>Tùy chỉnh</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @{
-                                        int stt = 1;
-                                     }
-                                    @foreach (var item in Model)
-                                    {
-                                        <tr>
-                                            <td>@stt</td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.ten_san_pham)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.mo_ta)
-                                            </td>
-                                            <td>
-                                                <button class='toggle-status btn btn-sm @(item.trang_thai == 1 ? "btn-success" : "btn-danger")' data-id='@item.ID' data-status='@item.trang_thai' style='width: 150px; height: 30px; line-height: 18px; white-space: nowrap;'>@(item.trang_thai == 1 ? "Hoạt động" : "Không hoạt động")</button>
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.ngay_tao)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Kieu_Dang.ten_kieu_dang)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Danh_Muc.ten_danh_muc)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Loai_Giay.ten_loai_giay)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Mui_Giay.ten_mui_giay)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Co_Giay.ten_loai_co_giay)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.De_Giay.ten_de_giay)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Chat_Lieu.ten_chat_lieu)
-                                            </td>
-                                            <td><a asp-area="Admin" asp-action="Edit" asp-route-id="@item.ID" class="btn btn-warning"><i class="fa fa-xs fa-pen"></i></a></td>
+                <table class="table table-bordered table-hover" id="sanPhamTable">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>@Html.DisplayNameFor(model => model.First().ten_san_pham)</th>
+                            <th>@Html.DisplayNameFor(model => model.First().ngay_tao)</th>
+                            <th>@Html.DisplayNameFor(model => model.First().so_luong_tong)</th>
+                            <th>@Html.DisplayNameFor(model => model.First().trang_thai)</th>
+                            <th>Tùy chỉnh</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int stt = 1;
+                        }
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@stt</td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ten_san_pham)
+                                </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ngay_tao)
+                        </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.so_luong_tong)
+                                </td>
+                               
+
+                                <td>
+
+                            <span id="status-badge" class="@(item.trang_thai == 1 ? "trang-thai-dang-dien-ra" : "trang-thai-het-han")" style='width: 150px; height: 30px; line-height: 18px; white-space: nowrap;'>@(item.trang_thai == 1 ? "Hoạt động" : "Ngừng hoạt động")</span>
+                                </td>
+                                <td>
+                                    <a asp-area="Admin" asp-controller="SanPhamChiTiet" asp-action="Index" class="btn btn-warning"><i class="fa-solid fa-eye"></i></a>
+                                    <a class='toggle-status btn btn-secondary' data-id='@item.ID' data-status='@item.trang_thai'><i class="fa fa-sync"></i></a>
+                                </td>
                             </tr>
                             stt++;
                         }
-                                </tbody>
-                            </table>
+                    </tbody>
+                </table>
 
-                    
+
             </div>
         </div>
-    </div>
-</div>
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 <script>
     $(document).ready(function () {
+        console.log(typeof $.fn.DataTable);
         
-        $("#sanPhamTable").DataTable({
-            "responsive": true, "lengthChange": true, "autoWidth": false, "paging": true,
+        if ($('#sanPhamTable').length > 0) {
+            try {
+                $("#sanPhamTable").DataTable({
+                    "paging": true,
+                    "lengthChange": false,
+                    "searching": false,
+                    "ordering": false,
+                    "info": true,
+                    "autoWidth": false,
+                    "responsive": true,
+                    language: {
+                        info: "Tổng số nhân viên: _TOTAL_ | Hiển thị từ _START_  đến _END_ ",
+                        infoEmpty: " Tổng số nhân viên: 0 | Hiển thị từ 0 đến 0 ",
+                        infoPostFix: "| Hiển thị 10 nục/trang",
+                        loadingRecords: "",
+                        zeroRecords: "Không có dữ liệu phù hợp",
+                        emptyTable: "Không có dữ liệu",
+                        paginate: {
+                            first:  '<i class="fas fa-angle-double-left"></i>',
+                            previous:  '<i class="fas fa-angle-left"></i>',
+                            next:  '<i class="fas fa-angle-right"></i>',
+                            last:  '<i class="fas fa-angle-double-right"></i>'
+                        },
+                    },
+                });
+                console.log("✅ DataTables đã khởi tạo thành công!");
+            } catch (error) {
+                console.error("❌ Lỗi khi khởi tạo DataTables:", error);
+            }
+        } else {
+            console.warn("⚠️ Không tìm thấy bảng DataTables!");
+        }
+        $('#exportExcel').click(function () {
+            let table = document.getElementById("sanPhamTable"); // Lấy bảng dữ liệu
+            let wb = XLSX.utils.book_new(); // Tạo file Excel mới
+            let ws = XLSX.utils.table_to_sheet(table); // Chuyển bảng thành Sheet
 
-            "info": true,
-            "searching": true,
-            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-        }).buttons().container().appendTo('#sanPhamTable_wrapper .col-md-6:eq(0)');
+            XLSX.utils.book_append_sheet(wb, ws, "SanPham"); // Thêm sheet vào file
 
+            // Xuất file Excel
+            XLSX.writeFile(wb, "DanhSachSanPham.xlsx");
+        });
+
+        
         $(document).ready(function () {
             $("#openFilterModal").click(function () {
                 console.log("📌 Đã bấm nút Lọc sản phẩm!");
@@ -212,30 +187,58 @@
             console.log("📌 Nút lọc đã được nhấn!"); // Kiểm tra sự kiện click có chạy không
             applyFilter();
         });
+        $('#searchProduct').keypress(function (e) {
+            if (e.which === 13) { // 13 là phím Enter
+                e.preventDefault();
+                applyFilter();
+            }
+        });
         window.applyFilter = function () {
             console.log("📌 Hàm applyFilter đã chạy!");
 
             let filters = {};
 
+            // Lấy dữ liệu từ các dropdown
             $('select.filter-select').each(function () {
                 let id = $(this).attr('id');
                 let value = $(this).val();
-                console.log(`🎯 Lọc ID: ${id}, Giá trị: ${value}`);
-
                 if (value && value !== '') {
                     let paramName = id.replace("filter", "").charAt(0).toLowerCase() + id.replace("filter", "").slice(1);
                     filters[paramName] = value;
                 }
             });
 
+            // Lấy dữ liệu từ ô tìm kiếm
+            let searchValue = $('#searchProduct').val().trim();
+            if (searchValue !== '') {
+                filters.tenSanPham = searchValue;
+            }
+
+            // Lấy giá trị trạng thái từ radio button
+            let trangThai = $('input[name="trangThai"]:checked').val();
+            if (trangThai !== undefined) {
+                filters.trangThai = trangThai;
+            }
+
             console.log("📌 Dữ liệu lọc gửi đi:", filters);
 
             let queryString = $.param(filters);
             console.log("🔗 URL lọc: /Admin/SanPham/Filter?" + queryString);
 
-
             window.location.href = '/Admin/SanPham/Filter?' + queryString;
         };
+
+        // Khi chọn radio button, tự động lọc
+        $('input[name="trangThai"]').change(function () {
+            applyFilter();
+        });
+
+        // Bắt sự kiện khi thay đổi giá trị của select box
+        $('select.filter-select').change(function () {
+            applyFilter();
+        });
+
+
 
 
         $(document).on('click', '.toggle-status', function () {
@@ -243,6 +246,7 @@
             let id = button.data("id");
             let currentStatus = button.data("status");
             let newStatus = currentStatus === 1 ? 0 : 1;
+            let badge = $('#status-badge');
 
             $.ajax({
                 url: '/Admin/SanPham/ChangeStatus',
@@ -251,8 +255,8 @@
                 async: false,  // Đảm bảo request hoàn tất trước khi tiếp tục
                 success: function () {
                     button.data("status", newStatus);
-                    button.toggleClass('btn-success btn-danger')
-                        .text(newStatus === 1 ? 'Hoạt động' : 'Không hoạt động');
+                    badge.toggleClass('trang-thai-dang-dien-ra trang-thai-het-han')
+                        .text(newStatus === 1 ? 'Hoạt động' : 'Ngừng hoạt động');
                 },
                 error: function (xhr, status, error) {
                     console.error("Lỗi AJAX:", status, error);
@@ -263,6 +267,6 @@
                 }
             });
         });
-
+        
     });
 </script>

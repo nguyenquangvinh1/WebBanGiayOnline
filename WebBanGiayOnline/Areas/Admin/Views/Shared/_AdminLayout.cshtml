@@ -7,9 +7,28 @@
     <title>@ViewData["Title"]</title>
     <!-- Giữ lại phiên bản jQuery từ CDN -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .trang-thai-het-han {
+            color: #FF0000; /* Chữ đỏ */
+            background-color: #fff;
+            border: 1px solid #FF0000; /* Viền đỏ (nếu muốn) */
+            border-radius: 20px;
+            padding: 4px 10px;
+            white-space: nowrap;
+        }
 
+        .trang-thai-dang-dien-ra {
+            color: #4CAF50; /* Chữ xanh lá */
+            background-color: #fff; /* Nền trắng */
+            border: 1px solid #4CAF50; /* Viền xanh lá */
+            border-radius: 20px; /* Bo tròn kiểu pill */
+            padding: 4px 10px; /* Khoảng cách trong */
+            white-space: nowrap; /* Giữ text trên 1 dòng */
+        }
+    </style>
 
     <!-- DataTables -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
     <link rel="stylesheet" href="~/AdminLTE-master/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="~/AdminLTE-master/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
     <link rel="stylesheet" href="~/AdminLTE-master/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
@@ -40,10 +59,10 @@
     <link rel="stylesheet" href="~/AdminLTE-master/plugins/dropzone/min/dropzone.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="~/AdminLTE-master/dist/css/adminlte.min.css">
-    @await RenderSectionAsync("Styles", required: false)
+    @await RenderSectionAsync("Styles", required: false)  
 </head>
 
-<body class="hold-transition sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed">
     <div class="app">
         <div class="wrapper">
             <!-- Header START -->
@@ -58,24 +77,24 @@
                 <!-- Content Header (Page header) -->
                 <div class="content-header">
                     <div class="container-fluid">
-                        <div class="row mb-2">
-                            <div class="col-sm-6">
-                                <h1 class="m-0">Dashboard v3</h1>
-                            </div><!-- /.col -->
-                            <div class="col-sm-6">
-                                <ol class="breadcrumb float-sm-right">
-                                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                                    <li class="breadcrumb-item active">Dashboard v3</li>
-                                </ol>
-                            </div><!-- /.col -->
-                        </div><!-- /.row -->
+                        @* <div class="row mb-2"> *@
+                        @*     <div class="col-sm-6"> *@
+                        @*         <h1 class="m-0">Dashboard v3</h1> *@
+                        @*     </div><!-- /.col --> *@
+                        @*     <div class="col-sm-6"> *@
+                        @*         <ol class="breadcrumb float-sm-right"> *@
+                        @*             <li class="breadcrumb-item"><a href="#">Home</a></li> *@
+                        @*             <li class="breadcrumb-item active">Dashboard v3</li> *@
+                        @*         </ol> *@
+                        @*     </div><!-- /.col --> *@
+                        @* </div><!-- /.row --> *@
                     </div><!-- /.container-fluid -->
                 </div>
                 <!-- /.content-header -->
                 <!-- Main content -->
                 <!-- Content Wrapper START -->
-                <div class="content">
-                    <div class="container-fluid">
+                <div class="content" >
+                    <div class="container-fluid" style="background-color:#fff">
                         @RenderBody()
 
                     </div>
@@ -97,7 +116,6 @@
     </div>
     </div>
     <!-- ./wrapper -->
-
     <!-- jQuery -->
     <script src="~/AdminLTE-master/plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
@@ -140,7 +158,72 @@
     <script src="~/AdminLTE-master/plugins/dropzone/min/dropzone.min.js"></script>
     <!-- AdminLTE App -->
     <script src="~/AdminLTE-master/dist/js/adminlte.min.js"></script>
-    
+    <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            if (!window.jQuery) {
+                console.error("❌ jQuery chưa được tải!");
+            } else if (!$.fn.DataTable) {
+                console.error("❌ DataTables chưa được tải!");
+            } else {
+                console.log("✅ jQuery và DataTables đã sẵn sàng!");
+            }
+            var Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            });
+            // Trong script Razor
+            let status = '@TempData["status"]';
+
+            if (status) {
+                // Xử lý thông báo
+
+                if (status === 'CreateSuccess') {
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Tạo sản phẩm thành công!'
+                    });
+                } else if (status === 'CreateError') {
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Tạo sản phẩm thất bại!'
+                    });
+                } else if (status === 'EditSuccess') {
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Sửa sản phẩm thành công!'
+                    });
+                } else if (status === 'EditError') {
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Sửa sản phẩm thất bại!'
+                    });
+                }
+                // 👉 Sau khi xử lý xong: xóa khỏi sessionStorage (cache tạm)
+                sessionStorage.removeItem("shownStatus");
+
+            } else {
+                // Tránh reload trình duyệt gây hiển thị lại nếu quay lại bằng "Back"
+                if (sessionStorage.getItem("shownStatus")) {
+                    status = "";
+                }
+            }
+
+            sessionStorage.setItem("shownStatus", "true");
+
+
+            // else if (status === 'info') {
+            //     toastr.error('Tạo sản phẩm thất bại!')
+            // } else if (status === 'Warning') {
+            //     toastr.error('Tạo sản phẩm thất bại!')
+            // }
+        });
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
     @*  @await Component.InvokeAsync("Notyf") *@

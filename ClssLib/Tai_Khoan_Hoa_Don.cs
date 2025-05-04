@@ -13,10 +13,12 @@ namespace ClssLib
         public Guid ID { get; set; }
         public string Ten { get; set; }
         public string vai_tro { get; set; }
+        public string? thao_tac { get; set; }
+        public string? ghi_chu { get; set; }
         public DateTime ngay_tao { get; set; }
         public DateTime? ngay_sua { get; set; }
         [ForeignKey("Tai_Khoan")]
-        public Guid Tai_KhoanID { get; set; }
+        public Guid? Tai_KhoanID { get; set; }
         [JsonIgnore]
         public virtual Tai_Khoan Tai_Khoan { get; set; }
         [ForeignKey("Hoa_Don")]

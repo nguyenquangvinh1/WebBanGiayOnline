@@ -1,12 +1,15 @@
 ﻿using ClssLib;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Net.Mail;
-using System.Net;
-using WebBanGiay.Data;
 // Sử dụng MailKit
-using MimeKit;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System.Net;
+using System.Net.Mail;
+using WebBanGiay.Data;
+using X.PagedList;
+using X.PagedList.Extensions;
+
+
 
 namespace WebBanGiay.Areas.Admin.Controllers
 {
@@ -16,142 +19,213 @@ namespace WebBanGiay.Areas.Admin.Controllers
     {
         // GET: CoGiayController
         private readonly AppDbContext _context;
-        private readonly string _smtpServer = "smtp.gmail.com";
-        private readonly int _port = 587;
-        private readonly string _user = "datnguyen24102002@gmail.com"; // Thay bằng địa chỉ email của bạn
-        private readonly string _password = "ruub cfwn grrs ukkz"; // Thay bằng mật khẩu ứng dụng của bạn
 
         public PhieuGiamGiaController(AppDbContext context)
         {
             _context = context;
         }
-        public async Task<IActionResult> Index(string searchString)
+        public async Task<IActionResult> Index(
+     int? page,
+     string searchString,
+     int? Category,
+     DateTime? fromDate,
+     DateTime? toDate,
+     int? trangThai)
         {
-            var phieuGiamGias = await _context.phieu_Giam_Gias.ToListAsync();
-            
+            // Truy vấn danh sách phiếu giảm giá
+            var query = _context.phieu_Giam_Gias.AsQueryable();
 
-           
-            // Cập nhật trạng thái dựa trên ngày hết hạn
-            foreach (var phieu in phieuGiamGias)
+            // Kiểm tra ngày hợp lệ
+            if (fromDate.HasValue && toDate.HasValue && fromDate >= toDate)
+            {
+                ViewBag.ThongBao = "❌ Ngày bắt đầu phải nhỏ hơn ngày kết thúc!";
+            }
+
+            // Lọc theo ngày nếu có
+            if (fromDate.HasValue)
+            {
+                query = query.Where(h => h.ngay_tao >= fromDate.Value);
+            }
+            if (toDate.HasValue)
+            {
+                query = query.Where(h => h.ngay_tao <= toDate.Value);
+            }
+
+            // Lọc theo từ khóa (tìm theo mã hoặc tên)
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                query = query.Where(p => p.ma.Contains(searchString) || p.ten_phieu_giam_gia.Contains(searchString));
+            }
+
+            // Lọc theo trạng thái nếu có
+            if (Category.HasValue)
+            {
+                query = query.Where(h => h.trang_thai == Category);
+            }
+
+            // Chuyển về danh sách trước khi cập nhật trạng thái
+            var danhSachPhieu = query.ToList();
+
+            // Cập nhật trạng thái
+            foreach (var phieu in danhSachPhieu)
             {
                 phieu.UpdateTrangThai();
+                _context.Entry(phieu).State = EntityState.Modified;
             }
+            danhSachPhieu = danhSachPhieu
+            .Where(h => h.ngay_tao != null)
+            .OrderByDescending(h => h.ngay_tao)
+            .ThenByDescending(h => h.ID)
+            .ToList();
+            _context.SaveChanges();
 
-             _context.SaveChanges(); // Lưu thay đổi nếu cần
-            var phieuGiamGiass = from pg in _context.phieu_Giam_Gias
-                                select pg;
+            // Sau khi cập nhật, thực hiện lại sắp xếp
+            danhSachPhieu = danhSachPhieu.OrderByDescending(h => h.ngay_tao).ToList();
 
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                phieuGiamGiass = phieuGiamGiass.Where(pg => pg.ma.Contains(searchString) ||
-                                                           pg.ten_phieu_giam_gia.Contains(searchString));
-            }
-            ViewData["SearchString"] = HttpContext.Request.Query["searchString"];
+            // Đổ dữ liệu vào dropdown trạng thái
+            ViewBag.TrangThaiList = new SelectList(new List<SelectListItem>
+    {
+        new SelectListItem { Value = "0", Text = "Đã hết hạn" },
+        new SelectListItem { Value = "1", Text = "Đang diễn ra" }
+    }, "Value", "Text", Category?.ToString());
 
-            return View(phieuGiamGias.ToList());
+            // Phân trang
+            int pageNumber = page ?? 1;
+            int pageSize = 5;
+            var pagedList = danhSachPhieu.ToPagedList(pageNumber, pageSize);
+
+            return View("Index", pagedList);
         }
 
-        // GET: KieuDangController/Details/5
-        public async Task<IActionResult> Details(Guid? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var phieu_giam_gia = await _context.phieu_Giam_Gias
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (phieu_giam_gia == null)
-            {
-                return NotFound();
-            }
-
-            return View(phieu_giam_gia);
-        }
-
-
-        // GET: KieuDangController/Create
         [HttpGet]
         public IActionResult Create()
         {
-          
+
+            var tai_khoan = _context.tai_Khoans.Include(x => x.Vai_Tro).ToList();
+            Console.WriteLine($"Số lượng tài khoản: {tai_khoan.Count}");
+            ViewBag.tai_khoans = tai_khoan ?? new List<Tai_Khoan>();
             return View();
+
         }
-
-
-
-        private async Task SendEmailAsync(string toEmail, string subject, string body)
-        {
-            var message = new MimeMessage();
-            message.From.Add(new MailboxAddress("datnguyen24102002@gmail.com", _user));
-            message.To.Add(new MailboxAddress("dat0358043034@gmail.com", toEmail));
-            message.Subject = subject;
-            message.Body = new TextPart("html") { Text = body };
-
-            using (var client = new MailKit.Net.Smtp.SmtpClient()) // Sử dụng MailKit
-            {
-                try
-                {
-                    await client.ConnectAsync(_smtpServer, _port, MailKit.Security.SecureSocketOptions.StartTls);
-                    await client.AuthenticateAsync(_user, _password);
-                    await client.SendAsync(message);
-                }
-                catch (Exception ex)
-                {
-                    // Ghi log hoặc xử lý lỗi
-                    Console.WriteLine($"Lỗi gửi email: {ex.Message}");
-                }
-                finally
-                {
-                    await client.DisconnectAsync(true);
-                }
-            }
-        }
-
-
-
-        // POST: KieuDangController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Phieu_Giam_Gia phieu_giam_gia)
+        public async Task<IActionResult> Create(Phieu_Giam_Gia phieu_giam_gia, Guid[] customerIds, int? page)
         {
+            Console.WriteLine($"Số lượng customerIds: {customerIds?.Length}");
+
             if (ModelState.IsValid)
             {
-                phieu_giam_gia.ID = Guid.NewGuid();
+                // Cập nhật ngày tạo mới nhất để đảm bảo sắp xếp đúng
                 phieu_giam_gia.ngay_tao = DateTime.Now;
-               
-               
+
                 _context.phieu_Giam_Gias.Add(phieu_giam_gia);
                 await _context.SaveChangesAsync();
-                // Lấy danh sách phiếu giảm giá và sắp xếp cho mới nhất lên đầu
-                var phieuGiamGias = _context.phieu_Giam_Gias.OrderByDescending(pg => pg.ID).ToList();
 
-                // Cập nhật lại danh sách trong ViewBag hoặc ViewModel
-                ViewBag.phieu_Giam_Gias = phieuGiamGias;
-                TempData["SuccessMessage"] = "Thêm phiếu giảm giá thành công!";
-                // Gửi email cho khách hàng
-                string toEmail = "dat0358043034@gmail.com"; // Địa chỉ email nhận
-                string subject = "Xác Nhận Phiếu Giảm Giá";
-                string base64Image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA...";
-                string body = $@"
-    <html>
-        <body>
-            <p>Chào bạn,</p>
-            <p>Bạn đã nhận được phiếu giảm giá mới! Mã: {phieu_giam_gia.ma}</p>
-            <img src='{base64Image}' alt='Phiếu Giảm Giá' style='max-width:100%; height:auto;' />
-            <p>Chúc bạn tiết kiệm!</p>
-        </body>
-    </html>";
+                // Xử lý nếu có danh sách khách hàng
+                if (customerIds != null && customerIds.Length > 0)
+                {
+                    var tai_khoan = _context.tai_Khoans.Where(c => customerIds.Contains(c.ID)).ToList();
 
-                phieu_giam_gia.ma = GenerateDiscountCode(); // Hàm tự sinh mã
-                await SendEmailAsync(toEmail, subject, body);
-                return RedirectToAction(nameof(Index));
+                    if (phieu_giam_gia.kieu_giam_gia == 0) // Nếu là cá nhân
+                    {
+                        foreach (var tk in tai_khoan)
+                        {
+                            if (!string.IsNullOrEmpty(tk.email))
+                            {
+                                await SendEmail(tk.email, phieu_giam_gia);
+                            }
+
+                            var link = new Phieu_Giam_Gia_Tai_Khoan
+                            {
+                                ID = Guid.NewGuid(),
+                                Tai_KhoanID = tk.ID,
+                                Phieu_Giam_GiaID = phieu_giam_gia.ID,
+                                trang_thai = 0,
+                                ngay_tao = DateTime.Now,
+                                nguoi_tao = User.Identity?.Name ?? "admin"
+                            };
+                            _context.phieu_Giam_Gia_Tai_Khoans.Add(link);
+                        }
+                        await _context.SaveChangesAsync();
+                    }
+                    else // Nếu là công khai, chỉ gửi email
+                    {
+                        foreach (var tk in tai_khoan)
+                        {
+                            if (!string.IsNullOrEmpty(tk.email))
+                            {
+                                await SendEmail(tk.email, phieu_giam_gia);
+                            }
+                        }
+                    }
+                }
+                // Truy vấn danh sách phiếu giảm giá
+                var query = _context.phieu_Giam_Gias.AsQueryable();
+                int pageSize = 5;
+                int pageNumber = page ?? 1;
+
+                // Lọc theo từ khóa (tìm theo mã hoặc tên)
+                // Truy vấn danh sách phiếu giảm giá
+
+
+                IPagedList<Phieu_Giam_Gia> pagedList = query.ToPagedList(pageNumber, pageSize);
+
+                ViewBag.TaiKhoans = pagedList;
+
+                // 🔥 Đặt thông báo thành công
+                TempData["SuccessMessage"] = "✅ Thêm thành công!";
+
+                // 🔥 Điều hướng về trang đầu tiên sau khi thêm
+                return RedirectToAction("Index", new { page = 1 });
             }
+
+            ViewBag.tai_khoans = _context.tai_Khoans.ToList();
             return View(phieu_giam_gia);
-
-
         }
 
+        private async Task SendEmail(string toEmail, Phieu_Giam_Gia phieu_giam_gia)
+        {
+            try
+            {
+                var fromEmail = new MailAddress("datnguyen24102002@gmail.com", "Trang wed bán giầy thời trang AĐI");
+                var toAddress = new MailAddress(toEmail);
+                const string fromPassword = "btoz oley calg yjyc";
+                string subject = "Ưu đãi đặc biệt dành cho bạn!";
+                string link = "https://localhost:7243";
+                string body = $"Xin chào,\n\nBạn nhận được phiếu giảm giá: {phieu_giam_gia.ma} với giá trị: {phieu_giam_gia.gia_tri_giam}%!\n" +
+                              $"Áp dụng từ: {phieu_giam_gia.ngay_bat_dau:dd/MM/yyyy} đến {phieu_giam_gia.ngay_ket_thuc:dd/MM/yyyy}.\n\n" +
+                              $"Xem chi tiết tại: {link}";
+
+                var smtp = new SmtpClient
+                {
+                    Host = "smtp.gmail.com",
+                    Port = 587,
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential(fromEmail.Address, fromPassword)
+                };
+
+                using (var message = new MailMessage(fromEmail, toAddress)
+                {
+                    Subject = subject,
+                    Body = body,
+                    IsBodyHtml = false
+                })
+                {
+                    await smtp.SendMailAsync(message);
+                    Console.WriteLine($"Email đã gửi thành công tới: {toEmail}");
+                }
+            }
+            catch (SmtpException smtpEx)
+            {
+                Console.WriteLine($"Lỗi SMTP: {smtpEx.StatusCode} - {smtpEx.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi không xác định khi gửi email: {ex.Message}\n{ex.StackTrace}");
+            }
+        }
         private string GenerateDiscountCode()
         {
             // Logic để sinh mã ngẫu nhiên (VD: "DISCOUNT2023")
@@ -163,7 +237,11 @@ namespace WebBanGiay.Areas.Admin.Controllers
             if (id == null)
             {
                 return NotFound();
-            }
+            } // Gán danh sách khách hàng vào ViewBag
+            ViewBag.tai_khoans = await _context.tai_Khoans
+                .Include(x => x.Vai_Tro)
+                .Where(tk => tk.Vai_Tro.ten_vai_tro == "Khách hàng")
+                .ToListAsync();
 
             var phieu_giam_gia = await _context.phieu_Giam_Gias.FindAsync(id);
             if (phieu_giam_gia == null)
@@ -180,10 +258,68 @@ namespace WebBanGiay.Areas.Admin.Controllers
         {
             var co = await _context.phieu_Giam_Gias.FindAsync(phieu_giam_gia.ID);
             if (co == null)
-                return NotFound();
+
+                if (!ModelState.IsValid)
+                {
+                    ViewBag.tai_khoans = await _context.tai_Khoans
+                .Include(x => x.Vai_Tro)
+                .Where(tk => tk.Vai_Tro.ten_vai_tro == "Khách hàng")
+                        .ToListAsync();
+
+                    return View(phieu_giam_gia); // quay lại view Edit để sửa lỗi
+                }
+
             _context.Entry(phieu_giam_gia).State = EntityState.Modified;
+
+
+
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
+        }
+        [HttpGet]
+        public IActionResult GetAvailableDiscounts(Guid? customerId, double orderTotal)
+        {
+            var now = DateTime.Now;
+            var query = _context.phieu_Giam_Gias.Where(pg => pg.trang_thai == 1  // Thay 1 -> 0 nếu active là 0
+                                                             && (pg.ngay_ket_thuc == null || pg.ngay_ket_thuc > now)
+                                                             && pg.so_luong > 0
+                                                             && (pg.gia_tri_toi_thieu == null || pg.gia_tri_toi_thieu <= orderTotal));
+
+            if (customerId == null)
+            {
+                // Khách lẻ: chỉ lấy voucher công khai
+                query = query.Where(pg => pg.kieu_giam_gia == 1);
+            }
+            else
+            {
+                // Nếu có khách hàng, lấy voucher công khai hoặc voucher cá nhân của họ
+                var personalVoucherIds = _context.phieu_Giam_Gia_Tai_Khoans
+                    .Where(x => x.Tai_KhoanID == customerId)
+                    .Select(x => x.Phieu_Giam_GiaID)
+                    .ToList();
+                query = query.Where(pg => pg.kieu_giam_gia == 1 || (pg.kieu_giam_gia == 0 && personalVoucherIds.Contains(pg.ID)));
+            }
+
+            var list = query.ToList();
+            //Console.WriteLine("Số phiếu giảm giá phù hợp: " + list.Count);
+
+            foreach (var pg in list)
+            {
+                pg.UpdateTrangThai();
+            }
+            _context.SaveChanges();
+
+            var result = list.Select(pg => new {
+                id = pg.ID,
+                ma = pg.ma,
+                ten = pg.ten_phieu_giam_gia,
+                loai = pg.loai_phieu_giam_gia,  // 0 => %, 1 => VND
+                kieu = pg.kieu_giam_gia,         // 0 => cá nhân, 1 => công khai
+                gia_tri = pg.gia_tri_giam,
+                so_tien_giam_toi_da = pg.so_tien_giam_toi_da,
+            });
+            return Json(result);
         }
 
         [HttpPost]
@@ -201,6 +337,19 @@ namespace WebBanGiay.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // Thêm chức năng lọc theo trạng thái
+        public static IEnumerable<Phieu_Giam_Gia> FilterByStatus(IEnumerable<Phieu_Giam_Gia> vouchers, int status)
+        {
+            return vouchers.Where(v => v.trang_thai == status);
+        }
 
+        // Thêm chức năng tìm kiếm theo mã hoặc tên
+        public static IEnumerable<Phieu_Giam_Gia> SearchByCodeOrName(IEnumerable<Phieu_Giam_Gia> vouchers, string searchTerm)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm)) return vouchers;
+
+            searchTerm = searchTerm.ToLower();
+            return vouchers.Where(v => v.ma.ToLower().Contains(searchTerm) || v.ten_phieu_giam_gia.ToLower().Contains(searchTerm));
+        }
     }
 }

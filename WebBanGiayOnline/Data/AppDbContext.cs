@@ -18,8 +18,6 @@ namespace WebBanGiay.Data
         public DbSet<Danh_Muc> danh_Mucs { get; set; }
         public DbSet<De_Giay> de_Giays { get; set; }
         public DbSet<Dia_Chi> dia_Chis { get; set; }
-        public DbSet<Gio_Hang> gio_Hangs { get; set; }
-        public DbSet<Gio_Hang_Chi_Tiet> gio_Hang_Chi_Tiets { get; set; }
         public DbSet<Hoa_Don> hoa_Dons { get; set; }
         public DbSet<Hoa_Don_Chi_Tiet> don_Chi_Tiets { get; set; }
         public DbSet<Kich_Thuoc> kich_Thuocs { get; set; }
@@ -37,6 +35,7 @@ namespace WebBanGiay.Data
         public DbSet<Thanh_Toan> thanh_Toans { get; set; }
         public DbSet<ThongKe> thongKes { get; set; }
         public DbSet<Vai_Tro> vai_Tros { get; set; }
+      
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -47,12 +46,12 @@ namespace WebBanGiay.Data
         {
             modelBuilder.Seed();
             base.OnModelCreating(modelBuilder);
+          
 
-            modelBuilder.Entity<Tai_Khoan>()
-                .Property(t => t.EmployeeNumber)
-                .UseIdentityColumn(1, 1);  // Cấu hình IDENTITY(1,1)
+           
+
+
         }
-
 
         internal object Find(int id)
         {
