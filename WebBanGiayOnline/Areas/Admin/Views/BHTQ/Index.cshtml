@@ -150,23 +150,23 @@
 										<label class="form-label">Email</label>
 									<input type="email" class="form-control customerEmail " placeholder="Email">
 									</div>
-								<div class="form-item my-3" id="AddressForm" onchange="calculateFee()" style="display: none;">
+								<div class="form-item my-3 AddressForm" onchange="calculateFee()" style="display: none;">
 									<div class="row">
 										<div class="col-md-4 mb-3">
 											<label>* Tỉnh/Thành phố</label>
-											<select class="form-control mt-2" id="tinh" name="tinh">
+											<select class="form-control mt-2 tinh"  name="tinh">
 												<option value="">Chọn tỉnh/thành phố</option>
 											</select>
 										</div>
 										<div class="col-md-4 mb-3">
 											<label>* Quận/Huyện</label>
-											<select class="form-control mt-2" id="huyen" name="huyen">
+											<select class="form-control mt-2 huyen"  name="huyen">
 												<option value="">Chọn quận/huyện</option>
 											</select>
 										</div>
 										<div class="col-md-4 mb-3">
 											<label>* Xã/Phường</label>
-											<select class="form-control mt-2" id="xa" name="xa">
+											<select class="form-control mt-2 xa"  name="xa">
 												<option value="">Chọn xã/phường</option>
 											</select>
 										</div>
@@ -213,7 +213,7 @@
 										</div>
 										<div class="col-12">
 										<label class="form-label">Phí vận chuyển</label>
-										  <img src="~/coloshop-master/images/tải xuống.png" class="img-fluid" alt="" style="width: 30px; height: 30px; object-fit: contain;"> <a id="fee"></a> 0 VNĐ
+										  <img src="~/coloshop-master/images/tải xuống.png" class="img-fluid" alt="" style="width: 30px; height: 30px; object-fit: contain;"> <a class="fee"></a> 0 VNĐ
 										</div>
 										<div class="col-12">
 											<label class="form-label">Tổng tiền</label>
@@ -713,7 +713,7 @@
 		 
 
 						$(document).ready(function () {
-								loadProvinces();
+								// loadProvinces();
 			$(".filter-select, #searchProduct").on("change keyup", function () {
 				filterProducts(); // Gọi hàm lọc sản phẩm
 			});
@@ -783,11 +783,13 @@
 
 		function toggleAddressForm() {
 			console.log("chay dia chi");
-			var form = document.getElementById("AddressForm");
-			if (form.style.display === "none") {
-				form.style.display = "block";
+			let container = $('#' + currentInvoiceId);
+
+			var form = container.find('.AddressForm');
+			if (form.is(':visible')) {
+				form.hide();
 			} else {
-				form.style.display = "none";
+				form.show();
 			}
 		}
 
@@ -940,7 +942,7 @@
 								// Nếu có khách hàng, ẩn "khách lẻ" và hiển thị thông tin khách hàng
 								let customer = invoice.khachHang;
 								container.find('.khachLe').hide(); // Ẩn phần khách lẻ
-								container.find('.AddressForm').show(); // Hiển thị phần thông tin khách hàng
+								 // Hiển thị phần thông tin khách hàng
 								container.find('.customerName').val(customer.ten);
 								container.find('.customerPhone').val(customer.phoneNumber);
 								container.find('.customerEmail').val(customer.email);
@@ -951,7 +953,7 @@
 							} else {
 								// Nếu không có khách hàng, hiển thị thông tin khách lẻ
 								container.find('.khachLe').show(); // Hiển thị phần khách lẻ
-								container.find('.AddressForm').hide(); // Ẩn phần thông tin khách hàng
+								 // Ẩn phần thông tin khách hàng
 							}
 						});
 
@@ -982,6 +984,8 @@
 			let invoiceId = $(e.target).data('invoice-id'); // lấy id của hóa đơn từ tab
 			currentInvoiceId = "invoice_" + invoiceId;      // cập nhật currentInvoiceId cho container
 			loadInvoiceDetails();
+
+			loadProvinces();
 		});
 				
 
@@ -2381,6 +2385,10 @@
 			var districtId = $("#huyen").val();
 			var wardCode = $("#xa").val();
 
+			let container = $('#' + currentInvoiceId);
+
+			var form = container.find('.fee');
+
 
 			if (provinceId =="" && districtId == "" && wardCode == "") {
 				alert("Vui lòng chọn đầy đủ địa chỉ.");
@@ -2427,7 +2435,7 @@
 					 // let total = response.ship + subtotal;
 					console.log("Nhận phản hồi:", response);
 					if (response.success) {
-						$("#fee").text(response.ship.toLocaleString() + " VNĐ");
+						form.text(response.ship.toLocaleString());
 						// $("#totalWithFee").text( total.toLocaleString() + " VNĐ");
 					} else {
 						alert(response.message);
@@ -2444,70 +2452,83 @@
 
 		// Load danh sách tỉnh/huyện/xã
 
-				   function loadProvinces() {
+		function loadProvinces() {
+			let container = $('#' + currentInvoiceId);
+			let tinh = container.find('.tinh');
+			let huyen = container.find('.huyen');
+			let xa = container.find('.xa');
 
-			console.log("chyaj tinh");
+			console.log("Container:", container.attr('id'));
+			console.log("Tỉnh select:", tinh.length, tinh);
+			console.log("Huyện select:", huyen.length, huyen);
+			console.log("Xã select:", xa.length, xa);
+
+
+			console.log("Đang load tỉnh cho " + currentInvoiceId);
+
 			$.ajax({
 				url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/province",
 				type: "GET",
 				headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
 				success: function (response) {
-					var provinces = response.data;
-					$("#tinh").empty().append('<option value="">Chọn Tỉnh/Thành phố</option>');
-					provinces.forEach(function (province) {
-						$("#tinh").append(`<option value="${province.ProvinceID}">${province.ProvinceName}</option>`);
+					tinh.empty().append('<option value="">Chọn Tỉnh/Thành phố</option>');
+					response.data.forEach(function (province) {
+						tinh.append(`<option value="${province.ProvinceID}">${province.ProvinceName}</option>`);
 					});
 				},
 				error: function () {
 					alert("Lỗi khi tải danh sách tỉnh/thành phố.");
 				}
 			});
+
+			// tỉnh thay đổi => load huyện
+			tinh.off('change').on('change', function () {
+				let provinceId = $(this).val();
+				if (!provinceId) return;
+
+				console.log("Đang load huyện cho " + currentInvoiceId);
+
+				$.ajax({
+					url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/district",
+					type: "GET",
+					headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
+					data: { "province_id": provinceId },
+					success: function (response) {
+						huyen.empty().append('<option value="">Chọn Quận/Huyện</option>');
+						response.data.forEach(function (district) {
+							huyen.append(`<option value="${district.DistrictID}">${district.DistrictName}</option>`);
+						});
+					},
+					error: function () {
+						alert("Lỗi khi tải danh sách quận/huyện.");
+					}
+				});
+			});
+
+			// huyện thay đổi => load xã
+			huyen.off('change').on('change', function () {
+				let districtId = $(this).val();
+				if (!districtId) return;
+
+				console.log("Đang load xã cho " + currentInvoiceId);
+
+				$.ajax({
+					url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/ward",
+					type: "GET",
+					headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
+					data: { "district_id": districtId },
+					success: function (response) {
+						xa.empty().append('<option value="">Chọn Xã/Phường</option>');
+						response.data.forEach(function (ward) {
+							xa.append(`<option value="${ward.WardCode}">${ward.WardName}</option>`);
+						});
+					},
+					error: function () {
+						alert("Lỗi khi tải danh sách xã/phường.");
+					}
+				});
+			});
 		}
-
-
-		$(document).on('change', '#tinh', function () {
-				  console.log("chyaj huyen");
-			var provinceId = $(this).val();
-			if (!provinceId) return;
-
-			$.ajax({
-				url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/district",
-				type: "GET",
-				headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
-				data: { "province_id": provinceId },
-				success: function (response) {
-					var districts = response.data;
-					$("#huyen").empty().append('<option value="">Chọn Quận/Huyện</option>');
-					districts.forEach(function (district) {
-						$("#huyen").append(`<option value="${district.DistrictID}">${district.DistrictName}</option>`);
-					});
-				},
-				error: function () {
-					alert("Lỗi khi tải danh sách quận/huyện.");
-				}
-			});
-		});
-		$(document).on('change', '#huyen', function () {
-			var districtId = $(this).val();
-			if (!districtId) return;
-
-			$.ajax({
-						url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?districtId",
-				type: "GET",
-				headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
-				data: { "district_id": districtId },
-				success: function (response) {
-					var wards = response.data;
-					$("#xa").empty().append('<option value="">Chọn Xã/Phường</option>');
-					wards.forEach(function (ward) {
-						$("#xa").append(`<option value="${ward.WardCode}">${ward.WardName}</option>`);
-					});
-				},
-				error: function () {
-					alert("Lỗi khi tải danh sách xã/phường.");
-				}
-			});
-		});
 
 
 
@@ -2563,26 +2584,32 @@
 			const tenTinh = cleanName(btn.data('tinh'));
 			const tenHuyen = btn.data('huyen');
 			const tenXa = btn.data('xa');
-			console.log(tenTinh);
-			console.log(tenHuyen);
-			console.log(tenXa);
+
+			// Xác định container tab đang mở
+			const container = $('#' + currentInvoiceId);
+			const tinhSelect = container.find('.tinh');
+			const huyenSelect = container.find('.huyen');
+			const xaSelect = container.find('.xa');
+
+			console.log("Container:", container.attr('id'));
+			console.log("Tỉnh cần chọn:", tenTinh);
+			console.log("Huyện cần chọn:", tenHuyen);
+			console.log("Xã cần chọn:", tenXa);
 
 			// Chọn tỉnh theo text
-			$('#tinh option').each(function () {
+			tinhSelect.find('option').each(function () {
 				if ($(this).text().trim() === tenTinh) {
-					$('#tinh').val($(this).val()).trigger('change');
+					tinhSelect.val($(this).val()).trigger('change');
 
-					// Delay đợi load quận/huyện
 					setTimeout(() => {
-						$('#huyen option').each(function () {
+						huyenSelect.find('option').each(function () {
 							if ($(this).text().trim() === tenHuyen) {
-								$('#huyen').val($(this).val()).trigger('change');
+								huyenSelect.val($(this).val()).trigger('change');
 
-								// Delay đợi load xã/phường
 								setTimeout(() => {
-									$('#xa option').each(function () {
+									xaSelect.find('option').each(function () {
 										if ($(this).text().trim() === tenXa) {
-											$('#xa').val($(this).val()).trigger('change');
+											xaSelect.val($(this).val()).trigger('change');
 										}
 									});
 								}, 500);
@@ -2591,8 +2618,8 @@
 					}, 500);
 				}
 			});
-
 		});
+
 		
 	</script>
 
