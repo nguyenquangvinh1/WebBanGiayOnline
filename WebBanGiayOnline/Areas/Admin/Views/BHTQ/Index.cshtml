@@ -134,10 +134,10 @@
 							<div class="khachLe">
 								<p>Khách lẻ</p>
 						</div>
-						<button class="btn btn-primary mb-3" onclick="toggleCustomerForm()">Giao hàng</button>
+						<button class="btn btn-primary mb-3" onclick="toggleAddressForm()">Giao hàng</button>
 						<button class="btn btn-primary mb-3 openAddress">Chọn địa chỉ</button>
 						<div class="customerForm mb-6">
-							<div class="p-3 border rounded bg-white  mt-3" id="customerForm" style="display: none;" >
+							<div class="p-3 border rounded bg-white  mt-3" id="customerForm">
 									<div class="col-12 mt-3.8.6">
 										<label class="form-label">Họ và tên</label>
 										<input type="text" class="form-control customerName" placeholder="Họ tên">
@@ -150,7 +150,7 @@
 										<label class="form-label">Email</label>
 									<input type="email" class="form-control customerEmail " placeholder="Email">
 									</div>
-								<div class="form-item my-3" onchange="calculateFee()">
+								<div class="form-item my-3" id="AddressForm" onchange="calculateFee()" style="display: none;">
 									<div class="row">
 										<div class="col-md-4 mb-3">
 											<label>* Tỉnh/Thành phố</label>
@@ -781,8 +781,9 @@
 			});
 		});
 
-			 function toggleCustomerForm() {
-			var form = document.getElementById("customerForm");
+		function toggleAddressForm() {
+			console.log("chay dia chi");
+			var form = document.getElementById("AddressForm");
 			if (form.style.display === "none") {
 				form.style.display = "block";
 			} else {
@@ -939,7 +940,7 @@
 								// Nếu có khách hàng, ẩn "khách lẻ" và hiển thị thông tin khách hàng
 								let customer = invoice.khachHang;
 								container.find('.khachLe').hide(); // Ẩn phần khách lẻ
-								container.find('.customerForm').show(); // Hiển thị phần thông tin khách hàng
+								container.find('.AddressForm').show(); // Hiển thị phần thông tin khách hàng
 								container.find('.customerName').val(customer.ten);
 								container.find('.customerPhone').val(customer.phoneNumber);
 								container.find('.customerEmail').val(customer.email);
@@ -950,7 +951,7 @@
 							} else {
 								// Nếu không có khách hàng, hiển thị thông tin khách lẻ
 								container.find('.khachLe').show(); // Hiển thị phần khách lẻ
-								container.find('.customerForm').hide(); // Ẩn phần thông tin khách hàng
+								container.find('.AddressForm').hide(); // Ẩn phần thông tin khách hàng
 							}
 						});
 
