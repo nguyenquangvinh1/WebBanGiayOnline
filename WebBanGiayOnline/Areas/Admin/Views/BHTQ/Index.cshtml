@@ -1130,13 +1130,15 @@
 			let container = $('#' + currentInvoiceId);
 			container.find('.basePrice').val(total);
 			container.find('.discountAmount').val(0);
-			container.find('.finalTotal').val(total);
 
 					// Gọi hàm cập nhật badge
 			updateInvoiceBadgeCount(currentInvoiceId);
 
 			// Nếu cần autoSelectDiscountCode
 			autoSelectDiscountCode(currentInvoiceId);
+			let fee= parseFloat(container.find('.fee').text());
+			total += fee;
+			container.find('.finalTotal').val(total);
 		}
 
 
@@ -1937,22 +1939,22 @@
 
 		// Nút "X" để xóa dòng
 		// 	   Xóa dòng thanh toán
-		// $(document).on('click', '.deletePaymentRow', function(){
-		//   let row = $(this).closest('tr');
-		//   let index = row.index();
-		//   row.remove();
-		//   paymentRows.splice(index, 1);
-		//   Cập nhật lại STT
-		//   $('#paymentDetailsTable tbody tr').each(function(i){
-		// 	$(this).find('td:first').text(i+1);
-		//   });
-		//   let totalPaid = paymentRows.reduce((sum, row) => sum + row.amount, 0);
-		//   let invoiceTotal = parseFloat($('#invoiceTotal').text().replace(/,/g, '')) || 0;
-		//   let remain = invoiceTotal - totalPaid;
-		//   if(remain < 0) remain = 0;
-		//   $('#paidAmount').text(totalPaid.toLocaleString());
-		//   $('#remaining').text(remain.toLocaleString());
-		// });
+		$(document).on('click', '.deletePaymentRow', function(){
+		  let row = $(this).closest('tr');
+		  let index = row.index();
+		  row.remove();
+		  paymentRows.splice(index, 1);
+		  // Cập nhật lại STT
+		  $('#paymentDetailsTable tbody tr').each(function(i){
+			$(this).find('td:first').text(i+1);
+		  });
+		  let totalPaid = paymentRows.reduce((sum, row) => sum + row.amount, 0);
+		  let invoiceTotal = parseFloat($('#invoiceTotal').text().replace(/,/g, '')) || 0;
+		  let remain = invoiceTotal - totalPaid;
+		  if(remain < 0) remain = 0;
+		  $('#paidAmount').text(totalPaid.toLocaleString());
+		  $('#remaining').text(remain.toLocaleString());
+		});
 
 				$('#addPaymentRowBtn').on('click', function(){
 					debugger;
@@ -2283,56 +2285,7 @@
 		  }
 		});
 
-			// $(document).on('click', '.payment-method', function(){
-			//   Lấy mã từ data-method
-			//   currentMethod = $(this).data('method'); "TTM", "CK", "all"
-
-			//   Hiển thị text cho #selectedMethod
-			//   if (currentMethod === 'TTM') {
-			// 	  $('#selectedMethod').text('Tiền mặt');
-			//   } else if (currentMethod === 'CK') {
-			// 	  $('#selectedMethod').text('Chuyển khoản');
-			// 	  Nếu là chuyển khoản, gọi hàm xử lý thanh toán VNPay
-			// 	  processVNPayPayment();
-			//   } else if (currentMethod === 'all') {
-			// 	  $('#selectedMethod').text('Cả 2');
-			//   }
-			// });
-
-		// 			function processVNPayPayment(){
-		// 	Lấy thông tin tổng tiền đơn hàng từ giao diện (giả sử được lưu trong input finalTotal)
-		// 	let invoiceDom = $('#' + currentInvoiceId);
-		// 	let orderTotal = parseFloat(invoiceDom.find('.finalTotal').val()) || 0;
-
-		// 	Lấy thông tin mô tả đơn hàng nếu cần (có thể lấy từ một trường ẩn hoặc từ mã hóa đơn)
-		// 	let orderInfo = invoiceDom.find('.orderInfo').text() || 'Thanh toán đơn hàng';
-
-		// 	Gọi API tạo request thanh toán VNPay
-		// 	$.ajax({
-		// 			   url: '/Admin/VNPayPayment/CreatePayment',
-		// Endpoint cần được định nghĩa trên server
-		// 		type: 'GET',
-		// 		data: {
-		// 			amount: orderTotal,
-		// 			orderInfo: orderInfo
-		// 		},
-		// 		success: function(res){
-		// 			if (res && res.redirectUrl) {
-		// 				Chuyển hướng trình duyệt sang URL VNPay
-		// 				window.location.href = res.redirectUrl;
-		// 			} else {
-		// 				alert("Không thể tạo URL thanh toán VNPay");
-		// 			}
-		// 		},
-		// 		error: function(err){
-		// 			console.error(err);
-		// 			alert("Có lỗi xảy ra khi tạo thanh toán VNPay");
-		// 		}
-		// 	});
-		// }
-
-		   // Gọi hàm khi trang tải
-	
+			
 
 		
 	
@@ -2383,14 +2336,14 @@
 
 						response.ship = 50000;
 					}
-					// if(subtotal > 2000000)
-				 //   {
+					// if(subtotal > )
+				 //   {2000000
 					//    response.ship = 0;
 				 //   }
 					 // let total = response.ship + subtotal;
 					console.log("Nhận phản hồi:", response);
 					if (response.success) {
-						$("#fee").text(response.ship.toLocaleString() + " VNĐ");
+						$("#fee").text(response.ship.toLocaleString());
 						// $("#totalWithFee").text( total.toLocaleString() + " VNĐ");
 					} else {
 						alert(response.message);
