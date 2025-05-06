@@ -753,11 +753,11 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 {
                     ship = 50000;
                 }
-                //if (request.subtotal > 2000000)
-                //{
-                //    ship = 0;
-                //}
-          
+                if (request.subtotal > 2000000)
+                {
+                    ship = 0;
+                }
+
                 return Json(new { success = true, ship });
 
             }

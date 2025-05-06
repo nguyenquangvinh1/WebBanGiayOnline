@@ -134,10 +134,10 @@
 							<div class="khachLe">
 								<p>Khách lẻ</p>
 						</div>
-						<button class="btn btn-primary mb-3 toggleAddressForm"  data-id="INVOICE_ID">Giao hàng</button>
+						<button class="btn btn-primary mb-3 toggleCustomerForm" data-id="INVOICE_ID">Giao hàng</button>
 						<button class="btn btn-primary mb-3 openAddress">Chọn địa chỉ</button>
-						<div class="customerForm mb-6">
-							<div class="p-3 border rounded bg-white  mt-3" id="customerForm">
+						<div class="customerForm mb-6" style="display: none;">
+							<div class="p-3 border rounded bg-white  mt-3">
 									<div class="col-12 mt-3.8.6">
 										<label class="form-label">Họ và tên</label>
 										<input type="text" class="form-control customerName" placeholder="Họ tên">
@@ -150,7 +150,7 @@
 										<label class="form-label">Email</label>
 									<input type="email" class="form-control customerEmail " placeholder="Email">
 									</div>
-								<div class="form-item my-3 AddressForm" onchange="calculateFee()" style="display: none;">
+								<div class="form-item my-3 AddressForm" onchange="calculateFee()">
 									<div class="row">
 										<div class="col-md-4 mb-3">
 											<label>* Tỉnh/Thành phố</label>
@@ -213,7 +213,7 @@
 										</div>
 										<div class="col-12">
 										<label class="form-label">Phí vận chuyển</label>
-										  <img src="~/coloshop-master/images/tải xuống.png" class="img-fluid" alt="" style="width: 30px; height: 30px; object-fit: contain;"> <a class="fee"></a> 0 VNĐ
+										  <img src="~/coloshop-master/images/tải xuống.png" class="img-fluid" alt="" style="width: 30px; height: 30px; object-fit: contain;"> <a class="fee">0</a> VNĐ
 										</div>
 										<div class="col-12">
 											<label class="form-label">Tổng tiền</label>
@@ -780,14 +780,14 @@
 				}
 			});
 		});
-		$(document).on('click', '.toggleAddressForm', function () {
+		$(document).on('click', '.toggleCustomerForm', function () {
 
 			currentInvoiceId = $(this).data('id');
 
 			console.log("chay dia chi");
 			let container = $('#' + currentInvoiceId);
 
-			var form = container.find('.AddressForm');
+			var form = container.find('.customerForm');
 			if (form.is(':visible')) {
 				form.hide();
 			} else {
@@ -950,6 +950,11 @@
 								container.find('.customerPhone').val(customer.phoneNumber);
 								container.find('.customerEmail').val(customer.email);
 									container.attr('data-customer-id', customer.id);
+
+
+								// Xử lý nút openAddress
+								let addressBtn = container.find('.openAddress');
+								addressBtn.attr('data-id', customer.id).show();
 
 								// Gọi tự động chọn phiếu giảm giá ngay sau khi cập nhật thông tin khách hàng
 								autoSelectDiscountCode(newInvoiceDomId);
@@ -1170,6 +1175,13 @@
 			let container = $('#' + currentInvoiceId);
 			container.find('.basePrice').val(total);
 			container.find('.discountAmount').val(0);
+
+
+
+			let fee = parseFloat(container.find('.fee').text()) || 0;
+			total += fee;
+			console.log(fee);
+
 			container.find('.finalTotal').val(total);
 
 					// Gọi hàm cập nhật badge
@@ -1739,6 +1751,8 @@
 			let customerId = container.attr('data-customer-id') || null;
 						console.log('customerId:',customerId);
 
+			let fee = container.find('.fee').val();
+
 			$.ajax({
 				url: '/Admin/PhieuGiamGia/GetAvailableDiscounts',
 				type: 'GET',
@@ -1771,7 +1785,7 @@
 						debugger;
 						container.find('.discountAmount').val(maxDiscount);
 						debugger;
-						container.find('.finalTotal').val(orderTotal - maxDiscount);
+						container.find('.finalTotal').val(orderTotal - maxDiscount + fee);
 						debugger;
 						// Nếu có voucher tốt nhất, hiển thị toast confirm
 						Swal.fire({
@@ -1849,11 +1863,14 @@
 			let giaTri = parseFloat($(this).data('gia-tri')) || 0;
 			let max = parseFloat($(this).data('max')) || 0;
 
+
 			if (!currentInvoiceId) {
 				alert("Không tìm thấy hóa đơn hiện hành.");
 				return;
 			}
 			let container = $('#' + currentInvoiceId);
+
+			let fee = container.find('.fee').val();
 			let orderTotal = parseFloat($('#totalPrice-' + currentInvoiceId).text()) || 0;
 
 			let discount = 0;
@@ -1872,7 +1889,7 @@
 			container.find('.discountCodeInput').val(voucherCode);
 			container.find('.basePrice').val(orderTotal);
 			container.find('.discountAmount').val(discount);
-			container.find('.finalTotal').val(orderTotal - discount);
+			container.find('.finalTotal').val(orderTotal - discount + fee);
 
 			//kiem tra xem co ma gg nay co trung voi ma gg cua voucher code hay khong
 			if(Math.abs(discount - bestDiscountAmount) < 0.01){
@@ -1894,7 +1911,7 @@
 			if (modal) {
 				modal.hide();
 			}
-			console.log("Voucher applied:", { voucherId, voucherCode, discount, finalTotal: orderTotal - discount });
+			console.log("Voucher applied:", { voucherId, voucherCode, discount, finalTotal: orderTotal - discount +fee });
 		});
 
 		////////
@@ -2393,6 +2410,11 @@
 			var form = container.find('.fee');
 
 
+			let subtotal = parseFloat($('#totalPrice-' + currentInvoiceId).text()) || 0;
+			console.log(subtotal);
+
+
+
 			if (provinceId =="" && districtId == "" && wardCode == "") {
 				alert("Vui lòng chọn đầy đủ địa chỉ.");
 				return;
@@ -2408,7 +2430,8 @@
 		height: 50,
 		length: 20,
 		weight: 200,
-		width: 20,
+				width: 20,
+				subtotal: subtotal,
 		provinceId: provinceId,
 		insurance_value: 10000,
 		cod_failed_amount: 2000,
@@ -2429,21 +2452,19 @@
 
 					 if (response.success) {
 				const container = $('#' + currentInvoiceId);
-				const shippingFee = response.ship;
-				container.find('.fee').text(shippingFee.toLocaleString());
+						const shippingFee = response.ship > 0 ? response.ship : 0 ;
+				container.find('.fee').text(shippingFee);
 				debugger;
 
-				// Lấy tổng tiền hiện tại
-				const subtotalText = container.find('.subtotal').text().replace(/\D/g, '');
-				const subtotal = parseFloat(subtotalText) || 0;
 
 				debugger;
 
 				// Tính tổng tiền mới
 				const total = subtotal + shippingFee;
+
+				container.find('.finalTotal').val(total);
 				debugger;
 
-				container.find('.total').text(total.toLocaleString() + ' VNĐ');
 			} else {
 				alert(response.message);
 			}
