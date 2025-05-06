@@ -134,7 +134,7 @@
 							<div class="khachLe">
 								<p>Khách lẻ</p>
 						</div>
-						<button class="btn btn-primary mb-3" onclick="toggleAddressForm()">Giao hàng</button>
+						<button class="btn btn-primary mb-3 toggleAddressForm"  data-id="INVOICE_ID">Giao hàng</button>
 						<button class="btn btn-primary mb-3 openAddress">Chọn địa chỉ</button>
 						<div class="customerForm mb-6">
 							<div class="p-3 border rounded bg-white  mt-3" id="customerForm">
@@ -780,8 +780,10 @@
 				}
 			});
 		});
+		$(document).on('click', '.toggleAddressForm', function () {
 
-		function toggleAddressForm() {
+			currentInvoiceId = $(this).data('id');
+
 			console.log("chay dia chi");
 			let container = $('#' + currentInvoiceId);
 
@@ -789,9 +791,10 @@
 			if (form.is(':visible')) {
 				form.hide();
 			} else {
+				loadProvinces();
 				form.show();
 			}
-		}
+		});
 
 
 
