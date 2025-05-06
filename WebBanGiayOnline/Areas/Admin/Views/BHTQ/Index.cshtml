@@ -2424,22 +2424,26 @@
 				dataType: "json",
 				success: function(response) {
 
-					if(provinceId !=  201){
+					 if (response.success) {
+				const container = $('#' + currentInvoiceId);
+				const shippingFee = response.ship;
+				container.find('.fee').text(shippingFee.toLocaleString());
+				debugger;
 
-						response.ship = 50000;
-					}
-					// if(subtotal > 2000000)
-				 //   {
-					//    response.ship = 0;
-				 //   }
-					 // let total = response.ship + subtotal;
-					console.log("Nhận phản hồi:", response);
-					if (response.success) {
-						form.text(response.ship.toLocaleString());
-						// $("#totalWithFee").text( total.toLocaleString() + " VNĐ");
-					} else {
-						alert(response.message);
-					}
+				// Lấy tổng tiền hiện tại
+				const subtotalText = container.find('.subtotal').text().replace(/\D/g, '');
+				const subtotal = parseFloat(subtotalText) || 0;
+
+				debugger;
+
+				// Tính tổng tiền mới
+				const total = subtotal + shippingFee;
+				debugger;
+
+				container.find('.total').text(total.toLocaleString() + ' VNĐ');
+			} else {
+				alert(response.message);
+			}
 				},
 				error: function(xhr) {
 					console.error("Lỗi chi tiết:", xhr.responseText);

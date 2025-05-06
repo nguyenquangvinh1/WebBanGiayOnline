@@ -181,38 +181,38 @@ namespace WebBanGiay.Areas.Admin.Controllers
             return Json(new { success = true, message = "Đã gắn khách hàng vào hóa đơn thành công!" });
         }
 
-        public class ShippingFeeRequest
-        {
-            public int to_district_id { get; set; }
-            public string to_ward_code { get; set; }
-            public int weight { get; set; }
-            // … nếu cần thêm length,width,height
-        }
+        //public class ShippingFeeRequest
+        //{
+        //    public int to_district_id { get; set; }
+        //    public string to_ward_code { get; set; }
+        //    public int weight { get; set; }
+        //    // … nếu cần thêm length,width,height
+        //}
 
-        [HttpPost]
-        public async Task<JsonResult> GetShippingFee([FromBody] ShippingFeeRequest rq)
-        {
-            using var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("Token", "YOUR_TOKEN");
-            client.DefaultRequestHeaders.Add("ShopId", "YOUR_SHOP_ID");
-            var payload = new
-            {
-                service_type_id = 2,
-                from_district_id = 1442,
-                from_ward_code = "21211",
-                to_district_id = rq.to_district_id,
-                to_ward_code = rq.to_ward_code,
-                weight = rq.weight
-            };
-            var resp = await client.PostAsJsonAsync(
-                "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee",
-                payload);
-            var data = await resp.Content.ReadFromJsonAsync<dynamic>();
-            if ((int)data.code != 200)
-                return Json(new { success = false, message = "Không tính được phí ship" });
-            decimal fee = data.data.total;
-            return Json(new { success = true, fee });
-        }
+        //[HttpPost]
+        //public async Task<JsonResult> GetShippingFee([FromBody] ShippingFeeRequest rq)
+        //{
+        //    using var client = new HttpClient();
+        //    client.DefaultRequestHeaders.Add("Token", "YOUR_TOKEN");
+        //    client.DefaultRequestHeaders.Add("ShopId", "YOUR_SHOP_ID");
+        //    var payload = new
+        //    {
+        //        service_type_id = 2,
+        //        from_district_id = 1442,
+        //        from_ward_code = "21211",
+        //        to_district_id = rq.to_district_id,
+        //        to_ward_code = rq.to_ward_code,
+        //        weight = rq.weight
+        //    };
+        //    var resp = await client.PostAsJsonAsync(
+        //        "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee",
+        //        payload);
+        //    var data = await resp.Content.ReadFromJsonAsync<dynamic>();
+        //    if ((int)data.code != 200)
+        //        return Json(new { success = false, message = "Không tính được phí ship" });
+        //    decimal fee = data.data.total;
+        //    return Json(new { success = true, fee });
+        //}
 
 
         [HttpPost]

@@ -76,6 +76,7 @@ namespace WebBanGiay.Controllers
                 new Claim("name", user.ho_ten),
                 new Claim("email", user.email),
                 new Claim("SDT", user.sdt),
+                new Claim("ma", user.ma),
                 new Claim(ClaimTypes.Name, user.user_name),
                 new Claim(ClaimTypes.Role, user.Vai_Tro.ten_vai_tro),
                 new Claim(ClaimTypes.Email, user.email ?? ""),
