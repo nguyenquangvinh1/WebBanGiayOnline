@@ -150,7 +150,7 @@
 										<label class="form-label">Email</label>
 									<input type="email" class="form-control customerEmail " placeholder="Email">
 									</div>
-								<div class="form-item my-3 AddressForm" onchange="calculateFee()">
+								<div class="form-item my-3 AddressForm" onchange="calculateFee()" style="display: none;">
 									<div class="row">
 										<div class="col-md-4 mb-3">
 											<label>* Tỉnh/Thành phố</label>
@@ -788,11 +788,14 @@
 			let container = $('#' + currentInvoiceId);
 
 			var form = container.find('.customerForm');
+			var diaChi = container.find('.AddressForm');
 			if (form.is(':visible')) {
 				form.hide();
+				diaChi.hide();
 			} else {
 				loadProvinces();
 				form.show();
+				diaChi.show();
 			}
 		});
 
@@ -2626,6 +2629,10 @@
 			const tinhSelect = container.find('.tinh');
 			const huyenSelect = container.find('.huyen');
 			const xaSelect = container.find('.xa');
+
+			var diaChi = container.find('.AddressForm');
+			diaChi.show();
+
 
 			console.log("Container:", container.attr('id'));
 			console.log("Tỉnh cần chọn:", tenTinh);
