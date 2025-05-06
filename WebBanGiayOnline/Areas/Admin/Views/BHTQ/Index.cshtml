@@ -205,11 +205,11 @@
 										</div>
 										<div class="col-12">
 											<label class="form-label">Giá gốc</label>
-											<input type="text" class="form-control basePrice text-start" readonly>
+											<input type="text" class="form-control basePrice text-start" value="0" readonly>
 										</div>
 										<div class="col-12">
 											<label class="form-label">Giảm giá</label>
-											<input type="text" class="form-control discountAmount text-start" readonly>
+											<input type="text" class="form-control discountAmount text-start" value="0" readonly>
 										</div>
 										<div class="col-12">
 										<label class="form-label">Phí vận chuyển</label>
@@ -217,7 +217,7 @@
 										</div>
 										<div class="col-12">
 											<label class="form-label">Tổng tiền</label>
-											<input type="text" class="form-control finalTotal text-start" readonly>
+											<input type="text" class="form-control finalTotal text-start" value="0" readonly>
 										</div>
 										<div class="col-12">
 											<button class="btn btn-success w-100" id="finalConfirmBtn">
@@ -1751,7 +1751,8 @@
 			let customerId = container.attr('data-customer-id') || null;
 						console.log('customerId:',customerId);
 
-			let fee = container.find('.fee').val();
+
+			let fee = parseFloat(container.find('.fee').text()) || 0;
 
 			$.ajax({
 				url: '/Admin/PhieuGiamGia/GetAvailableDiscounts',
@@ -1870,7 +1871,11 @@
 			}
 			let container = $('#' + currentInvoiceId);
 
-			let fee = container.find('.fee').val();
+
+
+			let fee = parseFloat(container.find('.fee').text()) || 0;
+
+			console.log("da chay voi fee: " + fee);
 			let orderTotal = parseFloat($('#totalPrice-' + currentInvoiceId).text()) || 0;
 
 			let discount = 0;
@@ -1911,7 +1916,7 @@
 			if (modal) {
 				modal.hide();
 			}
-			console.log("Voucher applied:", { voucherId, voucherCode, discount, finalTotal: orderTotal - discount +fee });
+			console.log("Voucher applied:", { voucherId, voucherCode, discount, finalTotal: orderTotal - discount + fee });
 		});
 
 		////////
@@ -2411,6 +2416,9 @@
 
 
 			let subtotal = parseFloat($('#totalPrice-' + currentInvoiceId).text()) || 0;
+
+
+			let discount = parseFloat(container.find('.discountAmount').val()) || 0;
 			console.log(subtotal);
 
 
@@ -2460,7 +2468,7 @@
 				debugger;
 
 				// Tính tổng tiền mới
-				const total = subtotal + shippingFee;
+						const total = subtotal + shippingFee - discount;
 
 				container.find('.finalTotal').val(total);
 				debugger;
