@@ -1532,6 +1532,7 @@
 
 		// Sự kiện khi nhấn nút "Tài khoản"
 		$(document).on('click', '.selectCustomer', function(){
+			currentInvoiceId = $(this).data('id');
 			// Khi nhấn "Tài khoản", load danh sách khách hàng ở trang đầu tiên
 			currentCustomerPage = 1;
 			  currentSearchKeyword = "";
@@ -2441,8 +2442,8 @@
 		height: 50,
 		length: 20,
 		weight: 200,
-				width: 20,
-				subtotal: subtotal,
+		width: 20,
+		subtotal: subtotal,
 		provinceId: provinceId,
 		insurance_value: 10000,
 		cod_failed_amount: 2000,
