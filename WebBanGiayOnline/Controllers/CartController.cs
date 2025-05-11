@@ -519,7 +519,7 @@ namespace WebBanGiay.Controllers
                             gia = item.DonGia,
                             thanh_tien = item.DonGia * item.SoLuong,
                             phuongThucthanhtoan = phuongthucthanhtoan.ten_phuong_thuc ?? phuongthucthanhtoan1.ten_phuong_thuc ,
-                          
+                            San_Pham_Chi_TietID = spChiTiet.ID,
                             Hoa_DonID = hoadon.ID,
                             ngay_tao = DateTime.Now,
                         });
