@@ -398,7 +398,7 @@
                         </td>
                             <td id="total-@item.ID">@item.thanh_tien?.ToString("#,##0 VNĐ")</td>
                             <td>
-                                <a asp-action="RemoveBill" asp-controller="HoaDon" asp-route-id="@item.ID" class="btn btn-md rounded-circle bg-light border mt-4">
+                                <a asp-action="RemoveBill" asp-controller="HoaDon" asp-route-id="@item.ID" class="btn btn-md rounded-circle bg-light border mt-4 remove">
                                     <i class="fa fa-times text-danger"></i>
                                 </a>
                             </td>
@@ -505,15 +505,10 @@
             huy.style.display="none";
             
 
-        }else if(currentStep === 3){
+        }
+        if(currentStep === 3){
             nextBtn.style.display = "none";
             prevBtn.style.display = "none";
-          
-            statusText = [
-            "Chờ xử lý",
-            "Đã xác nhận",
-            "Đang giao hàng",
-            "Hoàn thành",
            
 
         ];
@@ -678,6 +673,9 @@
                 }
             });
         });
+
+      
+        
 
                function toggleForm(show) {
                    

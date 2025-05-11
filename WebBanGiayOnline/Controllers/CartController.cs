@@ -320,7 +320,7 @@ namespace WebBanGiay.Controllers
                             spChiTiet.so_luong -= item.SoLuong;
                             db.Update(spChiTiet);
                         }
-                 
+
 
 
 
@@ -334,7 +334,7 @@ namespace WebBanGiay.Controllers
                             so_luong = item.SoLuong,
                             gia = item.DonGia,
                             thanh_tien = item.DonGia * item.SoLuong,
-                         
+                            San_Pham_Chi_TietID = spChiTiet.ID,
                             Phuong_Thuc_Thanh_ToanID = phuongthucthanhtoan.ID,
                             Hoa_DonID = hoadon.ID,
                             ngay_tao = DateTime.Now,
@@ -472,7 +472,7 @@ namespace WebBanGiay.Controllers
                     ngay_tao = DateTime.Now,
                     Ship = shippingFee,
                     Giam_GiaID = discount == Guid.Empty ? null : (Guid?)discount,
-                    trang_thai = 0,
+                    trang_thai = 1,
                     loai_hoa_don = 2,
                     ghi_chu = model.GhiChu,
                 };
@@ -528,8 +528,6 @@ namespace WebBanGiay.Controllers
                     db.AddRange(cthd);
                     db.SaveChanges();
                     db.Database.CommitTransaction();
-
-          
                     HttpContext.Session.Remove(MySetting.CART_KEY);
                     HttpContext.Session.Remove("CheckoutInfo");
                     HttpContext.Session.Remove("ShippingInfo");
