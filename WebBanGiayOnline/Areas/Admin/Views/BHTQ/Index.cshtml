@@ -136,7 +136,7 @@
 						</div>
 						<button class="btn btn-primary mb-3 toggleCustomerForm" data-id="INVOICE_ID">Giao hàng</button>
 						<button class="btn btn-primary mb-3 openAddress">Chọn địa chỉ</button>
-						<div class="customerForm mb-6" style="display: none;">
+						<div class="customerForm mb-6">
 							<div class="p-3 border rounded bg-white  mt-3">
 									<div class="col-12 mt-3.8.6">
 										<label class="form-label">Họ và tên</label>
@@ -769,6 +769,8 @@
 						$('#invoiceContent').append(newInvoiceHtml);
 						$(`#${newInvoiceDomId}`).attr('data-db-invoice-id', id);
 						let tab = new bootstrap.Tab(document.querySelector(`#tab-${newInvoiceDomId}`));
+
+						currentInvoiceId = newInvoiceDomId;
 						tab.show();
 					} else {
 						alert("Lỗi tạo hóa đơn: " + res.message);
@@ -790,13 +792,20 @@
 			var form = container.find('.customerForm');
 			var diaChi = container.find('.AddressForm');
 			if (form.is(':visible')) {
-				form.hide();
-				diaChi.hide();
+				if (!diaChi.is(':visible')) {
+					loadProvinces();
+					diaChi.show();
+				} else {
+
+					form.hide();
+					diaChi.hide();
+				}
 			} else {
 				loadProvinces();
 				form.show();
 				diaChi.show();
 			}
+			
 		});
 
 
@@ -996,7 +1005,6 @@
 			currentInvoiceId = "invoice_" + invoiceId;      // cập nhật currentInvoiceId cho container
 			loadInvoiceDetails();
 
-			loadProvinces();
 		});
 				
 

@@ -726,8 +726,8 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 {
                     ship = 0;
                 }
-
-                return Json(new { success = true, ship });
+				HttpContext.Session.SetInt32("ShippingFee", ship);
+				return Json(new { success = true, ship });
 
             }
             catch (Exception ex)
