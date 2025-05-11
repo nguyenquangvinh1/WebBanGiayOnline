@@ -1,6 +1,9 @@
 ﻿@model ClssLib.San_Pham
 
-
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
 
 <!-- Modal Hiển Thị Ảnh -->
 <div class="modal fade" id="productImageModal" tabindex="-1" aria-labelledby="productImageModalLabel" aria-hidden="true">
@@ -48,40 +51,43 @@
                     </button>
 
                     <div class="form-group">
-                        <label for="ten_san_pham" class="col-form-label">Tên Sản Phẩm</label>
-                        <select id="ten_san_pham" name="ten_san_pham" class="form-control select2">
-                            <option value="">-- Nhập hoặc chọn tên sản phẩm --</option>
+                        <label asp-for="ten_san_pham" class="col-form-label">Tên Sản Phẩm</label>
+                        <select asp-for="ten_san_pham" id="ten_san_pham" name="ten_san_pham" class="form-control select2">
+                            <option value="">-- Nhập tên sản phẩm --</option>
                             @foreach (var item in ViewBag.TenGiay as List<string>)
                             {
                                 <option value="@item">@item</option>
                             }
                         </select>
                         <span id="ten_san_pham_warning" class="text-danger" style="display: none;">⚠️ Tên sản phẩm đã tồn tại!</span>
+                        <span asp-validation-for="ten_san_pham" class="text-danger"></span>
                     </div>
 
 
                     <div class="form-group">
                         <label asp-for="Loai_GiayID" class="control-label"></label>
-                        <select id="Loai_GiayID" name="Loai_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddLoaiGiay">
+                        <select asp-for="Loai_GiayID" id="Loai_GiayID" name="Loai_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddLoaiGiay">
                             <option value="">-- Nhập hoặc chọn Loại Giày --</option>
                             @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Loai_GiayID)
                             {
                                 <option value="@item.Value">@item.Text</option>
                             }
                         </select>
+                        <span asp-validation-for="Loai_GiayID" class="text-danger"></span>
                     </div>
 
                     <div class="row">
                         <div class="col-sm-4">
                             <div class="form-group">
                                 <label asp-for="Chat_LieuID" class="control-label"></label>
-                                <select id="Chat_LieuID" name="Chat_LieuID" class="form-control select2" data-api="/Admin/SanPham/AddChatLieu">
+                                <select asp-for="Chat_LieuID" id="Chat_LieuID" name="Chat_LieuID" class="form-control select2" data-api="/Admin/SanPham/AddChatLieu">
                                     <option value="">-- Nhập hoặc chọn Chất Liệu --</option>
                                     @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Chat_LieuID)
                                     {
                                         <option value="@item.Value">@item.Text</option>
                                     }
                                 </select>
+                                <span asp-validation-for="Chat_LieuID" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-sm-4">
@@ -89,13 +95,14 @@
                             <div class="form-group">
                                 <label asp-for="Co_GiayID" class="control-label"></label>
 
-                                <select id="Co_GiayID" name="Co_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddCoGiay">
+                                <select asp-for="Co_GiayID" id="Co_GiayID" name="Co_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddCoGiay">
                                     <option value="">-- Nhập hoặc chọn Cổ Giày --</option>
                                     @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Co_GiayID)
                                     {
                                         <option value="@item.Value">@item.Text</option>
                                     }
                                 </select>
+                                <span asp-validation-for="Co_GiayID" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-sm-4">
@@ -104,13 +111,14 @@
                                 <label asp-for="Danh_MucID" class="control-label"></label>
 
 
-                                <select id="Danh_MucID" name="Danh_MucID" class="form-control select2" data-api="/Admin/SanPham/AddDanhMuc">
+                                <select asp-for="Danh_MucID" id="Danh_MucID" name="Danh_MucID" class="form-control select2" data-api="/Admin/SanPham/AddDanhMuc">
                                     <option value="">-- Nhập hoặc chọn Danh Mục --</option>
                                     @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Danh_MucID)
                                     {
                                         <option value="@item.Value">@item.Text</option>
                                     }
                                 </select>
+                                <span asp-validation-for="Danh_MucID" class="text-danger"></span>
                             </div>
                         </div>
 
@@ -120,13 +128,14 @@
                             <div class="form-group">
                                 <label asp-for="De_GiayID" class="control-label"></label>
 
-                                <select id="De_GiayID" name="De_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddDeGiay">
+                                <select asp-for="De_GiayID" id="De_GiayID" name="De_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddDeGiay">
                                     <option value="">-- Nhập hoặc chọn Đế Giày --</option>
                                     @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.De_GiayID)
                                     {
                                         <option value="@item.Value">@item.Text</option>
                                     }
                                 </select>
+                                <span asp-validation-for="De_GiayID" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-sm-4">
@@ -134,13 +143,14 @@
                             <div class="form-group">
                                 <label asp-for="Mui_GiayID" class="control-label"></label>
 
-                                <select id="Mui_GiayID" name="Mui_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddMuiGiay">
+                                <select asp-for="Mui_GiayID" id="Mui_GiayID" name="Mui_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddMuiGiay">
                                     <option value="">-- Nhập hoặc chọn Mũi Giày --</option>
                                     @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Mui_GiayID)
                                     {
                                         <option value="@item.Value">@item.Text</option>
                                     }
                                 </select>
+                                <span asp-validation-for="Mui_GiayID" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-sm-4">
@@ -148,13 +158,15 @@
                             <div class="form-group">
                                 <label asp-for="Kieu_DangID" class="control-label"></label>
 
-                                <select id="Kieu_DangID" name="Kieu_DangID" class="form-control select2" data-api="/Admin/SanPham/AddKieuDang">
+                                <select asp-for="Kieu_DangID" id="Kieu_DangID" name="Kieu_DangID" class="form-control select2" data-api="/Admin/SanPham/AddKieuDang">
                                     <option value="">-- Nhập hoặc chọn Kiểu Dáng --</option>
                                     @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Kieu_DangID)
                                     {
                                         <option value="@item.Value">@item.Text</option>
                                     }
                                 </select>
+                                
+                                <span asp-validation-for="Kieu_DangID" class="text-danger"></span>
                             </div>
                         </div>
 
@@ -327,6 +339,14 @@
         let selectedSizes = [];
         let uploadedImages = []; // Mảng lưu đường dẫn ảnh
 
+        var Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
+
 
         $(document).on("click", ".anh_form", function () {
 
@@ -368,7 +388,11 @@
                             $('#newSize').val(''); // Xóa nội dung nhập
                         },
                         error: function () {
-                            alert("Có lỗi xảy ra khi thêm kích cỡ.");
+                            
+                        Toast.fire({
+                                icon: 'error',
+                                title: "Có lỗi xảy ra khi thêm kích cỡ."
+                            });
                         }
                     });
                 }
@@ -404,7 +428,10 @@
                             $('#newColor').val('');
                         },
                         error: function () {
-                            alert("Có lỗi xảy ra khi thêm màu.");
+                            Toast.fire({
+                                icon: 'error',
+                                title: "Có lỗi xảy ra khi thêm màu."
+                            });
                         }
                     });
                 }
@@ -440,11 +467,17 @@
                                             `);
                         $("#productImages").val(JSON.stringify(uploadedImages)); // Lưu vào input ẩn
                     } else {
-                        alert("❌ Lỗi khi tải ảnh!");
+                        Toast.fire({
+                            icon: 'error',
+                            title: "❌ Lỗi khi tải ảnh!"
+                        });
                     }
                 },
                 error: function () {
-                    alert("⚠️ Có lỗi xảy ra khi tải ảnh!");
+                    Toast.fire({
+                        icon: 'error',
+                        title: "⚠️ Có lỗi xảy ra khi tải ảnh!"
+                    });
                 }
             });
         });
@@ -493,7 +526,10 @@
             });
 
             if (exceededLimit) {
-                alert("⚠️ Ảnh quá giới hạn! Chỉ có thể chọn tối đa 6 ảnh, các ảnh sau ảnh thứ 6 đã bị loại bỏ.");
+                Toast.fire({
+                    icon: 'error',
+                    title: "⚠️ Ảnh quá giới hạn! Chỉ có thể chọn tối đa 6 ảnh, các ảnh sau ảnh thứ 6 đã bị loại bỏ."
+                });
             }
 
 
@@ -601,11 +637,17 @@
                                     let newOption = new Option(response.text, response.id, true, true);
                                     selectElement.append(newOption).trigger("change");
                                 } else {
-                                    alert("❌ Không thể thêm giá trị mới.");
+                                    Toast.fire({
+                                        icon: 'error',
+                                        title: "❌ Không thể thêm giá trị mới."
+                                    });
                                 }
                             },
                             error: function () {
-                                alert("⚠️ Lỗi khi gửi dữ liệu.");
+                                Toast.fire({
+                                    icon: 'error',
+                                    title: "⚠️ Lỗi khi gửi dữ liệu."
+                                });
                             }
                         });
                     }
@@ -628,7 +670,10 @@
 
                     if (kiemTraTrungLap(tenSanPham)) {
                         warningElement.show();
-                        alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
+                        Toast.fire({
+                            icon: 'error',
+                            title: "⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác."
+                        });
                         e.preventDefault();
                     } else {
                         warningElement.hide();
@@ -662,7 +707,10 @@
 
                 if (kiemTraTrungLap(tenSanPham)) {
                     warningElement.show();
-                    alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
+                    Toast.fire({
+                        icon: 'error',
+                        title: "⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác."
+                    });
                     e.preventDefault();
                 } else {
                     warningElement.hide();
@@ -885,11 +933,17 @@
             });
 
             if (hasError) {
-                alert("⚠️ Vui lòng nhập số lượng và giá hợp lệ (> 0) cho tất cả sản phẩm.");
+                Toast.fire({
+                    icon: 'error',
+                    title: "⚠️ Vui lòng nhập số lượng và giá hợp lệ (> 0) cho tất cả sản phẩm."
+                });
                 return; // Dừng gửi form nếu có lỗi
             }
             if (sanPhamCTList.length === 0) {
-                alert("⚠️ Bạn chưa chọn màu sắc và kích thước hợp lệ! Vui lòng kiểm tra lại.");
+                Toast.fire({
+                    icon: 'error',
+                    title: "⚠️ Bạn chưa chọn màu sắc và kích thước hợp lệ! Vui lòng kiểm tra lại."
+                });
                 e.preventDefault(); // Ngăn không gửi form
                 return;
             }
@@ -906,7 +960,10 @@
 
             let tenSanPham = $("#ten_san_pham").val();
             if (kiemTraTrungLap(tenSanPham)) {
-                alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
+                Toast.fire({
+                    icon: 'error',
+                    title: "⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác."
+                });
                 return;
             }
 
@@ -945,7 +1002,10 @@
         $(document).off("click", "#quickEditForm").on("click", "#quickEditForm", function (e) {
 
             if (!currentTable) {
-                alert("⚠️ Không tìm thấy bảng sản phẩm!");
+                Toast.fire({
+                    icon: 'error',
+                    title: "⚠️ Không tìm thấy bảng sản phẩm!"
+                });
                 return;
             }
 
@@ -953,7 +1013,10 @@
             let price = $("#modalPrice").val();
 
             if (quantity === "" || price === "" || quantity < 0 || price < 0) {
-                alert("⚠️ Vui lòng nhập số lượng và giá hợp lệ!");
+                Toast.fire({
+                    icon: 'error',
+                    title: "⚠️ Vui lòng nhập số lượng và giá hợp lệ!"
+                });
                 return;
             }
 
