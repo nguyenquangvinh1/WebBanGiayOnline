@@ -181,38 +181,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
             return Json(new { success = true, message = "Đã gắn khách hàng vào hóa đơn thành công!" });
         }
 
-        //public class ShippingFeeRequest
-        //{
-        //    public int to_district_id { get; set; }
-        //    public string to_ward_code { get; set; }
-        //    public int weight { get; set; }
-        //    // … nếu cần thêm length,width,height
-        //}
-
-        //[HttpPost]
-        //public async Task<JsonResult> GetShippingFee([FromBody] ShippingFeeRequest rq)
-        //{
-        //    using var client = new HttpClient();
-        //    client.DefaultRequestHeaders.Add("Token", "YOUR_TOKEN");
-        //    client.DefaultRequestHeaders.Add("ShopId", "YOUR_SHOP_ID");
-        //    var payload = new
-        //    {
-        //        service_type_id = 2,
-        //        from_district_id = 1442,
-        //        from_ward_code = "21211",
-        //        to_district_id = rq.to_district_id,
-        //        to_ward_code = rq.to_ward_code,
-        //        weight = rq.weight
-        //    };
-        //    var resp = await client.PostAsJsonAsync(
-        //        "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee",
-        //        payload);
-        //    var data = await resp.Content.ReadFromJsonAsync<dynamic>();
-        //    if ((int)data.code != 200)
-        //        return Json(new { success = false, message = "Không tính được phí ship" });
-        //    decimal fee = data.data.total;
-        //    return Json(new { success = true, fee });
-        //}
+       
 
 
         [HttpPost]
@@ -804,23 +773,13 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     return Json(new { success = false, message = "Không tìm thấy phiếu giảm giá!" });
                 if (voucher.so_luong <= 0)
                     return Json(new { success = false, message = "Phiếu giảm giá đã hết!" });
-                invoice.tong_tien = _context.don_Chi_Tiets
-                  .Where(c => c.Hoa_DonID == invoice.ID)
-                  .Sum(c => c.so_luong * c.gia);
+                invoice.tong_tien = model.FinalTotal;
 
-                double discountAmount = 0;
+                
                 // Nếu loại phiếu giảm giá là 1 => Giảm %
-                if (voucher.loai_phieu_giam_gia == 1)
-                {
-                    discountAmount = invoice.tong_tien * (voucher.gia_tri_giam / 100.0);
-                    if (voucher.so_tien_giam_toi_da.HasValue && discountAmount > voucher.so_tien_giam_toi_da.Value)
-                        discountAmount = voucher.so_tien_giam_toi_da.Value;
-                }
+                
                 // Nếu loại phiếu giảm giá là 0 => Giảm VND
-                else if (voucher.loai_phieu_giam_gia == 0)
-                {
-                    discountAmount = voucher.gia_tri_giam;
-                }
+                
 
                 // Giảm số lượng voucher
                 voucher.so_luong -= 1;
@@ -831,10 +790,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 _context.hoa_Dons.Update(invoice);
                 _context.SaveChanges();
                 // Cập nhật tổng tiền hóa đơn (trừ số tiền giảm)
-                double newTotal = invoice.tong_tien - discountAmount;
-                if (newTotal < 0)
-                    newTotal = 0;
-                invoice.tong_tien = newTotal;
+                
             }
 
             // 4. Đổi trạng thái hóa đơn thành 6 (Đã thanh toán)
