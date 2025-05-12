@@ -54,7 +54,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     tong_tien = 0,
                     ghi_chu = "",
                     //(chờ thêm sản phẩm)
-                    trang_thai = -1,
+                    trang_thai = 6,
                     dia_chi = "Tại quầy",
                     sdt_nguoi_nhan = "",
                     email_nguoi_nhan = "",
@@ -726,8 +726,8 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 {
                     ship = 0;
                 }
-
-                return Json(new { success = true, ship });
+				HttpContext.Session.SetInt32("ShippingFee", ship);
+				return Json(new { success = true, ship });
 
             }
             catch (Exception ex)
@@ -794,7 +794,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
             }
 
             // 4. Đổi trạng thái hóa đơn thành 6 (Đã thanh toán)
-            invoice.trang_thai = -2;
+            invoice.trang_thai = 5;
             _context.hoa_Dons.Update(invoice);
             _context.SaveChanges();
 

@@ -88,11 +88,14 @@
         var trangThaiText = "";
         switch (Model.trang_thai)
         {
+            case -1: trangThaiText = "Chưa thanh toán"; break;
+            case -2: trangThaiText = "Đã thanh toán "; break;
             case 0: trangThaiText = "Chờ xử lý"; break;
             case 1: trangThaiText = "Đã xác nhận"; break;
             case 2: trangThaiText = "Đang giao hàng"; break;
             case 3: trangThaiText = "Hoàn thành"; break;
             case 4: trangThaiText = "Đã hủy"; break;
+           
 
             default: trangThaiText = "Không xác định"; break;
         }
@@ -325,7 +328,7 @@
                                             var id when id == Guid.Parse("C4D5897D-DC1C-4FA1-BE28-DDEAF5985F04") => "Thanh toán MoMo",
                                             _ => "Không xác định"
                                         };
-                                        <div>@phuongthuc</div>
+                                            <div>@phuongthuc</div>
                                     }
                                 }
                             </td>
@@ -398,7 +401,7 @@
                         </td>
                             <td id="total-@item.ID">@item.thanh_tien?.ToString("#,##0 VNĐ")</td>
                             <td>
-                                <a asp-action="RemoveBill" asp-controller="HoaDon" asp-route-id="@item.ID" class="btn btn-md rounded-circle bg-light border mt-4">
+                                <a asp-action="RemoveBill" asp-controller="HoaDon" asp-route-id="@item.ID" class="btn btn-md rounded-circle bg-light border mt-4 remove">
                                     <i class="fa fa-times text-danger"></i>
                                 </a>
                             </td>
@@ -438,14 +441,14 @@
 <br />
     <div class="row payment-summary">
         <div class="col-md-6">
-            <p><strong>Tổng tiền hàng:</strong> @Model.tong_tien.ToString("#,##0 VNĐ")</p>
+            <p><strong>Tổng tiền hàng:</strong> @Model.Hoa_Don_Chi_Tiets.Sum(x => x.thanh_tien)?.ToString("#,##0 VNĐ")</p>
             <p><strong>Phí vận chuyển:</strong> @(Model.Ship != null
                 ? Model.Ship.Value.ToString("#,##0 VNĐ")
                 : "0 VNĐ")
             </p>
             <p>
                 <strong>Mã giảm giá:</strong> @(Model.Giam_Gia != null
-                ? $"{Model.Giam_Gia.ten_phieu_giam_gia}"
+                ? $"{Model.Giam_Gia.gia_tri_giam} %"
                 : "Không áp dụng")
             </p>
         </div>
@@ -467,9 +470,9 @@
 
 
         <script>
-                    
-            
-            let currentStep = @Model.trang_thai ;
+
+
+           let currentStep = @Model.trang_thai ;
         const steps = document.querySelectorAll(".step");
         const progressBar = document.getElementById("progressBar");
         const statusTextElement = document.getElementById("statusText");
@@ -478,60 +481,55 @@
 
         let historyLog = [];
                 const statusText = [
-          
+           
             "Chờ xử lý",
             "Đã xác nhận",
             "Đang giao hàng",
             "Hoàn thành",
             "Đã hủy",
             "Đã Thanh Toán",
-            "Chưa Thanh Toán",
+            "Chưa Thanh Toán"
+           
         ];
 
-            function updateProgress() {
+                 function updateProgress() {
+            // Ẩn hết các bước trước
+            steps.forEach(step => step.classList.remove("active"));
+
+            // Chỉ xử lý tiến trình khi currentStep từ 0 đến 4
+            if (currentStep >= 0 && currentStep <= 4) {
                 steps.forEach((step, index) => {
                     step.classList.toggle("active", index <= currentStep);
                 });
                 progressBar.style.width = `${(currentStep / (steps.length - 1)) * 100}%`;
-
-                 statusTextElement.innerText = statusText[currentStep];
-
-                      statusTextElement.className = "badge";
-        const colors = ["bg-secondary", "bg-primary", "bg-warning", "bg-success","bg-warning","bg-success","bg-danger" ];
-        statusTextElement.classList.add(colors[currentStep]);
-         if (currentStep === 4) {
-            nextBtn.style.display = "none";
-            prevBtn.style.display = "none";
-            huy.style.display="none";
-            
-
-        }else if(currentStep === 3){
-            nextBtn.style.display = "none";
-            prevBtn.style.display = "none";
-          
-            statusText = [
-            "Chờ xử lý",
-            "Đã xác nhận",
-            "Đang giao hàng",
-            "Hoàn thành",
-           
-
-        ];
-
-        }else if (currentStep === 2){
-            prevBtn.style.display ="none";
-         
-        }else if(currentStep === -1 && currentStep===-2 )
-        {
-              nextBtn.style.display = "none";
-            prevBtn.style.display = "none";
-             huy.style.display ="none"j
-        }
-        else {
-            nextBtn.style.display = "inline-block";
-            prevBtn.style.display = "inline-block";
-        }
+            } else {
+                progressBar.style.width = "0%";
             }
+
+            // Hiển thị văn bản trạng thái
+            statusTextElement.innerText = statusText[currentStep];
+
+            // Gán màu tương ứng
+            statusTextElement.className = "badge"; // reset class
+            const colors = ["bg-secondary", "bg-primary", "bg-warning", "bg-success", "bg-warning", "bg-success", "bg-danger"];
+            statusTextElement.classList.add(colors[currentStep]);
+
+            // Ẩn/hiện nút tùy theo trạng thái
+            if (currentStep === 4 || currentStep === 5 || currentStep === 6) {
+                nextBtn.style.display = "none";
+                prevBtn.style.display = "none";
+                if (typeof huy !== "undefined") huy.style.display = "none";
+            } else if (currentStep === 3) {
+                nextBtn.style.display = "none";
+                prevBtn.style.display = "none";
+            } else if (currentStep === 2) {
+                prevBtn.style.display = "none";
+                nextBtn.style.display = "inline-block";
+            } else {
+                nextBtn.style.display = "inline-block";
+                prevBtn.style.display = "inline-block";
+            }
+        }
 
                     function promptReason(callback) {
             Swal.fire({
@@ -678,6 +676,9 @@
                 }
             });
         });
+
+      
+        
 
                function toggleForm(show) {
                    

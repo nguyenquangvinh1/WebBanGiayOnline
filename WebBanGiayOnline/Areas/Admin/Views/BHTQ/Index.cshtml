@@ -124,10 +124,6 @@
 						<h5 class="mb-0">
 							Tổng tiền tạm tính: <strong id="totalPrice-INVOICE_ID">0</strong> VND
 						</h5>
-					
-					<button class="btn btn-outline-primary ms-3  openAddress">
-						<i class="bi bi-geo-alt"></i>
-						Chọn địa chỉ</button>
 						<button class="btn btn-outline-primary ms-3 selectCustomer" data-id="INVOICE_ID">Tài khoản</button>
 					</div>
 					<div class="row">
@@ -138,8 +134,9 @@
 							<div class="khachLe">
 								<p>Khách lẻ</p>
 						</div>
-						
-						<div class="customerForm mb-6" style="display: none;">
+						<button class="btn btn-primary mb-3 toggleCustomerForm" data-id="INVOICE_ID">Giao hàng</button>
+						<button class="btn btn-primary mb-3 openAddress">Chọn địa chỉ</button>
+						<div class="customerForm mb-6">
 							<div class="p-3 border rounded bg-white  mt-3">
 									<div class="col-12 mt-3.8.6">
 										<label class="form-label">Họ và tên</label>
@@ -187,10 +184,8 @@
 						<div class="col-md-6 mb-4">
 							<h6 class="fw-bold mb-3">Thanh toán</h6>
 						<div class="p-3 border rounded bg-white">
-							<label class="form-label">Mở thanh toán </label>
-							
 								<button class="btn btn-outline-primary openPayment" data-id="INVOICE_ID">
-									<i class="fa fa-credit-card"></i>
+									<i class="fa fa-credit-card"></i> Mở thanh toán
 								</button> 
 								<!-- Phần tóm tắt hóa đơn & voucher -->
 								<div class="invoice-summary text-start">
@@ -217,15 +212,9 @@
 											<input type="text" class="form-control discountAmount text-start" value="0" readonly>
 										</div>
 										<div class="col-12">
-										<button class="btn btn-outline-primary ms-1  toggleCustomerForm" data-id="INVOICE_ID">
-											<i class="bi bi-truck"></i>
-											Giao hàng
-										</button>
 										<label class="form-label">Phí vận chuyển</label>
 										  <img src="~/coloshop-master/images/tải xuống.png" class="img-fluid" alt="" style="width: 30px; height: 30px; object-fit: contain;"> <a class="fee">0</a> VNĐ
 										</div>
-									
-									
 										<div class="col-12">
 											<label class="form-label">Tổng tiền</label>
 											<input type="text" class="form-control finalTotal text-start" value="0" readonly>
@@ -708,8 +697,6 @@
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-
 
 @section Scripts {
 
@@ -782,6 +769,8 @@
 						$('#invoiceContent').append(newInvoiceHtml);
 						$(`#${newInvoiceDomId}`).attr('data-db-invoice-id', id);
 						let tab = new bootstrap.Tab(document.querySelector(`#tab-${newInvoiceDomId}`));
+
+						currentInvoiceId = newInvoiceDomId;
 						tab.show();
 					} else {
 						alert("Lỗi tạo hóa đơn: " + res.message);
@@ -803,13 +792,20 @@
 			var form = container.find('.customerForm');
 			var diaChi = container.find('.AddressForm');
 			if (form.is(':visible')) {
-				form.hide();
-				diaChi.hide();
+				if (!diaChi.is(':visible')) {
+					loadProvinces();
+					diaChi.show();
+				} else {
+
+					form.hide();
+					diaChi.hide();
+				}
 			} else {
 				loadProvinces();
 				form.show();
 				diaChi.show();
 			}
+			
 		});
 
 
@@ -1009,7 +1005,6 @@
 			currentInvoiceId = "invoice_" + invoiceId;      // cập nhật currentInvoiceId cho container
 			loadInvoiceDetails();
 
-			loadProvinces();
 		});
 				
 
@@ -1545,6 +1540,7 @@
 
 		// Sự kiện khi nhấn nút "Tài khoản"
 		$(document).on('click', '.selectCustomer', function(){
+			currentInvoiceId = $(this).data('id');
 			// Khi nhấn "Tài khoản", load danh sách khách hàng ở trang đầu tiên
 			currentCustomerPage = 1;
 			  currentSearchKeyword = "";
@@ -2454,8 +2450,8 @@
 		height: 50,
 		length: 20,
 		weight: 200,
-				width: 20,
-				subtotal: subtotal,
+		width: 20,
+		subtotal: subtotal,
 		provinceId: provinceId,
 		insurance_value: 10000,
 		cod_failed_amount: 2000,

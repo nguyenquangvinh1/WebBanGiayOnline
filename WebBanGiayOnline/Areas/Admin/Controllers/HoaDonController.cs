@@ -144,15 +144,15 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
             hoaDon.Hoa_Don_Chi_Tiets = hoaDon.Hoa_Don_Chi_Tiets ?? new List<Hoa_Don_Chi_Tiet>();
             ViewBag.TrangThaiList = new List<SelectListItem>
-            {
-                new SelectListItem { Value = "0", Text = "Chờ xử lý" },
-                new SelectListItem { Value = "1", Text = "Đã xác nhận" },
-                new SelectListItem { Value = "2", Text = "Đang giao hàng" },
-                new SelectListItem { Value = "3", Text = "Hoàn thành" },
-                new SelectListItem { Value = "4", Text = "Đã hủy" },
+{
+    new SelectListItem { Value = "0", Text = "Chờ xử lý" },
+    new SelectListItem { Value = "1", Text = "Đã xác nhận" },
+    new SelectListItem { Value = "2", Text = "Đang giao hàng" },
+    new SelectListItem { Value = "3", Text = "Hoàn thành" },
+    new SelectListItem { Value = "4", Text = "Đã hủy" },  
 
     
-            };
+};
 
             if (hoaDon == null)
             {
