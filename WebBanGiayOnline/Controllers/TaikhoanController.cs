@@ -13,7 +13,8 @@ using System.Net.Mail;
 using System.Net;
 using WebBanGiay.ViewModel;
 using Microsoft.AspNetCore.Authorization;
-using System.Text.RegularExpressions;
+using WebBanGiay.Models.ViewModel;
+
 
 namespace WebBanGiay.Controllers
 {
@@ -27,17 +28,19 @@ namespace WebBanGiay.Controllers
             _context = context;
         }
 
+
+        [HttpGet]
         public IActionResult Login()
         {
             return View("Login");
         }
+
         [HttpPost]
-        public async Task<IActionResult> LoginAdmin(LoginViewmodel model, string? returnUrl = null)
+        public async Task<IActionResult> Login(Models.ViewModel.LoginViewmodel model, string? returnUrl = null)
         {
             if (!ModelState.IsValid)
                 return View("Login", model);
 
-            // Lấy thông tin người dùng từ database
             var user = _context.tai_Khoans
                 .Include(u => u.Vai_Tro)
                 .FirstOrDefault(u => u.user_name == model.Username);
@@ -48,27 +51,13 @@ namespace WebBanGiay.Controllers
                 return View("Login", model);
             }
 
-            // Kiểm tra nếu URL chứa "/Admin"
-            bool isAdminArea = !string.IsNullOrEmpty(returnUrl) && returnUrl.ToLower().Contains("/admin");
-
-            // Kiểm tra vai trò người dùng
-            bool isAdminOrEmployee = user.Vai_Tro.ten_vai_tro == "Admin" || user.Vai_Tro.ten_vai_tro == "Nhân Viên";
-            bool isCustomer = user.Vai_Tro.ten_vai_tro == "Khách hàng";
-
-            // Trường hợp vào trang Admin mà không có quyền Admin hoặc Nhân viên
-            if (isAdminArea && !isAdminOrEmployee)
+            if (user.Vai_Tro.ten_vai_tro != "Khách hàng")
             {
-                ModelState.AddModelError("", "Bạn không có quyền truy cập vào khu vực quản trị.");
+                ModelState.AddModelError("", "Tài khoản này không thuộc vai trò khách hàng.");
                 return View("Login", model);
             }
 
-            // Lấy địa chỉ của người dùng (nếu có)
             var diaChi = _context.dia_Chis.FirstOrDefault(dc => dc.Tai_KhoanID == user.ID);
-
-            string CleanLocationName(string input) =>
-            string.IsNullOrWhiteSpace(input) ? "" :
-            Regex.Replace(input, @"^(Tỉnh|Thành phố)\s+", "", RegexOptions.IgnoreCase).Trim();
-
 
             var claims = new List<Claim>
             {
@@ -76,7 +65,6 @@ namespace WebBanGiay.Controllers
                 new Claim("name", user.ho_ten),
                 new Claim("email", user.email),
                 new Claim("SDT", user.sdt),
-                new Claim("ma", user.ma),
                 new Claim(ClaimTypes.Name, user.user_name),
                 new Claim(ClaimTypes.Role, user.Vai_Tro.ten_vai_tro),
                 new Claim(ClaimTypes.Email, user.email ?? ""),
@@ -86,125 +74,14 @@ namespace WebBanGiay.Controllers
                 new Claim("address", diaChi?.dia_chi_chi_tiet ?? "")
             };
 
-
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
-            
-            if (isAdminOrEmployee)
-            {
-                return RedirectToAction("Index", "Home", new { area = "Admin" }); 
-            }
-            else if (isCustomer)
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
-            return returnUrl != null ? Redirect(returnUrl) : RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Home");
         }
 
 
 
-
-
-
-
-        //// Kiểm tra vai trò và điều hướng
-        //if (user.Vai_Tro.ten_vai_tro == "Admin" || user.Vai_Tro.ten_vai_tro == "Nhân viên")
-        //{
-        //	var referrer = Request.Headers["Referer"].ToString();
-        //	if (!referrer.Contains("/Admin"))
-        //	{
-        //		ModelState.AddModelError("", "Tài khoản này không thể đăng nhập ở đây. Vui lòng đăng nhập vào trang quản trị.");
-        //		return View("Login", model);
-        //	}
-
-        //	return RedirectToAction("Index", "Home", new { area = "Admin" });
-        //}
-
-        //return RedirectToAction("Index", "Home");
-
-
-
-
-        //    public IActionResult Login(bool isAdminLogin = false)
-        //    {
-        //        ViewBag.IsAdminLogin = isAdminLogin;
-        //        return View();
-        //    }
-
-        //    [HttpPost]
-        //    public async Task<IActionResult> LoginAdmin(LoginViewmodel model, bool isAdminLogin = false)
-        //    {
-        //        if (!ModelState.IsValid)
-        //            return View(model);
-
-        //        var user = _context.tai_Khoans
-        //            .Include(u => u.Vai_Tro)
-        //            .FirstOrDefault(u => u.user_name == model.Username);
-
-        //        if (user == null || user.pass_word != model.Password)
-        //        {
-        //            ModelState.AddModelError("", "Tài khoản hoặc mật khẩu không đúng.");
-        //            return View(model);
-        //        }
-
-        //        // Nếu đăng nhập ở trang bán hàng online nhưng tài khoản là Admin hoặc Nhân viên
-        //        if (!isAdminLogin && (user.Vai_Tro.ten_vai_tro == "Admin" || user.Vai_Tro.ten_vai_tro == "Nhân viên"))
-        //        {
-        //            ModelState.AddModelError("", "Tài khoản này không thể đăng nhập ở đây. Vui lòng đăng nhập vào trang quản trị.");
-        //            return View(model);
-        //        }
-
-        //        // Kiểm tra tài khoản khách hàng chưa có mật khẩu -> gửi link reset mật khẩu
-        //        if (user.Vai_Tro != null && user.Vai_Tro.ten_vai_tro == "Khách hàng" && string.IsNullOrEmpty(user.pass_word))
-        //        {
-        //            if (!string.IsNullOrEmpty(user.email) && user.email.Contains("@"))
-        //            {
-        //                await SendResetPasswordLink(user);
-        //                TempData["Message"] = "Tài khoản chưa có mật khẩu. Vui lòng kiểm tra email để đặt lại mật khẩu.";
-        //                return RedirectToAction("Login");
-        //            }
-
-        //            ModelState.AddModelError("", "Email không hợp lệ. Không thể gửi link đặt lại mật khẩu.");
-        //            return View(model);
-        //        }
-
-        //        // Lấy địa chỉ nếu có
-        //        var diaChi = _context.dia_Chis.FirstOrDefault(dc => dc.Tai_KhoanID == user.ID);
-
-        //        // Đăng nhập thành công
-        //        var claims = new List<Claim>
-        //{
-        //    new Claim("userid", user.ID.ToString()),
-        //    new Claim(ClaimTypes.Name, user.user_name),
-        //    new Claim(ClaimTypes.Role, user.Vai_Tro.ten_vai_tro),
-        //    new Claim(ClaimTypes.Email, user.email ?? ""),
-        //    new Claim("Phone", user.sdt ?? "")
-        //};
-
-        //        // Kiểm tra địa chỉ không null trước khi thêm claim
-        //        if (diaChi != null)
-        //        {
-        //            claims.Add(new Claim("Address", diaChi.dia_chi_chi_tiet ?? ""));
-        //            claims.Add(new Claim("tinh", diaChi.tinh ?? ""));
-        //            claims.Add(new Claim("huyen", diaChi.huyen ?? ""));
-        //            claims.Add(new Claim("xa", diaChi.xa ?? ""));
-        //        }
-
-        //        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        //        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-
-        //        // Điều hướng dựa trên vai trò và loại đăng nhập
-        //        if (isAdminLogin && (user.Vai_Tro.ten_vai_tro == "Admin" || user.Vai_Tro.ten_vai_tro == "Nhân viên"))
-        //        {
-        //            return RedirectToAction("Index", "Home", new { area = "Admin" });
-        //        }
-        //        else
-        //        {
-        //            return RedirectToAction("Index", "Home");
-        //        }
-        //    }
 
 
         public async Task<IActionResult> Edit(Guid id)
@@ -243,62 +120,78 @@ namespace WebBanGiay.Controllers
             return Json(new { success = true });
         }
 
-        private async Task<bool> SendResetPasswordLink(Tai_Khoan user)
+
+        //---------Quên mật khẩu--------------//
+        public IActionResult ForgotPassword()
         {
-            try
-            {
-                // Tạo link đặt lại mật khẩu chứa email đã mã hóa (hoặc ID)
-                string resetToken = Convert.ToBase64String(Guid.NewGuid().ToByteArray()); // Tạo token ngẫu nhiên
-                string resetLink = Url.Action("DatLaiMatKhau", "TaiKhoan", new { email = user.email, token = resetToken }, Request.Scheme);
-
-                var mailMessage = new MailMessage("your-email@gmail.com", user.email);
-                mailMessage.Subject = "Đặt lại mật khẩu tài khoản của bạn";
-                mailMessage.Body = $"Xin chào {user.user_name},<br/>Vui lòng nhấp vào liên kết sau để đặt lại mật khẩu: <a href='{resetLink}'>Đặt lại mật khẩu</a>";
-                mailMessage.IsBodyHtml = true;
-
-                using (var smtp = new SmtpClient("smtp.gmail.com"))
-                {
-                    smtp.Port = 587;
-                    smtp.Credentials = new NetworkCredential("your-email@gmail.com", "your-email-password");
-                    smtp.EnableSsl = true;
-                    await smtp.SendMailAsync(mailMessage);
-                }
-
-                return true; // Gửi thành công
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Lỗi gửi email: " + ex.Message);
-                return false; // Gửi thất bại
-            }
-        }
-
-        [HttpGet]
-        public IActionResult DatLaiMatKhau(string email, string token)
-        {
-            ViewBag.Email = email;
-            ViewBag.Token = token;
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> DatLaiMatKhau(string email, string token, string newPassword)
+        public IActionResult ForgotPassword(QuenMatkhau model)
         {
-            var user = await _context.tai_Khoans.FirstOrDefaultAsync(tk => tk.email == email);
+            if (!ModelState.IsValid)
+                return View(model);
 
-            if (user == null || string.IsNullOrEmpty(token))
+            var user = _context.tai_Khoans.FirstOrDefault(u => u.email == model.Email);
+            if (user == null)
             {
-                ViewBag.Message = "Liên kết không hợp lệ hoặc đã hết hạn.";
-                return View();
+                ModelState.AddModelError("", "Email không tồn tại trong hệ thống.");
+                return View(model);
             }
 
-            user.pass_word = newPassword;  // Nên mã hóa mật khẩu trước khi lưu
-            _context.Update(user);
-            await _context.SaveChangesAsync();
+            // Tạo mã xác nhận hoặc token (ở đây dùng Guid đơn giản)
+            var resetToken = Guid.NewGuid().ToString();
 
-            ViewBag.Message = "Đặt lại mật khẩu thành công!";
-            return RedirectToAction("Login", "Account");
+            // Lưu token vào bảng hoặc gửi trực tiếp qua email (ở đây giả sử bạn gửi link reset)
+            // Gửi email (giả lập link)
+            var resetLink = Url.Action("ResetPassword", "Account", new { email = model.Email, token = resetToken }, Request.Scheme);
+
+            // TODO: Gửi email resetLink cho người dùng
+            Console.WriteLine($"Gửi email đặt lại mật khẩu: {resetLink}");
+
+            TempData["SuccessMessage"] = "Hướng dẫn đặt lại mật khẩu đã được gửi tới email của bạn.";
+            return RedirectToAction("Login");
         }
+
+
+        //---------Reset Password-------------//
+
+        public IActionResult ResetPassword(string email, string token)
+        {
+            var model = new ResetPasswordViewModel
+            {
+                Email = email,
+                Token = token
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = _context.tai_Khoans.FirstOrDefault(u => u.email == model.Email);
+            if (user == null)
+            {
+                ModelState.AddModelError("", "Tài khoản không tồn tại.");
+                return View(model);
+            }
+
+            // Bạn có thể kiểm tra token ở đây nếu bạn lưu trong DB
+            // Trong ví dụ đơn giản này, ta giả lập là token luôn đúng
+
+            user.pass_word = model.NewPassword; // Bạn nên mã hóa mật khẩu nếu có
+
+            _context.tai_Khoans.Update(user);
+            _context.SaveChanges();
+
+            TempData["SuccessMessage"] = "Mật khẩu đã được đặt lại thành công.";
+            return RedirectToAction("Login");
+        }
+
 
         [HttpGet]
         public IActionResult Register()
@@ -307,7 +200,7 @@ namespace WebBanGiay.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterViewModel model)
+        public async Task<IActionResult> Register(Models.ViewModel.RegisterViewModel model)
         {
             if (!ModelState.IsValid)
                 return View(model);
@@ -362,11 +255,25 @@ namespace WebBanGiay.Controllers
             return RedirectToAction("Login");
         }
 
+        //public async Task<IActionResult> Logout()
+        //{
+        //    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        //    TempData["Message"] = "Đăng xuất thành công!";
+        //    return RedirectToAction("Login", "TaiKhoan");
+        //}
+        [HttpGet]
         public async Task<IActionResult> Logout()
         {
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            TempData["Message"] = "Đăng xuất thành công!";
+
+            if (role == "Admin" || role == "Nhân Viên")
+                return RedirectToAction("LoginAdmin", "Account", new { area = "Admin" });
+
             return RedirectToAction("Login", "TaiKhoan");
         }
+
+
     }
 }

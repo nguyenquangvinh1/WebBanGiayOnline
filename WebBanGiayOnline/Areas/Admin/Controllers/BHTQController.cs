@@ -11,6 +11,10 @@ using WebBanGiay.Data;
 using WebBanGiay.Models.ViewModel;
 using WebBanGiay.Service;
 using WebBanGiay.ViewModel;
+using System.Configuration;
+using System.Configuration;
+using System.Configuration;
+using System.Configuration;
 
 namespace WebBanGiay.Areas.Admin.Controllers
 {
