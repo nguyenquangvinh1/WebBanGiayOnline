@@ -124,6 +124,10 @@
 						<h5 class="mb-0">
 							Tổng tiền tạm tính: <strong id="totalPrice-INVOICE_ID">0</strong> VND
 						</h5>
+					
+					<button class="btn btn-outline-primary ms-3  openAddress">
+						<i class="bi bi-geo-alt"></i>
+						Chọn địa chỉ</button>
 						<button class="btn btn-outline-primary ms-3 selectCustomer" data-id="INVOICE_ID">Tài khoản</button>
 					</div>
 					<div class="row">
@@ -134,8 +138,7 @@
 							<div class="khachLe">
 								<p>Khách lẻ</p>
 						</div>
-						<button class="btn btn-primary mb-3 toggleCustomerForm" data-id="INVOICE_ID">Giao hàng</button>
-						<button class="btn btn-primary mb-3 openAddress">Chọn địa chỉ</button>
+						
 						<div class="customerForm mb-6" style="display: none;">
 							<div class="p-3 border rounded bg-white  mt-3">
 									<div class="col-12 mt-3.8.6">
@@ -184,8 +187,10 @@
 						<div class="col-md-6 mb-4">
 							<h6 class="fw-bold mb-3">Thanh toán</h6>
 						<div class="p-3 border rounded bg-white">
+							<label class="form-label">Mở thanh toán </label>
+							
 								<button class="btn btn-outline-primary openPayment" data-id="INVOICE_ID">
-									<i class="fa fa-credit-card"></i> Mở thanh toán
+									<i class="fa fa-credit-card"></i>
 								</button> 
 								<!-- Phần tóm tắt hóa đơn & voucher -->
 								<div class="invoice-summary text-start">
@@ -212,9 +217,15 @@
 											<input type="text" class="form-control discountAmount text-start" value="0" readonly>
 										</div>
 										<div class="col-12">
+										<button class="btn btn-outline-primary ms-1  toggleCustomerForm" data-id="INVOICE_ID">
+											<i class="bi bi-truck"></i>
+											Giao hàng
+										</button>
 										<label class="form-label">Phí vận chuyển</label>
 										  <img src="~/coloshop-master/images/tải xuống.png" class="img-fluid" alt="" style="width: 30px; height: 30px; object-fit: contain;"> <a class="fee">0</a> VNĐ
 										</div>
+									
+									
 										<div class="col-12">
 											<label class="form-label">Tổng tiền</label>
 											<input type="text" class="form-control finalTotal text-start" value="0" readonly>
@@ -697,6 +708,8 @@
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
 
 @section Scripts {
 
