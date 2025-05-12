@@ -15,7 +15,7 @@ namespace ClssLib
         public Guid ID { get; set; }
         [Display(Name = "Tên Sản Phẩm :")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "Hãy nhập tên Sản phẩm")]
-        [StringLength(maximumLength: 50, MinimumLength = 25, ErrorMessage = "Độ dài tên bắt buộc có từ 25 đến 50")]
+        [StringLength(maximumLength: 50, MinimumLength = 1, ErrorMessage = "Độ dài tên bắt buộc có từ 5 đến 50")]
         public string ten_san_pham { get; set; }
 
         [Display(Name = "Mô Tả :")]
