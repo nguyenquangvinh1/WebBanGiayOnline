@@ -501,7 +501,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         // GET: KieuDangController/Create
         public IActionResult Create()
         {
-            var query = _context.san_Phams.AsQueryable();
+            var query = _context.san_Phams.ToList();
             var tenDaDangKy = new List<string>();
             foreach (var item in query)
             {
