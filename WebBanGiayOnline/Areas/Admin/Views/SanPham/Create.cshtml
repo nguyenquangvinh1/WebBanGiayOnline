@@ -367,37 +367,51 @@
             $('#newSize').focus();
         });
 
-        // Khi nhấn Enter để thêm kích cỡ mới
+        const kichThuocDaCo = @Html.Raw(Json.Serialize((IEnumerable<SelectListItem>)ViewData["Kich_ThuocID"]));
+
         $('#newSize').keypress(function (e) {
-            if (e.which == 13) { // Nhấn Enter
+            if (e.which == 13) {
+                e.preventDefault();
+
                 let newSize = $('#newSize').val().trim();
-                if (newSize !== "") {
-                    $.ajax({
-                        url: '/Admin/SanPham/ThemKichCo',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify(newSize),
-                        success: function (response) {
-                            // Thêm checkbox kích cỡ mới vào danh sách
-                            $('#sizeModalBody').append(`
-                                        <div class="form-check">
-                                            <input class="form-check-input size-checkbox" type="checkbox" value="${response}" checked> ${response}
-                                        </div>
-                                    `);
-                            $('#sizePickerContainer').hide(); // Ẩn ô nhập kích cỡ
-                            $('#newSize').val(''); // Xóa nội dung nhập
-                        },
-                        error: function () {
-                            
-                        Toast.fire({
-                                icon: 'error',
-                                title: "Có lỗi xảy ra khi thêm kích cỡ."
-                            });
-                        }
+                if (newSize === "") return;
+
+                // 🔍 Kiểm tra trùng từ danh sách lấy từ Razor
+                let isDuplicate = kichThuocDaCo.some(item => item.text.toLowerCase() === newSize.toLowerCase());
+
+                if (isDuplicate) {
+                    Toast.fire({
+                        icon: 'warning',
+                        title: '⚠️ Kích cỡ đã tồn tại trong danh sách!'
                     });
+                    return;
                 }
+
+                $.ajax({
+                    url: '/Admin/SanPham/ThemKichCo',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(newSize),
+                    success: function (response) {
+                        $('#sizeModalBody').append(`
+                        <div class="form-check">
+                            <input class="form-check-input size-checkbox" type="checkbox" value="${response}" checked> ${response}
+                        </div>
+                    `);
+                        $('#sizePickerContainer').hide();
+                        $('#newSize').val('');
+                    },
+                    error: function () {
+                        Toast.fire({
+                            icon: 'error',
+                            title: "Có lỗi xảy ra khi thêm kích cỡ."
+                        });
+                    }
+                });
             }
         });
+
+
 
 
         $('#showColorPicker').click(function () {
@@ -406,37 +420,53 @@
         });
 
         // Thêm màu mới khi nhấn Enter
+        const mauSacDaCo = @Html.Raw(Json.Serialize((IEnumerable<SelectListItem>)ViewData["Mau_SacID"]));
+
 
         // Khi người dùng nhấn phím Enter trong ô nhập màu
         $('#newColor').keypress(function (e) {
-            if (e.which == 13) { // Nhấn Enter
+            if (e.which === 13) {
+                e.preventDefault();
+                console.log(mauSacDaCo);
+
                 let newColor = $('#newColor').val().trim();
-                if (newColor !== "") {
-                    $.ajax({
-                        url: '/Admin/SanPham/ThemMau',
-                        type: 'POST',
-                        contentType: 'application/json', // Chuyển về JSON
-                        data: JSON.stringify(newColor), // Chuyển thành JSON
-                        success: function (response) {
-                            $('#colorModalBody').append(`
-                                 <div class="form-check d-flex align-items-center">
-                                                            <input class="form-check-input color-checkbox me-2" type="checkbox" value="${response}" checked> ${response}
-                                                </div>
-                                `);
-                            
-                            $('#colorPickerContainer').hide();
-                            $('#newColor').val('');
-                        },
-                        error: function () {
-                            Toast.fire({
-                                icon: 'error',
-                                title: "Có lỗi xảy ra khi thêm màu."
-                            });
-                        }
+                if (newColor === "") return;
+
+                // 🔍 Kiểm tra trùng lặp từ danh sách Razor
+                let isDuplicate = mauSacDaCo.some(item => item.text.toLowerCase() === newColor.toLowerCase());
+
+                if (isDuplicate) {
+                    Toast.fire({
+                        icon: 'warning',
+                        title: '⚠️ Màu sắc đã tồn tại trong danh sách!'
                     });
+                    return;
                 }
+
+                $.ajax({
+                    url: '/Admin/SanPham/ThemMau',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(newColor),
+                    success: function (response) {
+                        $('#colorModalBody').append(`
+                        <div class="form-check d-flex align-items-center">
+                            <input class="form-check-input color-checkbox me-2" type="checkbox" value="${response}" checked> ${response}
+                        </div>
+                    `);
+                        $('#colorPickerContainer').hide();
+                        $('#newColor').val('');
+                    },
+                    error: function () {
+                        Toast.fire({
+                            icon: 'error',
+                            title: "Có lỗi xảy ra khi thêm màu."
+                        });
+                    }
+                });
             }
         });
+
 
 
 
@@ -591,32 +621,37 @@
         // Hàm khởi tạo Select2
         function khoiTaoSelect2() {
             $(".select2").each(function () {
-                let apiUrl = $(this).data("api"); // Lấy API từ data-attribute nếu có
+                let apiUrl = $(this).data("api");
 
                 $(this).select2({
-                    placeholder: "Nhập hoặc chọn một tùy chọn",
+                    placeholder: "Nhập hoặc chọn một tuỳ chọn",
                     allowClear: true,
                     tags: true,
-                    tokenSeparators: [','], // Giữ nguyên khoảng trắng trong giá trị nhập
+                    tokenSeparators: [','], // vẫn cho phép khoảng trắng
                     createTag: function (params) {
-                        let term = params.term.trim(); // Không xóa khoảng trắng giữa các từ
-                        if (term === "" || /^\s+$/.test(term)) return null; // Ngăn nhập toàn dấu cách
+                        let term = params.term.trim();
+                        if (term === "" || /^\s+$/.test(term)) return null;
 
+                        // Kiểm tra trùng option có sẵn
                         let exists = false;
                         $(this).find("option").each(function () {
-                            if ($(this).text().toLowerCase() === term.toLowerCase()) {
+                            if ($(this).text().trim().toLowerCase() === term.toLowerCase()) {
                                 exists = true;
                                 return false;
                             }
                         });
 
                         if (exists) {
+                            Toast.fire({
+                                icon: 'warning',
+                                title: '⚠️ Giá trị đã tồn tại trong danh sách!'
+                            });
                             return null;
                         }
 
                         return {
                             id: term,
-                            text: `Nhấn Enter để thêm mới \"${term}\"`,
+                            text: `Nhấn Enter để thêm mới "${term}"`,
                             newTag: true
                         };
                     }
@@ -625,13 +660,13 @@
                     let selectElement = $(this);
 
                     if (data.newTag) {
-                        let realValue = data.text.replace(/Nhấn Enter để thêm mới\s*\"(.+)\"$/, "$1");
+                        let realValue = data.text.replace(/Nhấn Enter để thêm mới\s*"(.+)"$/, "$1");
 
                         $.ajax({
                             url: apiUrl,
                             type: "POST",
                             contentType: "application/json",
-                            data: JSON.stringify(realValue), // Gửi JSON thay vì chuỗi thuần túy
+                            data: JSON.stringify(realValue),
                             success: function (response) {
                                 if (response.success) {
                                     let newOption = new Option(response.text, response.id, true, true);
@@ -653,6 +688,8 @@
                     }
                 });
             });
+        }
+
 
             $("#ten_san_pham").on("keypress", function (e) {
                 if (e.which === 32) {
@@ -680,7 +717,7 @@
                     }
                 }
             });
-        }
+        
 
 
 
