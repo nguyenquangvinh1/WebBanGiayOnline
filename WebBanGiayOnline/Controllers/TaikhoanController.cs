@@ -14,6 +14,7 @@ using System.Net;
 using WebBanGiay.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using WebBanGiay.Models.ViewModel;
+using System.Text.RegularExpressions;
 
 
 namespace WebBanGiay.Controllers
@@ -57,24 +58,33 @@ namespace WebBanGiay.Controllers
                 return View("Login", model);
             }
 
-            var diaChi = _context.dia_Chis.FirstOrDefault(dc => dc.Tai_KhoanID == user.ID);
 
-            var claims = new List<Claim>
-            {
-                new Claim("userid", user.ID.ToString()),
-                new Claim("name", user.ho_ten),
-                new Claim("email", user.email),
-                new Claim("SDT", user.sdt),
-                new Claim(ClaimTypes.Name, user.user_name),
-                new Claim(ClaimTypes.Role, user.Vai_Tro.ten_vai_tro),
-                new Claim(ClaimTypes.Email, user.email ?? ""),
-                new Claim("province", CleanLocationName(diaChi?.tinh)),
-                new Claim("district", diaChi?.huyen ?? ""),
-                new Claim("ward", diaChi?.xa ?? ""),
-                new Claim("address", diaChi?.dia_chi_chi_tiet ?? "")
-            };
+			// Lấy địa chỉ của người dùng (nếu có)
+			var diaChi = _context.dia_Chis.FirstOrDefault(dc => dc.Tai_KhoanID == user.ID);
 
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+			string CleanLocationName(string input) =>
+			string.IsNullOrWhiteSpace(input) ? "" :
+			Regex.Replace(input, @"^(Tỉnh|Thành phố)\s+", "", RegexOptions.IgnoreCase).Trim();
+
+
+			var claims = new List<Claim>
+			{
+				new Claim("userid", user.ID.ToString()),
+				new Claim("name", user.ho_ten),
+				new Claim("email", user.email),
+				new Claim("SDT", user.sdt),
+				new Claim("ma", user.ma),
+				new Claim(ClaimTypes.Name, user.user_name),
+				new Claim(ClaimTypes.Role, user.Vai_Tro.ten_vai_tro),
+				new Claim(ClaimTypes.Email, user.email ?? ""),
+				new Claim("province", CleanLocationName(diaChi?.tinh)),
+				new Claim("district", diaChi?.huyen ?? ""),
+				new Claim("ward", diaChi?.xa ?? ""),
+				new Claim("address", diaChi?.dia_chi_chi_tiet ?? "")
+			};
+
+
+			var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
             return RedirectToAction("Index", "Home");
