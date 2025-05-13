@@ -974,6 +974,7 @@
                     icon: 'error',
                     title: "⚠️ Vui lòng nhập số lượng và giá hợp lệ (> 0) cho tất cả sản phẩm."
                 });
+                e.preventDefault(); // Ngăn không gửi form
                 return; // Dừng gửi form nếu có lỗi
             }
             if (sanPhamCTList.length === 0) {

@@ -83,7 +83,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
         public IActionResult GetHoaDonTaiQuay()
         {
             var invoices = _context.hoa_Dons
-                .Where(hd => hd.trang_thai == -1
+                .Where(hd => hd.trang_thai == 6
                              && hd.dia_chi == "Tại quầy"
                              && hd.loai_hoa_don == 1)  // chỉ lấy hóa đơn tại quầy
                 .OrderBy(hd => hd.ngay_tao)
@@ -767,9 +767,18 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 }
                 _context.SaveChanges();
             }
+			if (!string.IsNullOrEmpty(model.FullAddress))
+			{
+				Console.WriteLine("📦 Địa chỉ giao hàng: " + model.FullAddress);
 
-            // 3. Nếu có Voucher (dựa vào VoucherCodeString)
-            if (!string.IsNullOrWhiteSpace(model.VoucherCodeString))
+				invoice.dia_chi = model.FullAddress;
+				// Hoặc lưu model.FullAddress vào bảng hóa đơn nếu bạn có field địa_chi_giao
+			}
+
+            
+
+			// 3. Nếu có Voucher (dựa vào VoucherCodeString)
+			if (!string.IsNullOrWhiteSpace(model.VoucherCodeString))
             {
                 // Tìm voucher theo mã (trường ma trong bảng phieu_Giam_Gias)
                 var voucher = _context.phieu_Giam_Gias.FirstOrDefault(v => v.ma == model.VoucherCodeString);
@@ -796,6 +805,8 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 // Cập nhật tổng tiền hóa đơn (trừ số tiền giảm)
                 
             }
+
+            invoice.Ship = model.ship;
 
             // 4. Đổi trạng thái hóa đơn thành 6 (Đã thanh toán)
             invoice.trang_thai = 5;
