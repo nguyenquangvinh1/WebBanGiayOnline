@@ -180,19 +180,19 @@ namespace WebBanGiay.Migrations
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ten_san_pham = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ten_san_pham = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     mo_ta = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     trang_thai = table.Column<int>(type: "int", nullable: false),
                     ngay_tao = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ngay_sua = table.Column<DateTime>(type: "datetime2", nullable: true),
                     nguoi_tao = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     nguoi_sua = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Kieu_DangID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Danh_MucID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Kieu_DangID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Danh_MucID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Loai_GiayID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Mui_GiayID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Co_GiayID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    De_GiayID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Mui_GiayID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Co_GiayID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    De_GiayID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Chat_LieuID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -208,22 +208,26 @@ namespace WebBanGiay.Migrations
                         name: "FK_san_Phams_co_Giays_Co_GiayID",
                         column: x => x.Co_GiayID,
                         principalTable: "co_Giays",
-                        principalColumn: "ID");
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_san_Phams_danh_Mucs_Danh_MucID",
                         column: x => x.Danh_MucID,
                         principalTable: "danh_Mucs",
-                        principalColumn: "ID");
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_san_Phams_de_Giays_De_GiayID",
                         column: x => x.De_GiayID,
                         principalTable: "de_Giays",
-                        principalColumn: "ID");
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_san_Phams_kieu_Dangs_Kieu_DangID",
                         column: x => x.Kieu_DangID,
                         principalTable: "kieu_Dangs",
-                        principalColumn: "ID");
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_san_Phams_loai_Giays_Loai_GiayID",
                         column: x => x.Loai_GiayID,
@@ -234,7 +238,8 @@ namespace WebBanGiay.Migrations
                         name: "FK_san_Phams_mui_Giays_Mui_GiayID",
                         column: x => x.Mui_GiayID,
                         principalTable: "mui_Giays",
-                        principalColumn: "ID");
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -615,12 +620,12 @@ namespace WebBanGiay.Migrations
                 columns: new[] { "ID", "ma", "ten_phuong_thuc" },
                 values: new object[,]
                 {
-                    { new Guid("10785df2-d6fd-4d08-a6dd-cad404bc5727"), "ALL", "Cả 2" },
-                    { new Guid("46c0967e-e44e-4bee-a6e3-23c1bcdf1c63"), "TTM", "Tiền mặt" },
-                    { new Guid("4d212161-58fe-493a-9bc3-baea195dc727"), "VNPAY", "Thanh toán VNPAY" },
-                    { new Guid("82ff9e3d-b091-400b-b406-9d96e02f18df"), "TTNH", "Thanh toán khi nhận hàng" },
-                    { new Guid("9e017aa0-a45b-4096-82ec-7d516cd0015f"), "CK", "Chuyển khoản" },
-                    { new Guid("ebd52d27-4be2-4ce2-9ba7-702819641c03"), "MoMo", "Thanh toán MoMo" }
+                    { new Guid("2336bbe5-2ab7-4b33-855a-bbeae8ed5c88"), "VNPAY", "Thanh toán VNPAY" },
+                    { new Guid("3b3f968e-8b3f-4f00-8753-468c3d776e7e"), "ALL", "Cả 2" },
+                    { new Guid("78324ad7-3c3a-41a4-84b0-0b408829874f"), "MoMo", "Thanh toán MoMo" },
+                    { new Guid("c6df63c9-0461-4abd-8ff2-e2a1dfe93e60"), "TTNH", "Thanh toán khi nhận hàng" },
+                    { new Guid("d7fc874b-591b-48c3-9f99-b764036d5f79"), "CK", "Chuyển khoản" },
+                    { new Guid("e1672052-08d4-49d6-ae91-ace8591f6831"), "TTM", "Tiền mặt" }
                 });
 
             migrationBuilder.InsertData(
@@ -628,15 +633,15 @@ namespace WebBanGiay.Migrations
                 columns: new[] { "ID", "ngay_sua", "ngay_tao", "ten_vai_tro", "trang_thai" },
                 values: new object[,]
                 {
-                    { new Guid("7c9a079b-6226-470c-8c58-73749e336a8b"), null, new DateTime(2025, 4, 26, 21, 8, 27, 979, DateTimeKind.Local).AddTicks(6442), "Khách hàng", 1 },
-                    { new Guid("877ab451-1026-4335-8fd5-2bab86aaaeab"), null, new DateTime(2025, 4, 26, 21, 8, 27, 979, DateTimeKind.Local).AddTicks(6418), "Admin", 1 },
-                    { new Guid("a823d100-8c55-4bbe-96b3-6b8c68acf3c6"), null, new DateTime(2025, 4, 26, 21, 8, 27, 979, DateTimeKind.Local).AddTicks(6437), "Nhân Viên", 1 }
+                    { new Guid("6399260b-48b8-4910-b69e-b3648f0e6790"), null, new DateTime(2025, 5, 13, 15, 19, 43, 118, DateTimeKind.Local).AddTicks(8318), "Nhân Viên", 1 },
+                    { new Guid("73ab7e3c-a973-41e8-a576-0700bc99e0bd"), null, new DateTime(2025, 5, 13, 15, 19, 43, 118, DateTimeKind.Local).AddTicks(8261), "Admin", 1 },
+                    { new Guid("fa66bd30-43bb-42d6-b581-221689d70096"), null, new DateTime(2025, 5, 13, 15, 19, 43, 118, DateTimeKind.Local).AddTicks(8326), "Khách hàng", 1 }
                 });
 
             migrationBuilder.InsertData(
                 table: "tai_Khoans",
                 columns: new[] { "ID", "ResetToken", "TokenExpiry", "Vai_TroID", "cccd", "email", "gioi_tinh", "hinh_anh", "ho_ten", "ma", "ngay_sinh", "ngay_sua", "ngay_tao", "pass_word", "sdt", "trang_thai", "user_name" },
-                values: new object[] { new Guid("e2fb8585-bcf6-42ec-be9d-2469b33a3926"), null, null, new Guid("877ab451-1026-4335-8fd5-2bab86aaaeab"), "123456789012", "admin_tong@fpt.edu.vn", 1, "admin_tong.png", "Admin Tổng", "ADMIN01", new DateTime(1980, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, new DateTime(2025, 4, 26, 21, 8, 27, 979, DateTimeKind.Local).AddTicks(6637), "Admin123", "0123456789", 1, "admin_tong" });
+                values: new object[] { new Guid("fdb316c5-0d6a-488b-8c8c-f69c6734dce6"), null, null, new Guid("73ab7e3c-a973-41e8-a576-0700bc99e0bd"), "123456789012", "admin_tong@fpt.edu.vn", 1, "admin_tong.png", "Admin Tổng", "ADMIN01", new DateTime(1980, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, new DateTime(2025, 5, 13, 15, 19, 43, 118, DateTimeKind.Local).AddTicks(8817), "Admin123", "0123456789", 1, "admin_tong" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_anh_San_Pham_San_Pham_Chi_Tiets_Anh_San_PhamID",

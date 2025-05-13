@@ -83,7 +83,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
         public IActionResult GetHoaDonTaiQuay()
         {
             var invoices = _context.hoa_Dons
-                .Where(hd => hd.trang_thai == -1
+                .Where(hd => hd.trang_thai == 6
                              && hd.dia_chi == "Tại quầy"
                              && hd.loai_hoa_don == 1)  // chỉ lấy hóa đơn tại quầy
                 .OrderBy(hd => hd.ngay_tao)
