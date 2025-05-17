@@ -56,6 +56,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 new Claim(ClaimTypes.Name, user.user_name),
                 new Claim(ClaimTypes.Role, user.Vai_Tro.ten_vai_tro),
                 new Claim(ClaimTypes.Email, user.email ?? ""),
+                new Claim("ma", user.ma),
                 new Claim("province", diaChi?.tinh ?? ""),
                 new Claim("district", diaChi?.huyen ?? ""),
                 new Claim("ward", diaChi?.xa ?? ""),
