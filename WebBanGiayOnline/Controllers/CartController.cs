@@ -80,19 +80,54 @@ namespace WebBanGiay.Controllers
         public IActionResult GetDiscounts()
         {
             var totalPrice = Cart.Sum(x => x.ThanhTien);
-            var discounts = db.phieu_Giam_Gias
-                .Where(x => x.kieu_giam_gia == 1 && x.trang_thai == 1 && x.gia_tri_toi_thieu <= totalPrice && x.so_luong > 0)
+
+            // Lấy danh sách công khai (ai cũng dùng được)
+            // Lấy danh sách công khai
+            var publicDiscounts = db.phieu_Giam_Gias
+                .Where(x => x.kieu_giam_gia == 1
+                            && x.trang_thai == 1
+                            && x.gia_tri_toi_thieu <= totalPrice
+                            && x.so_luong > 0)
                 .Select(x => new {
                     id = x.ID,
                     ten_phieu_giam_gia = x.ten_phieu_giam_gia,
                     gia_tri_giam = x.gia_tri_giam,
                     so_tien_giam_toi_da = x.so_tien_giam_toi_da,
-                }).ToList();
+                    loai = "Công khai"
+                });
 
-    
+            // Dùng kiểu cùng với publicDiscounts
+            var privateDiscounts = publicDiscounts.Where(x => false); // danh sách rỗng cùng kiểu
 
+            if (User.Identity.IsAuthenticated && User.FindFirst("userid") != null)
+            {
+                Guid currentUserId = Guid.Parse(User.FindFirst("userid").Value);
+
+                privateDiscounts = from pg in db.phieu_Giam_Gias
+                                   join pgtk in db.phieu_Giam_Gia_Tai_Khoans
+                                        on pg.ID equals pgtk.Phieu_Giam_GiaID
+                                   where pg.kieu_giam_gia == 0
+                                         && pg.trang_thai == 1
+                                         && pg.gia_tri_toi_thieu <= totalPrice
+                                         && pg.so_luong > 0
+                                         && pgtk.Tai_KhoanID == currentUserId
+                                   select new
+                                   {
+                                       id = pg.ID,
+                                       ten_phieu_giam_gia = pg.ten_phieu_giam_gia,
+                                       gia_tri_giam = pg.gia_tri_giam,
+                                       so_tien_giam_toi_da = pg.so_tien_giam_toi_da,
+                                       loai = "Cá nhân"
+                                   };
+            }
+
+            // Gộp và ToList
+            var discounts = publicDiscounts.Union(privateDiscounts).ToList();
             return Json(discounts);
+
         }
+
+
 
 
         [HttpPost]
@@ -474,7 +509,7 @@ namespace WebBanGiay.Controllers
                     Giam_GiaID = discount == Guid.Empty ? null : (Guid?)discount,
                     trang_thai = 1,
                     loai_hoa_don = 2,
-                    ghi_chu = model.GhiChu,
+                    ghi_chu = model?.GhiChu,
                 };
                 db.Add(hoadon);
                 db.SaveChanges();
