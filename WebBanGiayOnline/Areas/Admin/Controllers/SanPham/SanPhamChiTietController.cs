@@ -589,15 +589,75 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             return  Json(result); 
         }
 
+        //[HttpGet]
+        //public IActionResult GetAllSanPhamChiTiet(int pageNumber = 1, int pageSize = 10)
+        //{
+        //    try
+        //    {
+        //        var query = _context.san_Pham_Chi_Tiets
+        //            .Include(x => x.Kich_Thuoc)
+        //            .Include(x => x.Mau_Sac)
+        //            .Where(x => x.trang_thai == 1)
+        //            .Select(x => new {
+        //                id = x.ID,
+        //                imageUrl = (from asp in _context.anh_San_Pham_San_Pham_Chi_Tiets
+        //                            join a in _context.anh_San_Phams on asp.Anh_San_PhamID equals a.ID
+        //                            where asp.San_Pham_Chi_TietID == x.ID
+        //                            select a.anh_url).FirstOrDefault() ?? "/img/default.jpg",
+        //                ten_SPCT = x.ten_SPCT,
+        //                price = x.gia,
+        //                dbQuantity = x.so_luong,
+        //                size = x.Kich_Thuoc != null ? x.Kich_Thuoc.ten_kich_thuoc : "Chưa có",
+        //                color = x.Mau_Sac != null ? x.Mau_Sac.ma_mau : "Chưa có",
+        //                status = "Hoạt động",
+        //                chatlieu=x.Chat_Lieu != null ?x.Chat_Lieu.ten_chat_lieu:"Chưa có",
+        //                cogiay=x.Co_Giay!=null ?x.Co_Giay.ten_loai_co_giay:"Chưa có",
+        //                degiay=x.De_Giay!=null ?x.De_Giay.ten_de_giay :"Chưa có"
+        //            });
+
+        //        int totalItems = query.Count();
+
+        //        var list = query
+        //            .Skip((pageNumber - 1) * pageSize)
+        //            .Take(pageSize)
+        //            .ToList();
+
+        //        return Json(new
+        //        {
+        //            success = true,
+        //            data = list,
+        //            pagination = new
+        //            {
+        //                pageNumber,
+        //                pageSize,
+        //                totalItems,
+        //                totalPages = (int)Math.Ceiling((double)totalItems / pageSize)
+        //            }
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, ex.Message);
+        //    }
+        //}
+
         [HttpGet]
         public IActionResult GetAllSanPhamChiTiet(int pageNumber = 1, int pageSize = 10)
         {
             try
             {
-                var query = _context.san_Pham_Chi_Tiets
+                var baseQuery = _context.san_Pham_Chi_Tiets
                     .Include(x => x.Kich_Thuoc)
                     .Include(x => x.Mau_Sac)
                     .Where(x => x.trang_thai == 1)
+                    // <-- thêm OrderByDescending theo ID
+                    .OrderByDescending(x => x.ID);
+
+                int totalItems = baseQuery.Count();
+
+                var list = baseQuery
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
                     .Select(x => new {
                         id = x.ID,
                         imageUrl = (from asp in _context.anh_San_Pham_San_Pham_Chi_Tiets
@@ -610,16 +670,10 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                         size = x.Kich_Thuoc != null ? x.Kich_Thuoc.ten_kich_thuoc : "Chưa có",
                         color = x.Mau_Sac != null ? x.Mau_Sac.ma_mau : "Chưa có",
                         status = "Hoạt động",
-                        chatlieu=x.Chat_Lieu != null ?x.Chat_Lieu.ten_chat_lieu:"Chưa có",
-                        cogiay=x.Co_Giay!=null ?x.Co_Giay.ten_loai_co_giay:"Chưa có",
-                        degiay=x.De_Giay!=null ?x.De_Giay.ten_de_giay :"Chưa có"
-                    });
-
-                int totalItems = query.Count();
-
-                var list = query
-                    .Skip((pageNumber - 1) * pageSize)
-                    .Take(pageSize)
+                        chatlieu = x.Chat_Lieu != null ? x.Chat_Lieu.ten_chat_lieu : "Chưa có",
+                        cogiay = x.Co_Giay != null ? x.Co_Giay.ten_loai_co_giay : "Chưa có",
+                        degiay = x.De_Giay != null ? x.De_Giay.ten_de_giay : "Chưa có"
+                    })
                     .ToList();
 
                 return Json(new

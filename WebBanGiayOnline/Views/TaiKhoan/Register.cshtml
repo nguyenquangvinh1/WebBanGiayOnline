@@ -1,10 +1,8 @@
-﻿@model WebBanGiay.ViewModel.RegisterViewModel
+﻿@model WebBanGiay.Models.ViewModel.RegisterViewModel
 
 @{
     ViewData["Title"] = "Register";
-
 }
-
 
 <h1>Đăng Kí</h1>
 <style>
@@ -36,13 +34,13 @@
                 <label asp-for="Password" class="form-label fw-bold">Mật khẩu</label>
                 <input asp-for="Password" class="form-control form-control-lg" required placeholder="Mật khẩu" />
                 <span asp-validation-for="Password" class="text-danger"></span>
-
+                
             </div>
             <div class="mb-3 position-relative">
                 <label asp-for="ConfirmPassword" class="form-label fw-bold">Nhập lại mật khẩu</label>
                 <input asp-for="ConfirmPassword" class="form-control form-control-lg" required placeholder="Nhập lại mật khẩu" />
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-
+              
             </div>
             <button type="submit" class="btn btn-primary w-100 rounded-pill btn-lg">Đăng kí</button>
             <div class="mt-4">
@@ -62,3 +60,4 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
+
