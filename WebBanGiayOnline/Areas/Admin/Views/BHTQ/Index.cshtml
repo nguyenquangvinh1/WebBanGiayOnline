@@ -2442,11 +2442,13 @@
 		function calculateFee() {
 			console.log("da chay tinh phi");
 
-			var provinceId = $("#tinh").val();
-			var districtId = $("#huyen").val();
-			var wardCode = $("#xa").val();
 
 			let container = $('#' + currentInvoiceId);
+
+
+			var provinceCode = container.find('.tinh').val();
+			var districtId =   container.find('.huyen').val();
+			var wardCode =  container.find('.xa').val();
 
 			var form = container.find('.fee');
 
@@ -2459,7 +2461,7 @@
 
 
 
-			if (provinceId == "" && districtId == "" && wardCode == "") {
+			if (provinceCode == "" && districtId == "" && wardCode == "") {
 				alert("Vui lòng chọn đầy đủ địa chỉ.");
 				return;
 			}
@@ -2476,7 +2478,7 @@
 				weight: 200,
 				width: 20,
 				subtotal: subtotal,
-				provinceId: provinceId,
+				provinceId: provinceCode,
 				insurance_value: 10000,
 				cod_failed_amount: 2000,
 				coupon: null,
