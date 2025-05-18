@@ -588,15 +588,15 @@ namespace WebBanGiay.Areas.Admin.Controllers
 			}
             try
             {
-				var query = _context.dia_Chis.Where(x => x.Tai_KhoanID == customerId).AsQueryable();
-                var result = query.Select(x => new
-                {
-                    tinh = x.tinh,
-                    huyen = x.huyen,
-                    xa = x.xa,
-                    chi_tiet = x.dia_chi_chi_tiet
-                }).ToList();
-                return Json(result);
+				var query = _context.dia_Chis.Where(x => x.Tai_KhoanID == customerId)
+                    .Select(x => new
+				{
+					tinh = x.tinh,
+					huyen = x.huyen,
+					xa = x.xa,
+					chi_tiet = x.dia_chi_chi_tiet
+				}).ToList();
+                return Json(query);
 			}
 			catch (Exception ex)
             {

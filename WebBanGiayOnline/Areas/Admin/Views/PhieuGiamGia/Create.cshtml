@@ -107,6 +107,8 @@
                                                 <span class="input-group-text">$</span>
                                             </div>
                                         </div>
+
+                                        <span asp-validation-for="so_tien_giam_toi_da" class="text-danger"></span>
                                     </div>
 
 
@@ -114,6 +116,7 @@
 
                                 <!-- Ô ẩn để bind vào Model, thay thế cho radio -->
                                 <input asp-for="loai_phieu_giam_gia" type="hidden" id="loai_phieu_giam_gia" />
+                                <span asp-validation-for="loai_phieu_giam_gia" class="text-danger"></span>
 
 
                                 <div class="form-row">
@@ -165,6 +168,8 @@
                                                value="0" onchange="toggleForm()" />
                                         <label class="form-check-label" for="ca_nhan">Cá nhân</label>
                                     </div>
+
+                                    <span asp-validation-for="kieu_giam_gia" class="text-danger"></span>
                                 </div>
 
                             </div>
@@ -327,6 +332,7 @@
                 }
             };
                             function generateCode() {
+
                     // Logic để sinh mã ngẫu nhiên (VD: "DISCOUNT2023")
                     const newCode = 'DISCOUNT' + new Date().getFullYear() + Math.floor(Math.random() * 1000);
                     document.querySelector('input[name="ma"]').value = newCode;
