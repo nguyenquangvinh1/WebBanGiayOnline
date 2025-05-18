@@ -722,15 +722,16 @@ namespace WebBanGiay.Areas.Admin.Controllers
             try
             {
                 var ship = await _ghnService.CalculateFeeAsync(request);
-                if (request.provinceId != 201)
+                ship = 50000;
+                if (request.provinceId == 201)
                 {
-                    ship = 50000;
+                    ship = 0;
                 }
                 if (request.subtotal > 2000000)
                 {
                     ship = 0;
                 }
-				HttpContext.Session.SetInt32("ShippingFee", ship);
+                HttpContext.Session.SetInt32("ShippingFee", ship);
 				return Json(new { success = true, ship });
 
             }

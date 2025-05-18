@@ -125,7 +125,7 @@
 						Tổng tiền tạm tính: <strong id="totalPrice-INVOICE_ID">0</strong> VND
 					</h5>
 					<button class="btn btn-outline-primary ms-3 selectCustomer" data-id="INVOICE_ID">Tài khoản</button>
-					<button class="btn btn-outline-primary ms-3 openAddress">Chọn địa chỉ</button>
+					<button class="btn btn-outline-primary ms-3 openAddress" data-invoice="INVOICE_ID">Chọn địa chỉ</button>
 				</div>
 				<div class="row">
 					<!-- THÔNG TIN KHÁCH HÀNG -->
@@ -800,8 +800,8 @@
 			console.log("chay dia chi");
 			let container = $('#' + currentInvoiceId);
 
-			var form = container.find('.customerForm');
 			var diaChi = container.find('.AddressForm');
+			var form = container.find('.customerForm');
 			if (form.is(':visible')) {
 				if (!diaChi.is(':visible')) {
 					loadProvinces();
@@ -2044,87 +2044,98 @@
 		});
 
 		$('#addPaymentRowBtn').on('click', function () {
-			debugger;
-			// Nếu là thanh toán đơn lẻ (TTM hoặc CK)
+			const container = $('#' + currentInvoiceId);
+			const invoiceTotal = parseFloat(container.find('.finalTotal').val().replace(/\D/g, '')) || 0;
+			let totalPaid = paymentRows.reduce((sum, row) => sum + row.amount, 0);
+
+			// Kiểm tra nếu tổng thanh toán đã đủ
+			if (totalPaid >= invoiceTotal) {
+				alert("Tổng số tiền thanh toán đã đủ hoặc vượt quá giá trị hóa đơn.");
+				return;
+			}
+
 			if (currentMethod === 'TTM' || currentMethod === 'CK') {
+				// Không cho phép thêm 2 lần cùng phương thức
+				if (paymentRows.some(r => r.method === currentMethod)) {
+					alert("Phương thức này đã được thêm.");
+					return;
+				}
+
 				let amount = parseFloat($('#paymentAmount').val().replace(/\D/g, '')) || 0;
 				if (!amount || amount <= 0) {
 					alert("Vui lòng nhập số tiền > 0");
 					return;
 				}
-				let methodText = (currentMethod === 'TTM') ? "Tiền mặt" : "Chuyển khoản";
 
-				// Thêm dòng vào mảng paymentRows
-				paymentRows.push({ amount: amount, method: currentMethod });
-
-				// Thêm dòng vào table
-				let rowIndex = $('#paymentDetailsTable tbody tr').length + 1;
-				let newRow = `
-						<tr>
-						  <td>${rowIndex}</td>
-						  <td>${amount.toLocaleString()}</td>
-						  <td>${methodText}</td>
-						  <td><button class="btn btn-danger btn-sm deletePaymentRow">X</button></td>
-						</tr>
-					  `;
-				$('#paymentDetailsTable tbody').append(newRow);
-			}
-			// Nếu là thanh toán "Cả 2"
-			else if (currentMethod === 'all') {
-				// Lấy số tiền từ 2 input riêng
-				let cashAmount = parseFloat($('#cashAmount').val().replace(/\D/g, '')) || 0;
-				debugger;
-				let bankAmount = parseFloat($('#bankAmount').val().replace(/\D/g, '')) || 0;
-				debugger;
-				let totalSplit = cashAmount + bankAmount;
-				debugger;
-
-				// So sánh với số tiền tổng (nếu cần)
-				let invoiceTotal = parseFloat($('#paymentAmount').val().replace(/\D/g, '')) || 0;
-				// let amount = parseFloat($('#paymentAmount').val().replace(/\D/g,'')) || 0;
-				if (totalSplit !== invoiceTotal) {
-					alert("Tổng số tiền của Tiền mặt và Chuyển khoản phải bằng tổng số tiền hóa đơn (" + invoiceTotal.toLocaleString() + ")");
+				if (totalPaid + amount > invoiceTotal) {
+					alert("Tổng số tiền thanh toán vượt quá giá trị hóa đơn.");
 					return;
 				}
+
+				let methodText = (currentMethod === 'TTM') ? "Tiền mặt" : "Chuyển khoản";
+				paymentRows.push({ amount: amount, method: currentMethod });
+
+				let rowIndex = $('#paymentDetailsTable tbody tr').length + 1;
+				let newRow = `
+					<tr>
+					  <td>${rowIndex}</td>
+					  <td>${amount.toLocaleString()}</td>
+					  <td>${methodText}</td>
+					  <td><button class="btn btn-danger btn-sm deletePaymentRow">X</button></td>
+					</tr>
+				`;
+				$('#paymentDetailsTable tbody').append(newRow);
+			}
+
+			else if (currentMethod === 'all') {
+				// Đã có TTM hoặc CK rồi thì không cho thêm 'all'
+				if (paymentRows.some(r => r.method === 'TTM' || r.method === 'CK')) {
+					alert("Bạn đã thêm một trong hai phương thức, không thể dùng Cả hai.");
+					return;
+				}
+
+				let cashAmount = parseFloat($('#cashAmount').val().replace(/\D/g, '')) || 0;
+				let bankAmount = parseFloat($('#bankAmount').val().replace(/\D/g, '')) || 0;
+				let totalSplit = cashAmount + bankAmount;
+
 				if (cashAmount <= 0 || bankAmount <= 0) {
 					alert("Vui lòng nhập số tiền cho cả 2 phương thức > 0");
 					return;
 				}
+				if (totalSplit !== invoiceTotal) {
+					alert("Tổng tiền Tiền mặt và Chuyển khoản phải đúng bằng tổng tiền hóa đơn.");
+					return;
+				}
 
-				// Thêm 2 dòng tương ứng
 				paymentRows.push({ amount: cashAmount, method: 'TTM' });
-				debugger;
 				paymentRows.push({ amount: bankAmount, method: 'CK' });
-				debugger;
 
-				// Cập nhật table
-				// Xóa các dòng cũ (nếu cần) hoặc thêm tiếp vào bảng
 				let currentIndex = $('#paymentDetailsTable tbody tr').length;
 				let newRows = `
-						<tr>
-						  <td>${currentIndex + 1}</td>
-						  <td>${cashAmount.toLocaleString()}</td>
-						  <td>Tiền mặt</td>
-						  <td><button class="btn btn-danger btn-sm deletePaymentRow">X</button></td>
-						</tr>
-						<tr>
-						  <td>${currentIndex + 2}</td>
-						  <td>${bankAmount.toLocaleString()}</td>
-						  <td>Chuyển khoản</td>
-						  <td><button class="btn btn-danger btn-sm deletePaymentRow">X</button></td>
-						</tr>
-					  `;
+					<tr>
+					  <td>${currentIndex + 1}</td>
+					  <td>${cashAmount.toLocaleString()}</td>
+					  <td>Tiền mặt</td>
+					  <td><button class="btn btn-danger btn-sm deletePaymentRow">X</button></td>
+					</tr>
+					<tr>
+					  <td>${currentIndex + 2}</td>
+					  <td>${bankAmount.toLocaleString()}</td>
+					  <td>Chuyển khoản</td>
+					  <td><button class="btn btn-danger btn-sm deletePaymentRow">X</button></td>
+					</tr>
+				`;
 				$('#paymentDetailsTable tbody').append(newRows);
 			}
 
-			// Cập nhật tổng thanh toán
-			let totalPaid = paymentRows.reduce((sum, row) => sum + row.amount, 0);
-			let invoiceTotal = parseFloat($('#invoiceTotal').text().replace(/,/g, '')) || 0;
+			// Cập nhật tổng
+			totalPaid = paymentRows.reduce((sum, row) => sum + row.amount, 0);
 			let remain = invoiceTotal - totalPaid;
 			if (remain < 0) remain = 0;
 			$('#paidAmount').text(totalPaid.toLocaleString());
 			$('#remaining').text(remain.toLocaleString());
 		});
+
 
 		// Nút "Xác nhận thanh toán" -> gửi toàn bộ dữ liệu thanh toán lên server
 		// Mảng paymentRows, currentInvoiceId, ... đã có sẵn
@@ -2156,8 +2167,25 @@
 
 					const fullAddress = `${chiTiet}, ${xa}, ${huyen}, ${tinh}`;
 
-
+					let finalTotal = container.find('.finalTotal').val();
 					let paymentAmountStr = $('#paymentAmount').val(); // Lấy giá trị từ input
+
+					if (finalTotal != paymentAmountStr){
+						Swal.fire({
+							icon: 'error',
+							title: 'tổng tiền hóa đơn và số tiền thanh toán không khớp, hãy kiểm tra lại thanh toán',
+							toast: true,
+							position: 'top-end',
+							showConfirmButton: false,
+							timer: 3000,
+							timerProgressBar: true
+						});
+
+						const button = container.find('.openPayment');
+						button.trigger('click');
+
+						return;
+					}
 
 					// Kiểm tra nếu giá trị rỗng hoặc không hợp lệ
 					if (!paymentAmountStr || isNaN(paymentAmountStr.replace(/\D/g, ''))) {
@@ -2173,8 +2201,10 @@
 						return;
 					}
 
+
+					
 					// Chuyển đổi thành số
-					let finalTotal = parseFloat(paymentAmountStr.replace(/\D/g, '')) || 0;
+					
 					console.log("finalTotal sau khi chuyển đổi: ", finalTotal);
 
 					if (finalTotal <= 0) {
@@ -2445,11 +2475,13 @@
 		function calculateFee() {
 			console.log("da chay tinh phi");
 
-			var provinceId = $("#tinh").val();
-			var districtId = $("#huyen").val();
-			var wardCode = $("#xa").val();
 
 			let container = $('#' + currentInvoiceId);
+
+
+			var provinceCode = container.find('.tinh').val();
+			var districtId =   container.find('.huyen').val();
+			var wardCode =  container.find('.xa').val();
 
 			var form = container.find('.fee');
 
@@ -2462,7 +2494,7 @@
 
 
 
-			if (provinceId == "" && districtId == "" && wardCode == "") {
+			if (provinceCode == "" && districtId == "" && wardCode == "") {
 				alert("Vui lòng chọn đầy đủ địa chỉ.");
 				return;
 			}
@@ -2479,7 +2511,7 @@
 				weight: 200,
 				width: 20,
 				subtotal: subtotal,
-				provinceId: provinceId,
+				provinceId: provinceCode,
 				insurance_value: 10000,
 				cod_failed_amount: 2000,
 				coupon: null,
@@ -2610,11 +2642,31 @@
 		$(document).on('click', '.openAddress', function () {
 			const customerId = $(this).data('id'); // giả định nút có data-id
 
+			console.log("đã chạy openAddress");
+			console.log(customerId);
+
+			currentInvoiceId = $(this).data('invoice');
+
+			let container = $('#' + currentInvoiceId);
+
+			var form = container.find('.customerForm');
+			if (!form.is(':visible')) {
+				Swal.fire({
+					icon: 'warning',
+					title: 'Hãy chọn giao hàng trước khi chọn địa chỉ để thực hiện giao hàng!',
+					toast: true,
+					position: 'top-end',
+					showConfirmButton: false,
+					timer: 3000,
+					timerProgressBar: true
+				});
+			}
+
 			if (!customerId) {
 				alert("Không tìm thấy ID khách hàng!");
 				return;
 			}
-
+			debugger;
 			$.ajax({
 				url: `/Admin/Khachhang/GetAddressCustomer?customerId=${customerId}`,
 				type: 'GET',
