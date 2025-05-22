@@ -398,11 +398,9 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
                 // Cập nhật số lượng và thành tiền của dòng chi tiết
                 int newQty = invoiceItem.so_luong + req.delta;
-                if (newQty <= 0)
+                if (newQty < 1)
                 {
-                    // Nếu số lượng giảm về 0 hoặc âm, xóa dòng
-                    _context.don_Chi_Tiets.Remove(invoiceItem);
-                    newQty = 0;
+                    return Json(new { success = false, message = "Số lượng không thể nhỏ hơn 1!" });
                 }
                 else
                 {
