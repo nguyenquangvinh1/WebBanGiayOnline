@@ -75,7 +75,7 @@
                         <a href="https://localhost:7243" class="nav-item nav-link">Trang chủ</a>
                         <a asp-controller="San_Pham_Chi_Tiet" asp-action="Index" class="nav-item nav-link active">Cửa hàng</a>
 
-                        <a asp_controller="HoaDon1" asp-action="Index" class="nav-item nav-link active">Tra cứu</a>
+                        <a asp-controller="LichSuHoaDon" asp-action="Index" class="nav-item nav-link">Tra cứu</a>
 
                         <a href="contact.html" class="nav-item nav-link">Liên hệ</a>
                     </div>
@@ -391,22 +391,37 @@
                 errorMessage.style.display = "none";
             }
         }, 3000);
-        $(document).ready(function () {
+             $(document).ready(function () {
             // Khi nhấn nút chọn mã giảm giá
             $('.selectDiscount').click(function () {
                 $.ajax({
-                    url: "/Cart/GetDiscounts", 
+                    url: "/Cart/GetDiscounts",
                     type: "GET",
                     success: function (data) {
                         let html = "";
                         data.forEach(discount => {
-                            html += `<li class="list-group-item d-flex justify-content-between align-items-center">
-                                        <span>${discount.ten_phieu_giam_gia} - Giảm ${discount.gia_tri_giam}% số tiền giảm tối thiểu ${discount.so_tien_giam_toi_da} </span>
-                                        <button class="btn btn-primary btn-sm applyDiscount" data-id="${discount.id}" data-value="${discount.gia_tri_giam}" data-giam="${discount.so_tien_giam_toi_da}"  >Chọn</button>
-                                    </li>`;
+                                   let donVi = discount.loai_phieu_giam_gia === 0 ? "VNĐ" : "%";
+        let giaTriHienThi = discount.loai_phieu_giam_gia === 0
+            ? discount.gia_tri_giam.toLocaleString() + " " + donVi
+            : discount.gia_tri_giam + "%"; // không cần format nếu là %
+
+        html += `<li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>
+                        ${discount.ten_phieu_giam_gia} - Giảm ${giaTriHienThi}
+                        (Tối đa: ${discount.so_tien_giam_toi_da.toLocaleString()} VNĐ)
+                    </span>
+                    <button class="btn btn-primary btn-sm applyDiscount"
+                            data-id="${discount.id}"
+                            data-value="${discount.gia_tri_giam}"
+                            data-giam="${discount.so_tien_giam_toi_da}"
+                            data-type="${discount.loai_phieu_giam_gia}">
+                        Chọn
+                    </button>
+                 </li>`;
+
                         });
                         $('#discountList').html(html);
-                        $('#discountModal').modal('show'); 
+                        $('#discountModal').modal('show');
                     }
                 });
             });
@@ -414,42 +429,51 @@
             $(document).on('click', '.applyDiscount', function () {
                 let discountValue = $(this).data('value');
                 let discountId = $(this).data('id');
-                let discount=$(this).data('giam');
-             
-             
-                $('.discountCodeInput').val(`Giảm ${discountValue}%`);
+                let discountMax = $(this).data('giam');
+                let discountType = $(this).data('type'); 
 
-             
+                $('.discountCodeInput').val(discountType === 0
+                    ? `Giảm ${discountValue.toLocaleString()} VNĐ`
+                    : `Giảm ${discountValue}%`);
+
                 let subtotal = @Model.Sum(x => x.ThanhTien);
-                let discountAmount = subtotal * (discountValue / 100);
-                let newTotal = subtotal
-                if(discountAmount > discount){
-                     newTotal = subtotal - discount;
-                     
-                }else{
-                    newTotal = subtotal - discountAmount ;
-                  
-                }
-                 $('#totalPrice').text(newTotal.toLocaleString() + " VNĐ");
-                
-                 $.ajax({
-            url: "/Cart/ApplyDiscount",
-            type: "POST",
-            data: { totalPrice: newTotal,nameDiscount: discountId },
-            success: function (response) {
-                if (response.success) {
-                    console.log("Giảm giá áp dụng thành công!");
-                } else {
-                    alert("Lỗi: " + response.message);
-                }
-            },
-           
-        });
-        $('#discountModal').modal('hide');
-            });
-                
+                let discountAmount = 0;
 
+                if (discountType === 0) {
+                    // Giảm cố định theo số tiền
+                    discountAmount = Math.min(discountValue, subtotal);
+                } else {
+                    // Giảm theo %
+                    discountAmount = subtotal * (discountValue / 100);
+                    if (discountAmount > discountMax) {
+                        discountAmount = discountMax;
+                    }
+                }
+
+                let newTotal = subtotal - discountAmount;
+
+                $('#totalPrice').text(newTotal.toLocaleString() + " VNĐ");
+
+                $.ajax({
+                    url: "/Cart/ApplyDiscount",
+                    type: "POST",
+                    data: {
+                        totalPrice: newTotal,
+                        nameDiscount: discountId
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            console.log("Giảm giá áp dụng thành công!");
+                        } else {
+                            alert("Lỗi: " + response.message);
+                        }
+                    }
+                });
+
+                $('#discountModal').modal('hide');
+            });
         });
+
 
             $(document).ready(function () {
             $(".updateQuantity").click(function () {

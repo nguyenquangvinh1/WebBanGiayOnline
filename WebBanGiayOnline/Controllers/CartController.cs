@@ -75,14 +75,11 @@ namespace WebBanGiay.Controllers
 
             return Json(new { success = false, message = "Không tìm thấy sản phẩm trong giỏ hàng!" });
         }
-
         [HttpGet]
         public IActionResult GetDiscounts()
         {
             var totalPrice = Cart.Sum(x => x.ThanhTien);
 
-            // Lấy danh sách công khai (ai cũng dùng được)
-            // Lấy danh sách công khai
             var publicDiscounts = db.phieu_Giam_Gias
                 .Where(x => x.kieu_giam_gia == 1
                             && x.trang_thai == 1
@@ -93,11 +90,11 @@ namespace WebBanGiay.Controllers
                     ten_phieu_giam_gia = x.ten_phieu_giam_gia,
                     gia_tri_giam = x.gia_tri_giam,
                     so_tien_giam_toi_da = x.so_tien_giam_toi_da,
+                    loai_phieu_giam_gia = x.loai_phieu_giam_gia, // ✅ thêm
                     loai = "Công khai"
                 });
 
-            // Dùng kiểu cùng với publicDiscounts
-            var privateDiscounts = publicDiscounts.Where(x => false); // danh sách rỗng cùng kiểu
+            var privateDiscounts = publicDiscounts.Where(x => false); // giữ kiểu
 
             if (User.Identity.IsAuthenticated && User.FindFirst("userid") != null)
             {
@@ -117,14 +114,13 @@ namespace WebBanGiay.Controllers
                                        ten_phieu_giam_gia = pg.ten_phieu_giam_gia,
                                        gia_tri_giam = pg.gia_tri_giam,
                                        so_tien_giam_toi_da = pg.so_tien_giam_toi_da,
+                                       loai_phieu_giam_gia = pg.loai_phieu_giam_gia, // ✅ thêm
                                        loai = "Cá nhân"
                                    };
             }
 
-            // Gộp và ToList
             var discounts = publicDiscounts.Union(privateDiscounts).ToList();
             return Json(discounts);
-
         }
 
 
@@ -168,6 +164,15 @@ namespace WebBanGiay.Controllers
                     return Redirect("/404");
                 }
 
+                if (hanghoa.so_luong < quantity)
+                {
+
+                    TempData["Message"] = $"Không tìm thấy {id}";
+                    return RedirectToAction("Details");
+                }
+                hanghoa.so_luong -= quantity;
+                db.Update(hanghoa);
+                db.SaveChanges();
 
                 item = new CartItem
                 {

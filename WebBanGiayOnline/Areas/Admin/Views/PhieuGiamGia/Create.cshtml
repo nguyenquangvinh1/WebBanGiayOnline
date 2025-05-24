@@ -1,6 +1,7 @@
 ﻿@model ClssLib.Phieu_Giam_Gia
 @using X.PagedList.Mvc.Core;
-@using X.PagedList
+@using X.PagedList;
+
 
 <div class="page-content-wrapper">
     <div class="container-fluid">
@@ -28,7 +29,7 @@
         ViewData["Title"] = "Create";
     }
     @{
-        var taiKhoans = ViewBag.P as IPagedList<ClssLib.Phieu_Giam_Gia>;
+        var taiKhoans = ViewBag.tai_khoans as IPagedList<ClssLib.Tai_Khoan>;
         string searchString = ViewBag.SearchString as string;
     }
     <!DOCTYPE html>
@@ -92,7 +93,7 @@
                                             <input id="gia_tri_giam" name="gia_tri_giam" type="number" class="form-control" placeholder="0" />
                                             <div class="input-group-append">
                                                 <button type="button" id="btnPercent" value="1" class="btn btn-light" onclick="setDiscountType(1)">%</button>
-                                                <button type="button" id="btnDollar" value="0" class="btn btn-light" onclick="setDiscountType(0)">$</button>
+                                                <button type="button" id="btnDollar" value="0" class="btn btn-light" onclick="setDiscountType(0)">đ</button>
                                             </div>
 
                                             <span asp-validation-for="gia_tri_giam" class="text-danger"></span>
@@ -104,7 +105,7 @@
                                         <div class="input-group">
                                             <input asp-for="so_tien_giam_toi_da" type="number" class="form-control" placeholder="0 đ" />
                                             <div class="input-group-append">
-                                                <span class="input-group-text">$</span>
+                                                <span class="input-group-text">đ</span>
                                             </div>
                                         </div>
 
@@ -180,8 +181,14 @@
                                     <span class="input-group-text">
                                         <i class="fas fa-search text-orange"></i>
                                     </span>
-                                    <input type="text" id="searchInput" class="form-control" placeholder="Tên, SĐT hoặc Email">
+                                    <input type="text" id="searchInput" name="searchString" class="form-control" placeholder="Tên, SĐT hoặc Email">
+                                    <button  class="btn btn-primary" id="searchButton">Lọc</button>
                                 </div>
+
+                                <div id="customerTableContainer">
+                                    @await Html.PartialAsync("_PartialKhachHang", taiKhoans)
+                                </div>
+@* 
                                 <table class="table table-bordered table-hover">
                                     <thead>
                                         <tr>
@@ -195,9 +202,9 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @if (ViewBag.tai_khoans != null && ((List<ClssLib.Tai_Khoan>)ViewBag.tai_khoans).Count > 0)
+                                        @if (taiKhoans != null && taiKhoans.Count > 0)
                                         {
-                                            foreach (var tai_khoan in ViewBag.tai_khoans)
+                                            foreach (var tai_khoan in taiKhoans)
                                             {
 
                                                 if (tai_khoan.Vai_Tro.ten_vai_tro == "Khách hàng")
@@ -239,13 +246,13 @@
                                     DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
                                     DisplayLinkToNextPage = PagedListDisplayMode.Always,
                                     MaximumPageNumbersToDisplay = 5
-                                })
+                                }) *@
                             </div>
                         </div> <!-- Kết thúc .row chứa 2 cột -->
                         <!-- Nút Thêm mới ở dưới, canh phải -->
                         <div class="form-group text-right mt-3">
-                            <input type="submit" value="Thêm mới"
-                                   onclick="generateCode()" class="btn btn-primary" />
+                            <input type="submit" value="Thêm mới" onclick="generateCode()"
+                                    class="btn btn-primary" />
                         </div>
                     </form>
                 </div>
@@ -253,6 +260,7 @@
         </div>
 
         <script>
+
 
 
             function setDiscountType(type) {
@@ -373,6 +381,96 @@
                     }
                 }
 
+            function validateFormFields() {
+
+
+                var Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+
+                const form = document.getElementById("PhieuGiamGia");
+                const requiredFields = [
+                    "ma",
+                    "ten_phieu_giam_gia",
+                    "gia_tri_giam",
+                    "so_tien_giam_toi_da",
+                    "so_luong",
+                    "gia_tri_toi_thieu",
+                    "ngay_bat_dau",
+                    "ngay_ket_thuc",
+                    "loai_phieu_giam_gia"
+                ];
+
+                for (let name of requiredFields) {
+                    const field = form.querySelector(`[name="${name}"]`);
+                    if (!field || field.value.trim() === "") {
+                        Toast.fire({
+                            icon: 'warning',
+                            title: '⚠️ Vui lòng nhập đầy đủ thông tin!'
+                        });
+                        field.focus();
+                        return false;
+                    }
+                }
+
+                const isPercent = document.getElementById('btnPercent').classList.contains('btn-warning');
+                const giaTriGiam = parseFloat(document.getElementById('gia_tri_giam').value) || 0;
+                const soTienGiamToiDa = parseFloat(document.getElementById('so_tien_giam_toi_da').value) || 0;
+                const giaTriToiThieu = parseFloat(document.querySelector('input[name="gia_tri_toi_thieu"]').value) || 0;
+
+                const ngayBatDau = new Date(document.querySelector('input[name="ngay_bat_dau"]').value);
+                const ngayKetThuc = new Date(document.querySelector('input[name="ngay_ket_thuc"]').value);
+                const now = new Date();
+
+                if (isPercent && giaTriGiam > 100) {
+                    Toast.fire({
+                        icon: 'warning',
+                        title: '⚠️ Giá trị giảm không thể lớn hơn 100%.'
+                    });
+                    return false;
+                }
+
+                if (soTienGiamToiDa > giaTriToiThieu) {
+                    Toast.fire({
+                        icon: 'warning',
+                        title: '⚠️ Số tiền giảm tối đa phải nhỏ hơn hoặc bằng giá trị tối thiểu.'
+                    });
+                    return false;
+                }
+
+                if (ngayKetThuc <= ngayBatDau) {
+                    Toast.fire({
+                        icon: 'warning',
+                        title: '⚠️ Ngày kết thúc phải lớn hơn ngày bắt đầu.'
+                    });
+                    return false;
+                }
+
+                if (ngayKetThuc <= now) {
+                    Toast.fire({
+                        icon: 'warning',
+                        title: '⚠️ Ngày kết thúc không thể là ngày trong quá khứ.'
+                    });
+                    return false;
+                }
+
+                return true;
+            }
+
+            $(document).on("click", ".page-link", function (e) {
+                e.preventDefault();
+                let url = $(this).attr("href");
+
+                $.get(url, function (data) {
+                    $("#customerTableContainer").html(data);
+                });
+            });
+
+
         </script>
 
 
@@ -386,8 +484,8 @@
         }
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation/1.19.3/jquery.validate.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation/1.19.3/jquery.validate.min.js"></script> *@
+   @*  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script> *@
     <script type="text/javascript">
         $(document).ready(function () {
             $("#PhieuGiamGia").on("submit", function (event) {
@@ -403,10 +501,24 @@
                     cancelButtonText: "Hủy"
                 }).then(function (result) {
                     if (result.isConfirmed) {
-                        event.target.submit();
+                        if (validateFormFields()) {
+                            // Tránh gọi đệ quy
+                            $("#PhieuGiamGia").off("submit").submit();
+                        }
                     }
                 });
             });
+
+            $('#searchButton').on('click', function (e) {
+                e.preventDefault();
+                const keyword = $('#searchInput').val();
+                const url = '/Admin/PhieuGiamGia/Customer?searchString=' + encodeURIComponent(keyword);
+
+                $.get(url, function (data) {
+                    $('#customerTableContainer').html(data);
+                });
+            });
+
         });
 
     </script>

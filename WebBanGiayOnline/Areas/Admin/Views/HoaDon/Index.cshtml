@@ -278,7 +278,7 @@
                                 }
                                 @trangThaiText
                             </td>
-                        <td>@string.Format("{0:0,0} VND", item.tong_tien)</td>
+                        <td>@string.Format("{0:0,0} VND", item.tong_tien + item.Ship)</td>
                             <td>
                                 <div class="btn-group">
                                     <a asp-action="Details" asp-controller="HoaDon" asp-route-id="@item.ID" class="btn btn-info btn-sm">
