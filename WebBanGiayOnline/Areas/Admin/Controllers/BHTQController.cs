@@ -15,6 +15,7 @@ using System.Configuration;
 using System.Configuration;
 using System.Configuration;
 using System.Configuration;
+using DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace WebBanGiay.Areas.Admin.Controllers
 {
@@ -441,7 +442,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public IActionResult RemoveInvoiceItem([FromBody] Guid chiTietId)
+        public async Task<IActionResult> RemoveInvoiceItem([FromBody] Guid chiTietId)
         {
             try
             {
@@ -451,11 +452,19 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
                 // Trả lại số lượng vào kho
                 var spCT = _context.san_Pham_Chi_Tiets.FirstOrDefault(sp => sp.ID == chiTiet.San_Pham_Chi_TietID);
-                if (spCT != null)
+                if (spCT == null)
                 {
-                    spCT.so_luong += chiTiet.so_luong;
-                    _context.san_Pham_Chi_Tiets.Update(spCT);
+                    return Json(new { success = false, message = "Không tìm thấy sản phẩm:" + chiTietId });
                 }
+                spCT.so_luong += chiTiet.so_luong;
+                // đổi trạng thái
+
+                spCT.trang_thai = spCT.so_luong > 0 ? 1 : 0;
+                //await changeStatusSPCT(spCT);
+                _context.san_Pham_Chi_Tiets.Update(spCT);
+
+
+                await changeStatusSP(spCT.San_PhamID);
 
                 _context.don_Chi_Tiets.Remove(chiTiet);
                 _context.SaveChanges();
@@ -470,7 +479,9 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
       
         [HttpPost]
-        public IActionResult AddProductToInvoice([FromBody] AddProductDto request)
+        [HttpPost]
+        public async Task<IActionResult> AddProductToInvoice([FromBody] AddProductDto request)
+
         {
 
             try
@@ -542,7 +553,26 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 _context.SaveChanges();
                 // Cập nhật số lượng tồn kho: trừ số lượng được bán
                 productDetail.so_luong -= request.Quantity;
+
+                // đổi trạng thái
+
+
+                productDetail.trang_thai = productDetail.so_luong > 0 ? 1 : 0;
+
+
+
                 _context.san_Pham_Chi_Tiets.Update(productDetail);
+
+                _context.SaveChanges();
+
+
+
+
+
+                 await changeStatusSP(productDetail.San_PhamID);
+                
+
+                
 
                 var listHDCT = _context.don_Chi_Tiets.Where(x => x.Hoa_DonID == request.InvoiceId).AsQueryable();
 
@@ -563,6 +593,29 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
+
+        public async Task changeStatusSP(Guid id)
+        {
+
+
+            var sp = await _context.san_Phams
+                .Include(x => x.San_Pham_Chi_Tiets)
+                .FirstOrDefaultAsync(x => x.ID == id);
+
+            if (sp == null) return;
+
+            int tongSoLuong = sp.San_Pham_Chi_Tiets.Sum(ct => ct.so_luong);
+            sp.trang_thai = tongSoLuong > 0 ? 1 : 0;
+
+            _context.Entry(sp).State = EntityState.Modified;
+        }
+
+        //public async Task<San_Pham_Chi_Tiet> changeStatusSPCT(San_Pham_Chi_Tiet sp)
+        //{
+
+
+        //    return sp;
+        //}
 
 
 

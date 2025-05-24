@@ -795,9 +795,9 @@
 		});
 		$(document).on('click', '.toggleCustomerForm', function () {
 
+			console.log("chay dia chi");
 			currentInvoiceId = $(this).data('id');
 
-			console.log("chay dia chi");
 			let container = $('#' + currentInvoiceId);
 
 			var diaChi = container.find('.AddressForm');
@@ -1117,6 +1117,11 @@
 			let row = $(this).closest('tr');
 			let chiTietId = row.data('id');
 
+
+			let container = $('#' + currentInvoiceId);
+
+			var diaChi = container.find('.AddressForm');
+
 			$.ajax({
 				url: '/Admin/BHTQ/UpdateInvoiceItemQuantity',
 				type: 'POST',
@@ -1142,6 +1147,11 @@
 					}
 				}
 			});
+			if (diaChi.is(':visible')) {
+				setTimeout(() => {
+					calculateFee();
+				}, 500);
+			}
 		});
 
 
@@ -1151,6 +1161,12 @@
 		$(document).on('click', '.minus', function () {
 			let row = $(this).closest('tr');
 			let chiTietId = row.data('id');
+
+
+			let container = $('#' + currentInvoiceId);
+
+			var diaChi = container.find('.AddressForm');
+
 			$.ajax({
 				url: '/Admin/BHTQ/UpdateInvoiceItemQuantity',
 				type: 'POST',
@@ -1170,6 +1186,11 @@
 					}
 				}
 			});
+			if (diaChi.is(':visible')) {
+				setTimeout(() => {
+					calculateFee();
+				}, 500);
+			}
 		});
 
 		//update tong so luong cua san pham trong hoa don khi tang hoac giam so luong sp de hien thi len ma hoa don
@@ -1217,6 +1238,12 @@
 		$(document).on('click', '.deleteItem', function () {
 			let row = $(this).closest('tr');
 			let chiTietId = row.data('id');
+
+
+			let container = $('#' + currentInvoiceId);
+
+			var diaChi = container.find('.AddressForm');
+
 			$.ajax({
 				url: '/Admin/BHTQ/RemoveInvoiceItem',
 				type: 'POST',
@@ -1231,6 +1258,13 @@
 					}
 				}
 			});
+			
+			if (diaChi.is(':visible')) {
+				setTimeout(() => {
+					calculateFee();
+				}, 500);
+				
+			} 
 		});
 
 
@@ -2163,6 +2197,23 @@
 					const chiTiet = container.find('.DC_ChiTiet').val();  // class input địa chỉ chi tiết
 
 
+
+					// // Kiểm tra nếu không có sản phẩm nào
+					// const invoiceItems = container.find('.invoice-items tbody tr[data-id]');
+					// if (invoiceItems.length === 0) {
+					// 	Swal.fire({
+					// 		icon: 'warning',
+					// 		title: 'Không có sản phẩm nào trong hóa đơn!',
+					// 		text: 'Vui lòng thêm sản phẩm trước khi thanh toán.',
+					// 		toast: true,
+					// 		position: 'top-end',
+					// 		showConfirmButton: false,
+					// 		timer: 3000,
+					// 		timerProgressBar: true
+					// 	});
+					// 	return;
+					// }
+
 					let fee = parseFloat(container.find('.fee').text()) || 0;
 
 					const fullAddress = `${chiTiet}, ${xa}, ${huyen}, ${tinh}`;
@@ -2660,6 +2711,7 @@
 					timer: 3000,
 					timerProgressBar: true
 				});
+				return;
 			}
 
 			if (!customerId) {

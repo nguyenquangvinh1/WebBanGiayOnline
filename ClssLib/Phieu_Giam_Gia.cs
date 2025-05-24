@@ -55,7 +55,7 @@ namespace ClssLib
 		[Display(Name = "Ngày bắt đầu :")]
 		[DataType(DataType.Date)]
 		[Required(AllowEmptyStrings = false, ErrorMessage = "Hãy chọn ngày bắt đầu!")]
-		public DateTime ngay_bat_dau { get; set; }
+		public DateTime? ngay_bat_dau { get; set; }
 
 		[Display(Name = "Ngày kết thúc :")]
 		[DataType(DataType.Date)]
@@ -75,10 +75,15 @@ namespace ClssLib
             {
                 trang_thai = 0; // Hết hạn
             }
+            else if (ngay_bat_dau.HasValue && ngay_bat_dau.Value > DateTime.Now)
+            {
+                trang_thai = -1; // Chưa đến thời gian áp dụng
+            }
             else
             {
-                trang_thai = 1; // Còn hiệu lực
+                trang_thai = 1; // Đang hiệu lực
             }
         }
+
     }
 }

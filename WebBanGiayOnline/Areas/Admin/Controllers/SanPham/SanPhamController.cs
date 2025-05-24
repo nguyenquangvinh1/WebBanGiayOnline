@@ -54,6 +54,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                     }
                 }
                 item.so_luong_tong = tong;
+                CheckStatusSP(item.ID,(int)item.trang_thai);
             }
 
             return View(list);
@@ -471,14 +472,35 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 .Where(x => x.San_PhamID == id)
                 .ToList();
 
-            bool allMatch = spctList.All(x => x.trang_thai == trang_thai);
+            foreach (var spct in spctList)
+            {
+                if (spct.so_luong == 0 && spct.trang_thai != 0)
+                {
+                    spct.trang_thai = 0;
+                    _context.san_Pham_Chi_Tiets.Update(spct);
+                }
+                else if (spct.so_luong != 0 && spct.trang_thai == 0)
+                {
+                    spct.trang_thai = 1;
+                    _context.san_Pham_Chi_Tiets.Update(spct);
+                }
+            }
 
-            if (allMatch)
+            if (spctList.All(x => x.trang_thai == trang_thai))
             {
                 sp.trang_thai = trang_thai;
-                _context.SaveChanges();
+                _context.san_Phams.Update(sp);
             }
+            else if (spctList.All(x => x.trang_thai != trang_thai))
+            {
+                // ✅ Gán trạng thái theo item đầu tiên trong danh sách
+                sp.trang_thai = spctList.First().trang_thai;
+                _context.san_Phams.Update(sp);
+            }
+
+            _context.SaveChanges();
         }
+
 
         // GET: KieuDangController/Details/5
         public async Task<IActionResult> Details(Guid? id)
