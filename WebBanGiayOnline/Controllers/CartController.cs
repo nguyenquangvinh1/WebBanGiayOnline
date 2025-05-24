@@ -164,6 +164,15 @@ namespace WebBanGiay.Controllers
                     return Redirect("/404");
                 }
 
+                if (hanghoa.so_luong < quantity)
+                {
+
+                    TempData["Message"] = $"Không tìm thấy {id}";
+                    return RedirectToAction("Details");
+                }
+                hanghoa.so_luong -= quantity;
+                db.Update(hanghoa);
+                db.SaveChanges();
 
                 item = new CartItem
                 {
