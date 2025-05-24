@@ -118,7 +118,7 @@
                         <a href="https://localhost:7243" class="nav-item nav-link">Trang chủ</a>
                         <a asp-controller="San_Pham_Chi_Tiet" asp-action="Index" class="nav-item nav-link active">Cửa hàng</a>
 
-                        <a class="nav-item nav-link active">Tra cứu</a>
+                        <a asp-controller="LichSuHoaDon" asp-action="Index" class="nav-item nav-link">Tra cứu</a>
 
                         <a href="contact.html" class="nav-item nav-link">Liên hệ</a>
                     </div>
@@ -231,13 +231,7 @@
                             <div class="product-info">
                             <h4 class="fw-bold mb-3">@Model.TenHH</h4>
                                 <p id="productPrice" class="text-danger fw-bold">Giá: Vui lòng chọn Màu Sắc & Kích Thước</p>
-                            <div class="d-flex mb-4">
-                                <i class="fa fa-star text-secondary"></i>
-                                <i class="fa fa-star text-secondary"></i>
-                                <i class="fa fa-star text-secondary"></i>
-                                <i class="fa fa-star text-secondary"></i>
-                                <i class="fa fa-star"></i>
-                            </div>
+                          
                             <p class="mb-4">@Model.MoTa</p>
                             <div>
                                 <label><strong>Kích Thước: </strong></label>

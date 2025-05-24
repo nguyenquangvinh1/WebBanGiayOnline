@@ -199,71 +199,121 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
 
         [HttpPost]
-        public IActionResult UpdateQuantity(Guid id, int quantity)
+        public IActionResult UpdateQuantity(Guid id, int quantity, double newPrice)
         {
             var cart = _context.don_Chi_Tiets.FirstOrDefault(z => z.ID == id);
-
+            
             if (cart != null)
             {
                 var hoaDon = _context.hoa_Dons.FirstOrDefault(h => h.ID == cart.Hoa_DonID);
 
-                // ❗ THÊM PHẦN NÀY NGAY SAU KHI LẤY ĐƯỢC `cart` VÀ `hoaDon`
-                if (hoaDon != null && (hoaDon.trang_thai == 2 || hoaDon.trang_thai == 3 || hoaDon.trang_thai == 4 || hoaDon.trang_thai == 5 ))
+                if (hoaDon != null && (hoaDon.trang_thai == 2 || hoaDon.trang_thai == 3 || hoaDon.trang_thai == 4 || hoaDon.trang_thai == 5))
                 {
                     return Json(new { success = false, message = "Trạng đơn hàng không cho phép bạn thay đổi số lượng !" });
                 }
 
-             
-                var sanPham = _context.san_Pham_Chi_Tiets.FirstOrDefault(sp => sp.ID == cart.San_Pham_Chi_TietID); // Cần đảm bảo có `sanPham_id`
+                var sanPham = _context.san_Pham_Chi_Tiets.FirstOrDefault(sp => sp.ID == cart.San_Pham_Chi_TietID);
                 if (sanPham == null)
                 {
                     return Json(new { success = false, message = "Không tìm thấy sản phẩm trong kho!" });
                 }
 
-                int soLuongCu = cart.so_luong;
-                int chenhlech = quantity - soLuongCu;
-
-                if (chenhlech > 0 && chenhlech > sanPham.so_luong)
+                // Nếu giá mới khác giá cũ => tạo sản phẩm mới thay vì cập nhật dòng hiện tại
+                if (sanPham.gia != newPrice)
                 {
-                    return Json(new { success = false, message = $"Số lượng sản phẩm không đủ !" });
-                }
+                    // Kiểm tra số lượng đủ
+                    newPrice = sanPham.gia;
+                    int soLuongCu = cart.so_luong;
+                    int chenhlech = quantity - soLuongCu;
 
-                // Cập nhật lại số lượng kho dựa trên phần thay đổi
-                sanPham.so_luong -= chenhlech;
-                _context.Update(sanPham);
-                if (sanPham.so_luong < 0)
-                {
-                    return Json(new { success = false, message = "Không đủ số lượng trong kho để cập nhật!" });
-                }
+                    // Trừ số lượng sản phẩm trong kho
+                    sanPham.so_luong -= quantity;
+                    _context.Update(sanPham);
 
-                cart.so_luong = quantity;
-                cart.thanh_tien = cart.gia * quantity;
+              
+                    // Tạo sản phẩm mới với giá mới
+                    var newCart = new Hoa_Don_Chi_Tiet()
+                    {
+                        ID = Guid.NewGuid(),
+                        Hoa_DonID = cart.Hoa_DonID,
+                        San_Pham_Chi_TietID = cart.San_Pham_Chi_TietID,
+                        so_luong = chenhlech,
+                        gia = newPrice,
+                        thanh_tien = chenhlech * newPrice,
+                        ma = cart.ma
+                    };
 
-                _context.Update(cart);
-                _context.SaveChanges();
+                    _context.Add(newCart);
+                    _context.SaveChanges();
 
-                if (hoaDon != null)
-                {
+                    // Cập nhật tổng tiền hóa đơn
                     var tongTienMoi = _context.don_Chi_Tiets
                                         .Where(z => z.ma == hoaDon.MaHoaDon)
                                         .Sum(z => z.gia * z.so_luong);
 
                     hoaDon.tong_tien = tongTienMoi;
                     _context.Update(hoaDon);
+                    _context.SaveChanges();
+
+                    return Json(new
+                    {
+                        success = true,
+                        newTotal = newCart.thanh_tien,
+                        totalCart = hoaDon.tong_tien
+                    });
                 }
-
-                _context.SaveChanges();
-
-                return Json(new
+                else
                 {
-                    success = true,
-                    newTotal = cart.thanh_tien,
-                    totalCart = hoaDon?.tong_tien ?? cart.thanh_tien
-                });
+                    int soLuongCu = cart.so_luong;
+                    int chenhlech = quantity - soLuongCu;
+
+                    if (chenhlech > 0)
+                    {
+                        // Tăng số lượng => cần kiểm tra kho
+                        if (chenhlech > sanPham.so_luong)
+                        {
+                            return Json(new { success = false, message = "Số lượng sản phẩm không đủ trong kho!" });
+                        }
+                        sanPham.so_luong -= chenhlech;
+                    }
+                    else if (chenhlech < 0)
+                    {
+                        // Giảm số lượng => hoàn lại vào kho
+                        sanPham.so_luong += Math.Abs(chenhlech);
+                    }
+
+
+                    _context.Update(sanPham);
+
+                    cart.so_luong = quantity;
+                    cart.thanh_tien = cart.gia * quantity;
+
+                    _context.Update(cart);
+                    _context.SaveChanges();
+
+                    if (hoaDon != null)
+                    {
+                        var tongTienMoi = _context.don_Chi_Tiets
+                                            .Where(z => z.ma == hoaDon.MaHoaDon)
+                                            .Sum(z => z.gia * z.so_luong);
+
+                        hoaDon.tong_tien = tongTienMoi;
+                        _context.Update(hoaDon);
+                        _context.SaveChanges();
+                    }
+
+                    return Json(new
+                    {
+                        success = true,
+                        newTotal = cart.thanh_tien,
+                        totalCart = hoaDon?.tong_tien ?? cart.thanh_tien
+                    });
+                }
             }
 
             return Json(new { success = false, message = "Không tìm thấy sản phẩm trong giỏ hàng!" });
         }
+
 
 
         [HttpPost]

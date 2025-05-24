@@ -430,6 +430,7 @@
                                     <input type="number"
                                            class="product-quantity"
                                            data-id="@item.ID"
+                                           data-price="@item.gia"
                                            value="@item.so_luong"
                                            min="1"
                                     @(Model.trang_thai == 2 || Model.trang_thai == 3 || Model.trang_thai == 4 ? "readonly" : "") />
@@ -687,7 +688,7 @@
             var trangThai = parseInt($("#trangThaiDonHang").val());
 
             // Nếu là trạng thái không cho phép thay đổi
-            if (trangThai === 2 || trangThai === 3) {
+            if (trangThai === 2 || trangThai === 3 || trangThai == 1) {
                 $(".product-quantity").prop("readonly", true); // không cho chỉnh tay
                 $(".updateQuantity").prop("disabled", true);   // không cho bấm +/–
             }
@@ -719,7 +720,7 @@
                 $.ajax({
                     url: '@Url.Action("UpdateQuantity", "HoaDon")',
                     type: "POST",
-                    data: { id: productId, quantity: currentQuantity },
+                    data: { id: productId, quantity: currentQuantity,newPrice: $(`.product-quantity[data-id='${productId}']`).data("price") },
                     success: function (response) {
                         if (response.success) {
                             var newTotal = response.newTotal;
