@@ -82,6 +82,14 @@ namespace WebBanGiay.Controllers
 				new Claim("ward", diaChi?.xa ?? ""),
 				new Claim("address", diaChi?.dia_chi_chi_tiet ?? "")
 			};
+            Console.WriteLine(user.ID.ToString());
+            Console.WriteLine(user.ho_ten);
+            Console.WriteLine(user.email);
+            Console.WriteLine(user.sdt);
+            Console.WriteLine(user.ma);
+            Console.WriteLine(user.user_name);
+            Console.WriteLine(user.Vai_Tro.ten_vai_tro);
+            Console.WriteLine(CleanLocationName(diaChi?.tinh));
 
 
 			var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

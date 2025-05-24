@@ -930,20 +930,32 @@
         }
 
         $('#saveProduct').click(function (e) {
-
             let sanPhamCTList = [];
-            let hasError = false; // Biến kiểm tra lỗi
+            let hasError = false;
+            let hasImage = false;
 
-            console.log("🔹 Đã chạy save");
+            let tenSanPham = $("#ten_san_pham").val();
+            let danhSachTenGiay = @Html.Raw(Json.Serialize(ViewBag.TenGiay));
+            function kiemTraTrungLap(ten) {
+                return danhSachTenGiay.some(item => item.toLowerCase() === ten.trim().toLowerCase());
+            }
+
+            if (kiemTraTrungLap(tenSanPham)) {
+                Toast.fire({
+                    icon: 'error',
+                    title: "⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác."
+                });
+                e.preventDefault();
+                return;
+            }
 
             $("[id^='table-']").each(function () {
                 let color = $(this).attr('id').replace('table-', '');
-                let table = $(this);
-                let rows = table.find("tbody tr");
+                let rows = $(this).find("tbody tr");
 
                 if (rows.length === 0) {
-                    console.warn(`⚠️ Không có hàng sản phẩm nào trong #table-${color}`);
-                    return; // Dừng gửi form nếu có lỗi
+                    console.warn(`⚠️ Không có sản phẩm trong bảng màu ${color}`);
+                    return;
                 }
 
                 rows.each(function () {
@@ -952,62 +964,62 @@
                     let price = parseInt($(this).find(".price").val()) || 0;
                     let imgUrl = $(this).find(".lst_img").val();
 
-                    if (quantity <= 0 || price <= 0) {
-                        hasError = true; // Đánh dấu có lỗi
-                        console.error(`❌ Lỗi: Màu: ${color}, Size: ${size}, SL: ${quantity}, Giá: ${price}`);
-                    } else {
-                        sanPhamCTList.push({
-                            Mau_Sac: color,
-                            Kich_Thuoc: size,
-                            so_luong: quantity,
-                            gia: price,
-                            imgUrl: imgUrl,
-                            trang_thai: 1,
-                            ngay_tao: new Date().toISOString()
-                        });
+                    const imgMissing = !imgUrl || imgUrl.trim() === "";
+                    const invalidData = quantity <= 0 || price <= 0;
+
+                    if (invalidData || imgMissing) {
+                        if (invalidData) {
+                            hasError = true;
+                            console.error(`❌ Lỗi dữ liệu: Màu: ${color}, Size: ${size}, SL: ${quantity}, Giá: ${price}`);
+                        }
+                        if (imgMissing) {
+                            hasImage = true;
+                            console.error(`❌ Lỗi thiếu ảnh: Màu: ${color}, Size: ${size}`);
+                        }
+                        return;
                     }
+
+                    sanPhamCTList.push({
+                        Mau_Sac: color,
+                        Kich_Thuoc: size,
+                        so_luong: quantity,
+                        gia: price,
+                        imgUrl: imgUrl,
+                        trang_thai: 1,
+                        ngay_tao: new Date().toISOString()
+                    });
                 });
             });
 
-            if (hasError) {
-                Toast.fire({
-                    icon: 'error',
-                    title: "⚠️ Vui lòng nhập số lượng và giá hợp lệ (> 0) cho tất cả sản phẩm."
-                });
-                e.preventDefault(); // Ngăn không gửi form
-                return; // Dừng gửi form nếu có lỗi
-            }
-            if (sanPhamCTList.length === 0) {
-                Toast.fire({
-                    icon: 'error',
-                    title: "⚠️ Bạn chưa chọn màu sắc và kích thước hợp lệ! Vui lòng kiểm tra lại."
-                });
-                e.preventDefault(); // Ngăn không gửi form
+            // Xử lý lỗi
+            if (hasError || hasImage || sanPhamCTList.length === 0) {
+                e.preventDefault();
+
+                if (hasError) {
+                    Toast.fire({
+                        icon: 'error',
+                        title: "⚠️ Vui lòng nhập số lượng và giá hợp lệ (> 0) cho tất cả sản phẩm."
+                    });
+                }
+
+                if (hasImage) {
+                    Toast.fire({
+                        icon: 'error',
+                        title: "⚠️ Vui lòng thêm ảnh cho tất cả sản phẩm."
+                    });
+                }
+@* 
+                if (sanPhamCTList.length === 0) {
+                    Toast.fire({
+                        icon: 'error',
+                        title: "⚠️ Bạn chưa chọn màu sắc và kích thước hợp lệ!"
+                    });
+                } *@
                 return;
             }
 
-            // Chuyển dữ liệu thành JSON và gán vào input ẩn
             $('#lstSPCT').val(JSON.stringify(sanPhamCTList));
 
-
-
-            let danhSachTenGiay = @Html.Raw(Json.Serialize(ViewBag.TenGiay));
-            function kiemTraTrungLap(tenSanPham) {
-                return danhSachTenGiay.some(item => item.toLowerCase() === tenSanPham.trim().toLowerCase());
-            }
-
-            let tenSanPham = $("#ten_san_pham").val();
-            if (kiemTraTrungLap(tenSanPham)) {
-                Toast.fire({
-                    icon: 'error',
-                    title: "⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác."
-                });
-                return;
-            }
-
-            debugger;
-            console.log("✅ Không có lỗi, gửi form...");
-            e.preventDefault();
             Swal.fire({
                 title: "Xác nhận",
                 text: "Bạn có chắc chắn muốn thêm sản phẩm này?",
@@ -1019,12 +1031,11 @@
                 cancelButtonText: "Hủy"
             }).then(function (result) {
                 if (result.isConfirmed) {
-
                     $('#formSanPham').submit();
-                    
                 }
             });
         });
+
         let currentTable = null;
 
         // Mở modal và xác định bảng cần cập nhật
