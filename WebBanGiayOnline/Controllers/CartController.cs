@@ -17,6 +17,7 @@ using WebBanGiay.Models.ViewModel;
 using WebBanGiay.Service;
 using static WebBanGiay.Models.ViewModel.GHNShipping;
 using System.Security.Claims;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 
 namespace WebBanGiay.Controllers
 {
@@ -155,16 +156,26 @@ namespace WebBanGiay.Controllers
               .Include(c => c.Anh_San_Pham)
               .ToList();
 
+            var hanghoa = db.san_Pham_Chi_Tiets.SingleOrDefault(x => x.ID == id);
+            if (hanghoa == null)
+            {
+                TempData["Message"] = $"Không tìm thấy {id}";
+                return Redirect("/404");
+            }
+           
+            if (hanghoa.so_luong < quantity)
+            {
+                
+                TempData["Message"] = $"Không tìm thấy {id}";
+                return RedirectToAction("Details");
+            }
+            hanghoa.so_luong -= quantity;
+            db.Update(hanghoa);
+            db.SaveChanges();
+
             if (item == null)
             {
-                var hanghoa = db.san_Pham_Chi_Tiets.SingleOrDefault(x => x.ID == id);
-                if (hanghoa == null)
-                {
-                    TempData["Message"] = $"Không tìm thấy {id}";
-                    return Redirect("/404");
-                }
-
-
+                
                 item = new CartItem
                 {
                     id = hanghoa.ID,
