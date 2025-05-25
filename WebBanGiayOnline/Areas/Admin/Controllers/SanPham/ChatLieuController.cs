@@ -1,4 +1,5 @@
 ﻿using ClssLib;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +8,8 @@ using WebBanGiay.Data;
 namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 {
     [Area("Admin")] /*sfsdfsd*/
+    [Authorize(Policy = "AdminOrEmployeePolicy")]
+
     public class ChatLieuController : Controller
     {
         // GET: ChatLieuController

@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace WebBanGiay.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize]
+    [Authorize(Policy = "AdminOrEmployeePolicy")]
     public class ThongKesController : Controller
     {
         private readonly AppDbContext _context;

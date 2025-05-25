@@ -28,6 +28,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
     [Area("Admin")]
     //[Authorize(Policy = "EmployeePolicy")]
     //[Authorize(Policy = "EmployeePolicy")]
+    [Authorize(Policy = "AdminOrEmployeePolicy")]
 
     //[Route("Admin/NhanVien")]
 

@@ -1,4 +1,5 @@
 ﻿using ClssLib;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 // Sử dụng MailKit
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -15,6 +16,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
 {
 
     [Area("Admin")] /*sfsdfsd*/
+    [Authorize(Policy = "AdminOrEmployeePolicy")]
     public class PhieuGiamGiaController : Controller
     {
         // GET: CoGiayController

@@ -23,11 +23,13 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using WebBanGiay.Helpers;
 using WebBanGiay.Models;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace WebBanGiay.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Policy = "AdminOrEmployeePolicy")]
     public class HoaDonController : Controller
     {
         private readonly AppDbContext _context;

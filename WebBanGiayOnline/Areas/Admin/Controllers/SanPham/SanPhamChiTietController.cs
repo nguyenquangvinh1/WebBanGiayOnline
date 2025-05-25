@@ -1,4 +1,5 @@
 ﻿using ClssLib;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
@@ -12,6 +13,8 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 {
 
     [Area("Admin")] /*sfsdfsd*/
+    [Authorize(Policy = "AdminOrEmployeePolicy")]
+
     public class SanPhamChiTietController : Controller
     {
         private readonly AppDbContext _context;
