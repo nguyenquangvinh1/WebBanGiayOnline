@@ -107,6 +107,13 @@
                 </div>
             </div>
         </div>
+        @if (TempData["Message"] != null)
+        {
+            <div class="alert alert-warning">
+                @TempData["Message"]
+            </div>
+        }
+
         <div class="container px-0">
             <nav class="navbar navbar-light bg-white navbar-expand-xl">
                 <a asp-controller="San_Pham_Chi_Tiet" asp-action="Index" class="navbar-brand"><h1 class="text-primary display-6">Adidas Shop</h1></a>
@@ -492,6 +499,7 @@
                 let validMauSacs = sanPhamChiTietList
                     .filter(spct => spct.kichThuoc === selectedKichThuoc)
                     .map(spct => spct.mauSac);
+
 
                 $('.mau-sac-btn').each(function () {
                     let mauSacID = $(this).data('mausac');
