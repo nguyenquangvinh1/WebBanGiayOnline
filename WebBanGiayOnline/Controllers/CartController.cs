@@ -156,45 +156,47 @@ namespace WebBanGiay.Controllers
               .Include(c => c.Anh_San_Pham)
               .ToList();
 
-            var hanghoa = db.san_Pham_Chi_Tiets.SingleOrDefault(x => x.ID == id);
-            if (hanghoa == null)
-            {
-                TempData["Message"] = $"Không tìm thấy {id}";
-                return Redirect("/404");
-            }
-           
-            if (hanghoa.so_luong < quantity)
-            {
-                
-                TempData["Message"] = $"Không tìm thấy {id}";
-                return RedirectToAction("Details");
-            }
-            hanghoa.so_luong -= quantity;
-            db.Update(hanghoa);
-            db.SaveChanges();
-
             if (item == null)
             {
-                
-                item = new CartItem
+                var hanghoa = db.san_Pham_Chi_Tiets.SingleOrDefault(x => x.ID == id);
+                if (hanghoa == null)
                 {
-                    id = hanghoa.ID,
-                    TenHH = hanghoa.ten_SPCT,
-                    DonGia = db.san_Pham_Chi_Tiets.Find(id).gia,
-                    SoLuong = quantity,
-                    Hinh = hinh?.FirstOrDefault(x => x.San_Pham_Chi_TietID == id)?.Anh_San_Pham.anh_url ?? "Default_Image_URL"
-                };
-                Cart1.Add(item);
-            }
-            else
-            {
-                item.SoLuong += quantity;
+                    TempData["Message"] = $"Không tìm thấy {id}";
+                    return Redirect("/404");
+                }
+
+                if (hanghoa.so_luong < quantity)
+                {
+
+                    TempData["Message"] = $"Không tìm thấy {id}";
+                    return RedirectToAction("Details");
+                }
+                hanghoa.so_luong -= quantity;
+                db.Update(hanghoa);
+                db.SaveChanges();
+
+        
+
+                    item = new CartItem
+                    {
+                        id = hanghoa.ID,
+                        TenHH = hanghoa.ten_SPCT,
+                        DonGia = db.san_Pham_Chi_Tiets.Find(id).gia,
+                        SoLuong = quantity,
+                        Hinh = hinh?.FirstOrDefault(x => x.San_Pham_Chi_TietID == id)?.Anh_San_Pham.anh_url ?? "Default_Image_URL"
+                    };
+                    Cart1.Add(item);
+                }
+                else
+                {
+                    item.SoLuong += quantity;
 
 
+                }
+                HttpContext.Session.Set(MySetting.CART_KEY, Cart1);
+                return RedirectToAction("Index");
             }
-            HttpContext.Session.Set(MySetting.CART_KEY, Cart1);
-            return RedirectToAction("Index");
-        }
+           
 
         public IActionResult RemoveCart(Guid id)
         {
@@ -302,7 +304,7 @@ namespace WebBanGiay.Controllers
                     Giam_GiaID = discount == Guid.Empty ? null : (Guid?)discount,
                     trang_thai = 0,
                     loai_hoa_don = 2,
-                    ghi_chu = model.GhiChu,
+                    ghi_chu = model.GhiChu ?? "Không có",
                 };
                 
                 db.Add(hoadon);
@@ -387,7 +389,8 @@ namespace WebBanGiay.Controllers
                     db.AddRange(cthd);
                     db.SaveChanges();
                     HttpContext.Session.Set<List<CartItem>>(MySetting.CART_KEY, new List<CartItem>());
-                    return View("Success");
+                    return View("Success", Cart);
+
                 }
                 catch
                 {
@@ -468,7 +471,6 @@ namespace WebBanGiay.Controllers
             HttpContext.Session.Set("CheckoutInfo", model);
         
 
-            // Chuyển hướng đến VNPay
             return Redirect(_vnPayservice.CreatePaymentUrl(HttpContext, vnPayModel));
         }
 
@@ -516,7 +518,7 @@ namespace WebBanGiay.Controllers
                     Giam_GiaID = discount == Guid.Empty ? null : (Guid?)discount,
                     trang_thai = 1,
                     loai_hoa_don = 2,
-                    ghi_chu = model?.GhiChu,
+                    ghi_chu = model.GhiChu ?? "Không có",
                 };
                 db.Add(hoadon);
                 db.SaveChanges();

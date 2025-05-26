@@ -177,12 +177,12 @@
                         <textarea asp-for="mo_ta" class="form-control"></textarea>
                         <span asp-validation-for="mo_ta" class="text-danger"></span>
                     </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary" id="saveProduct">thêm</button>
-                        @* <input type="submit" value="Create" id="saveProduct" class="btn btn-primary" /> *@
-                    </div>
+                    
                 </form>
-
+                <div class="form-group">
+                    <button class="btn btn-primary" id="saveProduct">thêm</button>
+                    @* <input type="submit" value="Create" id="saveProduct" class="btn btn-primary" /> *@
+                </div>
             </div>
         </div>
 
@@ -929,11 +929,10 @@
             }
         }
 
-        $('#saveProduct').click(function (e) {
+        $('#saveProduct').off('click').on('click', function (e) {
             let sanPhamCTList = [];
             let hasError = false;
             let hasImage = false;
-
             let tenSanPham = $("#ten_san_pham").val();
             let danhSachTenGiay = @Html.Raw(Json.Serialize(ViewBag.TenGiay));
             function kiemTraTrungLap(ten) {
@@ -1024,6 +1023,7 @@
                 title: "Xác nhận",
                 text: "Bạn có chắc chắn muốn thêm sản phẩm này?",
                 icon: "warning",
+                showConfirmButton: true,
                 showCancelButton: true,
                 confirmButtonColor: "#3085d6",
                 cancelButtonColor: "#d33",

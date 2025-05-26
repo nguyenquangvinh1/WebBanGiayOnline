@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WebBanGiay.Migrations
 {
     /// <inheritdoc />
-    public partial class a : Migration
+    public partial class datn : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -131,8 +131,8 @@ namespace WebBanGiay.Migrations
                     loai_phieu_giam_gia = table.Column<int>(type: "int", nullable: false),
                     kieu_giam_gia = table.Column<int>(type: "int", nullable: false),
                     gia_tri_giam = table.Column<int>(type: "int", nullable: false),
-                    gia_tri_toi_thieu = table.Column<double>(type: "float", nullable: true),
-                    so_tien_giam_toi_da = table.Column<int>(type: "int", nullable: true),
+                    gia_tri_toi_thieu = table.Column<double>(type: "float", nullable: false),
+                    so_tien_giam_toi_da = table.Column<int>(type: "int", nullable: false),
                     so_luong = table.Column<int>(type: "int", nullable: false),
                     trang_thai = table.Column<int>(type: "int", nullable: false),
                     ngay_bat_dau = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -620,12 +620,12 @@ namespace WebBanGiay.Migrations
                 columns: new[] { "ID", "ma", "ten_phuong_thuc" },
                 values: new object[,]
                 {
-                    { new Guid("2336bbe5-2ab7-4b33-855a-bbeae8ed5c88"), "VNPAY", "Thanh toán VNPAY" },
-                    { new Guid("3b3f968e-8b3f-4f00-8753-468c3d776e7e"), "ALL", "Cả 2" },
-                    { new Guid("78324ad7-3c3a-41a4-84b0-0b408829874f"), "MoMo", "Thanh toán MoMo" },
-                    { new Guid("c6df63c9-0461-4abd-8ff2-e2a1dfe93e60"), "TTNH", "Thanh toán khi nhận hàng" },
-                    { new Guid("d7fc874b-591b-48c3-9f99-b764036d5f79"), "CK", "Chuyển khoản" },
-                    { new Guid("e1672052-08d4-49d6-ae91-ace8591f6831"), "TTM", "Tiền mặt" }
+                    { new Guid("1b78693f-bc1f-4a4a-b1f8-51700e637c5b"), "CK", "Chuyển khoản" },
+                    { new Guid("34bcf697-08cc-4bcc-b533-543fa3129ef6"), "VNPAY", "Thanh toán VNPAY" },
+                    { new Guid("4d92623f-36d1-4022-a483-5b097a8f80b1"), "TTNH", "Thanh toán khi nhận hàng" },
+                    { new Guid("7d3b8f8c-c8b1-4493-95ad-2e7513fa7e3d"), "ALL", "Cả 2" },
+                    { new Guid("aac1bc23-ef9c-4049-b294-733cb577c6b4"), "TTM", "Tiền mặt" },
+                    { new Guid("f50a179b-5178-4904-a4cc-7b2991e072c4"), "MoMo", "Thanh toán MoMo" }
                 });
 
             migrationBuilder.InsertData(
@@ -633,15 +633,15 @@ namespace WebBanGiay.Migrations
                 columns: new[] { "ID", "ngay_sua", "ngay_tao", "ten_vai_tro", "trang_thai" },
                 values: new object[,]
                 {
-                    { new Guid("6399260b-48b8-4910-b69e-b3648f0e6790"), null, new DateTime(2025, 5, 13, 15, 19, 43, 118, DateTimeKind.Local).AddTicks(8318), "Nhân Viên", 1 },
-                    { new Guid("73ab7e3c-a973-41e8-a576-0700bc99e0bd"), null, new DateTime(2025, 5, 13, 15, 19, 43, 118, DateTimeKind.Local).AddTicks(8261), "Admin", 1 },
-                    { new Guid("fa66bd30-43bb-42d6-b581-221689d70096"), null, new DateTime(2025, 5, 13, 15, 19, 43, 118, DateTimeKind.Local).AddTicks(8326), "Khách hàng", 1 }
+                    { new Guid("10f89178-6618-496b-bac5-8b6537c5d88f"), null, new DateTime(2025, 5, 21, 19, 38, 32, 991, DateTimeKind.Local).AddTicks(1705), "Admin", 1 },
+                    { new Guid("5abcfe9e-5e0b-4d45-bd82-b342b193c6b1"), null, new DateTime(2025, 5, 21, 19, 38, 32, 991, DateTimeKind.Local).AddTicks(1718), "Khách hàng", 1 },
+                    { new Guid("ec66e80c-e0eb-4755-992d-fbb280fca287"), null, new DateTime(2025, 5, 21, 19, 38, 32, 991, DateTimeKind.Local).AddTicks(1717), "Nhân Viên", 1 }
                 });
 
             migrationBuilder.InsertData(
                 table: "tai_Khoans",
                 columns: new[] { "ID", "ResetToken", "TokenExpiry", "Vai_TroID", "cccd", "email", "gioi_tinh", "hinh_anh", "ho_ten", "ma", "ngay_sinh", "ngay_sua", "ngay_tao", "pass_word", "sdt", "trang_thai", "user_name" },
-                values: new object[] { new Guid("fdb316c5-0d6a-488b-8c8c-f69c6734dce6"), null, null, new Guid("73ab7e3c-a973-41e8-a576-0700bc99e0bd"), "123456789012", "admin_tong@fpt.edu.vn", 1, "admin_tong.png", "Admin Tổng", "ADMIN01", new DateTime(1980, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, new DateTime(2025, 5, 13, 15, 19, 43, 118, DateTimeKind.Local).AddTicks(8817), "Admin123", "0123456789", 1, "admin_tong" });
+                values: new object[] { new Guid("36a4e267-2233-4c94-8931-6a8c1d81ef64"), null, null, new Guid("10f89178-6618-496b-bac5-8b6537c5d88f"), "123456789012", "admin_tong@fpt.edu.vn", 1, "admin_tong.png", "Admin Tổng", "ADMIN01", new DateTime(1980, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, new DateTime(2025, 5, 21, 19, 38, 32, 991, DateTimeKind.Local).AddTicks(1846), "Admin123", "0123456789", 1, "admin_tong" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_anh_San_Pham_San_Pham_Chi_Tiets_Anh_San_PhamID",

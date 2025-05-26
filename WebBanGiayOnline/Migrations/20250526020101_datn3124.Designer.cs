@@ -12,8 +12,8 @@ using WebBanGiay.Data;
 namespace WebBanGiay.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250513081951_a")]
-    partial class a
+    [Migration("20250526020101_datn3124")]
+    partial class datn3124
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -195,7 +195,6 @@ namespace WebBanGiay.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ghi_chu")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("loai_hoa_don")
@@ -381,6 +380,7 @@ namespace WebBanGiay.Migrations
                         .HasColumnType("int");
 
                     b.Property<double?>("gia_tri_toi_thieu")
+                        .IsRequired()
                         .HasColumnType("float");
 
                     b.Property<int>("kieu_giam_gia")
@@ -393,7 +393,8 @@ namespace WebBanGiay.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("ngay_bat_dau")
+                    b.Property<DateTime?>("ngay_bat_dau")
+                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("ngay_ket_thuc")
@@ -416,6 +417,7 @@ namespace WebBanGiay.Migrations
                         .HasColumnType("int");
 
                     b.Property<int?>("so_tien_giam_toi_da")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<string>("ten_phieu_giam_gia")
@@ -488,37 +490,37 @@ namespace WebBanGiay.Migrations
                     b.HasData(
                         new
                         {
-                            ID = new Guid("e1672052-08d4-49d6-ae91-ace8591f6831"),
+                            ID = new Guid("b9d0629c-3603-4c11-b47b-f6c555af55ce"),
                             ma = "TTM",
                             ten_phuong_thuc = "Tiền mặt"
                         },
                         new
                         {
-                            ID = new Guid("d7fc874b-591b-48c3-9f99-b764036d5f79"),
+                            ID = new Guid("9b60612e-d762-4490-b277-ceba1944857f"),
                             ma = "CK",
                             ten_phuong_thuc = "Chuyển khoản"
                         },
                         new
                         {
-                            ID = new Guid("3b3f968e-8b3f-4f00-8753-468c3d776e7e"),
+                            ID = new Guid("a08e785d-8efe-4fd6-8f30-5538deff5928"),
                             ma = "ALL",
                             ten_phuong_thuc = "Cả 2"
                         },
                         new
                         {
-                            ID = new Guid("c6df63c9-0461-4abd-8ff2-e2a1dfe93e60"),
+                            ID = new Guid("9899a762-f240-49bf-83e6-6fbb6fd6613b"),
                             ma = "TTNH",
                             ten_phuong_thuc = "Thanh toán khi nhận hàng"
                         },
                         new
                         {
-                            ID = new Guid("2336bbe5-2ab7-4b33-855a-bbeae8ed5c88"),
+                            ID = new Guid("767ca49a-67fa-4b32-a369-6567242f749d"),
                             ma = "VNPAY",
                             ten_phuong_thuc = "Thanh toán VNPAY"
                         },
                         new
                         {
-                            ID = new Guid("78324ad7-3c3a-41a4-84b0-0b408829874f"),
+                            ID = new Guid("07ba264c-882a-43be-bfdf-2e2f31b843f1"),
                             ma = "MoMo",
                             ten_phuong_thuc = "Thanh toán MoMo"
                         });
@@ -748,8 +750,8 @@ namespace WebBanGiay.Migrations
                     b.HasData(
                         new
                         {
-                            ID = new Guid("fdb316c5-0d6a-488b-8c8c-f69c6734dce6"),
-                            Vai_TroID = new Guid("73ab7e3c-a973-41e8-a576-0700bc99e0bd"),
+                            ID = new Guid("ee056c12-a4d5-412f-98cf-834f622908f0"),
+                            Vai_TroID = new Guid("0499cd73-ec61-48f6-b9a3-8cdf21567af7"),
                             cccd = "123456789012",
                             email = "admin_tong@fpt.edu.vn",
                             gioi_tinh = 1,
@@ -757,7 +759,7 @@ namespace WebBanGiay.Migrations
                             ho_ten = "Admin Tổng",
                             ma = "ADMIN01",
                             ngay_sinh = new DateTime(1980, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ngay_tao = new DateTime(2025, 5, 13, 15, 19, 43, 118, DateTimeKind.Local).AddTicks(8817),
+                            ngay_tao = new DateTime(2025, 5, 26, 9, 0, 58, 80, DateTimeKind.Local).AddTicks(1388),
                             pass_word = "Admin123",
                             sdt = "0123456789",
                             trang_thai = 1,
@@ -902,22 +904,22 @@ namespace WebBanGiay.Migrations
                     b.HasData(
                         new
                         {
-                            ID = new Guid("73ab7e3c-a973-41e8-a576-0700bc99e0bd"),
-                            ngay_tao = new DateTime(2025, 5, 13, 15, 19, 43, 118, DateTimeKind.Local).AddTicks(8261),
+                            ID = new Guid("0499cd73-ec61-48f6-b9a3-8cdf21567af7"),
+                            ngay_tao = new DateTime(2025, 5, 26, 9, 0, 58, 80, DateTimeKind.Local).AddTicks(1068),
                             ten_vai_tro = "Admin",
                             trang_thai = 1
                         },
                         new
                         {
-                            ID = new Guid("6399260b-48b8-4910-b69e-b3648f0e6790"),
-                            ngay_tao = new DateTime(2025, 5, 13, 15, 19, 43, 118, DateTimeKind.Local).AddTicks(8318),
+                            ID = new Guid("7610414a-957f-4562-be9f-4ce1f84d8c90"),
+                            ngay_tao = new DateTime(2025, 5, 26, 9, 0, 58, 80, DateTimeKind.Local).AddTicks(1083),
                             ten_vai_tro = "Nhân Viên",
                             trang_thai = 1
                         },
                         new
                         {
-                            ID = new Guid("fa66bd30-43bb-42d6-b581-221689d70096"),
-                            ngay_tao = new DateTime(2025, 5, 13, 15, 19, 43, 118, DateTimeKind.Local).AddTicks(8326),
+                            ID = new Guid("27726e5d-79d3-4d6d-afd5-9732eb8f5c42"),
+                            ngay_tao = new DateTime(2025, 5, 26, 9, 0, 58, 80, DateTimeKind.Local).AddTicks(1085),
                             ten_vai_tro = "Khách hàng",
                             trang_thai = 1
                         });
