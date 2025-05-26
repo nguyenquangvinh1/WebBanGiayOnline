@@ -144,17 +144,20 @@
     <div class="container-fluid py-5">
         <div class="container py-5">
             <h1 class="mb-4">Thanh toán</h1>
-            
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                <div class="form-check my-3">
+                    <button type="submit"
+                            class="btn border-secondary text-uppercase text-primary w-100 mt-2 openAddress" data-id="@User.FindFirst("userid")?.Value">
+                        <span>Địa chỉ khách hàng</span>
+                    </button>
+
+                </div>
+            }
             <form asp-action="Checkout" asp-controller="Cart" >
                 <div class="row g-5">
                     <div class="col-md-12 col-lg-6 col-xl-7">
-                        @if (User.Identity != null && User.Identity.IsAuthenticated)
-                        {
-                            <div class="form-check my-3">
-                                <input type="checkbox" name="GiongKhachHang" class="form-check-input" id="GiongKhachHang" value="false">
-                                <label class="form-check-label" for="GiongKhachHang">Lấy thông tin khách hàng?</label>
-                            </div>
-                        }
+                        
                         <div class="form-item delivery-info">
                             <label class="form-label my-2">Người nhận hàng<sup>*</sup></label>
                             <input type="text" name="TenKhachHang" class="form-control">
@@ -375,6 +378,35 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Địa chỉ -->
+    <div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Stt</th>
+                                <th>Tỉnh</th>
+                                <th>Huyện</th>
+                                <th>Xã</th>
+                                <th>chi tiết</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Sẽ được fill bằng JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Copyright End -->
     <!-- Back to Top -->
     <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i class="fa fa-arrow-up"></i></a>
@@ -429,22 +461,18 @@
 
 
         const stripPrefix = str => str?.replace(/^Tỉnh\s+|^Thành phố\s+/i, '').trim();
-        const userClaims = {
-            name: '@User.FindFirst("name")?.Value',
-            email: '@User.FindFirst("email")?.Value',
-            phone: '@User.FindFirst("SDT")?.Value',
-            province: stripPrefix(@Html.Raw(Json.Serialize(User.FindFirst("province")?.Value))),
-            district: @Html.Raw(Json.Serialize(User.FindFirst("district")?.Value)),
-            ward: stripPrefix(@Html.Raw(Json.Serialize(User.FindFirst("ward")?.Value))),
-            address: '@User.FindFirst("address")?.Value'
-
-
-        };
-        console.log(userClaims);
+        
+        
         // Gọi hàm khi trang tải
         $(document).ready(function () {
-           
-            loadProvinces();
+
+        @if (User.Identity.IsAuthenticated)
+        {
+
+            <text>
+                    loadCustomerInfo('@User.FindFirst("userid")?.Value');
+            </text>
+        }
         });
 
               function calculateFee() {
@@ -517,7 +545,7 @@
 
        
 
-        // Load danh sách tỉnh/huyện/xã
+        //Load danh sách tỉnh/huyện/xã
        
                    function loadProvinces() {
             $.ajax({
@@ -582,58 +610,232 @@
         });
 
 
+        // function loadProvinces() {
+            
 
 
 
-        $('#GiongKhachHang').on('change', function () {
-            const checked = $(this).is(':checked');
+        //     $.ajax({
+        //         url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/province",
+        //         type: "GET",
+        //         headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
+        //         success: function (response) {
+        //             $("#tinh").empty().append('<option value="">Chọn Tỉnh/Thành phố</option>');
+        //             response.data.forEach(function (province) {
+        //                 $("#tinh").append(`<option value="${province.ProvinceID}">${province.ProvinceName}</option>`);
+        //             });
+        //         },
+        //         error: function () {
+        //             alert("Lỗi khi tải danh sách tỉnh/thành phố.");
+        //         }
+        //     });
 
-            if (checked) {
-                $('input[name="TenKhachHang"]').val(userClaims.name);
-                $('input[name="Email"]').val(userClaims.email);
-                $('input[name="Sdt"]').val(userClaims.phone);
-                $('input[name="fulldiachi"]').val(userClaims.address);
+        //     // tỉnh thay đổi => load huyện
+        //     $("#tinh").off('change').on('change', function () {
+        //         let provinceId = $(this).val();
+        //         if (!provinceId) return;
 
-                const cleanName = (str) => str.replace(/^Tỉnh\s+|^Thành phố\s+/i, "").trim();
+        //         console.log("Đang load huyện cho " + currentInvoiceId);
 
-                const userProvince = cleanName(userClaims.province);
-                const userDistrict = userClaims.district;
-                const userWard = userClaims.ward;
+        //         $.ajax({
+        //             url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/district",
+        //             type: "GET",
+        //             headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
+        //             data: { "province_id": provinceId },
+        //             success: function (response) {
+        //                 $("#huyen").empty().append('<option value="">Chọn Quận/Huyện</option>');
+        //                 response.data.forEach(function (district) {
+        //                     $("#huyen").append(`<option value="${district.DistrictID}">${district.DistrictName}</option>`);
+        //                 });
+        //             },
+        //             error: function () {
+        //                 alert("Lỗi khi tải danh sách quận/huyện.");
+        //             }
+        //         });
+        //     });
 
-                // Chọn tỉnh theo text
-                $('#tinh option').each(function () {
-                    if ($(this).text().trim() === userProvince) {
-                        $('#tinh').val($(this).val()).trigger('change');
+        //     // huyện thay đổi => load xã
+        //     $("#huyen").off('change').on('change', function () {
+        //         let districtId = $(this).val();
+        //         if (!districtId) return;
 
-                        // Delay đợi load quận/huyện
-                        setTimeout(() => {
-                            $('#huyen option').each(function () {
-                                if ($(this).text().trim() === userDistrict) {
-                                    $('#huyen').val($(this).val()).trigger('change');
+        //         console.log("Đang load xã cho " + currentInvoiceId);
 
-                                    // Delay đợi load xã/phường
-                                    setTimeout(() => {
-                                        $('#xa option').each(function () {
-                                            if ($(this).text().trim() === userWard) {
-                                                $('#xa').val($(this).val()).trigger('change');
-                                            }
-                                        });
-                                    }, 1200);
-                                }
-                            });
-                        }, 1200);
-                    }
-                });
+        //         $.ajax({
+        //             url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/ward",
+        //             type: "GET",
+        //             headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
+        //             data: { "district_id": districtId },
+        //             success: function (response) {
+        //                 $("#xa").empty().append('<option value="">Chọn Xã/Phường</option>');
+        //                 response.data.forEach(function (ward) {
+        //                     $("#xa").append(`<option value="${ward.WardCode}">${ward.WardName}</option>`);
+        //                 });
+        //             },
+        //             error: function () {
+        //                 alert("Lỗi khi tải danh sách xã/phường.");
+        //             }
+        //         });
+        //     });
+        // }
 
-            } else {
-                $('input[name="TenKhachHang"]').val('');
-                $('input[name="Email"]').val('');
-                $('input[name="Sdt"]').val('');
-                $('input[name="fulldiachi"]').val('');
-                $('#tinh').val('').trigger('change');
-                $('#huyen').val('').trigger('change');
-                $('#xa').val('').trigger('change');
+
+
+        function loadCustomerInfo(customerId) {
+            $.ajax({
+                url: '/KhachHang/GetThongTinKhachHang', // ✅ Đổi tên controller nếu khác
+                type: 'GET',
+                data: { id: customerId },
+                success: function (response) {
+                    if (!response) return;
+
+                    console.log(response);
+                    // ✅ Gán dữ liệu vào form
+                    $('input[name="TenKhachHang"]').val(response.name);
+                    $('input[name="Email"]').val(response.email);
+                    $('input[name="Sdt"]').val(response.phone);
+                    $('input[name="fulldiachi"]').val(response.address);
+
+                    const cleanName = (str) => str.replace(/^Tỉnh\s+|^Thành phố\s+/i, "").trim();
+                    const userProvince = cleanName(response.province);
+                    const userDistrict = response.district;
+                    const userWard = response.ward;
+
+                    loadProvinces();
+                    setTimeout(() => {
+                        // Chọn tỉnh
+                        $('#tinh').find('option').each(function () {
+                            if ($(this).text().trim() === userProvince) {
+                                $('#tinh').val($(this).val()).trigger('change');
+
+                                setTimeout(() => {
+                                    $('#huyen').find('option').each(function () {
+                                        if ($(this).text().trim() === userDistrict) {
+                                            $('#huyen').val($(this).val()).trigger('change');
+
+                                            setTimeout(() => {
+                                                $('#xa').find('option').each(function () {
+                                                    if ($(this).text().trim() === userWard) {
+                                                        $('#xa').val($(this).val()).trigger('change');
+                                                    }
+                                                });
+                                            }, 500);
+                                        }
+                                    });
+                                }, 500);
+                            }
+                        });
+                    }, 500);
+                },
+                error: function () {
+                    Toast.fire({
+                        icon: 'error',
+                        title: "❌ Không thể tải thông tin khách hàng."
+                    });
+                }
+            });
+        }
+
+
+        $(document).on('click', '.openAddress', function () {
+            const customerId = $(this).data('id'); // giả định nút có data-id
+
+            console.log("đã chạy openAddress");
+            console.log(customerId);
+
+
+
+            if (!customerId) {
+                alert("Không tìm thấy ID khách hàng!");
+                return;
             }
+            debugger;
+            $.ajax({
+                url: `/Khachhang/GetAddressCustomer?customerId=${customerId}`,
+                type: 'GET',
+                success: function (res) {
+                    const $tbody = $('#addressModal tbody');
+                    $tbody.empty();
+
+                    if (!res || res.length === 0 || res.success === false) {
+                        $tbody.append(`<tr><td colspan="6">${res.message || "Không có địa chỉ nào!"}</td></tr>`);
+                        return;
+                    }
+
+                    res.forEach((item, index) => {
+                        $tbody.append(`
+                                            <tr>
+                                                <td>${index + 1}</td>
+                                                <td>${item.tinh}</td>
+                                                <td>${item.huyen}</td>
+                                                <td>${item.xa}</td>
+                                                <td>${item.chi_tiet}</td>
+                                                <td><button class="btn btn-sm btn-primary select-address"
+                                                    data-tinh="${item.tinh}"
+                                                    data-huyen="${item.huyen}"
+                                                    data-xa="${item.xa}"
+                                                    data-chitiet="${item.chi_tiet}">Chọn</button></td>
+                                            </tr>
+                                        `);
+                    });
+
+                    $('#addressModal').modal('show');
+                    loadProvinces();
+                },
+                error: function (err) {
+                    alert("Lỗi khi lấy địa chỉ!");
+                }
+            });
+        });
+
+        $(document).on('click', '.select-address', function () {
+            const btn = $(this);
+            const cleanName = (str) => str.replace(/^Tỉnh\s+|^Thành phố\s+/i, "").trim();
+
+            const tenTinh = cleanName(btn.data('tinh'));
+            const tenHuyen = btn.data('huyen');
+            const tenXa = btn.data('xa');
+            const DC_ChiTiet = btn.data('chitiet');
+
+            // Xác định container tab đang mở
+            const tinhSelect = $('#tinh');
+            const huyenSelect = $('#huyen');
+            const xaSelect = $("#xa");
+            const chiTietSelect = $('input[name="fulldiachi"]');
+
+
+
+            console.log("Tỉnh cần chọn:", tenTinh);
+            console.log("Huyện cần chọn:", tenHuyen);
+            console.log("Xã cần chọn:", tenXa);
+            console.log("DC_ChiTiet cần chọn:", DC_ChiTiet);
+
+            // Chọn tỉnh theo text
+            tinhSelect.find('option').each(function () {
+                if ($(this).text().trim() === tenTinh) {
+                    tinhSelect.val($(this).val()).trigger('change');
+
+                    setTimeout(() => {
+                        huyenSelect.find('option').each(function () {
+                            if ($(this).text().trim() === tenHuyen) {
+                                huyenSelect.val($(this).val()).trigger('change');
+
+                                setTimeout(() => {
+                                    xaSelect.find('option').each(function () {
+                                        if ($(this).text().trim() === tenXa) {
+                                            xaSelect.val($(this).val()).trigger('change');
+
+                                            setTimeout(() => {
+                                                chiTietSelect.val(DC_ChiTiet);
+                                            }, 5000);
+                                        }
+                                    });
+                                }, 5000);
+                            }
+                        });
+                    }, 5000);
+                }
+            });
         });
 
    
