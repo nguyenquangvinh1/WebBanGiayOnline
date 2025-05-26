@@ -86,12 +86,13 @@ namespace WebBanGiay.Areas.Admin.Controllers
             var invoices = _context.hoa_Dons
                 .Where(hd => hd.trang_thai == 6
                              && hd.dia_chi == "Tại quầy"
-                             && hd.loai_hoa_don == 1)  // chỉ lấy hóa đơn tại quầy
+							 && (hd.loai_hoa_don == 1 || hd.loai_hoa_don == 3))  // chỉ lấy hóa đơn tại quầy
                 .OrderBy(hd => hd.ngay_tao)
                 .Select(hd => new {
                     hd.ID,
                     hd.MaHoaDon,
                     hd.ngay_tao,
+                    hd.loai_hoa_don,
                     hd.tong_tien,
                     // Hiển thị trạng thái dưới dạng chuỗi
                     TrangThai = "Chờ xử lí",
@@ -862,6 +863,12 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
             // 4. Đổi trạng thái hóa đơn thành 6 (Đã thanh toán)
             invoice.trang_thai = 5;
+            if (invoice.loai_hoa_don == 3)
+            {
+
+				invoice.loai_hoa_don = 1;
+				invoice.trang_thai = 1;
+			}
             _context.hoa_Dons.Update(invoice);
             _context.SaveChanges();
 
@@ -899,6 +906,42 @@ namespace WebBanGiay.Areas.Admin.Controllers
             return Guid.Empty;
         }
 
+		[HttpPost]
+		public IActionResult GiaoHang(Guid invoiceId)
+		{
+			try
+			{
+				var hoaDon = _context.hoa_Dons.FirstOrDefault(h => h.ID == invoiceId);
+				if (hoaDon == null)
+				{
+					return Json(new { success = false, message = "Không tìm thấy hóa đơn!" });
+				}
 
-    }
+				// Cập nhật trạng thái sang "Đang giao" (giả định = 3)
+				;
+                if (hoaDon.loai_hoa_don != 1)
+                {
+                    hoaDon.loai_hoa_don = 1;
+
+                }
+                else
+                {
+					hoaDon.loai_hoa_don = 3;
+				}
+				hoaDon.ngay_sua = DateTime.Now; // Nếu có cột cập nhật
+
+				_context.hoa_Dons.Update(hoaDon);
+				_context.SaveChanges();
+
+				return Json(new { success = true });
+			}
+			catch (Exception ex)
+			{
+				return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+			}
+		}
+
+
+
+	}
 }

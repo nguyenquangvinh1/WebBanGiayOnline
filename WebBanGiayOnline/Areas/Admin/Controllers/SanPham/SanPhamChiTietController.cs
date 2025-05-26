@@ -229,11 +229,11 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 return NotFound();
             }
 
-            CheckStatusSP(sanPham.San_PhamID, trang_thai);
             // Cập nhật trạng thái
             sanPham.trang_thai = trang_thai;
             _context.san_Pham_Chi_Tiets.Update(sanPham);
             _context.SaveChanges();
+            CheckStatusSP(sanPham.San_PhamID, trang_thai);
 
             return Json(new { success = true });
         }
@@ -246,13 +246,33 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 .Where(x => x.San_PhamID == id)
                 .ToList();
 
-            bool allMatch = spctList.All(x => x.trang_thai == trang_thai);
+            foreach (var spct in spctList)
+            {
+                if (spct.so_luong == 0 && spct.trang_thai != 0)
+                {
+                    spct.trang_thai = 0;
+                    _context.san_Pham_Chi_Tiets.Update(spct);
+                }
+                else if (spct.so_luong != 0 && spct.trang_thai == 0)
+                {
+                    spct.trang_thai = 1;
+                    _context.san_Pham_Chi_Tiets.Update(spct);
+                }
+            }
 
-            if (allMatch)
+            if (spctList.All(x => x.trang_thai == trang_thai))
             {
                 sp.trang_thai = trang_thai;
-                _context.SaveChanges();
+                _context.san_Phams.Update(sp);
             }
+            else if (spctList.All(x => x.trang_thai != trang_thai))
+            {
+                // ✅ Gán trạng thái theo item đầu tiên trong danh sách
+                sp.trang_thai = spctList.First().trang_thai;
+                _context.san_Phams.Update(sp);
+            }
+
+            _context.SaveChanges();
         }
         [HttpPost]
         public async Task<IActionResult> UpdateSpct([FromBody] San_PhamCTView model)
@@ -508,7 +528,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         {
             Console.WriteLine($"📌 Nhận giá trị lọc: chatLieu={chatLieu}, coGiay={coGiay}, danhMuc={danhMuc}, deGiay={deGiay}, muiGiay={muiGiay}, kieuDang={kieuDang}, loaiGiay={loaiGiay}, tenSanPham={tenSanPham}");
 
-            var query = _context.san_Pham_Chi_Tiets.Where(x=>x.trang_thai==1).AsQueryable();
+            var query = _context.san_Pham_Chi_Tiets.Where(x=>x.trang_thai==1 && x.so_luong!=0).AsQueryable();
 
             if (!string.IsNullOrEmpty(chatLieu))
                 query = query.Where(sp => sp.Chat_LieuID.ToString() == chatLieu);
@@ -649,7 +669,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 var baseQuery = _context.san_Pham_Chi_Tiets
                     .Include(x => x.Kich_Thuoc)
                     .Include(x => x.Mau_Sac)
-                    .Where(x => x.trang_thai == 1)
+                    .Where(x => x.trang_thai == 1 && x.so_luong != 0)
                     // <-- thêm OrderByDescending theo ID
                     .OrderByDescending(x => x.ID);
 

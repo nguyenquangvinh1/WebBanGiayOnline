@@ -90,14 +90,14 @@
                                     <div class="form-group col-md-6">
                                         <label asp-for="gia_tri_giam">Giá trị</label>
                                         <div class="input-group">
-                                            <input id="gia_tri_giam" name="gia_tri_giam" type="number" class="form-control" placeholder="0" />
+                                            <input asp-for="gia_tri_giam" id="gia_tri_giam" name="gia_tri_giam" type="number" class="form-control" placeholder="0" />
                                             <div class="input-group-append">
                                                 <button type="button" id="btnPercent" value="1" class="btn btn-light" onclick="setDiscountType(1)">%</button>
                                                 <button type="button" id="btnDollar" value="0" class="btn btn-light" onclick="setDiscountType(0)">đ</button>
                                             </div>
-
-                                            <span asp-validation-for="gia_tri_giam" class="text-danger"></span>
                                         </div>
+
+                                        <span asp-validation-for="gia_tri_giam" class="text-danger"></span>
                                     </div>
                                     <!-- Số tiền giảm tối  -->
                                     <div class="form-group col-md-6">
@@ -128,8 +128,8 @@
                                     </div>
                                     <div class="form-group col-md-6">
                                         <label asp-for="gia_tri_toi_thieu">Giá trị tối thiểu</label>
-                                        <input asp-for="gia_tri_toi_thieu" type="text" class="form-control" placeholder="Nhập giá tị tối thiểu " />
-                                        <span asp-validation-for="ma" class="text-danger"></span>
+                                        <input asp-for="gia_tri_toi_thieu" type="number" class="form-control" placeholder="Nhập giá tị tối thiểu " />
+                                        <span asp-validation-for="gia_tri_toi_thieu" class="text-danger"></span>
                                     </div>
                                 </div>
 
@@ -382,8 +382,6 @@
                 }
 
             function validateFormFields() {
-
-
                 var Toast = Swal.mixin({
                     toast: true,
                     position: 'top-end',
@@ -418,18 +416,40 @@
                 }
 
                 const isPercent = document.getElementById('btnPercent').classList.contains('btn-warning');
+                const isDollar = document.getElementById('btnDollar').classList.contains('btn-warning');
+
                 const giaTriGiam = parseFloat(document.getElementById('gia_tri_giam').value) || 0;
                 const soTienGiamToiDa = parseFloat(document.getElementById('so_tien_giam_toi_da').value) || 0;
                 const giaTriToiThieu = parseFloat(document.querySelector('input[name="gia_tri_toi_thieu"]').value) || 0;
+                const soLuong = parseFloat(document.querySelector('input[name="so_luong"]').value) || 0;
 
                 const ngayBatDau = new Date(document.querySelector('input[name="ngay_bat_dau"]').value);
                 const ngayKetThuc = new Date(document.querySelector('input[name="ngay_ket_thuc"]').value);
                 const now = new Date();
 
+                // Validate số âm
+                if (giaTriGiam < 0 || soTienGiamToiDa < 0 || soLuong < 0 || giaTriToiThieu < 0) {
+                    Toast.fire({
+                        icon: 'warning',
+                        title: '⚠️ Không được nhập giá trị âm.'
+                    });
+                    return false;
+                }
+
+                // % không quá 100
                 if (isPercent && giaTriGiam > 100) {
                     Toast.fire({
                         icon: 'warning',
                         title: '⚠️ Giá trị giảm không thể lớn hơn 100%.'
+                    });
+                    return false;
+                }
+
+                // VND: Giảm tối đa phải lớn hơn hoặc bằng giảm thực tế
+                if (isDollar && soTienGiamToiDa < giaTriGiam) {
+                    Toast.fire({
+                        icon: 'warning',
+                        title: '⚠️ Số tiền giảm tối đa phải ≥ giá trị giảm.'
                     });
                     return false;
                 }
@@ -460,6 +480,7 @@
 
                 return true;
             }
+
 
             $(document).on("click", ".page-link", function (e) {
                 e.preventDefault();

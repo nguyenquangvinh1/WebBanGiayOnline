@@ -487,11 +487,11 @@ namespace WebBanGiay.Areas.Admin.Controllers
             {
                 ModelState.AddModelError("email", "Email đã tồn tại!");
             }
-            if (_context.tai_Khoans.Any(n => n.cccd == nv.cccd))
+            if (_context.tai_Khoans.Any(n => n.cccd == nv.cccd && n.Vai_TroID == nhanVienRole.ID))
             {
                 ModelState.AddModelError("cccd", "Số CCCD đã tồn tại!");
             }
-            if (_context.tai_Khoans.Any(n => n.sdt == nv.sdt))
+            if (_context.tai_Khoans.Any(n => n.sdt == nv.sdt && n.Vai_TroID == nhanVienRole.ID))
             {
                 ModelState.AddModelError("sdt", "Số điện thoại đã tồn tại!");
             }

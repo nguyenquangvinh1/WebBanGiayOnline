@@ -133,15 +133,26 @@
                                                 <input asp-for="gia_tri_giam" class="form-control" />
                                                 @if (loai == 1)
                                                 {
-                                                    <button type="button" id="btnPercent" value="1" class="btn btn-warning" onclick="setDiscountType(1)">%</button>
+                                                            <button type="button" id="btnPercent" value="1" class="btn btn-warning active" onclick="setDiscountType(1)">%</button>
                                                 }
                                                 else
                                                 {
-                                                    <button type="button" id="btnDollar" value="0" class="btn btn-warning" onclick="setDiscountType(0)">đ</button>
+                                                            <button type="button" id="btnDollar" value="0" class="btn btn-warning active" onclick="setDiscountType(0)">đ</button>
                                                 }
                                             </div>
                                             <span asp-validation-for="gia_tri_giam" class="text-danger"></span>
                                         </div>
+                                                <div class="form-group col-md-6" hidden>
+                                                    <label asp-for="loai_phieu_giam_gia" class="control-label">Tên</label>
+                                                    <input asp-for="loai_phieu_giam_gia" class="form-control" />
+                                                    <span asp-validation-for="loai_phieu_giam_gia" class="text-danger"></span>
+                                                </div>
+                                                <div class="form-group col-md-6" hidden>
+                                                    <label asp-for="kieu_giam_gia" class="control-label">Tên</label>
+                                                    <input asp-for="kieu_giam_gia" class="form-control" />
+                                                    <span asp-validation-for="kieu_giam_gia" class="text-danger"></span>
+                                                </div>
+
                                     </div>
 
                                     <div class="form-row">
@@ -284,6 +295,17 @@
                                     </div>
                                     <span asp-validation-for="gia_tri_giam" class="text-danger"></span>
                                 </div>
+                                <div class="form-group col-md-6" hidden>
+                                    <label asp-for="loai_phieu_giam_gia" class="control-label">Tên</label>
+                                    <input asp-for="loai_phieu_giam_gia" class="form-control" />
+                                    <span asp-validation-for="loai_phieu_giam_gia" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-md-6" hidden>
+                                    <label asp-for="kieu_giam_gia" class="control-label">Tên</label>
+                                    <input asp-for="kieu_giam_gia" class="form-control" />
+                                    <span asp-validation-for="kieu_giam_gia" class="text-danger"></span>
+                                </div>
+
                             </div>
 
                             <div class="form-row">

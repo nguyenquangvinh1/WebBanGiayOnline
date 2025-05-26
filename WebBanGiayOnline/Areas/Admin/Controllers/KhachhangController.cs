@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Newtonsoft.Json;
+using System.Net;
 using System.Net.Http;
+using System.Net.Mail;
 using System.Text;
 using WebBanGiay.Areas.Admin.Data;
 using WebBanGiay.Areas.Admin.Models.ViewModel;
@@ -102,18 +104,21 @@ namespace WebBanGiay.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateCustomerViewModel model)
         {
-            if (_context.tai_Khoans.Any(n => n.email == model.Email))
+            var khachHangrole= _context.vai_Tros.FirstOrDefault(x => x.ten_vai_tro== "Khách hàng");
+            if (_context.tai_Khoans.Any(n => n.email == model.Email && n.Vai_TroID == khachHangrole.ID))
             {
                 ModelState.AddModelError("email", "Email đã tồn tại!");
             }
-            if (_context.tai_Khoans.Any(n => n.cccd == model.CCCD))
+            if (_context.tai_Khoans.Any(n => n.cccd == model.CCCD && n.Vai_TroID == khachHangrole.ID))
             {
                 ModelState.AddModelError("cccd", "Số CCCD đã tồn tại!");
             }
+            if (_context.tai_Khoans.Any(n => n.sdt == n.sdt && n.Vai_TroID == khachHangrole.ID))
+            {
+                ModelState.AddModelError("sdt", "Số điện thoại đã tồn tại!");
+            }
             if (ModelState.IsValid)
             {
-
-                // Truy vấn vai trò "Khách hàng" trong cơ sở dữ liệu
                 var vaiTro = _context.vai_Tros.FirstOrDefault(v => v.ten_vai_tro == "Khách hàng");
 
                 if (vaiTro == null)
@@ -122,13 +127,14 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     return View(model);
                 }
 
-                // Tạo mới tài khoản
+                string password = GenerateRandomPassword(); 
+
                 var taiKhoan = new Tai_Khoan
                 {
                     ID = Guid.NewGuid(),
                     user_name = model.UserName,
                     ho_ten = model.Ho_ten,
-                  
+                    pass_word = password, // ✅ Dùng mật khẩu ngẫu nhiên
                     ngay_sinh = model.DateOfBirth,
                     sdt = model.PhoneNumber,
                     email = model.Email,
@@ -138,18 +144,16 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     ngay_tao = DateTime.Now,
                     Vai_TroID = vaiTro.ID,
                     ma = GenerateUniqueMaKhachHang(),
-
                 };
-
-
-                //taiKhoan.GenerateCustomerCode();
-
 
                 _context.tai_Khoans.Add(taiKhoan);
                 await _context.SaveChangesAsync();
 
+                // ✅ Gửi email chứa mật khẩu
+                SendEmail(taiKhoan.email, taiKhoan.user_name, password);
+
                 model.Makh = taiKhoan.ma;
-                // Tạo địa chỉ
+
                 var diaChi = new Dia_Chi
                 {
                     Tai_KhoanID = taiKhoan.ID,
@@ -159,19 +163,15 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     dia_chi_chi_tiet = model.dia_chi,
                     loai_dia_chi = 1,
                     ngay_tao = DateTime.Now,
-
                 };
-
-
-                //model.Ma = taiKhoan.ma;
 
                 _context.dia_Chis.Add(diaChi);
                 await _context.SaveChangesAsync();
 
                 TempData["Success"] = "Thêm khách hàng thành công!";
-
                 return RedirectToAction("Index", "Khachhang");
             }
+
             return View(model);
         }
 
@@ -180,6 +180,51 @@ namespace WebBanGiay.Areas.Admin.Controllers
             return "KH" + new Random().Next(100000, 999999);
 
         }
+
+
+        //------------------Gửi Mail------------------------//
+
+        private void SendEmail(string toEmail, string username, string password)
+        {
+            string fromEmail = "trangthph44337@fpt.edu.vn";  // Thay bằng Gmail của bạn
+            string fromPassword = "fdqe bzsy cscd kerv"; // Thay bằng App Password (16 ký tự)
+
+            string subject = "Tài khoản của bạn đã được tạo thành công";
+            string body = $@"
+            <p>Chào {username},</p>
+            <p>Tài khoản của bạn đã được tạo thành công.</p>
+            <p><b>Tên đăng nhập:</b> {username}</p>
+            <p><b>Mật khẩu:</b> {password}</p>";
+
+            using (MailMessage mail = new MailMessage())
+            {
+                mail.From = new MailAddress(fromEmail);
+                mail.To.Add(toEmail);
+                mail.Subject = subject;
+                mail.Body = body;
+                mail.IsBodyHtml = true;
+
+                using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                {
+                    smtp.UseDefaultCredentials = false; // Bắt buộc phải đặt false
+                    smtp.Credentials = new NetworkCredential(fromEmail, fromPassword);
+                    smtp.EnableSsl = true;
+                    smtp.Send(mail);
+                }
+            }
+        }
+
+
+        public string GenerateRandomPassword(int length = 8)
+        {
+            const string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$!";
+            Random random = new Random();
+            return new string(Enumerable.Repeat(validChars, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+
+       
 
         //----------------------------------------Edit----------------------------------//
 

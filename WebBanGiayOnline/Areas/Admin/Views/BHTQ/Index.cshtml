@@ -800,26 +800,79 @@
 
 			let container = $('#' + currentInvoiceId);
 
+
+			// 🔄 Gửi AJAX đổi trạng thái hóa đơn sang "Đang giao"
+			const invoiceDbId = container.attr('data-db-invoice-id');
+
 			var diaChi = container.find('.AddressForm');
 			var form = container.find('.customerForm');
 			if (form.is(':visible')) {
 				if (!diaChi.is(':visible')) {
 					loadProvinces();
 					diaChi.show();
+					giaoHang(invoiceDbId);
 				} else {
 
 					form.hide();
 					diaChi.hide();
+					giaoHang(invoiceDbId);
 				}
 			} else {
 				loadProvinces();
 				form.show();
 				diaChi.show();
+				giaoHang(invoiceDbId);
 			}
 
+
+			
+			
 		});
 
-
+		function giaoHang(id) {
+			if (id) {
+				$.ajax({
+					url: '/Admin/BHTQ/GiaoHang',
+					type: 'POST',
+					data: { invoiceId: id },
+					success: function (res) {
+						if (res.success) {
+							console.log("✅  Hóa đơn đã cập nhật trạng thái giao hàng");
+							Swal.fire({
+								icon: 'success',
+								title: 'Hóa đơn đã cập nhật trạng thái giao hàng',
+								toast: true,
+								position: 'top-end',
+								showConfirmButton: false,
+								timer: 2000,
+								timerProgressBar: true
+							});
+						} else {
+							Swal.fire({
+								icon: 'error',
+								title: res.message || 'Lỗi khi cập nhật trạng thái',
+								toast: true,
+								position: 'top-end',
+								showConfirmButton: false,
+								timer: 3000,
+								timerProgressBar: true
+							});
+						}
+					},
+					error: function () {
+						Swal.fire({
+							icon: 'error',
+							title: 'Không thể cập nhật trạng thái giao hàng!',
+							toast: true,
+							position: 'top-end',
+							showConfirmButton: false,
+							timer: 3000,
+							timerProgressBar: true
+						});
+					}
+				});
+			}
+		}
 
 
 		function filterProducts() {
@@ -974,6 +1027,14 @@
 								container.find('.customerEmail').val(customer.email);
 								container.attr('data-customer-id', customer.id);
 
+								var diaChi = container.find('.AddressForm');
+								var form = container.find('.customerForm');
+
+								form.show();
+								if (invoice.loai_hoa_don == 3) {
+
+									diaChi.show();
+								}
 
 								// Xử lý nút openAddress
 								let addressBtn = container.find('.openAddress');
@@ -2381,6 +2442,18 @@
 
 			let voucherCode = $('#discountCodeInput').val() || '';
 
+			// 🔢 Tính lại tổng tiền đã thanh toán từ bảng
+			let totalPaid = 0;
+			$('#paymentDetailsTable tbody tr').each(function () {
+				const amountText = $(this).find('td:nth-child(2)').text().replace(/\D/g, '');
+				const amount = parseFloat(amountText) || 0;
+				totalPaid += amount;
+			});
+			$('#paymentAmount').val(totalPaid);
+			let tien = $('#paymentAmount').val()
+			console.log(totalPaid , tien);
+
+
 			window.tempPaymentData = {
 				InvoiceId: $('#invoiceContent .active').data('db-invoice-id'),
 				FinalTotal: finalTotal,
@@ -2700,7 +2773,7 @@
 
 			let container = $('#' + currentInvoiceId);
 
-			var form = container.find('.customerForm');
+			var form = container.find('.AddressForm');
 			if (!form.is(':visible')) {
 				Swal.fire({
 					icon: 'warning',
@@ -2800,13 +2873,13 @@
 
 											setTimeout(() => {
 												chiTietSelect.val(DC_ChiTiet);
-											}, 500);
+											}, 5000);
 										}
 									});
-								}, 500);
+								}, 5000);
 							}
 						});
-					}, 500);
+					}, 5000);
 				}
 			});
 		});

@@ -44,6 +44,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 .ToListAsync();
             foreach (var item in list)
             {
+                CheckStatusSP(item.ID, (int)item.trang_thai);
                 int tong = 0;
                 var spct = _context.san_Pham_Chi_Tiets.Where(x => x.San_PhamID == item.ID).ToList();
                 if (spct.Count != 0)
@@ -54,7 +55,6 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                     }
                 }
                 item.so_luong_tong = tong;
-                CheckStatusSP(item.ID,(int)item.trang_thai);
             }
 
             return View(list);
