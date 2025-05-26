@@ -127,7 +127,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     return View(model);
                 }
 
-                string password = GenerateRandomPassword(); // ✅ Tạo mật khẩu ngẫu nhiên
+                string password = GenerateRandomPassword(); 
 
                 var taiKhoan = new Tai_Khoan
                 {
