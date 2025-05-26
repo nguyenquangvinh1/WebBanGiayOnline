@@ -1,6 +1,6 @@
 ﻿using ClssLib;
 using Microsoft.AspNetCore.Mvc;
-// Sử dụng MailKit
+
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
