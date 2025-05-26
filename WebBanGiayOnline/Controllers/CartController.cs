@@ -17,6 +17,7 @@ using WebBanGiay.Models.ViewModel;
 using WebBanGiay.Service;
 using static WebBanGiay.Models.ViewModel.GHNShipping;
 using System.Security.Claims;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 
 namespace WebBanGiay.Controllers
 {
@@ -164,41 +165,38 @@ namespace WebBanGiay.Controllers
                     return Redirect("/404");
                 }
 
-                if (hanghoa.so_luong < quantity )
+                if (hanghoa.so_luong < quantity)
                 {
 
                     TempData["Message"] = $"Không tìm thấy {id}";
                     return RedirectToAction("Details");
-                }
-                if(quantity <0)
-                {
-                    TempData["Message"] = $"Không tìm thấy {id}";
-                    return RedirectToAction("Details");
-
                 }
                 hanghoa.so_luong -= quantity;
                 db.Update(hanghoa);
                 db.SaveChanges();
 
-                item = new CartItem
+        
+
+                    item = new CartItem
+                    {
+                        id = hanghoa.ID,
+                        TenHH = hanghoa.ten_SPCT,
+                        DonGia = db.san_Pham_Chi_Tiets.Find(id).gia,
+                        SoLuong = quantity,
+                        Hinh = hinh?.FirstOrDefault(x => x.San_Pham_Chi_TietID == id)?.Anh_San_Pham.anh_url ?? "Default_Image_URL"
+                    };
+                    Cart1.Add(item);
+                }
+                else
                 {
-                    id = hanghoa.ID,
-                    TenHH = hanghoa.ten_SPCT,
-                    DonGia = db.san_Pham_Chi_Tiets.Find(id).gia,
-                    SoLuong = quantity,
-                    Hinh = hinh?.FirstOrDefault(x => x.San_Pham_Chi_TietID == id)?.Anh_San_Pham.anh_url ?? "Default_Image_URL"
-                };
-                Cart1.Add(item);
-            }
-            else
-            {
-                item.SoLuong += quantity;
+                    item.SoLuong += quantity;
 
 
+                }
+                HttpContext.Session.Set(MySetting.CART_KEY, Cart1);
+                return RedirectToAction("Index");
             }
-            HttpContext.Session.Set(MySetting.CART_KEY, Cart1);
-            return RedirectToAction("Index");
-        }
+           
 
         public IActionResult RemoveCart(Guid id)
         {
