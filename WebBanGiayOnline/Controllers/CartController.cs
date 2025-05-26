@@ -164,11 +164,17 @@ namespace WebBanGiay.Controllers
                     return Redirect("/404");
                 }
 
-                if (hanghoa.so_luong < quantity)
+                if (hanghoa.so_luong < quantity )
                 {
 
                     TempData["Message"] = $"Không tìm thấy {id}";
                     return RedirectToAction("Details");
+                }
+                if(quantity <0)
+                {
+                    TempData["Message"] = $"Không tìm thấy {id}";
+                    return RedirectToAction("Details");
+
                 }
                 hanghoa.so_luong -= quantity;
                 db.Update(hanghoa);
@@ -300,7 +306,7 @@ namespace WebBanGiay.Controllers
                     Giam_GiaID = discount == Guid.Empty ? null : (Guid?)discount,
                     trang_thai = 0,
                     loai_hoa_don = 2,
-                    ghi_chu = model.GhiChu,
+                    ghi_chu = model.GhiChu ?? "Không có",
                 };
                 
                 db.Add(hoadon);
@@ -385,7 +391,8 @@ namespace WebBanGiay.Controllers
                     db.AddRange(cthd);
                     db.SaveChanges();
                     HttpContext.Session.Set<List<CartItem>>(MySetting.CART_KEY, new List<CartItem>());
-                    return View("Success");
+                    return View("Success", Cart);
+
                 }
                 catch
                 {
@@ -466,7 +473,6 @@ namespace WebBanGiay.Controllers
             HttpContext.Session.Set("CheckoutInfo", model);
         
 
-            // Chuyển hướng đến VNPay
             return Redirect(_vnPayservice.CreatePaymentUrl(HttpContext, vnPayModel));
         }
 
@@ -514,7 +520,7 @@ namespace WebBanGiay.Controllers
                     Giam_GiaID = discount == Guid.Empty ? null : (Guid?)discount,
                     trang_thai = 1,
                     loai_hoa_don = 2,
-                    ghi_chu = model?.GhiChu,
+                    ghi_chu = model.GhiChu ?? "Không có",
                 };
                 db.Add(hoadon);
                 db.SaveChanges();
