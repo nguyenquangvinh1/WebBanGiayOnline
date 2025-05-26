@@ -253,11 +253,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                     spct.trang_thai = 0;
                     _context.san_Pham_Chi_Tiets.Update(spct);
                 }
-                else if (spct.so_luong != 0 && spct.trang_thai == 0)
-                {
-                    spct.trang_thai = 1;
-                    _context.san_Pham_Chi_Tiets.Update(spct);
-                }
+                
             }
 
             if (spctList.All(x => x.trang_thai == trang_thai))
