@@ -87,6 +87,7 @@ options.Events = new CookieAuthenticationEvents
 
 
 
+
 //.AddCookie(options =>
 //{
 //    options.LoginPath = "/TaiKhoan/Login";
