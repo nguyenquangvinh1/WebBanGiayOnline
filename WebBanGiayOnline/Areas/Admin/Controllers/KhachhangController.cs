@@ -105,7 +105,9 @@ namespace WebBanGiay.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateCustomerViewModel model)
         {
+
             var khachHangrole = _context.vai_Tros.FirstOrDefault(x => x.ten_vai_tro == "Khách hàng");
+
             if (_context.tai_Khoans.Any(n => n.email == model.Email && n.Vai_TroID == khachHangrole.ID))
             {
                 ModelState.AddModelError("email", "Email đã tồn tại!");
@@ -128,7 +130,10 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     return View(model);
                 }
 
+
                 string password = GenerateRandomPassword(); // ✅ Tạo mật khẩu ngẫu nhiên
+
+
 
                 var taiKhoan = new Tai_Khoan
                 {
@@ -190,40 +195,8 @@ namespace WebBanGiay.Areas.Admin.Controllers
             string fromEmail = "trangthph44337@fpt.edu.vn";  // Thay bằng Gmail của bạn
             string fromPassword = "fdqe bzsy cscd kerv"; // Thay bằng App Password (16 ký tự)
 
+
             string subject = "Tài khoản của bạn đã được tạo thành công";
-            string body = $@"
-            <p>Chào {username},</p>
-            <p>Tài khoản của bạn đã được tạo thành công.</p>
-            <p><b>Tên đăng nhập:</b> {username}</p>
-            <p><b>Mật khẩu:</b> {password}</p>";
-
-            using (MailMessage mail = new MailMessage())
-            {
-                mail.From = new MailAddress(fromEmail);
-                mail.To.Add(toEmail);
-                mail.Subject = subject;
-                mail.Body = body;
-                mail.IsBodyHtml = true;
-
-                using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
-                {
-                    smtp.UseDefaultCredentials = false; // Bắt buộc phải đặt false
-                    smtp.Credentials = new NetworkCredential(fromEmail, fromPassword);
-                    smtp.EnableSsl = true;
-                    smtp.Send(mail);
-                }
-            }
-        }
-
-
-        //------------------Gửi Mail------------------------//
-
-        private void SendEmail(string toEmail, string username, string password)
-        {
-            string fromEmail = "trangthph44337@fpt.edu.vn";  // Thay bằng Gmail của bạn
-            string fromPassword = "fdqe bzsy cscd kerv"; // Thay bằng App Password (16 ký tự)
-
-            string subject = "Tài khoản nhân viên mới";
             string body = $@"
             <p>Chào {username},</p>
             <p>Tài khoản của bạn đã được tạo thành công.</p>
@@ -649,7 +622,6 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
 
 
-        //------------------------------------------------------------------------------//
         private bool Exists(Guid id)
         {
             return _context.tai_Khoans.Any(e => e.ID == id);
