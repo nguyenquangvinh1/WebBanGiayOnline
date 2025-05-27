@@ -8,9 +8,9 @@ using WebBanGiay.Data;
 namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 {
     [Area("Admin")] /*sfsdfsd*/
-    [Authorize(Policy = "AdminOrEmployeePolicy")]
+	[Authorize(AuthenticationSchemes = "AdminScheme", Policy = "AdminOrEmployeePolicy")]
 
-    public class ChatLieuController : Controller
+	public class ChatLieuController : Controller
     {
         // GET: ChatLieuController
         // GET: CoGiayController

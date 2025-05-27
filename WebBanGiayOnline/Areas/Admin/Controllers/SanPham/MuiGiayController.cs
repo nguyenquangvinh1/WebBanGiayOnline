@@ -8,9 +8,9 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 {
 
     [Area("Admin")] /*sfsdfsd*/
-    [Authorize(Policy = "AdminOrEmployeePolicy")]
+	[Authorize(AuthenticationSchemes = "AdminScheme", Policy = "AdminOrEmployeePolicy")]
 
-    public class MuiGiayController : Controller
+	public class MuiGiayController : Controller
     {
         private readonly AppDbContext _context;
 

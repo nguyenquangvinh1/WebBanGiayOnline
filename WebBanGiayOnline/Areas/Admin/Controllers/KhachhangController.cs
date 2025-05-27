@@ -19,8 +19,8 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 namespace WebBanGiay.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Policy = "AdminOrEmployeePolicy")]
-    public class KhachhangController : Controller
+	[Authorize(AuthenticationSchemes = "AdminScheme", Policy = "AdminOrEmployeePolicy")]
+	public class KhachhangController : Controller
     {
         //HttpClient _httpClient;
         private readonly AppDbContext _context;

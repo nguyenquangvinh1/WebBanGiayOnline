@@ -13,9 +13,9 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 {
 
     [Area("Admin")] /*sfsdfsd*/
-    [Authorize(Policy = "AdminOrEmployeePolicy")]
+	[Authorize(AuthenticationSchemes = "AdminScheme", Policy = "AdminOrEmployeePolicy")]
 
-    public class SanPhamChiTietController : Controller
+	public class SanPhamChiTietController : Controller
     {
         private readonly AppDbContext _context;
 

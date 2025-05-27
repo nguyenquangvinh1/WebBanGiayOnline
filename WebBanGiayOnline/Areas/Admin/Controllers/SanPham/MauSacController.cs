@@ -9,9 +9,9 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 {
 
     [Area("Admin")] /*123344*/
-    [Authorize(Policy = "AdminOrEmployeePolicy")]
+	[Authorize(AuthenticationSchemes = "AdminScheme", Policy = "AdminOrEmployeePolicy")]
 
-    public class MauSacController : Controller
+	public class MauSacController : Controller
     {
         private readonly AppDbContext _context;
 

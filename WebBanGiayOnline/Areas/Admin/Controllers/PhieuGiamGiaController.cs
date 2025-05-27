@@ -16,8 +16,8 @@ namespace WebBanGiay.Areas.Admin.Controllers
 {
 
     [Area("Admin")] /*sfsdfsd*/
-    [Authorize(Policy = "AdminOrEmployeePolicy")]
-    public class PhieuGiamGiaController : Controller
+	[Authorize(AuthenticationSchemes = "AdminScheme", Policy = "AdminOrEmployeePolicy")]
+	public class PhieuGiamGiaController : Controller
     {
         // GET: CoGiayController
         private readonly AppDbContext _context;

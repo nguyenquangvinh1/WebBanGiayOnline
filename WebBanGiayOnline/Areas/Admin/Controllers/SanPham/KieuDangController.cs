@@ -8,9 +8,9 @@ using WebBanGiay.Data;
 namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 {
     [Area("Admin")] /*sfsdfsd*/
-    [Authorize(Policy = "AdminOrEmployeePolicy")]
+	[Authorize(AuthenticationSchemes = "AdminScheme", Policy = "AdminOrEmployeePolicy")]
 
-    public class KieuDangController : Controller
+	public class KieuDangController : Controller
     {
         // GET: KieuDangController
         private readonly AppDbContext _context;

@@ -19,10 +19,10 @@ using System.Configuration;
 namespace WebBanGiay.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    //[Authorize(Policy = "AdminPolicy")]
-    //[Authorize(Policy = "EmployeePolicy")]
-    [Authorize(Policy = "AdminOrEmployeePolicy")]
-    public class BHTQController : Controller
+	//[Authorize(Policy = "AdminPolicy")]
+	//[Authorize(Policy = "EmployeePolicy")]
+	[Authorize(AuthenticationSchemes = "AdminScheme", Policy = "AdminOrEmployeePolicy")]
+	public class BHTQController : Controller
     {
         private readonly AppDbContext _context;
         private readonly IGhnService _ghnService;

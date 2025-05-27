@@ -7,11 +7,17 @@ using System.Security.Claims;
 using WebBanGiay.Data;
 using WebBanGiay.Areas.Admin.Models.ViewModel;
 using WebBanGiay.Models.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebBanGiay.Areas.Admin.Controllers
 {
-    [Area("Admin")]
-    public class AccountController : Controller
+	[AllowAnonymous]
+
+
+	[Area("Admin")]
+	[Authorize(AuthenticationSchemes = "AdminScheme", Policy = "AdminOrEmployeePolicy")]
+
+	public class AccountController : Controller
     {
         private readonly AppDbContext _context;
         public AccountController(AppDbContext context)
@@ -68,10 +74,12 @@ namespace WebBanGiay.Areas.Admin.Controllers
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+			//await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+			await HttpContext.SignInAsync("AdminScheme", new ClaimsPrincipal(claimsIdentity));
 
-            //return RedirectToAction("Index", "Home"/*, new { area = "Admin" }*/);
-            return RedirectToAction("Index", "Home");
+
+			//return RedirectToAction("Index", "Home"/*, new { area = "Admin" }*/);
+			return RedirectToAction("Index", "Home");
 
         }
     }

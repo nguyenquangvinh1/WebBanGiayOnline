@@ -19,7 +19,9 @@ using WebBanGiay.Models.ViewModel;
 namespace WebBanGiay.Controllers
 {
     [AllowAnonymous]
-    public class TaiKhoanController : Controller
+	[Authorize(AuthenticationSchemes = "CustomerScheme", Policy = "CustomerPolicy")]
+
+	public class TaiKhoanController : Controller
     {
         private readonly AppDbContext _context;
 
@@ -72,9 +74,11 @@ namespace WebBanGiay.Controllers
         };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+			//await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+			await HttpContext.SignInAsync("CustomerScheme", new ClaimsPrincipal(claimsIdentity));
 
-            return RedirectToAction("Index", "Home");
+
+			return RedirectToAction("Index", "Home");
         }
 
 
@@ -258,18 +262,18 @@ namespace WebBanGiay.Controllers
         //    TempData["Message"] = "Đăng xuất thành công!";
         //    return RedirectToAction("Login", "TaiKhoan");
         //}
-        [HttpGet]
-        public async Task<IActionResult> Logout()
-        {
-            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+            [HttpGet]
+            public async Task<IActionResult> Logout()
+            {
+                var role = User.FindFirst(ClaimTypes.Role)?.Value;
 
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-            if (role == "Admin" || role == "Nhân Viên")
-                return RedirectToAction("LoginAdmin", "Account", new { area = "Admin" });
+                if (role == "Admin" || role == "Nhân Viên")
+                    return RedirectToAction("LoginAdmin", "Account", new { area = "Admin" });
 
-            return RedirectToAction("Login", "TaiKhoan");
-        }
+                return RedirectToAction("Login", "TaiKhoan");
+            }
 
 
     }
