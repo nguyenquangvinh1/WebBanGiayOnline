@@ -17,7 +17,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap" rel="stylesheet">
-
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
     <!-- Icon Font Stylesheet -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
@@ -166,7 +166,7 @@
 
                 </div>
             }
-            <form asp-action="Checkout" asp-controller="Cart" >
+            <form  id="formThanhToan" method="post">
                 <div class="row g-5">
                     <div class="col-md-12 col-lg-6 col-xl-7">
 
@@ -224,25 +224,24 @@
                             <textarea name="GhiChu" class="form-control" spellcheck="false" cols="30" rows="11" placeholder="Ghi chú"></textarea>
                         </div>
 
-                        <form id="formThanhToanKhiNhanHang" method="post">
-                            <input type="submit"
-                                   name="payment"
-                                   class="btn border-secondary text-uppercase text-primary w-100 mt-2"
-                                   value="Thanh toán khi nhận hàng" />
-                        </form>
+                        <button type="button"
+                                data-action="/Cart/Checkout"
+                                class="btn border-secondary text-uppercase text-primary w-100 mt-2 btn-confirm-payment">
+                            Thanh toán khi nhận hàng
+                        </button>
 
-                        <form id="formPayMentVNPAY" asp-action="PayMent" asp-controller="Cart" method="post">
-                            <button type="submit"
-                                    class="btn border-secondary text-uppercase text-primary w-100 mt-2">
-                                Thanh Toán với VNPAY
-                            </button>
-                        </form>
+                        <button type="button"
+                                data-action="/Cart/PayMent"
+                                class="btn border-secondary text-uppercase text-primary w-100 mt-2 btn-confirm-payment">
+                            Thanh Toán với VNPAY
+                        </button>
 
-                            <button type="submit"
-                                    class="btn border-secondary text-uppercase text-primary w-100 mt-2">
-                                Thanh Toán với MoMo
-                            </button>
-                        </form>
+                        <button type="button"
+                                data-action="/Cart/PaymentMoMo"
+                                class="btn border-secondary text-uppercase text-primary w-100 mt-2 btn-confirm-payment">
+                            Thanh Toán với MoMo
+                        </button>
+                       
                     </div>
 
                     <div class="col-md-12 col-lg-6 col-xl-5">
@@ -426,7 +425,8 @@
     <!-- JavaScript Libraries -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    6
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script src="~/lib/easing/easing.min.js"></script>
     <script src="~/lib/waypoints/waypoints.min.js"></script>
     <script src="~/lib/lightbox/js/lightbox.min.js"></script>
@@ -474,16 +474,44 @@
         const stripPrefix = str => str?.replace(/^Tỉnh\s+|^Thành phố\s+/i, '').trim();
 
 
-        // Gọi hàm khi trang tải
-        $(document).ready(function () {
-            loadProvinces();
-        @if (User.Identity.IsAuthenticated)
+
+              $(document).ready(function () {
+
+            @if (User.Identity.IsAuthenticated)
+            {
+
+            <text>
+
+                        loadProvinces();
+                        loadCustomerInfo('@User.FindFirst("userid")?.Value');
+            </text>
+            }
+        else
         {
 
             <text>
-                    loadCustomerInfo('@User.FindFirst("userid")?.Value');
+                        loadProvinces();
             </text>
         }
+                $('.btn-confirm-payment').on('click', function () {
+                    const actionUrl = $(this).data('action');
+
+                    Swal.fire({
+                        title: "Xác nhận",
+                        text: "Bạn có chắc chắn muốn thanh Toán?",
+                        icon: "warning",
+                        showConfirmButton: true,
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Có!",
+                        cancelButtonText: "Hủy"
+                    }).then(function (result) {
+                        if (result.isConfirmed) {
+                            $('#formThanhToan').attr('action', actionUrl).submit();
+                        }
+                    });
+                });
         });
 
               function calculateFee() {
