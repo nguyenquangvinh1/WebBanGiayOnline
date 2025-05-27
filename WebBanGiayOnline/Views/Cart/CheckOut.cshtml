@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<WebBanGiay.Models.ViewModel.CartItem>
 @{
-   var pattern = @"^[^\s@]+@[^\s@]+\.[^\s@]+$";
+    var pattern = @"^[^\s@]+@[^\s@]+\.[^\s@]+$";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <!DOCTYPE html>
@@ -17,7 +17,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap" rel="stylesheet">
-
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
     <!-- Icon Font Stylesheet -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
@@ -35,10 +35,22 @@
 
     <style>
         .container-fluid.page-header {
-            background-image: url(/coloshop-master/images/anhdep1.jpg); 
-            background-size: cover;
-            background-position: center;
+        background-image: url(/coloshop-master/images/anhdep1.jpg); 
+        background-size: cover;
+        background-position: center;
         }
+
+        .custom-btn {
+            width: auto;
+            padding: 8px 16px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+            .custom-btn:hover {
+                background-color: #28a745 !important; /* xanh lá cây Bootstrap */
+                color: white !important;
+                border-color: #28a745 !important;
+            }
     </style>
 </head>
 
@@ -73,7 +85,7 @@
                         <a href="https://localhost:7243" class="nav-item nav-link">Trang chủ</a>
                         <a asp-controller="San_Pham_Chi_Tiet" asp-action="Index" class="nav-item nav-link active">Cửa hàng</a>
 
-                        <a class="nav-item nav-link active">Tra cứu</a>
+                        <a asp-controller="LichSuHoaDon" asp-action="Index" class="nav-item nav-link">Tra cứu</a>
 
                         <a href="contact.html" class="nav-item nav-link">Liên hệ</a>
                     </div>
@@ -144,31 +156,34 @@
     <div class="container-fluid py-5">
         <div class="container py-5">
             <h1 class="mb-4">Thanh toán</h1>
-            
-            <form asp-action="Checkout" asp-controller="Cart" >
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                <div class="form-check my-3">
+                    <button type="submit"
+                            class="btn border-secondary text-uppercase text-primary w-100 mt-2 openAddress" data-id="@User.FindFirst("userid")?.Value">
+                        <span>Địa chỉ khách hàng</span>
+                    </button>
+
+                </div>
+            }
+            <form  id="formThanhToan" method="post">
                 <div class="row g-5">
                     <div class="col-md-12 col-lg-6 col-xl-7">
-                        @if (User.Identity != null && User.Identity.IsAuthenticated)
-                        {
-                            <div class="form-check my-3">
-                                <input type="checkbox" name="GiongKhachHang" class="form-check-input" id="GiongKhachHang" value="false">
-                                <label class="form-check-label" for="GiongKhachHang">Lấy thông tin khách hàng?</label>
-                            </div>
-                        }
+
                         <div class="form-item delivery-info">
                             <label class="form-label my-2">Người nhận hàng<sup>*</sup></label>
-                            <input name="TenKhachHang" class="form-control">
-                         
-                           
+                            <input type="text" name="TenKhachHang" class="form-control">
+                            <span id="nameError" style="color: red; font-size: 14px;"></span>
 
-                            
+
+
                         </div>
                         <div class="form-item delivery-info">
                             <label class="form-label my-2">Email<sup>*</sup></label>
                             <input type="@pattern" name="Email" class="form-control">
-                          
+
                         </div>
-                     
+
 
                         <div class="form-item my-3" onchange="calculateFee()">
                             <div class="row">
@@ -190,27 +205,43 @@
                                         <option value="">Chọn xã/phường</option>
                                     </select>
                                 </div>
+                                <span id="addressError" style="color: red; font-size: 14px;"></span>
                             </div>
                         </div>
                         <div class="form-item delivery-info">
                             <label class="form-label my-2">Địa chỉ chi tiết<sup>*</sup></label>
-                            <input name="fulldiachi" class="form-control">
+                            <input type="text" name="fulldiachi" class="form-control">
 
                         </div>
 
                         <div class="form-item delivery-info">
                             <label class="form-label my-2">Điện thoại<sup>*</sup></label>
-                            <input name="Sdt" class="form-control">
+                            <input type="text" name="Sdt" class="form-control">
                             <span id="phoneError" style="color: red; font-size: 14px;"></span>
-                           
+
                         </div>
                         <div class="form-item mt-4">
                             <textarea name="GhiChu" class="form-control" spellcheck="false" cols="30" rows="11" placeholder="Ghi chú"></textarea>
                         </div>
 
-                        <input type="submit" name="payment" class="btn border-secondary text-uppercase text-primary w-100 mt-2" value="Thanh toán khi nhận hàng">
-                        <button asp-action="PayMent" asp-controller="Cart" class="btn border-secondary text-uppercase text-primary w-100 mt-2">Thanh Toán với VNPAY</button>
-                        <button asp-action="PaymentMoMo" asp-controller="Cart" class="btn border-secondary text-uppercase text-primary w-100 mt-2">Thanh Toán với MoMo</button>
+                        <button type="button"
+                                data-action="/Cart/Checkout"
+                                class="btn border-secondary text-uppercase text-primary w-100 mt-2 btn-confirm-payment">
+                            Thanh toán khi nhận hàng
+                        </button>
+
+                        <button type="button"
+                                data-action="/Cart/PayMent"
+                                class="btn border-secondary text-uppercase text-primary w-100 mt-2 btn-confirm-payment">
+                            Thanh Toán với VNPAY
+                        </button>
+
+                        <button type="button"
+                                data-action="/Cart/PaymentMoMo"
+                                class="btn border-secondary text-uppercase text-primary w-100 mt-2 btn-confirm-payment">
+                            Thanh Toán với MoMo
+                        </button>
+                       
                     </div>
 
                     <div class="col-md-12 col-lg-6 col-xl-5">
@@ -240,18 +271,18 @@
                                             <td class="py-5">@item.ThanhTien.ToString("#,##0 VNĐ")</td>
                                         </tr>
                                     }
-                                    
+
 
                                     <tr>
                                         <td colspan="4">Phí vận chuyển :</td>
-                                        <td>  <img src="~/coloshop-master/images/tải xuống.png" class="img-fluid" alt="" style="width: 30px; height: 30px; object-fit: contain;"> <a id="fee"></a> 0VN </td>
+                                        <td>  <img src="~/coloshop-master/images/tải xuống.png" class="img-fluid" alt="" style="width: 30px; height: 30px; object-fit: contain;"> <a id="fee"></a> </td>
                                     </tr>
                                     <tr>
                                         <td colspan="4">Tổng Tiền :</td>
                                         <td id="totalWithFee">
                                             @(Model.Sum(p => p.ThanhTienGG) > 0
-                                                ? Model.Sum(p => p.ThanhTienGG).ToString("#,##0 VNĐ")
-                                                : Model.Sum(p => p.ThanhTien).ToString("#,##0 VNĐ"))
+                                                    ? Model.Sum(p => p.ThanhTienGG).ToString("#,##0 VNĐ")
+                                                    : Model.Sum(p => p.ThanhTien).ToString("#,##0 VNĐ"))
                                         </td>
                                     </tr>
 
@@ -275,14 +306,14 @@
                 <div class="row g-4">
                     <div class="col-lg-3">
                         <a href="#">
-                            <h1 class="text-primary mb-0">Fruitables</h1>
+                            <h1 class="text-primary mb-0">Adidas Shop</h1>
                             <p class="text-secondary mb-0">Fresh products</p>
                         </a>
                     </div>
                     <div class="col-lg-6">
                         <div class="position-relative mx-auto">
-                            <input class="form-control border-0 w-100 py-3 px-4 rounded-pill" type="number" placeholder="Your Email">
-                            <button type="submit" class="btn btn-primary border-0 border-secondary py-3 px-4 position-absolute rounded-pill text-white" style="top: 0; right: 0;">Subscribe Now</button>
+                            <input class="form-control border-0 w-100 py-3 px-4 rounded-pill" type="number" placeholder="Email của bạn">
+                            <button type="submit" class="btn btn-primary border-0 border-secondary py-3 px-4 position-absolute rounded-pill text-white" style="top: 0; right: 0;"> Đăng ký ngay</button>
                         </div>
                     </div>
                     <div class="col-lg-3">
@@ -298,43 +329,42 @@
             <div class="row g-5">
                 <div class="col-lg-3 col-md-6">
                     <div class="footer-item">
-                        <h4 class="text-light mb-3">Why People Like us!</h4>
+                        <h4 class="text-light mb-3">Tại sao mọi người thích chúng tôi</h4>
                         <p class="mb-4">
-                            typesetting, remaining essentially unchanged. It was
-                            popularised in the 1960s with the like Aldus PageMaker including of Lorem Ipsum.
+                            Adidas là thương hiêu giày đã có từ rất lâu từ thế kỉ trước
                         </p>
-                        <a href="" class="btn border-secondary py-2 px-4 rounded-pill text-primary">Read More</a>
+                        <a href="" class="btn border-secondary py-2 px-4 rounded-pill text-primary">Tìm hiểu thêm </a>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <div class="d-flex flex-column text-start footer-item">
-                        <h4 class="text-light mb-3">Shop Info</h4>
-                        <a class="btn-link" href="">About Us</a>
-                        <a class="btn-link" href="">Contact Us</a>
-                        <a class="btn-link" href="">Privacy Policy</a>
-                        <a class="btn-link" href="">Terms & Condition</a>
-                        <a class="btn-link" href="">Return Policy</a>
-                        <a class="btn-link" href="">FAQs & Help</a>
+                        <h4 class="text-light mb-3">Thông tin cửa hàng</h4>
+                        <a class="btn-link" href="">Về chúng tôi </a>
+                        <a class="btn-link" href="">Liên hệ chúng tôi</a>
+                        <a class="btn-link" href="">Chính sách bảo mật</a>
+                        <a class="btn-link" href="">Điều khoản & Điều kiện</a>
+
+                        <a class="btn-link" href="">Câu hỏi thường gặp & Trợ giúp</a>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <div class="d-flex flex-column text-start footer-item">
-                        <h4 class="text-light mb-3">Account</h4>
-                        <a class="btn-link" href="">My Account</a>
-                        <a class="btn-link" href="">Shop details</a>
-                        <a class="btn-link" href="">Shopping Cart</a>
-                        <a class="btn-link" href="">Wishlist</a>
-                        <a class="btn-link" href="">Order History</a>
-                        <a class="btn-link" href="">International Orders</a>
+                        <h4 class="text-light mb-3">Tài khoản</h4>
+                        <a class="btn-link" href="">>Tài khoản cửa tôi</a>
+                        <a class="btn-link" href="">Chi tiết cửa hàng</a>
+                        <a class="btn-link" href="">giỏ cửa hàng</a>
+                        <a class="btn-link" href="">Danh sách mong muốn</a>
+                        <a class="btn-link" href="">Lịch sử đơn hàng</a>
+                        <a class="btn-link" href="">Đơn hàng quốc tế</a>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <div class="footer-item">
-                        <h4 class="text-light mb-3">Contact</h4>
-                        <p>Address: 1429 Netus Rd, NY 48247</p>
-                        <p>Email: Example@gmail.com</p>
-                        <p>Phone: +0123 4567 8910</p>
-                        <p>Payment Accepted</p>
+                        <h4 class="text-light mb-3">Liên hệ</h4>
+                        <p>Địa chỉ:  Số 28 Trung Văn,Nam Từ Liêm ,Hà Nội</p>
+                        <p>Email:vinhnq041003@gmail.com</p>
+                        <p>Số điện thoại: 0865884051</p>
+
                         <img src="~/img/payment.png" class="img-fluid" alt="">
                     </div>
                 </div>
@@ -358,6 +388,35 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Địa chỉ -->
+    <div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Stt</th>
+                                <th>Tỉnh</th>
+                                <th>Huyện</th>
+                                <th>Xã</th>
+                                <th>chi tiết</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Sẽ được fill bằng JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Copyright End -->
     <!-- Back to Top -->
     <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i class="fa fa-arrow-up"></i></a>
@@ -366,11 +425,13 @@
     <!-- JavaScript Libraries -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script src="~/lib/easing/easing.min.js"></script>
     <script src="~/lib/waypoints/waypoints.min.js"></script>
     <script src="~/lib/lightbox/js/lightbox.min.js"></script>
     <script src="~/lib/owlcarousel/owl.carousel.min.js"></script>
-                 
+
     <!-- Template~/ Javascript -->
     <script src="~/js/main.js"></script>
 </body>
@@ -379,50 +440,78 @@
     <script>
 
 
-              document.addEventListener("DOMContentLoaded", function () {
-            let tenKhachHangInput = document.querySelector("input[name='TenKhachHang']");
-            if (tenKhachHangInput) {
-                tenKhachHangInput.addEventListener("blur", function () {
-                    if (this.value.trim() === "") {
-                        alert("Tên khách hàng không được để trống!");
-                        setTimeout(() => { this.focus(); }, 3);
-                    }
-                });
-            }
+        document.addEventListener("DOMContentLoaded", function () {
+        let tenKhachHangInput = document.querySelector("input[name='TenKhachHang']");
+        if (tenKhachHangInput) {
+        tenKhachHangInput.addEventListener("blur", function () {
+        let errorSpan = document.getElementById("nameError");
+        if (this.value.trim() === "") {
+        errorSpan.textContent = "Tên không được để trống";
+        setTimeout(() => { this.focus(); }, 3);
+        }
+        else {
+        errorSpan.textContent = "";
+        }
+        });
+        }
 
-            let phoneInput = document.querySelector("input[name='Sdt']");
-            if (phoneInput) {
-                phoneInput.addEventListener("blur", function () {
-                    let phonePattern = /^[0-9]{10,11}$/;
-                    let errorSpan = document.getElementById("phoneError");
+        let phoneInput = document.querySelector("input[name='Sdt']");
+        if (phoneInput) {
+        phoneInput.addEventListener("blur", function () {
+        let phonePattern = /^[0-9]{10,11}$/;
+        let errorSpan = document.getElementById("phoneError");
 
-                    if (!phonePattern.test(this.value.trim())) {
-                        errorSpan.textContent = "Số điện thoại không hợp lệ! (10-11 số)";
-                    } else {
-                        errorSpan.textContent = "";
-                    }
-                });
-            }
+        if (!phonePattern.test(this.value.trim())) {
+        errorSpan.textContent = "Số điện thoại không hợp lệ! (10-11 số)";
+        } else {
+        errorSpan.textContent = "";
+        }
+        });
+        }
         });
 
 
         const stripPrefix = str => str?.replace(/^Tỉnh\s+|^Thành phố\s+/i, '').trim();
-        const userClaims = {
-            name: '@User.FindFirst("name")?.Value',
-            email: '@User.FindFirst("email")?.Value',
-            phone: '@User.FindFirst("SDT")?.Value',
-            province: stripPrefix(@Html.Raw(Json.Serialize(User.FindFirst("province")?.Value))),
-            district: @Html.Raw(Json.Serialize(User.FindFirst("district")?.Value)),
-            ward: stripPrefix(@Html.Raw(Json.Serialize(User.FindFirst("ward")?.Value))),
-            address: '@User.FindFirst("address")?.Value'
 
 
-        };
-        console.log(userClaims);
-        // Gọi hàm khi trang tải
-        $(document).ready(function () {
-           
-            loadProvinces();
+
+              $(document).ready(function () {
+
+            @if (User.Identity.IsAuthenticated)
+            {
+
+            <text>
+
+                        loadProvinces();
+                        loadCustomerInfo('@User.FindFirst("userid")?.Value');
+            </text>
+            }
+        else
+        {
+
+            <text>
+                        loadProvinces();
+            </text>
+        }
+                $('.btn-confirm-payment').on('click', function () {
+                    const actionUrl = $(this).data('action');
+
+                    Swal.fire({
+                        title: "Xác nhận",
+                        text: "Bạn có chắc chắn muốn thanh Toán?",
+                        icon: "warning",
+                        showConfirmButton: true,
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Có!",
+                        cancelButtonText: "Hủy"
+                    }).then(function (result) {
+                        if (result.isConfirmed) {
+                            $('#formThanhToan').attr('action', actionUrl).submit();
+                        }
+                    });
+                });
         });
 
               function calculateFee() {
@@ -433,8 +522,9 @@
             let subtotal =  @(Model.Sum(p => p.ThanhTienGG) > 0
                                 ? Model.Sum(p => p.ThanhTienGG)
                                 : Model.Sum(p => p.ThanhTien));
+                                let errorSpan = document.getElementById("addressError");
             if (provinceId =="" && districtId == "" && wardCode == "") {
-                alert("Vui lòng chọn đầy đủ địa chỉ.");
+                errorSpan.textContent("Vui lòng chọn đầy đủ địa chỉ.");
                 return;
             }
 
@@ -494,9 +584,9 @@
 
        
 
-        // Load danh sách tỉnh/huyện/xã
-       
-                   function loadProvinces() {
+        //Load danh sách tỉnh/huyện/xã
+
+        function loadProvinces() {
             $.ajax({
                 url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/province",
                 type: "GET",
@@ -559,58 +649,231 @@
         });
 
 
+        // function loadProvinces() {
+            
 
 
 
-        $('#GiongKhachHang').on('change', function () {
-            const checked = $(this).is(':checked');
+        //     $.ajax({
+        //         url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/province",
+        //         type: "GET",
+        //         headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
+        //         success: function (response) {
+        //             $("#tinh").empty().append('<option value="">Chọn Tỉnh/Thành phố</option>');
+        //             response.data.forEach(function (province) {
+        //                 $("#tinh").append(`<option value="${province.ProvinceID}">${province.ProvinceName}</option>`);
+        //             });
+        //         },
+        //         error: function () {
+        //             alert("Lỗi khi tải danh sách tỉnh/thành phố.");
+        //         }
+        //     });
 
-            if (checked) {
-                $('input[name="TenKhachHang"]').val(userClaims.name);
-                $('input[name="Email"]').val(userClaims.email);
-                $('input[name="Sdt"]').val(userClaims.phone);
-                $('input[name="fulldiachi"]').val(userClaims.address);
+        //     // tỉnh thay đổi => load huyện
+        //     $("#tinh").off('change').on('change', function () {
+        //         let provinceId = $(this).val();
+        //         if (!provinceId) return;
 
-                const cleanName = (str) => str.replace(/^Tỉnh\s+|^Thành phố\s+/i, "").trim();
+        //         console.log("Đang load huyện cho " + currentInvoiceId);
 
-                const userProvince = cleanName(userClaims.province);
-                const userDistrict = userClaims.district;
-                const userWard = userClaims.ward;
+        //         $.ajax({
+        //             url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/district",
+        //             type: "GET",
+        //             headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
+        //             data: { "province_id": provinceId },
+        //             success: function (response) {
+        //                 $("#huyen").empty().append('<option value="">Chọn Quận/Huyện</option>');
+        //                 response.data.forEach(function (district) {
+        //                     $("#huyen").append(`<option value="${district.DistrictID}">${district.DistrictName}</option>`);
+        //                 });
+        //             },
+        //             error: function () {
+        //                 alert("Lỗi khi tải danh sách quận/huyện.");
+        //             }
+        //         });
+        //     });
 
-                // Chọn tỉnh theo text
-                $('#tinh option').each(function () {
-                    if ($(this).text().trim() === userProvince) {
-                        $('#tinh').val($(this).val()).trigger('change');
+        //     // huyện thay đổi => load xã
+        //     $("#huyen").off('change').on('change', function () {
+        //         let districtId = $(this).val();
+        //         if (!districtId) return;
 
-                        // Delay đợi load quận/huyện
-                        setTimeout(() => {
-                            $('#huyen option').each(function () {
-                                if ($(this).text().trim() === userDistrict) {
-                                    $('#huyen').val($(this).val()).trigger('change');
+        //         console.log("Đang load xã cho " + currentInvoiceId);
 
-                                    // Delay đợi load xã/phường
-                                    setTimeout(() => {
-                                        $('#xa option').each(function () {
-                                            if ($(this).text().trim() === userWard) {
-                                                $('#xa').val($(this).val()).trigger('change');
-                                            }
-                                        });
-                                    }, 500);
-                                }
-                            });
-                        }, 500);
-                    }
-                });
+        //         $.ajax({
+        //             url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/ward",
+        //             type: "GET",
+        //             headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
+        //             data: { "district_id": districtId },
+        //             success: function (response) {
+        //                 $("#xa").empty().append('<option value="">Chọn Xã/Phường</option>');
+        //                 response.data.forEach(function (ward) {
+        //                     $("#xa").append(`<option value="${ward.WardCode}">${ward.WardName}</option>`);
+        //                 });
+        //             },
+        //             error: function () {
+        //                 alert("Lỗi khi tải danh sách xã/phường.");
+        //             }
+        //         });
+        //     });
+        // }
 
-            } else {
-                $('input[name="TenKhachHang"]').val('');
-                $('input[name="Email"]').val('');
-                $('input[name="Sdt"]').val('');
-                $('input[name="fulldiachi"]').val('');
-                $('#tinh').val('').trigger('change');
-                $('#huyen').val('').trigger('change');
-                $('#xa').val('').trigger('change');
+
+
+        function loadCustomerInfo(customerId) {
+            $.ajax({
+                url: '/KhachHang/GetThongTinKhachHang', // ✅ Đổi tên controller nếu khác
+                type: 'GET',
+                data: { id: customerId },
+                success: function (response) {
+                    if (!response) return;
+
+                    console.log(response);
+                    // ✅ Gán dữ liệu vào form
+                    $('input[name="TenKhachHang"]').val(response.name);
+                    $('input[name="Email"]').val(response.email);
+                    $('input[name="Sdt"]').val(response.phone);
+                    $('input[name="fulldiachi"]').val(response.address);
+
+                    const cleanName = (str) => str.replace(/^Tỉnh\s+|^Thành phố\s+/i, "").trim();
+                    const userProvince = cleanName(response.province);
+                    const userDistrict = response.district;
+                    const userWard = response.ward;
+
+                    setTimeout(() => {
+                        // Chọn tỉnh
+                        $('#tinh').find('option').each(function () {
+                            if ($(this).text().trim() === userProvince) {
+                                $('#tinh').val($(this).val()).trigger('change');
+
+                                setTimeout(() => {
+                                    $('#huyen').find('option').each(function () {
+                                        if ($(this).text().trim() === userDistrict) {
+                                            $('#huyen').val($(this).val()).trigger('change');
+
+                                            setTimeout(() => {
+                                                $('#xa').find('option').each(function () {
+                                                    if ($(this).text().trim() === userWard) {
+                                                        $('#xa').val($(this).val()).trigger('change');
+                                                    }
+                                                });
+                                            }, 1000);
+                                        }
+                                    });
+                                }, 1000);
+                            }
+                        });
+                    }, 1000);
+                },
+                error: function () {
+                    Toast.fire({
+                        icon: 'error',
+                        title: "❌ Không thể tải thông tin khách hàng."
+                    });
+                }
+            });
+        }
+
+
+        $(document).on('click', '.openAddress', function () {
+            const customerId = $(this).data('id'); // giả định nút có data-id
+
+            console.log("đã chạy openAddress");
+            console.log(customerId);
+
+
+
+            if (!customerId) {
+                alert("Không tìm thấy ID khách hàng!");
+                return;
             }
+            debugger;
+            $.ajax({
+                url: `/Khachhang/GetAddressCustomer?customerId=${customerId}`,
+                type: 'GET',
+                success: function (res) {
+                    const $tbody = $('#addressModal tbody');
+                    $tbody.empty();
+
+                    if (!res || res.length === 0 || res.success === false) {
+                        $tbody.append(`<tr><td colspan="6">${res.message || "Không có địa chỉ nào!"}</td></tr>`);
+                        return;
+                    }
+
+                    res.forEach((item, index) => {
+                        $tbody.append(`
+                                            <tr>
+                                                <td>${index + 1}</td>
+                                                <td>${item.tinh}</td>
+                                                <td>${item.huyen}</td>
+                                                <td>${item.xa}</td>
+                                                <td>${item.chi_tiet}</td>
+                                                <td><button class="btn btn-sm btn-primary select-address"
+                                                    data-tinh="${item.tinh}"
+                                                    data-huyen="${item.huyen}"
+                                                    data-xa="${item.xa}"
+                                                    data-chitiet="${item.chi_tiet}">Chọn</button></td>
+                                            </tr>
+                                        `);
+                    });
+
+                    $('#addressModal').modal('show');
+                    loadProvinces();
+                },
+                error: function (err) {
+                    alert("Lỗi khi lấy địa chỉ!");
+                }
+            });
+        });
+
+        $(document).on('click', '.select-address', function () {
+            const btn = $(this);
+            const cleanName = (str) => str.replace(/^Tỉnh\s+|^Thành phố\s+/i, "").trim();
+
+            const tenTinh = cleanName(btn.data('tinh'));
+            const tenHuyen = btn.data('huyen');
+            const tenXa = btn.data('xa');
+            const DC_ChiTiet = btn.data('chitiet');
+
+            // Xác định container tab đang mở
+            const tinhSelect = $('#tinh');
+            const huyenSelect = $('#huyen');
+            const xaSelect = $("#xa");
+            const chiTietSelect = $('input[name="fulldiachi"]');
+
+
+
+            console.log("Tỉnh cần chọn:", tenTinh);
+            console.log("Huyện cần chọn:", tenHuyen);
+            console.log("Xã cần chọn:", tenXa);
+            console.log("DC_ChiTiet cần chọn:", DC_ChiTiet);
+
+            // Chọn tỉnh theo text
+            tinhSelect.find('option').each(function () {
+                if ($(this).text().trim() === tenTinh) {
+                    tinhSelect.val($(this).val()).trigger('change');
+
+                    setTimeout(() => {
+                        huyenSelect.find('option').each(function () {
+                            if ($(this).text().trim() === tenHuyen) {
+                                huyenSelect.val($(this).val()).trigger('change');
+
+                                setTimeout(() => {
+                                    xaSelect.find('option').each(function () {
+                                        if ($(this).text().trim() === tenXa) {
+                                            xaSelect.val($(this).val()).trigger('change');
+
+                                            setTimeout(() => {
+                                                chiTietSelect.val(DC_ChiTiet);
+                                            }, 500);
+                                        }
+                                    });
+                                }, 500);
+                            }
+                        });
+                    }, 500);
+                }
+            });
         });
 
    

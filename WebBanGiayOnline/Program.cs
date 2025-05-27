@@ -21,11 +21,42 @@ builder.Services.AddSession(options =>
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/TaiKhoan/Login";  
+        // Controller khách hàng
+        options.LoginPath = "/TaiKhoan/Login";       
         options.LogoutPath = "/TaiKhoan/Logout";
-
         options.AccessDeniedPath = "/TaiKhoan/AccessDenied";
+
+        options.Events = new CookieAuthenticationEvents
+        {
+            OnRedirectToLogin = context =>
+            {
+                var path = context.Request.Path;
+
+                if (path.StartsWithSegments("/admin", StringComparison.OrdinalIgnoreCase))
+                {
+                    // ✅ Đổi theo controller admin mới là AccountController
+                    context.Response.Redirect("/Admin/Account/LoginAdmin");
+                }
+                else
+                {
+                    context.Response.Redirect("/TaiKhoan/Login"); // khách
+                }
+
+                return Task.CompletedTask;
+            }
+        };
     });
+
+
+
+//.AddCookie(options =>
+//{
+//    options.LoginPath = "/TaiKhoan/Login";
+//    options.LogoutPath = "/TaiKhoan/Logout";
+//    options.Cookie.Path = "/"; // <- Cookie hoạt động trên toàn bộ website
+
+//    options.AccessDeniedPath = "/TaiKhoan/AccessDenied";
+//});
 
 builder.Services.AddAuthorization(options =>
 {
@@ -34,6 +65,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("CustomerPolicy", policy => policy.RequireRole("Khách hàng"));
     options.AddPolicy("AdminOrEmployeePolicy", policy => policy.RequireRole("Admin", "Nhân Viên"));
 });
+
 
 // Đăng ký dbcontext
 builder.Services.AddDbContext<AppDbContext>(options => {

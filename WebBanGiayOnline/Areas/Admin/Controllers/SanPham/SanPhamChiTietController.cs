@@ -74,13 +74,13 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 item.imgUrl = JsonConvert.SerializeObject(imgUrls);
             }
 
-            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu");
-            ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.ToList(), "ID", "ten_loai_co_giay");
-            ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.ToList(), "ID", "ten_danh_muc");
-            ViewData["De_GiayID"] = new SelectList(_context.de_Giays.ToList(), "ID", "ten_de_giay");
-            ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.ToList(), "ID", "ten_mui_giay");
-            ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.ToList(), "ID", "ten_kieu_dang");
-            ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.ToList(), "ID", "ten_loai_giay");
+            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_chat_lieu");
+            ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_loai_co_giay");
+            ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_danh_muc");
+            ViewData["De_GiayID"] = new SelectList(_context.de_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_de_giay");
+            ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_mui_giay");
+            ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_kieu_dang");
+            ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_loai_giay");
 
             return View(list);
         }
@@ -170,13 +170,13 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             ViewData["SelectedTenSanPham"] = tenSanPham;
 
 
-            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu", chatLieu);
-            ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.ToList(), "ID", "ten_loai_co_giay", coGiay);
-            ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.ToList(), "ID", "ten_danh_muc", danhMuc);
-            ViewData["De_GiayID"] = new SelectList(_context.de_Giays.ToList(), "ID", "ten_de_giay", deGiay);
-            ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.ToList(), "ID", "ten_mui_giay", muiGiay);
-            ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.ToList(), "ID", "ten_kieu_dang", kieuDang);
-            ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.ToList(), "ID", "ten_loai_giay", loaiGiay);
+            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_chat_lieu", chatLieu);
+            ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_loai_co_giay", coGiay);
+            ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_danh_muc", danhMuc);
+            ViewData["De_GiayID"] = new SelectList(_context.de_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_de_giay", deGiay);
+            ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_mui_giay", muiGiay);
+            ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_kieu_dang", kieuDang);
+            ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_loai_giay", loaiGiay);
 
 
             return View("Index", result);
@@ -229,11 +229,11 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 return NotFound();
             }
 
-            CheckStatusSP(sanPham.San_PhamID, trang_thai);
             // Cập nhật trạng thái
             sanPham.trang_thai = trang_thai;
             _context.san_Pham_Chi_Tiets.Update(sanPham);
             _context.SaveChanges();
+            CheckStatusSP(sanPham.San_PhamID, trang_thai);
 
             return Json(new { success = true });
         }
@@ -246,13 +246,29 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 .Where(x => x.San_PhamID == id)
                 .ToList();
 
-            bool allMatch = spctList.All(x => x.trang_thai == trang_thai);
+            foreach (var spct in spctList)
+            {
+                if (spct.so_luong == 0 && spct.trang_thai != 0)
+                {
+                    spct.trang_thai = 0;
+                    _context.san_Pham_Chi_Tiets.Update(spct);
+                }
+                
+            }
 
-            if (allMatch)
+            if (spctList.All(x => x.trang_thai == trang_thai))
             {
                 sp.trang_thai = trang_thai;
-                _context.SaveChanges();
+                _context.san_Phams.Update(sp);
             }
+            else if (spctList.All(x => x.trang_thai != trang_thai))
+            {
+                // ✅ Gán trạng thái theo item đầu tiên trong danh sách
+                sp.trang_thai = spctList.First().trang_thai;
+                _context.san_Phams.Update(sp);
+            }
+
+            _context.SaveChanges();
         }
         [HttpPost]
         public async Task<IActionResult> UpdateSpct([FromBody] San_PhamCTView model)
@@ -420,8 +436,8 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         // GET: KieuDangController/Create
         public ActionResult Create()
         {
-            ViewData["Kich_ThuocID"] = new SelectList(_context.kich_Thuocs.ToList(), "ID", "ten_kich_thuoc");
-            ViewData["Mau_SacID"] = new SelectList(_context.mau_Sacs.ToList(), "ID", "ten_mau");
+            ViewData["Kich_ThuocID"] = new SelectList(_context.kich_Thuocs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_kich_thuoc");
+            ViewData["Mau_SacID"] = new SelectList(_context.mau_Sacs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_mau");
             return View();
         }
 
@@ -443,8 +459,8 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         // GET: KieuDangController/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
-            ViewData["Kich_ThuocID"] = new SelectList(_context.kich_Thuocs.ToList(), "ID", "ten_kich_thuoc");
-            ViewData["Mau_SacID"] = new SelectList(_context.mau_Sacs.ToList(), "ID", "ten_mau");
+            ViewData["Kich_ThuocID"] = new SelectList(_context.kich_Thuocs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_kich_thuoc");
+            ViewData["Mau_SacID"] = new SelectList(_context.mau_Sacs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_mau");
             if (id == null)
             {
                 return NotFound();
@@ -508,7 +524,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         {
             Console.WriteLine($"📌 Nhận giá trị lọc: chatLieu={chatLieu}, coGiay={coGiay}, danhMuc={danhMuc}, deGiay={deGiay}, muiGiay={muiGiay}, kieuDang={kieuDang}, loaiGiay={loaiGiay}, tenSanPham={tenSanPham}");
 
-            var query = _context.san_Pham_Chi_Tiets.Where(x=>x.trang_thai==1).AsQueryable();
+            var query = _context.san_Pham_Chi_Tiets.Where(x=>x.trang_thai==1 && x.so_luong!=0).AsQueryable();
 
             if (!string.IsNullOrEmpty(chatLieu))
                 query = query.Where(sp => sp.Chat_LieuID.ToString() == chatLieu);
@@ -577,27 +593,87 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             ViewData["SelectedTenSanPham"] = tenSanPham;
 
 
-            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu", chatLieu);
-            ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.ToList(), "ID", "ten_loai_co_giay", coGiay);
-            ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.ToList(), "ID", "ten_danh_muc", danhMuc);
-            ViewData["De_GiayID"] = new SelectList(_context.de_Giays.ToList(), "ID", "ten_de_giay", deGiay);
-            ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.ToList(), "ID", "ten_mui_giay", muiGiay);
-            ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.ToList(), "ID", "ten_kieu_dang", kieuDang);
-            ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.ToList(), "ID", "ten_loai_giay", loaiGiay);
+            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_chat_lieu", chatLieu);
+            ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_loai_co_giay", coGiay);
+            ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_danh_muc", danhMuc);
+            ViewData["De_GiayID"] = new SelectList(_context.de_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_de_giay", deGiay);
+            ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_mui_giay", muiGiay);
+            ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_kieu_dang", kieuDang);
+            ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_loai_giay", loaiGiay);
 
 
             return  Json(result); 
         }
+
+        //[HttpGet]
+        //public IActionResult GetAllSanPhamChiTiet(int pageNumber = 1, int pageSize = 10)
+        //{
+        //    try
+        //    {
+        //        var query = _context.san_Pham_Chi_Tiets
+        //            .Include(x => x.Kich_Thuoc)
+        //            .Include(x => x.Mau_Sac)
+        //            .Where(x => x.trang_thai == 1)
+        //            .Select(x => new {
+        //                id = x.ID,
+        //                imageUrl = (from asp in _context.anh_San_Pham_San_Pham_Chi_Tiets
+        //                            join a in _context.anh_San_Phams on asp.Anh_San_PhamID equals a.ID
+        //                            where asp.San_Pham_Chi_TietID == x.ID
+        //                            select a.anh_url).FirstOrDefault() ?? "/img/default.jpg",
+        //                ten_SPCT = x.ten_SPCT,
+        //                price = x.gia,
+        //                dbQuantity = x.so_luong,
+        //                size = x.Kich_Thuoc != null ? x.Kich_Thuoc.ten_kich_thuoc : "Chưa có",
+        //                color = x.Mau_Sac != null ? x.Mau_Sac.ma_mau : "Chưa có",
+        //                status = "Hoạt động",
+        //                chatlieu=x.Chat_Lieu != null ?x.Chat_Lieu.ten_chat_lieu:"Chưa có",
+        //                cogiay=x.Co_Giay!=null ?x.Co_Giay.ten_loai_co_giay:"Chưa có",
+        //                degiay=x.De_Giay!=null ?x.De_Giay.ten_de_giay :"Chưa có"
+        //            });
+
+        //        int totalItems = query.Count();
+
+        //        var list = query
+        //            .Skip((pageNumber - 1) * pageSize)
+        //            .Take(pageSize)
+        //            .ToList();
+
+        //        return Json(new
+        //        {
+        //            success = true,
+        //            data = list,
+        //            pagination = new
+        //            {
+        //                pageNumber,
+        //                pageSize,
+        //                totalItems,
+        //                totalPages = (int)Math.Ceiling((double)totalItems / pageSize)
+        //            }
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, ex.Message);
+        //    }
+        //}
 
         [HttpGet]
         public IActionResult GetAllSanPhamChiTiet(int pageNumber = 1, int pageSize = 10)
         {
             try
             {
-                var query = _context.san_Pham_Chi_Tiets
+                var baseQuery = _context.san_Pham_Chi_Tiets
                     .Include(x => x.Kich_Thuoc)
                     .Include(x => x.Mau_Sac)
-                    .Where(x => x.trang_thai == 1)
+                    .Where(x => x.trang_thai == 1 && x.so_luong != 0)
+                    // <-- thêm OrderByDescending theo ID
+                    .OrderByDescending(x => x.ID);
+
+                int totalItems = baseQuery.Count();
+
+                var list = baseQuery
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
                     .Select(x => new {
                         id = x.ID,
                         imageUrl = (from asp in _context.anh_San_Pham_San_Pham_Chi_Tiets
@@ -610,16 +686,10 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                         size = x.Kich_Thuoc != null ? x.Kich_Thuoc.ten_kich_thuoc : "Chưa có",
                         color = x.Mau_Sac != null ? x.Mau_Sac.ma_mau : "Chưa có",
                         status = "Hoạt động",
-                        chatlieu=x.Chat_Lieu != null ?x.Chat_Lieu.ten_chat_lieu:"Chưa có",
-                        cogiay=x.Co_Giay!=null ?x.Co_Giay.ten_loai_co_giay:"Chưa có",
-                        degiay=x.De_Giay!=null ?x.De_Giay.ten_de_giay :"Chưa có"
-                    });
-
-                int totalItems = query.Count();
-
-                var list = query
-                    .Skip((pageNumber - 1) * pageSize)
-                    .Take(pageSize)
+                        chatlieu = x.Chat_Lieu != null ? x.Chat_Lieu.ten_chat_lieu : "Chưa có",
+                        cogiay = x.Co_Giay != null ? x.Co_Giay.ten_loai_co_giay : "Chưa có",
+                        degiay = x.De_Giay != null ? x.De_Giay.ten_de_giay : "Chưa có"
+                    })
                     .ToList();
 
                 return Json(new

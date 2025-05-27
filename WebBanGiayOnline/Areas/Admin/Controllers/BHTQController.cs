@@ -11,6 +11,11 @@ using WebBanGiay.Data;
 using WebBanGiay.Models.ViewModel;
 using WebBanGiay.Service;
 using WebBanGiay.ViewModel;
+using System.Configuration;
+using System.Configuration;
+using System.Configuration;
+using System.Configuration;
+using DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace WebBanGiay.Areas.Admin.Controllers
 {
@@ -54,7 +59,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     tong_tien = 0,
                     ghi_chu = "",
                     //(chờ thêm sản phẩm)
-                    trang_thai = -1,
+                    trang_thai = 6,
                     dia_chi = "Tại quầy",
                     sdt_nguoi_nhan = "",
                     email_nguoi_nhan = "",
@@ -79,14 +84,15 @@ namespace WebBanGiay.Areas.Admin.Controllers
         public IActionResult GetHoaDonTaiQuay()
         {
             var invoices = _context.hoa_Dons
-                .Where(hd => hd.trang_thai == -1
+                .Where(hd => hd.trang_thai == 6
                              && hd.dia_chi == "Tại quầy"
-                             && hd.loai_hoa_don == 1)  // chỉ lấy hóa đơn tại quầy
+							 && (hd.loai_hoa_don == 1 || hd.loai_hoa_don == 3))  // chỉ lấy hóa đơn tại quầy
                 .OrderBy(hd => hd.ngay_tao)
                 .Select(hd => new {
                     hd.ID,
                     hd.MaHoaDon,
                     hd.ngay_tao,
+                    hd.loai_hoa_don,
                     hd.tong_tien,
                     // Hiển thị trạng thái dưới dạng chuỗi
                     TrangThai = "Chờ xử lí",
@@ -181,6 +187,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
             return Json(new { success = true, message = "Đã gắn khách hàng vào hóa đơn thành công!" });
         }
 
+       
 
 
         [HttpPost]
@@ -393,11 +400,9 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
                 // Cập nhật số lượng và thành tiền của dòng chi tiết
                 int newQty = invoiceItem.so_luong + req.delta;
-                if (newQty <= 0)
+                if (newQty < 1)
                 {
-                    // Nếu số lượng giảm về 0 hoặc âm, xóa dòng
-                    _context.don_Chi_Tiets.Remove(invoiceItem);
-                    newQty = 0;
+                    return Json(new { success = false, message = "Số lượng không thể nhỏ hơn 1!" });
                 }
                 else
                 {
@@ -436,7 +441,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public IActionResult RemoveInvoiceItem([FromBody] Guid chiTietId)
+        public async Task<IActionResult> RemoveInvoiceItem([FromBody] Guid chiTietId)
         {
             try
             {
@@ -446,11 +451,19 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
                 // Trả lại số lượng vào kho
                 var spCT = _context.san_Pham_Chi_Tiets.FirstOrDefault(sp => sp.ID == chiTiet.San_Pham_Chi_TietID);
-                if (spCT != null)
+                if (spCT == null)
                 {
-                    spCT.so_luong += chiTiet.so_luong;
-                    _context.san_Pham_Chi_Tiets.Update(spCT);
+                    return Json(new { success = false, message = "Không tìm thấy sản phẩm:" + chiTietId });
                 }
+                spCT.so_luong += chiTiet.so_luong;
+                // đổi trạng thái
+
+                spCT.trang_thai = spCT.so_luong > 0 ? 1 : 0;
+                //await changeStatusSPCT(spCT);
+                _context.san_Pham_Chi_Tiets.Update(spCT);
+
+
+                await changeStatusSP(spCT.San_PhamID);
 
                 _context.don_Chi_Tiets.Remove(chiTiet);
                 _context.SaveChanges();
@@ -465,7 +478,9 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
       
         [HttpPost]
-        public IActionResult AddProductToInvoice([FromBody] AddProductDto request)
+        [HttpPost]
+        public async Task<IActionResult> AddProductToInvoice([FromBody] AddProductDto request)
+
         {
 
             try
@@ -537,7 +552,26 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 _context.SaveChanges();
                 // Cập nhật số lượng tồn kho: trừ số lượng được bán
                 productDetail.so_luong -= request.Quantity;
+
+                // đổi trạng thái
+
+
+                productDetail.trang_thai = productDetail.so_luong > 0 ? 1 : 0;
+
+
+
                 _context.san_Pham_Chi_Tiets.Update(productDetail);
+
+                _context.SaveChanges();
+
+
+
+
+
+                 await changeStatusSP(productDetail.San_PhamID);
+                
+
+                
 
                 var listHDCT = _context.don_Chi_Tiets.Where(x => x.Hoa_DonID == request.InvoiceId).AsQueryable();
 
@@ -558,6 +592,29 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
+
+        public async Task changeStatusSP(Guid id)
+        {
+
+
+            var sp = await _context.san_Phams
+                .Include(x => x.San_Pham_Chi_Tiets)
+                .FirstOrDefaultAsync(x => x.ID == id);
+
+            if (sp == null) return;
+
+            int tongSoLuong = sp.San_Pham_Chi_Tiets.Sum(ct => ct.so_luong);
+            sp.trang_thai = tongSoLuong > 0 ? 1 : 0;
+
+            _context.Entry(sp).State = EntityState.Modified;
+        }
+
+        //public async Task<San_Pham_Chi_Tiet> changeStatusSPCT(San_Pham_Chi_Tiet sp)
+        //{
+
+
+        //    return sp;
+        //}
 
 
 
@@ -711,22 +768,23 @@ namespace WebBanGiay.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [Route("GetShippingFee")]
-        public async Task<IActionResult> GetShippingFee([FromBody] GHNShipping request)
+        //[Route("GetShippingFee1")]
+        public async Task<IActionResult> GetShippingFee1([FromBody] GHNShipping request)
         {
             try
             {
                 var ship = await _ghnService.CalculateFeeAsync(request);
-                if (request.provinceId != 201)
+                ship = 50000;
+                if (request.provinceId == 201)
                 {
-                    ship = 50000;
+                    ship = 0;
                 }
                 if (request.subtotal > 2000000)
                 {
                     ship = 0;
                 }
-          
-                return Json(new { success = true, ship });
+                HttpContext.Session.SetInt32("ShippingFee", ship);
+				return Json(new { success = true, ship });
 
             }
             catch (Exception ex)
@@ -734,6 +792,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 return Json(new { success = false, message = "Lỗi vận chuyển: " + ex.Message });
             }
         }
+
         [HttpPost]
         public IActionResult FinalizePayment([FromBody] FinalizePaymentRequest model)
         {
@@ -761,9 +820,18 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 }
                 _context.SaveChanges();
             }
+			if (!string.IsNullOrEmpty(model.FullAddress))
+			{
+				Console.WriteLine("📦 Địa chỉ giao hàng: " + model.FullAddress);
 
-            // 3. Nếu có Voucher (dựa vào VoucherCodeString)
-            if (!string.IsNullOrWhiteSpace(model.VoucherCodeString))
+				invoice.dia_chi = model.FullAddress;
+				// Hoặc lưu model.FullAddress vào bảng hóa đơn nếu bạn có field địa_chi_giao
+			}
+
+            
+
+			// 3. Nếu có Voucher (dựa vào VoucherCodeString)
+			if (!string.IsNullOrWhiteSpace(model.VoucherCodeString))
             {
                 // Tìm voucher theo mã (trường ma trong bảng phieu_Giam_Gias)
                 var voucher = _context.phieu_Giam_Gias.FirstOrDefault(v => v.ma == model.VoucherCodeString);
@@ -771,23 +839,13 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     return Json(new { success = false, message = "Không tìm thấy phiếu giảm giá!" });
                 if (voucher.so_luong <= 0)
                     return Json(new { success = false, message = "Phiếu giảm giá đã hết!" });
-                invoice.tong_tien = _context.don_Chi_Tiets
-                  .Where(c => c.Hoa_DonID == invoice.ID)
-                  .Sum(c => c.so_luong * c.gia);
+                invoice.tong_tien = model.FinalTotal;
 
-                double discountAmount = 0;
+                
                 // Nếu loại phiếu giảm giá là 1 => Giảm %
-                if (voucher.loai_phieu_giam_gia == 1)
-                {
-                    discountAmount = invoice.tong_tien * (voucher.gia_tri_giam / 100.0);
-                    if (voucher.so_tien_giam_toi_da.HasValue && discountAmount > voucher.so_tien_giam_toi_da.Value)
-                        discountAmount = voucher.so_tien_giam_toi_da.Value;
-                }
+                
                 // Nếu loại phiếu giảm giá là 0 => Giảm VND
-                else if (voucher.loai_phieu_giam_gia == 0)
-                {
-                    discountAmount = voucher.gia_tri_giam;
-                }
+                
 
                 // Giảm số lượng voucher
                 voucher.so_luong -= 1;
@@ -798,14 +856,19 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 _context.hoa_Dons.Update(invoice);
                 _context.SaveChanges();
                 // Cập nhật tổng tiền hóa đơn (trừ số tiền giảm)
-                double newTotal = invoice.tong_tien - discountAmount;
-                if (newTotal < 0)
-                    newTotal = 0;
-                invoice.tong_tien = newTotal;
+                
             }
 
+            invoice.Ship = model.ship;
+
             // 4. Đổi trạng thái hóa đơn thành 6 (Đã thanh toán)
-            invoice.trang_thai = -2;
+            invoice.trang_thai = 5;
+            if (invoice.loai_hoa_don == 3)
+            {
+
+				invoice.loai_hoa_don = 1;
+				invoice.trang_thai = 1;
+			}
             _context.hoa_Dons.Update(invoice);
             _context.SaveChanges();
 
@@ -843,6 +906,42 @@ namespace WebBanGiay.Areas.Admin.Controllers
             return Guid.Empty;
         }
 
+		[HttpPost]
+		public IActionResult GiaoHang(Guid invoiceId)
+		{
+			try
+			{
+				var hoaDon = _context.hoa_Dons.FirstOrDefault(h => h.ID == invoiceId);
+				if (hoaDon == null)
+				{
+					return Json(new { success = false, message = "Không tìm thấy hóa đơn!" });
+				}
 
-    }
+				// Cập nhật trạng thái sang "Đang giao" (giả định = 3)
+				;
+                if (hoaDon.loai_hoa_don != 1)
+                {
+                    hoaDon.loai_hoa_don = 1;
+
+                }
+                else
+                {
+					hoaDon.loai_hoa_don = 3;
+				}
+				hoaDon.ngay_sua = DateTime.Now; // Nếu có cột cập nhật
+
+				_context.hoa_Dons.Update(hoaDon);
+				_context.SaveChanges();
+
+				return Json(new { success = true });
+			}
+			catch (Exception ex)
+			{
+				return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+			}
+		}
+
+
+
+	}
 }

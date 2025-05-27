@@ -1,6 +1,6 @@
 ﻿using ClssLib;
 using Microsoft.AspNetCore.Mvc;
-// Sử dụng MailKit
+
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
@@ -86,6 +86,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
             ViewBag.TrangThaiList = new SelectList(new List<SelectListItem>
     {
         new SelectListItem { Value = "0", Text = "Đã hết hạn" },
+        new SelectListItem { Value = "-1", Text = "Chưa diễn ra" },
         new SelectListItem { Value = "1", Text = "Đang diễn ra" }
     }, "Value", "Text", Category?.ToString());
 
@@ -96,14 +97,45 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
             return View("Index", pagedList);
         }
+        [HttpGet]
+        public IActionResult Customer(int? page, string searchString)
+        {
+            var query = _context.tai_Khoans
+                .Where(t => t.Vai_Tro.ten_vai_tro == "Khách hàng");
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                query = query.Where(t =>
+                    t.ho_ten.Contains(searchString) ||
+                    t.sdt.Contains(searchString) ||
+                    t.email.Contains(searchString));
+            }
+
+            int pageSize = 5;
+            int pageNumber = page ?? 1;
+            var taiKhoans = query.OrderBy(t => t.ho_ten).ToPagedList(pageNumber, pageSize);
+
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_PartialKhachHang", taiKhoans);
+            }
+
+            return View(taiKhoans); // ✅ truyền model
+        }
+
 
         [HttpGet]
-        public IActionResult Create()
+        public IActionResult Create(int? page)
         {
 
-            var tai_khoan = _context.tai_Khoans.Include(x => x.Vai_Tro).ToList();
-            Console.WriteLine($"Số lượng tài khoản: {tai_khoan.Count}");
-            ViewBag.tai_khoans = tai_khoan ?? new List<Tai_Khoan>();
+
+            var query = _context.tai_Khoans
+                .Where(t => t.Vai_Tro.ten_vai_tro == "Khách hàng");
+            int pageSize = 5;
+            int pageNumber = page ?? 1;
+            var taiKhoans = query.OrderBy(t => t.ho_ten).ToPagedList(pageNumber, pageSize);
+            Console.WriteLine($"Số lượng tài khoản: {taiKhoans.Count}");
+            ViewBag.tai_khoans = taiKhoans;
             return View();
 
         }
@@ -117,6 +149,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
             {
                 // Cập nhật ngày tạo mới nhất để đảm bảo sắp xếp đúng
                 phieu_giam_gia.ngay_tao = DateTime.Now;
+                phieu_giam_gia.UpdateTrangThai();
 
                 _context.phieu_Giam_Gias.Add(phieu_giam_gia);
                 await _context.SaveChangesAsync();
@@ -124,7 +157,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 // Xử lý nếu có danh sách khách hàng
                 if (customerIds != null && customerIds.Length > 0)
                 {
-                    var tai_khoan = _context.tai_Khoans.Where(c => customerIds.Contains(c.ID)).ToList();
+                    var tai_khoan = await _context.tai_Khoans.Where(c => customerIds.Contains(c.ID)).ToListAsync();
 
                     if (phieu_giam_gia.kieu_giam_gia == 0) // Nếu là cá nhân
                     {
@@ -144,7 +177,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                                 ngay_tao = DateTime.Now,
                                 nguoi_tao = User.Identity?.Name ?? "admin"
                             };
-                            _context.phieu_Giam_Gia_Tai_Khoans.Add(link);
+                            await _context.phieu_Giam_Gia_Tai_Khoans.AddAsync(link);
                         }
                         await _context.SaveChangesAsync();
                     }
@@ -232,16 +265,33 @@ namespace WebBanGiay.Areas.Admin.Controllers
             return "DISCOUNT" + DateTime.Now.Year;
         }
         // GET: KieuDangController/Edit/5
-        public async Task<IActionResult> Edit(Guid? id)
+        public async Task<IActionResult> Edit(Guid? id, int? page)
         {
             if (id == null)
             {
                 return NotFound();
-            } // Gán danh sách khách hàng vào ViewBag
-            ViewBag.tai_khoans = await _context.tai_Khoans
-                .Include(x => x.Vai_Tro)
-                .Where(tk => tk.Vai_Tro.ten_vai_tro == "Khách hàng")
+            }
+            var taiKhoanDaCo = await _context.phieu_Giam_Gia_Tai_Khoans
+                .Where(x => x.Phieu_Giam_GiaID == id)
+                .Select(x => x.Tai_KhoanID)
                 .ToListAsync();
+
+
+            var query = _context.tai_Khoans
+                .Include(x => x.Vai_Tro)
+                .Where(tk => tk.Vai_Tro.ten_vai_tro == "Khách hàng" && !taiKhoanDaCo.Contains(tk.ID));
+            int pageSize = 5;
+            int pageNumber = page ?? 1;
+            var taiKhoans = query.OrderBy(t => t.ho_ten).ToPagedList(pageNumber, pageSize);
+            Console.WriteLine($"Số lượng tài khoản: {taiKhoans.Count}");
+            ViewBag.tai_khoans = taiKhoans;
+
+            //// Lọc khách hàng chưa có trong phiếu
+            //ViewBag.tai_khoans = await _context.tai_Khoans
+            //    .Include(x => x.Vai_Tro)
+            //    .Where(tk => tk.Vai_Tro.ten_vai_tro == "Khách hàng" && !taiKhoanDaCo.Contains(tk.ID))
+            //    .ToListAsync();
+
 
             var phieu_giam_gia = await _context.phieu_Giam_Gias.FindAsync(id);
             if (phieu_giam_gia == null)
