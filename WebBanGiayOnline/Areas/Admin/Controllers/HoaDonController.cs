@@ -360,7 +360,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
 
         [HttpPost]
-        public JsonResult UpdateStatus(Guid? id, int newStatus)
+        public JsonResult UpdateStatus(Guid? id, int newStatus, string reason)
         {
             var hoaDon = _context.hoa_Dons.FirstOrDefault(h => h.ID == id);
 
@@ -385,7 +385,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     Ten = name,           // Gán tên NV
                     vai_tro = role, // Gán vai trò
                     thao_tac = "Chuyển trạng thái Hóa Đơn thành: " + tTHD.Name,
-                    ghi_chu = "không"
+                    ghi_chu = reason
                 };
                 if (newStatus == 1)
                 {
