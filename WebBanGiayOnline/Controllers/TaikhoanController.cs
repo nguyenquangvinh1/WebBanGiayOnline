@@ -73,9 +73,12 @@ namespace WebBanGiay.Controllers
             new Claim("address", diaChi?.dia_chi_chi_tiet ?? "")
         };
 
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-			//await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+			//         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+			////await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+			//await HttpContext.SignInAsync("CustomerScheme", new ClaimsPrincipal(claimsIdentity));
+			var claimsIdentity = new ClaimsIdentity(claims, "CustomerScheme");
 			await HttpContext.SignInAsync("CustomerScheme", new ClaimsPrincipal(claimsIdentity));
+
 
 
 			return RedirectToAction("Index", "Home");
@@ -269,10 +272,33 @@ namespace WebBanGiay.Controllers
 
 		//    return RedirectToAction("Login", "TaiKhoan");
 		//}
+		//[HttpGet]
+		//public async Task<IActionResult> Logout()
+		//{
+		//	var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
+		//	if (role == "Admin" || role == "Nhân Viên")
+		//	{
+		//		await HttpContext.SignOutAsync("AdminScheme");
+		//		return RedirectToAction("LoginAdmin", "Account", new { area = "Admin" });
+		//	}
+		//	else
+		//	{
+		//		await HttpContext.SignOutAsync("CustomerScheme");
+		//		return RedirectToAction("Login", "TaiKhoan");
+		//	}
+		//}
 		[HttpGet]
 		public async Task<IActionResult> Logout()
 		{
-			var role = User.FindFirst(ClaimTypes.Role)?.Value;
+			// Đọc User từ scheme Admin
+			var adminResult = await HttpContext.AuthenticateAsync("AdminScheme");
+			var customerResult = await HttpContext.AuthenticateAsync("CustomerScheme");
+
+			var adminUser = adminResult?.Principal;
+			var customerUser = customerResult?.Principal;
+
+			var role = adminUser?.FindFirst(ClaimTypes.Role)?.Value ?? customerUser?.FindFirst(ClaimTypes.Role)?.Value;
 
 			if (role == "Admin" || role == "Nhân Viên")
 			{
