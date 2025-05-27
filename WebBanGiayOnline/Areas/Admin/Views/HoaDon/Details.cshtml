@@ -253,7 +253,7 @@
                 <p><strong>SDT người nhận:</strong> @Model.sdt_nguoi_nhan</p>
                 <p><strong>Email người nhận:</strong> @Model.email_nguoi_nhan</p>
                 <p><strong>Địa chỉ người nhận:</strong> @Model.dia_chi</p>
-                @if (Model.trang_thai < 2 || Model.trang_thai == -1)
+                @if (Model.trang_thai < 1 || Model.trang_thai == 5)
                 {
                     <button class="btn btn-primary" onclick="toggleForm(true)">Sửa</button>
                 }

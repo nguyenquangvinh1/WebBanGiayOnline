@@ -418,6 +418,9 @@
     <!-- JavaScript Libraries -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- SweetAlert2 CDN -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script src="~/lib/easing/easing.min.js"></script>
     <script src="~/lib/waypoints/waypoints.min.js"></script>
     <script src="~/lib/lightbox/js/lightbox.min.js"></script>
@@ -510,52 +513,118 @@
             });
 
 
-            // Cảnh báo khi nhấn nút Mua Hàng nhưng chưa chọn đủ
-         $('#btnMuaHang').click(function () {
+                 $('#btnMuaHang').click(function () {
             if (!selectedMauSac || !selectedKichThuoc) {
-               // Ngăn chặn điều hướng
-                alert("Vui lòng chọn đầy đủ Màu Sắc và Kích Thước trước khi mua hàng!");
-            }
-            var productId = $(this).data("id");
-                var quantity = $('input[name="quantity"]').val();
-                debugger;
-                $.ajax({
-                    url: "/Cart/AddCart1",
-                    type: "POST",
-                   data: { id: productId ,quantity : quantity  },
-                    success: function (response) {
-                      
-                         window.location.href = "/Cart/Index";
-                    },
-                    error: function () {
-                        alert("Có lỗi xảy ra, vui lòng thử lại.");
-                    }
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Thiếu thông tin',
+                    text: 'Vui lòng chọn đầy đủ Màu Sắc và Kích Thước trước khi mua hàng!',
                 });
-             debugger;
-            });
-
-             $("#add-to-cart").click(function () {
-            if (!selectedMauSac || !selectedKichThuoc) {
-              e.preventDefault(); // Ngăn chặn điều hướng
-              alert("Vui lòng chọn đầy đủ Màu Sắc và Kích Thước trước khi mua hàng!");
-           }
+                return;
+            }
                
-               var productId = $(this).data("id");
-              var quantity = $('input[name="quantity"]').val();
-               $.ajax({
-                   url: "/Cart/AddCart1",
-                   type: "POST",
-                   data: { id: productId  ,quantity : quantity },
-                   success: function (response) {
-                       alert("Thêm vào giỏ hàng thành công!");
 
-                   },
-                   error: function () {
-                       alert("Có lỗi xảy ra, vui lòng thử lại.");
-                   }
-               });
-           });
+            var productId = $(this).data("id");
+            var quantity = $('input[name="quantity"]').val();
+             if (quantity <= 0 || isNaN(quantity)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Số lượng không hợp lệ',
+                text: 'Vui lòng nhập số lượng lớn hơn 0!'
+            });
+            return;
+        }
+            $.ajax({
+                url: "/Cart/AddCart1",
+                type: "POST",
+                data: { id: productId, quantity: quantity },
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Thêm vào giỏ thành công!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            window.location.href = "/Cart/Index";
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Thất bại',
+                        text: 'Đã xảy ra lỗi khi thêm vào giỏ hàng.'
+                    });
+                }
+            });
+        });
+
+
+                    $("#add-to-cart").click(function (e) {
+            e.preventDefault(); 
+
+            if (!selectedMauSac || !selectedKichThuoc) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Thiếu thông tin',
+                    text: 'Vui lòng chọn đầy đủ Màu Sắc và Kích Thước trước khi mua hàng!',
+                });
+                return;
+            }
+               
+            var productId = $(this).data("id");
+            var quantity = $('input[name="quantity"]').val();
+             if (quantity <= 0 || isNaN(quantity)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Số lượng không hợp lệ',
+                text: 'Vui lòng nhập số lượng lớn hơn 0!'
+            });
+            return;
+        }
+            $.ajax({
+                url: "/Cart/AddCart1",
+                type: "POST",
+                data: { id: productId, quantity: quantity },
+                success: function (response) {
+            
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Thành công!',
+                            text: 'Sản phẩm đã được thêm vào giỏ hàng!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi',
+                            text: response.message || "Không thể thêm vào giỏ hàng!"
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi hệ thống',
+                        text: 'Không thể kết nối tới máy chủ.'
+                    });
+                }
+            });
+        });
+
 
          });
+      
+          
+        
     </script>
 }
