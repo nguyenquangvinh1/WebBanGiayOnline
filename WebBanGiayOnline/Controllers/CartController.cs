@@ -488,7 +488,14 @@ namespace WebBanGiay.Controllers
                 string newMa = $"HD{soNgauNhien}";
                 var discount = Cart.FirstOrDefault()?.Discount;
                 var khach = new Tai_Khoan();
-
+                foreach (var item in Cart)
+                {
+                    var spChiTiet = db.san_Pham_Chi_Tiets.SingleOrDefault(x => x.ID == item.id);
+                    if (spChiTiet == null || spChiTiet.so_luong < item.SoLuong)
+                    {
+                        return RedirectToAction("Index");
+                    }
+                }
                 var hoadon = new Hoa_Don
                 {
 
@@ -543,7 +550,7 @@ namespace WebBanGiay.Controllers
                            
                             
                         }
-                    if(spChiTiet.so_luong <= item.SoLuong)
+                    if(spChiTiet.so_luong < item.SoLuong)
                         {
                             return RedirectToAction("Index");
                         }
