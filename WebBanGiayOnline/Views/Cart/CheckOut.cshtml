@@ -212,26 +212,22 @@
                             <textarea name="GhiChu" class="form-control" spellcheck="false" cols="30" rows="11" placeholder="Ghi chú"></textarea>
                         </div>
 
-                        <form id="formThanhToanKhiNhanHang" method="post">
-                            <input type="submit"
+                            <input type="submit" method="post"
                                    name="payment"
                                    class="btn border-secondary text-uppercase text-primary w-100 mt-2"
                                    value="Thanh toán khi nhận hàng" />
-                        </form>
 
-                        <form id="formPayMentVNPAY" asp-action="PayMent" asp-controller="Cart" method="post">
                             <button type="submit"
+                                    asp-action="PayMent" asp-controller="Cart" method="post"
                                     class="btn border-secondary text-uppercase text-primary w-100 mt-2">
                                 Thanh Toán với VNPAY
                             </button>
-                        </form>
 
-                        <form id="formPaymentMoMo" asp-action="PaymentMoMo" asp-controller="Cart" method="post">
                             <button type="submit"
+                                    asp-action="PaymentMoMo" asp-controller="Cart" method="post"
                                     class="btn border-secondary text-uppercase text-primary w-100 mt-2">
                                 Thanh Toán với MoMo
                             </button>
-                        </form>
                     </div>
 
                     <div class="col-md-12 col-lg-6 col-xl-5">
@@ -276,8 +272,6 @@
                                         </td>
                                     </tr>
 
-
-                                    
                                 </tbody>
                             </table>
                         </div>
@@ -470,7 +464,16 @@
         {
 
             <text>
+
+                    loadProvinces();
                     loadCustomerInfo('@User.FindFirst("userid")?.Value');
+            </text>
+        }
+        else
+        {
+
+            <text>
+                    loadProvinces();
             </text>
         }
         });
@@ -546,8 +549,8 @@
        
 
         //Load danh sách tỉnh/huyện/xã
-       
-                   function loadProvinces() {
+
+        function loadProvinces() {
             $.ajax({
                 url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/province",
                 type: "GET",
@@ -701,7 +704,6 @@
                     const userDistrict = response.district;
                     const userWard = response.ward;
 
-                    loadProvinces();
                     setTimeout(() => {
                         // Chọn tỉnh
                         $('#tinh').find('option').each(function () {
@@ -719,13 +721,13 @@
                                                         $('#xa').val($(this).val()).trigger('change');
                                                     }
                                                 });
-                                            }, 500);
+                                            }, 1000);
                                         }
                                     });
-                                }, 500);
+                                }, 1000);
                             }
                         });
-                    }, 500);
+                    }, 1000);
                 },
                 error: function () {
                     Toast.fire({
@@ -827,13 +829,13 @@
 
                                             setTimeout(() => {
                                                 chiTietSelect.val(DC_ChiTiet);
-                                            }, 5000);
+                                            }, 500);
                                         }
                                     });
-                                }, 5000);
+                                }, 500);
                             }
                         });
-                    }, 5000);
+                    }, 500);
                 }
             });
         });
