@@ -11,6 +11,7 @@ namespace ClssLib
     {
         public Guid ID { get; set; }
         public string ten_kieu_dang { get; set; }
+        public DateTime ngay_tao { get; set; }
         [JsonIgnore]
         public virtual ICollection<San_Pham>? San_Phams { get; set; }
         [JsonIgnore]

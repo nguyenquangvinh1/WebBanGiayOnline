@@ -4,23 +4,32 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="ten_de_giay" class="control-label"></label>
-                <input asp-for="ten_de_giay" class="form-control" />
-                <span asp-validation-for="ten_de_giay" class="text-danger"></span>
+
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Thêm Sản Phẩm</h3>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+            <div class="card-body">
+
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="ten_de_giay" class="control-label"></label>
+                        <input asp-for="ten_de_giay" class="form-control" />
+                        <span asp-validation-for="ten_de_giay" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Create" class="btn btn-primary" />
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
+@* <div>
     <a asp-action="Index">Back to List</a>
-</div>
+</div> *@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

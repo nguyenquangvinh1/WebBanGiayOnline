@@ -74,13 +74,13 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 item.imgUrl = JsonConvert.SerializeObject(imgUrls);
             }
 
-            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu");
-            ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.ToList(), "ID", "ten_loai_co_giay");
-            ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.ToList(), "ID", "ten_danh_muc");
-            ViewData["De_GiayID"] = new SelectList(_context.de_Giays.ToList(), "ID", "ten_de_giay");
-            ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.ToList(), "ID", "ten_mui_giay");
-            ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.ToList(), "ID", "ten_kieu_dang");
-            ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.ToList(), "ID", "ten_loai_giay");
+            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_chat_lieu");
+            ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_loai_co_giay");
+            ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_danh_muc");
+            ViewData["De_GiayID"] = new SelectList(_context.de_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_de_giay");
+            ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_mui_giay");
+            ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_kieu_dang");
+            ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_loai_giay");
 
             return View(list);
         }
@@ -170,13 +170,13 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             ViewData["SelectedTenSanPham"] = tenSanPham;
 
 
-            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu", chatLieu);
-            ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.ToList(), "ID", "ten_loai_co_giay", coGiay);
-            ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.ToList(), "ID", "ten_danh_muc", danhMuc);
-            ViewData["De_GiayID"] = new SelectList(_context.de_Giays.ToList(), "ID", "ten_de_giay", deGiay);
-            ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.ToList(), "ID", "ten_mui_giay", muiGiay);
-            ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.ToList(), "ID", "ten_kieu_dang", kieuDang);
-            ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.ToList(), "ID", "ten_loai_giay", loaiGiay);
+            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_chat_lieu", chatLieu);
+            ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_loai_co_giay", coGiay);
+            ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_danh_muc", danhMuc);
+            ViewData["De_GiayID"] = new SelectList(_context.de_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_de_giay", deGiay);
+            ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_mui_giay", muiGiay);
+            ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_kieu_dang", kieuDang);
+            ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_loai_giay", loaiGiay);
 
 
             return View("Index", result);
@@ -436,8 +436,8 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         // GET: KieuDangController/Create
         public ActionResult Create()
         {
-            ViewData["Kich_ThuocID"] = new SelectList(_context.kich_Thuocs.ToList(), "ID", "ten_kich_thuoc");
-            ViewData["Mau_SacID"] = new SelectList(_context.mau_Sacs.ToList(), "ID", "ten_mau");
+            ViewData["Kich_ThuocID"] = new SelectList(_context.kich_Thuocs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_kich_thuoc");
+            ViewData["Mau_SacID"] = new SelectList(_context.mau_Sacs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_mau");
             return View();
         }
 
@@ -459,8 +459,8 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         // GET: KieuDangController/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
-            ViewData["Kich_ThuocID"] = new SelectList(_context.kich_Thuocs.ToList(), "ID", "ten_kich_thuoc");
-            ViewData["Mau_SacID"] = new SelectList(_context.mau_Sacs.ToList(), "ID", "ten_mau");
+            ViewData["Kich_ThuocID"] = new SelectList(_context.kich_Thuocs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_kich_thuoc");
+            ViewData["Mau_SacID"] = new SelectList(_context.mau_Sacs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_mau");
             if (id == null)
             {
                 return NotFound();
@@ -593,13 +593,13 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             ViewData["SelectedTenSanPham"] = tenSanPham;
 
 
-            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu", chatLieu);
-            ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.ToList(), "ID", "ten_loai_co_giay", coGiay);
-            ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.ToList(), "ID", "ten_danh_muc", danhMuc);
-            ViewData["De_GiayID"] = new SelectList(_context.de_Giays.ToList(), "ID", "ten_de_giay", deGiay);
-            ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.ToList(), "ID", "ten_mui_giay", muiGiay);
-            ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.ToList(), "ID", "ten_kieu_dang", kieuDang);
-            ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.ToList(), "ID", "ten_loai_giay", loaiGiay);
+            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_chat_lieu", chatLieu);
+            ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_loai_co_giay", coGiay);
+            ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_danh_muc", danhMuc);
+            ViewData["De_GiayID"] = new SelectList(_context.de_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_de_giay", deGiay);
+            ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_mui_giay", muiGiay);
+            ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_kieu_dang", kieuDang);
+            ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_loai_giay", loaiGiay);
 
 
             return  Json(result); 
