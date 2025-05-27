@@ -56,9 +56,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
             var diaChi = _context.dia_Chis.FirstOrDefault(dc => dc.Tai_KhoanID == user.ID);
 
-            var avatarPath = string.IsNullOrEmpty(user.hinh_anh)
-    ? "/images/nhanvien/default-avatar.jpg"
-    : $"/images/nhanvien/{user.hinh_anh}";
+
 
             var claims = new List<Claim>
             {
@@ -71,11 +69,12 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 new Claim("district", diaChi?.huyen ?? ""),
                 new Claim("ward", diaChi?.xa ?? ""),
                 new Claim("address", diaChi?.dia_chi_chi_tiet ?? ""),
-                new Claim("avatar", avatarPath)
             };
 
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-			//await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+			//         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+			////await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+			//await HttpContext.SignInAsync("AdminScheme", new ClaimsPrincipal(claimsIdentity));
+			var claimsIdentity = new ClaimsIdentity(claims, "AdminScheme");
 			await HttpContext.SignInAsync("AdminScheme", new ClaimsPrincipal(claimsIdentity));
 
 
