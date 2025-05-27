@@ -694,7 +694,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
             var hoaDon = _context.hoa_Dons
                 .Include(h => h.Hoa_Don_Chi_Tiets) 
                 .FirstOrDefault(h => h.ID == id);
-          
+        
 
             if (hoaDon == null)
             {
@@ -721,9 +721,13 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 }
             }
             var giamgia = _context.phieu_Giam_Gias.FirstOrDefault(x => x.ID == hoaDon.Giam_GiaID);
-            if(giamgia != null)
+            foreach (var ct in hoaDon.Hoa_Don_Chi_Tiets)
             {
-                giamgia.gia_tri_giam = 0;
+                if (giamgia != null)
+                {
+                    giamgia.so_luong += ct.so_luong;
+                    giamgia.gia_tri_giam = 0;
+                }
             }
             if (hoaDon.Ship != null)
             {
