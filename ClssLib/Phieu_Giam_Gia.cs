@@ -57,8 +57,8 @@ namespace ClssLib
 		[Required(AllowEmptyStrings = false, ErrorMessage = "Hãy chọn ngày bắt đầu!")]
 		public DateTime? ngay_bat_dau { get; set; }
 
-		[Display(Name = "Ngày kết thúc :")]
-		[DataType(DataType.Date)]
+        [DataType(DataType.Date)]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Hãy chọn ngày kết thúc!")]
 		public DateTime? ngay_ket_thuc { get; set; }
         public DateTime ngay_tao { get; set; }
         public DateTime? ngay_sua { get; set; }
