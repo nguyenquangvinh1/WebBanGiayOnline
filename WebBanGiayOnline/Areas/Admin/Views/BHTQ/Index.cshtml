@@ -73,429 +73,32 @@
 
 </style>
 
-	<div class="container py-4">
-		<div class="d-flex justify-content-between align-items-center mb-4">
-			<h2 class="mb-0">Bán hàng tại quầy</h2>
-			<button class="btn btn-primary" id="createInvoice">+ Tạo hóa đơn</button>
-		</div>
-
-		<ul class="nav nav-tabs mb-3" id="invoiceTabs"></ul>
-		<div class="tab-content" id="invoiceContent"></div>
+<div class="container py-4">
+	<div class="d-flex justify-content-between align-items-center mb-4">
+		<h2 class="mb-0">Bán hàng tại quầy</h2>
+		<button class="btn btn-primary" id="createInvoice">+ Tạo hóa đơn</button>
 	</div>
 
-	<!-- Template Hóa đơn (ẩn) -->
-	<div id="invoiceTemplate" style="display: none;">
-		<div class="tab-pane fade invoice" id="INVOICE_ID">
-			<div class="invoice-card">
-				<div class="invoice-header d-flex justify-content-between align-items-center">
-					<div class="invoice-actions">
-						@* <button class="btn btn-info qrCode" data-id="INVOICE_ID">📷 QR Code</button> *@
+	<ul class="nav nav-tabs mb-3" id="invoiceTabs"></ul>
+	<div class="tab-content" id="invoiceContent"></div>
+</div>
+
+<!-- Template Hóa đơn (ẩn) -->
+<div id="invoiceTemplate" style="display: none;">
+	<div class="tab-pane fade invoice" id="INVOICE_ID">
+		<div class="invoice-card">
+			<div class="invoice-header d-flex justify-content-between align-items-center">
+				<div class="invoice-actions">
+					@* <button class="btn btn-info qrCode" data-id="INVOICE_ID">📷 QR Code</button> *@
 					<button class="btn btn-outline-warning selectProduct " data-id="INVOICE_ID">+ Thêm sản phẩm</button>
-					</div>
-					
 				</div>
-				<div class="p-3">
-					<!-- Sản phẩm -->
-					<div id="invoiceTableContainer-INVOICE_ID" class="table-responsive mb-4" style="display: none;">
-						<table class="table table-hover" id="invoiceTable-INVOICE_ID">
-							<thead class="table-light">
-								<tr>
-									<th>STT</th>
-									<th>Ảnh</th>
-									<th>Tên SP</th>
-									<th>Giá bán</th>
-									<th>Số lượng</th>
-									<th>Kích thước</th>
-									<th>Màu sắc</th>
-									<th>Thành tiền</th>
-									<th>Hành động</th>
-								</tr>
-							</thead>
-							<tbody class="productList"></tbody>
-						</table>
-					</div>
-					<div id="emptyCartPlaceholder-INVOICE_ID" class="empty-placeholder text-center" style="display: none;">
-						<img src="/images/nhanvien/hoadonkhongcosanpham.png" alt="Chưa có sản phẩm" style="max-width: 120px;" />
-						<h5 class="mt-3">Chưa có sản phẩm</h5>
-					</div>
-
-					<!-- Tổng tiền tạm tính -->
-					<div class="d-flex justify-content-end align-items-center mb-4">
-						<h5 class="mb-0">
-							Tổng tiền tạm tính: <strong id="totalPrice-INVOICE_ID">0</strong> VND
-						</h5>
-						<button class="btn btn-outline-primary ms-3 selectCustomer" data-id="INVOICE_ID">Tài khoản</button>
-					</div>
-					<div class="row">
-						<!-- THÔNG TIN KHÁCH HÀNG -->
-
-						<div class="col-md-6 mb-6">
-							<h6> Thông tin Khách hàng</h6> 
-							<div class="khachLe">
-								<p>Khách lẻ</p>
-						</div>
-						<button class="btn btn-primary mb-3" onclick="toggleCustomerForm()">Giao hàng</button>
-						<div class="customerForm mb-6">
-							<div class="p-3 border rounded bg-white  mt-3" id="customerForm" style="display: none;" >
-									<div class="col-12 mt-3.8.6">
-										<label class="form-label">Họ và tên</label>
-										<input type="text" class="form-control customerName" placeholder="Họ tên">
-									</div>
-								<div class="col-12 mt-3.8.6">
-										<label class="form-label">Số điện thoại</label>
-										<input type="text" class="form-control customerPhone" placeholder="Số điện thoại">
-									</div>
-								<div class="col-12 mb-6 ">
-										<label class="form-label">Email</label>
-									<input type="email" class="form-control customerEmail " placeholder="Email">
-									</div>
-								<div class="form-item my-3" onchange="calculateFee()">
-									<div class="row">
-										<div class="col-md-4 mb-3">
-											<label>* Tỉnh/Thành phố</label>
-											<select class="form-control mt-2" id="tinh" name="tinh">
-												<option value="">Chọn tỉnh/thành phố</option>
-											</select>
-										</div>
-										<div class="col-md-4 mb-3">
-											<label>* Quận/Huyện</label>
-											<select class="form-control mt-2" id="huyen" name="huyen">
-												<option value="">Chọn quận/huyện</option>
-											</select>
-										</div>
-										<div class="col-md-4 mb-3">
-											<label>* Xã/Phường</label>
-											<select class="form-control mt-2" id="xa" name="xa">
-												<option value="">Chọn xã/phường</option>
-											</select>
-										</div>
-									</div>
-								</div>
-
-								</div>
-							
-								</div>
-
-							
-						</div>
-
-						<!-- THÔNG TIN THANH TOÁN -->
-						<div class="col-md-6 mb-4">
-							<h6 class="fw-bold mb-3">Thanh toán</h6>
-						<div class="p-3 border rounded bg-white">
-								<button class="btn btn-outline-primary openPayment" data-id="INVOICE_ID">
-									<i class="fa fa-credit-card"></i> Mở thanh toán
-								</button> 
-								<!-- Phần tóm tắt hóa đơn & voucher -->
-								<div class="invoice-summary text-start">
-									<div class="row g-2">
-										<div class="col-12">
-											<label class="form-label">Mã giảm giá</label>
-											<div class="input-group">
-												<input type="text"
-												   class="form-control discountCodeInput  text-start" id="discountCodeInput"
-													   placeholder="Mã tốt nhất"
-													   readonly> 
-												<button class="btn btn-outline-secondary selectDiscount"
-														data-id="INVOICE_ID">
-													Chọn
-												</button>
-											</div>
-										</div>
-										<div class="col-12">
-											<label class="form-label">Giá gốc</label>
-											<input type="text" class="form-control basePrice text-start" readonly>
-										</div>
-										<div class="col-12">
-											<label class="form-label">Giảm giá</label>
-											<input type="text" class="form-control discountAmount text-start" readonly>
-										</div>
-										<div class="col-12">
-										<label class="form-label">Phí vận chuyển</label>
-										  <img src="~/coloshop-master/images/tải xuống.png" class="img-fluid" alt="" style="width: 30px; height: 30px; object-fit: contain;"> <a id="fee"></a> 0 VNĐ
-										</div>
-										<div class="col-12">
-											<label class="form-label">Tổng tiền</label>
-											<input type="text" class="form-control finalTotal text-start" readonly>
-										</div>
-										<div class="col-12">
-											<button class="btn btn-success w-100" id="finalConfirmBtn">
-												Xác nhận thanh toán
-											</button>
-										</div>
-									</div>
-								</div>
-							</div> 
-
-				 		
-					</div>
-				</div>
-
-
-					@* <div class="row"> *@
-					@* 	<!-- Khách hàng --> *@
-					@* 	<div class="col-md-6 mb-4 customer-section"> *@
-					@* 		<h6>Khách hàng</h6> *@
-					@* 		<div class="khachLe"> *@
-					@* 			<p>Khách lẻ</p> *@
-					@* 		</div> *@
-					@* 		<div class="customerForm" style="display: none;"> *@
-					@* 			<div class="row g-2 mt-5"> *@
-					@* 				<div class="col-12 mt-3.8.6"> *@
-					@* 					<label class="form-label">Họ và tên</label> *@
-					@* 					<input type="text" class="form-control customerName" placeholder="Họ tên"> *@
-					@* 				</div> *@
-					@* 				<div class="col-12 mt-3.8.6"> *@
-					@* 					<label class="form-label">Số điện thoại</label> *@
-					@* 					<input type="text" class="form-control customerPhone" placeholder="Số điện thoại"> *@
-					@* 				</div> *@
-					@* 				<div class="col-12 mt-3.8.6"> *@
-					@* 					<label class="form-label">Email</label> *@
-					@* 					<input type="email" class="form-control customerEmail" placeholder="Email"> *@
-					@* 				</div> *@
-					@* 			</div> *@
-					@* 		</div> *@
-					@* 	</div> *@
-
-
-					@* 	<!-- Thanh toán --> *@
-					@* 	<div class="col-md-6 mb-4 payment-section"> *@
-					@* 		<h6>Thanh toán</h6> *@
-					@* 		<div class="mb-3"> *@
-					@* 			<button class="btn btn-outline-primary openPayment" data-id="INVOICE_ID"> *@
-					@* 				<i class="fa fa-credit-card"></i> Mở thanh toán *@
-					@* 			</button> *@
-					@* 		</div> *@
-
-					@* 		<!-- Phần tóm tắt hóa đơn & voucher --> *@
-					@* 		<div class="invoice-summary text-start"> *@
-					@* 			<div class="row g-2"> *@
-					@* 				<div class="col-12"> *@
-					@* 					<label class="form-label">Mã giảm giá</label> *@
-					@* 					<div class="input-group"> *@
-					@* 						<input type="text" *@
-					@* 							   class="form-control discountCodeInput text-start" *@
-					@* 							   placeholder="Mã tốt nhất" *@
-					@* 							   readonly> *@
-					@* 						<button class="btn btn-outline-secondary selectDiscount" *@
-					@* 								data-id="INVOICE_ID"> *@
-					@* 							Chọn *@
-					@* 						</button> *@
-					@* 					</div> *@
-					@* 				</div> *@
-					@* 				<div class="col-12"> *@
-					@* 					<label class="form-label">Giá gốc</label> *@
-					@* 					<input type="text" class="form-control basePrice text-start" readonly> *@
-					@* 				</div> *@
-					@* 				<div class="col-12"> *@
-					@* 					<label class="form-label">Giảm giá</label> *@
-					@* 					<input type="text" class="form-control discountAmount text-start" readonly> *@
-					@* 				</div> *@
-					@* 				<div class="col-12"> *@
-					@* 					<label class="form-label">Tổng tiền</label> *@
-					@* 					<input type="text" class="form-control finalTotal text-start" readonly> *@
-					@* 				</div> *@
-					@* 				<div class="col-12"> *@
-					@* 					<button class="btn btn-success w-100" id="finalConfirmBtn"> *@
-					@* 						Xác nhận thanh toán *@
-					@* 					</button> *@
-					@* 				</div> *@
-					@* 			</div> *@
-					@* 		</div> *@
-					@* 	</div> *@
-					@* </div> *@
 
 			</div>
-		</div>
-	</div>
-	</div>
-
-
-	<!-- Các modal (sản phẩm, khách hàng, mã giảm giá, thanh toán) giữ nguyên bố cục HTML tĩnh -->
-	<!-- Modal sản phẩm -->
-	<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
-		<div class="modal-dialog modal-xl">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="productModalLabel">Danh sách sản phẩm</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					<p class="text-center">[Danh sách sản phẩm]</p>
-					<canvas id="qrcode"></canvas>
-
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- Modal khách hàng -->
-	<div class="modal fade" id="customerModal" tabindex="-1" aria-labelledby="customerModalLabel" aria-hidden="true">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="customerModalLabel">Danh sách khách hàng</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-				</div>
-				<div class="modal-body">
-					<!-- Form Thêm nhanh khách hàng, đặt ở đây -->
-					<div class="mb-3">
-						<input type="text" id="customerSearchInput" class="form-control" placeholder="Nhập từ khóa tìm kiếm khách hàng..." />
-					</div>
-					<div class="mb-3">
-						<h6>Thêm nhanh khách hàng</h6>
-						<form id="quickAddCustomerForm" class="row g-2">
-							<div class="col-md-4">
-								<input type="text" class="form-control" id="quickCustomerName" placeholder="Họ tên" required>
-							</div>
-							<div class="col-md-4">
-								<input type="text" class="form-control" id="quickCustomerPhone" placeholder="Số điện thoại" required>
-							</div>
-							<div class="col-md-4">
-								<input type="email" class="form-control" id="quickCustomerEmail" placeholder="Email" required>
-							</div>
-
-
-							<div class="col-12">
-							<button type="submit" class="btn btn-outline-warning">+ Thêm nhanh</button>
-							</div>
-						</form>
-					</div>
-					<table class="table table-bordered" id="customerTable">
-						<thead>
-							<tr>
-								<th>STT</th>
-								<th>Tên</th>
-								<th>SĐT</th>
-								<th>Email</th>
-								<th>Hành động</th>
-							</tr>
-						</thead>
-						<tbody>
-							<!-- Các dòng khách hàng sẽ được load vào đây -->
-
-
-						</tbody>
-					</table>
-					<nav aria-label="Customer Pagination">
-						<ul id="customerPaginationContainer" class="pagination justify-content-center"></ul>
-					</nav>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal Danh sách sản phẩm chi tiết -->
-	<!-- Modal Danh sách sản phẩm chi tiết -->
-	<div class="modal fade" id="detailedProductModal" tabindex="-1" aria-labelledby="detailedProductModalLabel" aria-hidden="true">
-		<div class="modal-dialog modal-xl">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="detailedProductModalLabel">Thêm sản phẩm</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-				</div>
-				<div class="modal-body">
-					<div class="row">
-						<div class="col-12">
-							<label for="searchProduct">Tìm kiếm sản phẩm:</label>
-							<input type="text" id="searchProduct" class="form-control" placeholder="Nhập tên sản phẩm...">
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-md-3">
-							<label for="filterChatLieu">Chất liệu:</label>
-							<select id="filterChatLieu" class="form-control filter-select">
-								<option value="">Tất cả</option>
-								@foreach (var item in (SelectList)ViewData["Chat_LieuID"])
-								{
-									<option value="@item.Value" selected="@(ViewData["SelectedChatLieu"]?.ToString() == item.Value ? "selected" : null)">
-										@item.Text
-									</option>
-								}
-							</select>
-						</div>
-						<div class="col-md-3">
-
-							<label for="filterCoGiay">Cổ giày:</label>
-							<select id="filterCoGiay" class="form-control filter-select">
-								<option value="">Tất cả</option>
-								@foreach (var item in (SelectList)ViewData["Co_GiayID"])
-								{
-									<option value="@item.Value" selected="@(ViewData["SelectedCoGiay"]?.ToString() == item.Value ? "selected" : null)">
-										@item.Text
-									</option>
-								}
-							</select>
-						</div>
-						<div class="col-md-3">
-
-							<label for="filterDanhMuc">Danh mục:</label>
-							<select id="filterDanhMuc" class="form-control filter-select">
-								<option value="">Tất cả</option>
-								@foreach (var item in (SelectList)ViewData["Danh_MucID"])
-								{
-									<option value="@item.Value" selected="@(ViewData["SelectedDanhMuc"]?.ToString() == item.Value ? "selected" : null)">
-										@item.Text
-									</option>
-								}
-							</select>
-						</div>
-						<div class="col-md-3">
-
-
-							<label for="filterDeGiay">Đế giày:</label>
-							<select id="filterDeGiay" class="form-control filter-select">
-								<option value="">Tất cả</option>
-								@foreach (var item in (SelectList)ViewData["De_GiayID"])
-								{
-									<option value="@item.Value" selected="@(ViewData["SelectedDeGiay"]?.ToString() == item.Value ? "selected" : null)">
-										@item.Text
-									</option>
-								}
-							</select>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-md-4">
-							<label for="filterMuiGiay">Mũi giày:</label>
-							<select id="filterMuiGiay" class="form-control filter-select">
-								<option value="">Tất cả</option>
-								@foreach (var item in (SelectList)ViewData["Mui_GiayID"])
-								{
-									<option value="@item.Value" selected="@(ViewData["SelectedMuiGiay"]?.ToString() == item.Value ? "selected" : null)">
-										@item.Text
-									</option>
-								}
-							</select>
-						</div>
-						<div class="col-md-4">
-
-							<label for="filterKieuDang">Kiểu dáng:</label>
-							<select id="filterKieuDang" class="form-control filter-select">
-								<option value="">Tất cả</option>
-								@foreach (var item in (SelectList)ViewData["Kieu_DangID"])
-								{
-									<option value="@item.Value" selected="@(ViewData["SelectedKieuDang"]?.ToString() == item.Value ? "selected" : null)">
-										@item.Text
-									</option>
-								}
-							</select>
-						</div>
-						<div class="col-md-4">
-							<label for="filterLoaiGiay">Loại giày:</label>
-							<select id="filterLoaiGiay" class="form-control filter-select">
-								<option value="">Tất cả</option>
-								@foreach (var item in (SelectList)ViewData["Loai_GiayID"])
-								{
-									<option value="@item.Value" selected="@(ViewData["SelectedLoaiGiay"]?.ToString() == item.Value ? "selected" : null)">
-										@item.Text
-									</option>
-								}
-							</select>
-						</div>
-
-					</div>
-					<table class="table table-bordered" id="detailedProductTable">
-						<thead>
+			<div class="p-3">
+				<!-- Sản phẩm -->
+				<div id="invoiceTableContainer-INVOICE_ID" class="table-responsive mb-4" style="display: none;">
+					<table class="table table-hover" id="invoiceTable-INVOICE_ID">
+						<thead class="table-light">
 							<tr>
 								<th>STT</th>
 								<th>Ảnh</th>
@@ -504,87 +107,524 @@
 								<th>Số lượng</th>
 								<th>Kích thước</th>
 								<th>Màu sắc</th>
-								
-								<th>Cổ giày</th>
-								<th>Đế giày</th>
-								<th>Chất liệu</th>
-								
-
+								<th>Thành tiền</th>
 								<th>Hành động</th>
 							</tr>
 						</thead>
-						<tbody>
-							<!-- Hàng sản phẩm sẽ được load ở đây -->
-
-						</tbody>
+						<tbody class="productList"></tbody>
 					</table>
-					<nav aria-label="Product Pagination">
-						<ul id="productPaginationContainer" class="pagination justify-content-center"></ul>
-					</nav>
 				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- Modal nhập số lượng -->
-	<div class="modal fade" id="quantityModal" tabindex="-1" aria-labelledby="quantityModalLabel" aria-hidden="true">
-		<div class="modal-dialog modal-sm">
-			<!-- .modal-sm để modal nhỏ -->
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="quantityModalLabel">Nhập số lượng</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+				<div id="emptyCartPlaceholder-INVOICE_ID" class="empty-placeholder text-center" style="display: none;">
+					<img src="/images/nhanvien/hoadonkhongcosanpham.png" alt="Chưa có sản phẩm" style="max-width: 120px;" />
+					<h5 class="mt-3">Chưa có sản phẩm</h5>
 				</div>
-				<div class="modal-body">
-					<!-- Thông tin sản phẩm -->
-					@* <p id="productNameLabel" style="font-weight: bold;"></p> *@
-					@* <p>Giá: <span id="productPriceLabel"></span> VND</p> *@
 
-					<!-- Ô nhập số lượng -->
-					<div class="mb-3">
-						<label for="quantityInput" class="form-label">Số lượng</label>
-						<input type="number" class="form-control" id="quantityInput" min="1" value="1">
+				<!-- Tổng tiền tạm tính -->
+				<div class="d-flex justify-content-end align-items-center mb-4">
+					<h5 class="mb-0">
+						Tổng tiền tạm tính: <strong id="totalPrice-INVOICE_ID">0</strong> VND
+					</h5>
+					<button class="btn btn-outline-primary ms-3 selectCustomer" data-id="INVOICE_ID">Tài khoản</button>
+					<button class="btn btn-outline-primary ms-3 openAddress" data-invoice="INVOICE_ID">Chọn địa chỉ</button>
+				</div>
+				<div class="row">
+					<!-- THÔNG TIN KHÁCH HÀNG -->
+
+					<div class="col-md-6 mb-6">
+						<h6> Thông tin Khách hàng</h6>
+						<div class="khachLe">
+							<p>Khách lẻ</p>
+						</div>
+						
+						
+						<div class="customerForm mb-6" style="display: none;">
+							<div class="p-3 border rounded bg-white  mt-3">
+								<div class="col-12 mt-3.8.6">
+									<label class="form-label">Họ và tên</label>
+									<input type="text" class="form-control customerName" placeholder="Họ tên">
+								</div>
+								<div class="col-12 mt-3.8.6">
+									<label class="form-label">Số điện thoại</label>
+									<input type="text" class="form-control customerPhone" placeholder="Số điện thoại">
+								</div>
+								<div class="col-12 mb-6 ">
+									<label class="form-label">Email</label>
+									<input type="email" class="form-control customerEmail " placeholder="Email">
+								</div>
+								<div class="form-item my-3 AddressForm" onchange="calculateFee()" style="display: none;">
+									<div class="row">
+										<div class="row col-12">
+											<div class="col-md-4 mb-3">
+												<label>* Tỉnh/Thành phố</label>
+												<select class="form-control mt-2 tinh" name="tinh">
+													<option value="">Chọn tỉnh/thành phố</option>
+												</select>
+											</div>
+											<div class="col-md-4 mb-3">
+												<label>* Quận/Huyện</label>
+												<select class="form-control mt-2 huyen" name="huyen">
+													<option value="">Chọn quận/huyện</option>
+												</select>
+											</div>
+											<div class="col-md-4 mb-3">
+												<label>* Xã/Phường</label>
+												<select class="form-control mt-2 xa" name="xa">
+													<option value="">Chọn xã/phường</option>
+												</select>
+											</div>
+										</div>
+										<div class="row col-12">
+											<div>
+												<label class="form-label">Địa chỉ chi tiết</label>
+												<input type="text" class="form-control DC_ChiTiet" placeholder="Địa chỉ chi tiết">
+											</div>
+										</div>
+									</div>
+								</div>
+
+							</div>
+
+						</div>
+
+
+					</div>
+
+					<!-- THÔNG TIN THANH TOÁN -->
+					<div class="col-md-6 mb-4">
+						<h6 class="fw-bold mb-3">Thanh toán</h6>
+						<div class="p-3 border rounded bg-white">
+							<button class="btn btn-outline-primary openPayment" data-id="INVOICE_ID">
+								<i class="fa fa-credit-card"></i> Mở thanh toán
+							</button>
+							<!-- Phần tóm tắt hóa đơn & voucher -->
+							<div class="invoice-summary text-start">
+								<div class="row g-2">
+									<div class="col-12">
+										<label class="form-label">Mã giảm giá</label>
+										<div class="input-group">
+											<input type="text"
+												   class="form-control discountCodeInput  text-start" id="discountCodeInput"
+												   placeholder="Mã tốt nhất"
+												   readonly>
+											<button class="btn btn-outline-secondary selectDiscount"
+													data-id="INVOICE_ID">
+												Chọn
+											</button>
+										</div>
+									</div>
+									<div class="col-12">
+										<label class="form-label">Giá gốc</label>
+										<input type="text" class="form-control basePrice text-start" value="0" readonly>
+									</div>
+									<div class="col-12">
+										<label class="form-label">Giảm giá</label>
+										<input type="text" class="form-control discountAmount text-start" value="0" readonly>
+									</div>
+									
+									<div class="col-12">
+										<button class="btn btn-outline-primary ms-1 toggleCustomerForm" data-id="INVOICE_ID">Giao hàng</button>
+										<label class="form-label">Phí vận chuyển</label>
+										<img src="~/coloshop-master/images/tải xuống.png" class="img-fluid" alt="" style="width: 30px; height: 30px; object-fit: contain;"> <a class="fee">0</a> VNĐ
+									</div>
+									<div class="col-12">
+										<label class="form-label">Tổng tiền</label>
+										<input type="text" class="form-control finalTotal text-start" value="0" readonly>
+									</div>
+									<div class="col-12">
+										<button class="btn btn-success w-100" id="finalConfirmBtn">
+											Xác nhận thanh toán
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+
+
 					</div>
 				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-					<button type="button" class="btn btn-primary" id="confirmQuantityBtn">Thêm sản phẩm</button>
-				</div>
+
+
+				@* <div class="row"> *@
+				@* 	<!-- Khách hàng --> *@
+				@* 	<div class="col-md-6 mb-4 customer-section"> *@
+				@* 		<h6>Khách hàng</h6> *@
+				@* 		<div class="khachLe"> *@
+				@* 			<p>Khách lẻ</p> *@
+				@* 		</div> *@
+				@* 		<div class="customerForm" style="display: none;"> *@
+				@* 			<div class="row g-2 mt-5"> *@
+				@* 				<div class="col-12 mt-3.8.6"> *@
+				@* 					<label class="form-label">Họ và tên</label> *@
+				@* 					<input type="text" class="form-control customerName" placeholder="Họ tên"> *@
+				@* 				</div> *@
+				@* 				<div class="col-12 mt-3.8.6"> *@
+				@* 					<label class="form-label">Số điện thoại</label> *@
+				@* 					<input type="text" class="form-control customerPhone" placeholder="Số điện thoại"> *@
+				@* 				</div> *@
+				@* 				<div class="col-12 mt-3.8.6"> *@
+				@* 					<label class="form-label">Email</label> *@
+				@* 					<input type="email" class="form-control customerEmail" placeholder="Email"> *@
+				@* 				</div> *@
+				@* 			</div> *@
+				@* 		</div> *@
+				@* 	</div> *@
+
+
+				@* 	<!-- Thanh toán --> *@
+				@* 	<div class="col-md-6 mb-4 payment-section"> *@
+				@* 		<h6>Thanh toán</h6> *@
+				@* 		<div class="mb-3"> *@
+				@* 			<button class="btn btn-outline-primary openPayment" data-id="INVOICE_ID"> *@
+				@* 				<i class="fa fa-credit-card"></i> Mở thanh toán *@
+				@* 			</button> *@
+				@* 		</div> *@
+
+				@* 		<!-- Phần tóm tắt hóa đơn & voucher --> *@
+				@* 		<div class="invoice-summary text-start"> *@
+				@* 			<div class="row g-2"> *@
+				@* 				<div class="col-12"> *@
+				@* 					<label class="form-label">Mã giảm giá</label> *@
+				@* 					<div class="input-group"> *@
+				@* 						<input type="text" *@
+				@* 							   class="form-control discountCodeInput text-start" *@
+				@* 							   placeholder="Mã tốt nhất" *@
+				@* 							   readonly> *@
+				@* 						<button class="btn btn-outline-secondary selectDiscount" *@
+				@* 								data-id="INVOICE_ID"> *@
+				@* 							Chọn *@
+				@* 						</button> *@
+				@* 					</div> *@
+				@* 				</div> *@
+				@* 				<div class="col-12"> *@
+				@* 					<label class="form-label">Giá gốc</label> *@
+				@* 					<input type="text" class="form-control basePrice text-start" readonly> *@
+				@* 				</div> *@
+				@* 				<div class="col-12"> *@
+				@* 					<label class="form-label">Giảm giá</label> *@
+				@* 					<input type="text" class="form-control discountAmount text-start" readonly> *@
+				@* 				</div> *@
+				@* 				<div class="col-12"> *@
+				@* 					<label class="form-label">Tổng tiền</label> *@
+				@* 					<input type="text" class="form-control finalTotal text-start" readonly> *@
+				@* 				</div> *@
+				@* 				<div class="col-12"> *@
+				@* 					<button class="btn btn-success w-100" id="finalConfirmBtn"> *@
+				@* 						Xác nhận thanh toán *@
+				@* 					</button> *@
+				@* 				</div> *@
+				@* 			</div> *@
+				@* 		</div> *@
+				@* 	</div> *@
+				@* </div> *@
+
 			</div>
 		</div>
 	</div>
+</div>
 
 
-	<!-- Chỗ hiển thị Tổng tiền hóa đơn: ... -->
-	<!-- Modal mã giảm giá -->
-	<div class="modal fade" id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel" aria-hidden="true">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="discountModalLabel">Chọn mã giảm giá</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					<table class="table table-bordered">
-						<thead>
-							<tr>
-								<th>Mã</th>
-								<th>Tên phiếu</th>
-								<th>Loại</th>
-								<th>Giá trị</th>
-								<th>Hành động</th>
-							</tr>
-						</thead>
-						<tbody>
-							<!-- Sẽ được fill bằng JS -->
-						</tbody>
-					</table>
-				</div>
+<!-- Các modal (sản phẩm, khách hàng, mã giảm giá, thanh toán) giữ nguyên bố cục HTML tĩnh -->
+<!-- Modal sản phẩm -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-xl">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="productModalLabel">Danh sách sản phẩm</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<p class="text-center">[Danh sách sản phẩm]</p>
+				<canvas id="qrcode"></canvas>
+
 			</div>
 		</div>
 	</div>
+</div>
 
-	<!-- Modal Thanh toán -->
+<!-- Modal khách hàng -->
+<div class="modal fade" id="customerModal" tabindex="-1" aria-labelledby="customerModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="customerModalLabel">Danh sách khách hàng</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+			</div>
+			<div class="modal-body">
+				<!-- Form Thêm nhanh khách hàng, đặt ở đây -->
+				<div class="mb-3">
+					<input type="text" id="customerSearchInput" class="form-control" placeholder="Nhập từ khóa tìm kiếm khách hàng..." />
+				</div>
+				<div class="mb-3">
+					<h6>Thêm nhanh khách hàng</h6>
+					<form id="quickAddCustomerForm" class="row g-2">
+						<div class="col-md-4">
+							<input type="text" class="form-control" id="quickCustomerName" placeholder="Họ tên" required>
+						</div>
+						<div class="col-md-4">
+							<input type="text" class="form-control" id="quickCustomerPhone" placeholder="Số điện thoại" required>
+						</div>
+						<div class="col-md-4">
+							<input type="email" class="form-control" id="quickCustomerEmail" placeholder="Email" required>
+						</div>
+
+
+						<div class="col-12">
+							<button type="submit" class="btn btn-outline-warning">+ Thêm nhanh</button>
+						</div>
+					</form>
+				</div>
+				<table class="table table-bordered" id="customerTable">
+					<thead>
+						<tr>
+							<th>STT</th>
+							<th>Tên</th>
+							<th>SĐT</th>
+							<th>Email</th>
+							<th>Hành động</th>
+						</tr>
+					</thead>
+					<tbody>
+						<!-- Các dòng khách hàng sẽ được load vào đây -->
+
+
+					</tbody>
+				</table>
+				<nav aria-label="Customer Pagination">
+					<ul id="customerPaginationContainer" class="pagination justify-content-center"></ul>
+				</nav>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal Danh sách sản phẩm chi tiết -->
+<!-- Modal Danh sách sản phẩm chi tiết -->
+<div class="modal fade" id="detailedProductModal" tabindex="-1" aria-labelledby="detailedProductModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-xl">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="detailedProductModalLabel">Thêm sản phẩm</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-12">
+						<label for="searchProduct">Tìm kiếm sản phẩm:</label>
+						<input type="text" id="searchProduct" class="form-control" placeholder="Nhập tên sản phẩm...">
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-3">
+						<label for="filterChatLieu">Chất liệu:</label>
+						<select id="filterChatLieu" class="form-control filter-select">
+							<option value="">Tất cả</option>
+							@foreach (var item in (SelectList)ViewData["Chat_LieuID"])
+							{
+								<option value="@item.Value" selected="@(ViewData["SelectedChatLieu"]?.ToString() == item.Value ? "selected" : null)">
+									@item.Text
+								</option>
+							}
+						</select>
+					</div>
+					<div class="col-md-3">
+
+						<label for="filterCoGiay">Cổ giày:</label>
+						<select id="filterCoGiay" class="form-control filter-select">
+							<option value="">Tất cả</option>
+							@foreach (var item in (SelectList)ViewData["Co_GiayID"])
+							{
+								<option value="@item.Value" selected="@(ViewData["SelectedCoGiay"]?.ToString() == item.Value ? "selected" : null)">
+									@item.Text
+								</option>
+							}
+						</select>
+					</div>
+					<div class="col-md-3">
+
+						<label for="filterDanhMuc">Danh mục:</label>
+						<select id="filterDanhMuc" class="form-control filter-select">
+							<option value="">Tất cả</option>
+							@foreach (var item in (SelectList)ViewData["Danh_MucID"])
+							{
+								<option value="@item.Value" selected="@(ViewData["SelectedDanhMuc"]?.ToString() == item.Value ? "selected" : null)">
+									@item.Text
+								</option>
+							}
+						</select>
+					</div>
+					<div class="col-md-3">
+
+
+						<label for="filterDeGiay">Đế giày:</label>
+						<select id="filterDeGiay" class="form-control filter-select">
+							<option value="">Tất cả</option>
+							@foreach (var item in (SelectList)ViewData["De_GiayID"])
+							{
+								<option value="@item.Value" selected="@(ViewData["SelectedDeGiay"]?.ToString() == item.Value ? "selected" : null)">
+									@item.Text
+								</option>
+							}
+						</select>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-4">
+						<label for="filterMuiGiay">Mũi giày:</label>
+						<select id="filterMuiGiay" class="form-control filter-select">
+							<option value="">Tất cả</option>
+							@foreach (var item in (SelectList)ViewData["Mui_GiayID"])
+							{
+								<option value="@item.Value" selected="@(ViewData["SelectedMuiGiay"]?.ToString() == item.Value ? "selected" : null)">
+									@item.Text
+								</option>
+							}
+						</select>
+					</div>
+					<div class="col-md-4">
+
+						<label for="filterKieuDang">Kiểu dáng:</label>
+						<select id="filterKieuDang" class="form-control filter-select">
+							<option value="">Tất cả</option>
+							@foreach (var item in (SelectList)ViewData["Kieu_DangID"])
+							{
+								<option value="@item.Value" selected="@(ViewData["SelectedKieuDang"]?.ToString() == item.Value ? "selected" : null)">
+									@item.Text
+								</option>
+							}
+						</select>
+					</div>
+					<div class="col-md-4">
+						<label for="filterLoaiGiay">Loại giày:</label>
+						<select id="filterLoaiGiay" class="form-control filter-select">
+							<option value="">Tất cả</option>
+							@foreach (var item in (SelectList)ViewData["Loai_GiayID"])
+							{
+								<option value="@item.Value" selected="@(ViewData["SelectedLoaiGiay"]?.ToString() == item.Value ? "selected" : null)">
+									@item.Text
+								</option>
+							}
+						</select>
+					</div>
+
+				</div>
+				<table class="table table-bordered" id="detailedProductTable">
+					<thead>
+						<tr>
+							<th>STT</th>
+							<th>Ảnh</th>
+							<th>Tên SP</th>
+							<th>Giá bán</th>
+							<th>Số lượng</th>
+							<th>Kích thước</th>
+							<th>Màu sắc</th>
+
+							<th>Cổ giày</th>
+							<th>Đế giày</th>
+							<th>Chất liệu</th>
+
+
+							<th>Hành động</th>
+						</tr>
+					</thead>
+					<tbody>
+						<!-- Hàng sản phẩm sẽ được load ở đây -->
+
+					</tbody>
+				</table>
+				<nav aria-label="Product Pagination">
+					<ul id="productPaginationContainer" class="pagination justify-content-center"></ul>
+				</nav>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal nhập số lượng -->
+<div class="modal fade" id="quantityModal" tabindex="-1" aria-labelledby="quantityModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-sm">
+		<!-- .modal-sm để modal nhỏ -->
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="quantityModalLabel">Nhập số lượng</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+			</div>
+			<div class="modal-body">
+				<!-- Thông tin sản phẩm -->
+				@* <p id="productNameLabel" style="font-weight: bold;"></p> *@
+				@* <p>Giá: <span id="productPriceLabel"></span> VND</p> *@
+
+				<!-- Ô nhập số lượng -->
+				<div class="mb-3">
+					<label for="quantityInput" class="form-label">Số lượng</label>
+					<input type="number" class="form-control" id="quantityInput" min="1" value="1">
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+				<button type="button" class="btn btn-primary" id="confirmQuantityBtn">Thêm sản phẩm</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!-- Chỗ hiển thị Tổng tiền hóa đơn: ... -->
+<!-- Modal mã giảm giá -->
+<div class="modal fade" id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="discountModalLabel">Chọn mã giảm giá</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th>Mã</th>
+							<th>Tên phiếu</th>
+							<th>Loại</th>
+							<th>Giá trị</th>
+							<th>Hành động</th>
+						</tr>
+					</thead>
+					<tbody>
+						<!-- Sẽ được fill bằng JS -->
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal Địa chỉ -->
+<div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th>Stt</th>
+							<th>Tỉnh</th>
+							<th>Huyện</th>
+							<th>Xã</th>
+							<th>chi tiết</th>
+							<th>Hành động</th>
+						</tr>
+					</thead>
+					<tbody>
+						<!-- Sẽ được fill bằng JS -->
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal Thanh toán -->
 <!-- Modal Thanh toán -->
 <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-xl">
@@ -664,6 +704,7 @@
 		</div>
 	</div>
 </div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
@@ -673,30 +714,32 @@
 	<script>
 
 
-			 const MAX_INVOICE = 6;
+		const MAX_INVOICE = 6;
 
-		 let invoiceCount = 0;
-		 let currentInvoiceId = null;
-		 let data = []; // mảng 2 chiều. 1 chiều lưu id hóa đơn, 1 chiều lưu các giá trị detail của hóa đơn đó
-		 let dataMaster = [];
+		let invoiceCount = 0;
+		let currentInvoiceId = null;
+		let data = []; // mảng 2 chiều. 1 chiều lưu id hóa đơn, 1 chiều lưu các giá trị detail của hóa đơn đó
+		let dataMaster = [];
 
-		 
 
-						$(document).ready(function () {
-								loadProvinces();
+
+		$(document).ready(function () {
+			// loadProvinces();
 			$(".filter-select, #searchProduct").on("change keyup", function () {
 				filterProducts(); // Gọi hàm lọc sản phẩm
 			});
-			 console.log("Document ready");
-			  $('#menuBanHangTaiQuay').on('click', function(e) {
-			e.preventDefault();  // Ngăn hành vi mặc định của link nếu cần
-			getDataInvoices();
-		});
+			console.log("Document ready");
+			$('#menuBanHangTaiQuay').on('click', function (e) {
+				e.preventDefault();  // Ngăn hành vi mặc định của link nếu cần
+				getDataInvoices();
+			});
+			$('.openAddress').hide();
+
 
 		});
-			 // 1. Tạo hóa đơn mới
-				// 1. Tạo hóa đơn mới
-		$('#createInvoice').on('click', function() {
+		// 1. Tạo hóa đơn mới
+		// 1. Tạo hóa đơn mới
+		$('#createInvoice').on('click', function () {
 
 			if (invoiceCount >= MAX_INVOICE) {
 				Swal.fire({
@@ -714,7 +757,7 @@
 			$.ajax({
 				url: '/Admin/BHTQ/CreateInvoice',
 				type: 'POST',
-				success: function(res) {
+				success: function (res) {
 					if (res && res.success) {
 						invoiceCount++;
 						// Clone template, tạo tab và gán invoiceId vào DOM...
@@ -725,43 +768,114 @@
 
 						// Append tab
 						$('#invoiceTabs').append(`
-							<li class="nav-item">
-								<a class="nav-link" id="tab-${newInvoiceDomId}" data-bs-toggle="tab" href="#${newInvoiceDomId}">
-									${invoiceCode}
-									<!-- Thêm vòng tròn/badge hiển thị số lượng: -->
-									<span class="badge invoice-count-badge" id="badge-${newInvoiceDomId}">0</span>
-									<span class="close-tab" data-id="${newInvoiceDomId}">✖</span>
-								</a>
-							</li>`);
+									<li class="nav-item">
+										<a class="nav-link" id="tab-${newInvoiceDomId}" data-bs-toggle="tab" href="#${newInvoiceDomId}">
+											${invoiceCode}
+											<!-- Thêm vòng tròn/badge hiển thị số lượng: -->
+											<span class="badge invoice-count-badge" id="badge-${newInvoiceDomId}">0</span>
+											<span class="close-tab" data-id="${newInvoiceDomId}">✖</span>
+										</a>
+									</li>`);
 						// Append nội dung hóa đơn
 						$('#invoiceContent').append(newInvoiceHtml);
 						$(`#${newInvoiceDomId}`).attr('data-db-invoice-id', id);
 						let tab = new bootstrap.Tab(document.querySelector(`#tab-${newInvoiceDomId}`));
+
+						currentInvoiceId = newInvoiceDomId;
 						tab.show();
 					} else {
 						alert("Lỗi tạo hóa đơn: " + res.message);
 					}
 				},
-				error: function(err) {
+				error: function (err) {
 					console.error(err);
 					alert("Không thể tạo hóa đơn, vui lòng thử lại!");
 				}
 			});
 		});
+		$(document).on('click', '.toggleCustomerForm', function () {
 
-			 function toggleCustomerForm() {
-			var form = document.getElementById("customerForm");
-			if (form.style.display === "none") {
-				form.style.display = "block";
+			console.log("chay dia chi");
+			currentInvoiceId = $(this).data('id');
+
+			let container = $('#' + currentInvoiceId);
+
+
+			// 🔄 Gửi AJAX đổi trạng thái hóa đơn sang "Đang giao"
+			const invoiceDbId = container.attr('data-db-invoice-id');
+
+			var diaChi = container.find('.AddressForm');
+			var form = container.find('.customerForm');
+			if (form.is(':visible')) {
+				if (!diaChi.is(':visible')) {
+					loadProvinces();
+					diaChi.show();
+					giaoHang(invoiceDbId);
+				} else {
+
+					form.hide();
+					diaChi.hide();
+					giaoHang(invoiceDbId);
+				}
 			} else {
-				form.style.display = "none";
+				loadProvinces();
+				form.show();
+				diaChi.show();
+				giaoHang(invoiceDbId);
+			}
+
+
+			
+			
+		});
+
+		function giaoHang(id) {
+			if (id) {
+				$.ajax({
+					url: '/Admin/BHTQ/GiaoHang',
+					type: 'POST',
+					data: { invoiceId: id },
+					success: function (res) {
+						if (res.success) {
+							console.log("✅  Hóa đơn đã cập nhật trạng thái giao hàng");
+							Swal.fire({
+								icon: 'success',
+								title: 'Hóa đơn đã cập nhật trạng thái giao hàng',
+								toast: true,
+								position: 'top-end',
+								showConfirmButton: false,
+								timer: 2000,
+								timerProgressBar: true
+							});
+						} else {
+							Swal.fire({
+								icon: 'error',
+								title: res.message || 'Lỗi khi cập nhật trạng thái',
+								toast: true,
+								position: 'top-end',
+								showConfirmButton: false,
+								timer: 3000,
+								timerProgressBar: true
+							});
+						}
+					},
+					error: function () {
+						Swal.fire({
+							icon: 'error',
+							title: 'Không thể cập nhật trạng thái giao hàng!',
+							toast: true,
+							position: 'top-end',
+							showConfirmButton: false,
+							timer: 3000,
+							timerProgressBar: true
+						});
+					}
+				});
 			}
 		}
 
 
-
-
-				function filterProducts() {
+		function filterProducts() {
 			let searchQuery = $("#searchProduct").val().toLowerCase();
 			let selectedChatLieu = $("#filterChatLieu").val();
 			let selectedCoGiay = $("#filterCoGiay").val();
@@ -795,31 +909,31 @@
 						$.each(result, function (index, product) {
 							let imgUrl = product.imageUrl || "/img/default.jpg";
 							let rowHtml = `
-								<tr>
-									<td>${index + 1}</td>
-									<td><img src="${imgUrl}" alt="${product.ten_SPCT}" width="50"></td>
-									<td>${product.ten_SPCT}</td>
-									<td>${parseFloat(product.price).toLocaleString()} VND</td>
-									<td>${product.dbQuantity}</td>
-									<td>${product.size}</td>
-									<td>${product.color}</td>
-									<td>${product.cogiay}</td>
-									<td>${product.degiay}</td>
-									<td>${product.chatlieu}</td>
-									<td>
-										<button class="btn btn-success btn-sm add-product"
-											data-id="${product.id}"
-											data-name="${product.ten_SPCT}"
-											data-price="${product.price}"
-											data-size="${product.size}"
-											data-color="${product.color}"
-											data-status="${product.status}"
-											data-img="${imgUrl}">
-											Thêm
-										</button>
-									</td>
-								</tr>
-							`;
+										<tr>
+											<td>${index + 1}</td>
+											<td><img src="${imgUrl}" alt="${product.ten_SPCT}" width="50"></td>
+											<td>${product.ten_SPCT}</td>
+											<td>${parseFloat(product.price).toLocaleString()} VND</td>
+											<td>${product.dbQuantity}</td>
+											<td>${product.size}</td>
+											<td>${product.color}</td>
+											<td>${product.cogiay}</td>
+											<td>${product.degiay}</td>
+											<td>${product.chatlieu}</td>
+											<td>
+												<button class="btn btn-success btn-sm add-product"
+													data-id="${product.id}"
+													data-name="${product.ten_SPCT}"
+													data-price="${product.price}"
+													data-size="${product.size}"
+													data-color="${product.color}"
+													data-status="${product.status}"
+													data-img="${imgUrl}">
+													Thêm
+												</button>
+											</td>
+										</tr>
+									`;
 							tbody.append(rowHtml);
 						});
 					} else {
@@ -833,11 +947,11 @@
 		}
 
 
-		
 
-		 //close hoa don
 
-			$(document).on('click', '.close-tab', function(e) {
+		//close hoa don
+
+		$(document).on('click', '.close-tab', function (e) {
 			// e.stopPropagation();
 			let removedInvoiceDomId = $(this).attr('data-id');
 
@@ -846,12 +960,12 @@
 
 			console.log("ID đơn hàng sau khi làm sạch:", cleanId); // Kiểm tra lại ID
 
-			$.post('/Admin/BHTQ/HuyDonHang', { id: cleanId }, function(response) {
+			$.post('/Admin/BHTQ/HuyDonHang', { id: cleanId }, function (response) {
 				if (response.success) {
-					    $(`#tab-${removedInvoiceDomId}`).parent().remove();
-						$(`#${removedInvoiceDomId}`).remove();
-						Swal.fire({
-						 icon: 'success',
+					$(`#tab-${removedInvoiceDomId}`).parent().remove();
+					$(`#${removedInvoiceDomId}`).remove();
+					Swal.fire({
+						icon: 'success',
 						title: "Huỷ đơn hàng thành công",
 						toast: true,
 						position: 'top-end',
@@ -867,13 +981,13 @@
 
 
 
-			function getDataInvoices() {
-			
+		function getDataInvoices() {
+			console.log("da chay lay invoice");
 			$.ajax({
 				url: '/Admin/BHTQ/GetHoaDonTaiQuay',
 				type: 'GET',
-				success: function(res) {
-					
+				success: function (res) {
+
 					if (res.success) {
 						// Xóa nội dung cũ nếu cần
 						$("#invoiceTabs").empty();
@@ -886,14 +1000,14 @@
 							// Cập nhật số lượng
 							// Tạo tab cho hóa đơn
 							$("#invoiceTabs").append(`
-								<li class="nav-item">
-									<a class="nav-link" id="tab-${newInvoiceDomId}" data-bs-toggle="tab" href="#${newInvoiceDomId}" data-invoice-id="${invoice.id}">
-										${invoice.maHoaDon}
-										<span class="badge invoice-count-badge" id="badge-${newInvoiceDomId}">${invoice.soLuongSanPham || 0}</span>
-										<span class="close-tab" data-id="${newInvoiceDomId}">✖</span>
-									</a>
-								</li>
-							`);
+										<li class="nav-item">
+											<a class="nav-link" id="tab-${newInvoiceDomId}" data-bs-toggle="tab" href="#${newInvoiceDomId}" data-invoice-id="${invoice.id}">
+												${invoice.maHoaDon}
+												<span class="badge invoice-count-badge" id="badge-${newInvoiceDomId}">${invoice.soLuongSanPham || 0}</span>
+												<span class="close-tab" data-id="${newInvoiceDomId}">✖</span>
+											</a>
+										</li>
+									`);
 							// Tạo container nội dung cho hóa đơn (clone template)
 							let newInvoiceHtml = $('#invoiceTemplate').html().replace(/INVOICE_ID/g, newInvoiceDomId);
 							$("#invoiceContent").append(newInvoiceHtml);
@@ -907,18 +1021,31 @@
 								// Nếu có khách hàng, ẩn "khách lẻ" và hiển thị thông tin khách hàng
 								let customer = invoice.khachHang;
 								container.find('.khachLe').hide(); // Ẩn phần khách lẻ
-								container.find('.customerForm').show(); // Hiển thị phần thông tin khách hàng
+								// Hiển thị phần thông tin khách hàng
 								container.find('.customerName').val(customer.ten);
 								container.find('.customerPhone').val(customer.phoneNumber);
 								container.find('.customerEmail').val(customer.email);
-									container.attr('data-customer-id', customer.id);
+								container.attr('data-customer-id', customer.id);
+
+								var diaChi = container.find('.AddressForm');
+								var form = container.find('.customerForm');
+
+								form.show();
+								if (invoice.loai_hoa_don == 3) {
+
+									diaChi.show();
+								}
+
+								// Xử lý nút openAddress
+								let addressBtn = container.find('.openAddress');
+								addressBtn.attr('data-id', customer.id).show();
 
 								// Gọi tự động chọn phiếu giảm giá ngay sau khi cập nhật thông tin khách hàng
 								autoSelectDiscountCode(newInvoiceDomId);
 							} else {
 								// Nếu không có khách hàng, hiển thị thông tin khách lẻ
 								container.find('.khachLe').show(); // Hiển thị phần khách lẻ
-								container.find('.customerForm').hide(); // Ẩn phần thông tin khách hàng
+								// Ẩn phần thông tin khách hàng
 							}
 						});
 
@@ -938,26 +1065,27 @@
 						console.error("Lỗi API:", res.message);
 					}
 				},
-				error: function(err) {
+				error: function (err) {
 					console.error("Lỗi khi gọi API GetHoaDonTaiQuay", err);
 				}
 			});
 		}
 
 		//Cập nhật biến currentInvoiceId khi người dùng chuyển tab
-								$(document).on('shown.bs.tab', 'a[data-bs-toggle="tab"]', function (e) {
+		$(document).on('shown.bs.tab', 'a[data-bs-toggle="tab"]', function (e) {
 			let invoiceId = $(e.target).data('invoice-id'); // lấy id của hóa đơn từ tab
 			currentInvoiceId = "invoice_" + invoiceId;      // cập nhật currentInvoiceId cho container
 			loadInvoiceDetails();
+
 		});
-				
 
 
 
-		  // 3. Hiển thị danh sách sản phẩm trong hóa đơn
+
+		// 3. Hiển thị danh sách sản phẩm trong hóa đơn
 		// 				function loadInvoiceDetails() {
 		// 	let dbInvoiceId = $(`#${currentInvoiceId}`).attr('data-db-invoice-id');
-		
+
 
 		// 	$.getJSON('/Admin/BHTQ/GetInvoiceDetails', { invoiceId: dbInvoiceId }, function(res) {
 		// 		if (res && res.success) {
@@ -966,7 +1094,7 @@
 		// 				res.data.forEach((item, index) => {
 		// 					html += renderDetailInvoice(item, index);
 		// 				});
-						
+
 		// 				Giả sử bảng sản phẩm chi tiết có id là invoiceTable-{currentInvoiceId}
 		// 				$(`#invoiceTable-${currentInvoiceId} tbody`).html(html);
 		// 				recalcInvoiceTotal();
@@ -976,10 +1104,10 @@
 		// 		}
 		// 	});
 		// }
-				function loadInvoiceDetails() {
+		function loadInvoiceDetails() {
 			let dbInvoiceId = $(`#${currentInvoiceId}`).attr('data-db-invoice-id');
 
-			$.getJSON('/Admin/BHTQ/GetInvoiceDetails', { invoiceId: dbInvoiceId }, function(res) {
+			$.getJSON('/Admin/BHTQ/GetInvoiceDetails', { invoiceId: dbInvoiceId }, function (res) {
 				if (res && res.success) {
 					let data = res.data || [];
 					let tbody = $(`#invoiceTable-${currentInvoiceId} tbody`);
@@ -996,7 +1124,7 @@
 
 						// Render từng dòng sản phẩm
 						data.forEach((item, index) => {
-												tbody.append(renderDetailInvoice(item, index));
+							tbody.append(renderDetailInvoice(item, index));
 
 						});
 
@@ -1009,46 +1137,51 @@
 
 
 
-		 /**
-		  * Xử lý ren HTML cho thông tin detail danh sách
-		  */
-				function renderDetailInvoice(item, index){
+		/**
+		 * Xử lý ren HTML cho thông tin detail danh sách
+		 */
+		function renderDetailInvoice(item, index) {
 			return `
-			  <tr data-id="${item.id}">
-				 <td>${index + 1}</td>
-				 <td><img src="${item.anhUrl}" alt="Ảnh SP" width="50"></td>
-				 <td>${item.tenSP}</td>
-				 <td>${item.gia}</td>
-				 <td>
-					 <button class="btn btn-sm btn-outline-secondary minus">-</button>
-					 <span class="quantity">${item.soLuong}</span>
-					 <button class="btn btn-sm btn-outline-secondary plus">+</button>
-				 </td>
+					  <tr data-id="${item.id}">
+						 <td>${index + 1}</td>
+						 <td><img src="${item.anhUrl}" alt="Ảnh SP" width="50"></td>
+						 <td>${item.tenSP}</td>
+						 <td>${item.gia}</td>
+						 <td>
+							 <button class="btn btn-sm btn-outline-secondary minus">-</button>
+							 <span class="quantity">${item.soLuong}</span>
+							 <button class="btn btn-sm btn-outline-secondary plus">+</button>
+						 </td>
 
-					
 
-				 <td>${item.kichThuoc}</td>
-				 <td>${item.mauSac}</td>
-				
-				 <td class="row-total">${item.thanhTien}</td>
-				 <td><button class="btn btn-danger btn-sm deleteItem">Xóa</button></td>
-			  </tr>
-						
-			  
-			  <tr class="price-change-row" style="display: none;">
-			<td colspan="9">
-				<span class="price-change-message text-danger small"></span>
-			</td>
-		</tr>
 
-			`;
+						 <td>${item.kichThuoc}</td>
+						 <td>${item.mauSac}</td>
+
+						 <td class="row-total">${item.thanhTien}</td>
+						 <td><button class="btn btn-danger btn-sm deleteItem">    <i class="fas fa-trash"></i></button></td>
+					  </tr>
+
+
+					  <tr class="price-change-row" style="display: none;">
+					<td colspan="9">
+						<span class="price-change-message text-danger small"></span>
+					</td>
+				</tr>
+
+					`;
 		}
 
 
-		 // xư li tang so luong o hoa don ban hang
-						$(document).on('click', '.plus', function () {
+		// xư li tang so luong o hoa don ban hang
+		$(document).on('click', '.plus', function () {
 			let row = $(this).closest('tr');
 			let chiTietId = row.data('id');
+
+
+			let container = $('#' + currentInvoiceId);
+
+			var diaChi = container.find('.AddressForm');
 
 			$.ajax({
 				url: '/Admin/BHTQ/UpdateInvoiceItemQuantity',
@@ -1062,34 +1195,45 @@
 						row.find('.quantity').text(res.newQty);
 						row.find('.row-total').text(res.newTotal);
 
-						
+
 
 						recalcInvoiceTotal(); // Cập nhật tổng tiền hóa đơn
 					} else {
-							if (res.priceChangeMessage) {
-			infoRow.find('.price-change-message').html(res.priceChangeMessage);
-		} else {
-			infoRow.find('.price-change-message').text(res.message);
-		}
-		infoRow.show();
+						if (res.priceChangeMessage) {
+							infoRow.find('.price-change-message').html(res.priceChangeMessage);
+						} else {
+							infoRow.find('.price-change-message').text(res.message);
+						}
+						infoRow.show();
 					}
 				}
 			});
+			if (diaChi.is(':visible')) {
+				setTimeout(() => {
+					calculateFee();
+				}, 500);
+			}
 		});
 
-	
 
 
-		 //xu li nut giam so luong
-					   $(document).on('click', '.minus', function() {
+
+		//xu li nut giam so luong
+		$(document).on('click', '.minus', function () {
 			let row = $(this).closest('tr');
 			let chiTietId = row.data('id');
+
+
+			let container = $('#' + currentInvoiceId);
+
+			var diaChi = container.find('.AddressForm');
+
 			$.ajax({
 				url: '/Admin/BHTQ/UpdateInvoiceItemQuantity',
 				type: 'POST',
 				contentType: 'application/json;charset=utf-8',
 				data: JSON.stringify({ chiTietId: chiTietId, delta: -1 }),
-				success: function(res) {
+				success: function (res) {
 					if (res.success) {
 						if (res.newQty === 0) {
 							row.remove();
@@ -1103,20 +1247,25 @@
 					}
 				}
 			});
+			if (diaChi.is(':visible')) {
+				setTimeout(() => {
+					calculateFee();
+				}, 500);
+			}
 		});
 
 		//update tong so luong cua san pham trong hoa don khi tang hoac giam so luong sp de hien thi len ma hoa don
-						function updateInvoiceBadgeCount(invoiceDomId) {
-						let sumQty = 0;
-						$(`#invoiceTable-${invoiceDomId} .quantity`).each(function () {
-							let qty = parseInt($(this).text()) || 0;
-							sumQty += qty;
-						});
-						// Cập nhật badge
-						$(`#badge-${invoiceDomId}`).text(sumQty);
+		function updateInvoiceBadgeCount(invoiceDomId) {
+			let sumQty = 0;
+			$(`#invoiceTable-${invoiceDomId} .quantity`).each(function () {
+				let qty = parseInt($(this).text()) || 0;
+				sumQty += qty;
+			});
+			// Cập nhật badge
+			$(`#badge-${invoiceDomId}`).text(sumQty);
 		}
 
-						function recalcInvoiceTotal() {
+		function recalcInvoiceTotal() {
 			let total = 0;
 			$(`#invoiceTable-${currentInvoiceId} tbody tr`).each(function () {
 				let rowTotal = parseFloat($(this).find('.row-total').text()) || 0;
@@ -1130,9 +1279,16 @@
 			let container = $('#' + currentInvoiceId);
 			container.find('.basePrice').val(total);
 			container.find('.discountAmount').val(0);
+
+
+
+			let fee = parseFloat(container.find('.fee').text()) || 0;
+			total += fee;
+			console.log(fee);
+
 			container.find('.finalTotal').val(total);
 
-					// Gọi hàm cập nhật badge
+			// Gọi hàm cập nhật badge
 			updateInvoiceBadgeCount(currentInvoiceId);
 
 			// Nếu cần autoSelectDiscountCode
@@ -1140,39 +1296,52 @@
 		}
 
 
-		 $(document).on('click', '.deleteItem', function() {
-			 let row = $(this).closest('tr');
-			 let chiTietId = row.data('id');
-			 $.ajax({
-				 url: '/Admin/BHTQ/RemoveInvoiceItem',
-				 type: 'POST',
-				 contentType: 'application/json;charset=utf-8',
-				 data: JSON.stringify(chiTietId),
-				 success: function(res) {
-					 if (res.success) {
-						 row.remove();
-						 recalcInvoiceTotal();
-					 } else {
-						 alert(res.message);
-					 }
-				 }
-			 });
-		 });
+		$(document).on('click', '.deleteItem', function () {
+			let row = $(this).closest('tr');
+			let chiTietId = row.data('id');
+
+
+			let container = $('#' + currentInvoiceId);
+
+			var diaChi = container.find('.AddressForm');
+
+			$.ajax({
+				url: '/Admin/BHTQ/RemoveInvoiceItem',
+				type: 'POST',
+				contentType: 'application/json;charset=utf-8',
+				data: JSON.stringify(chiTietId),
+				success: function (res) {
+					if (res.success) {
+						row.remove();
+						recalcInvoiceTotal();
+					} else {
+						alert(res.message);
+					}
+				}
+			});
+			
+			if (diaChi.is(':visible')) {
+				setTimeout(() => {
+					calculateFee();
+				}, 500);
+				
+			} 
+		});
 
 
 
-				 //Ví dụ, khi nhấn nút có class selectProduct, bạn cần gán:
-				$(document).on('click', '.selectProduct', function(){
-			 currentInvoiceId = $(this).data('id');
-			 let modal = new bootstrap.Modal(document.getElementById('detailedProductModal'));
-			 modal.show();
-			 loadDetailedProducts();
-		 });
+		//Ví dụ, khi nhấn nút có class selectProduct, bạn cần gán:
+		$(document).on('click', '.selectProduct', function () {
+			currentInvoiceId = $(this).data('id');
+			let modal = new bootstrap.Modal(document.getElementById('detailedProductModal'));
+			modal.show();
+			loadDetailedProducts();
+		});
 
 
 
-		 // 2. Thêm sản phẩm vào hóa đơn
-							$(document).on('click', '.add-product', function () {
+		// 2. Thêm sản phẩm vào hóa đơn
+		$(document).on('click', '.add-product', function () {
 			// Lấy thông tin sản phẩm từ data attribute
 			let productId = $(this).data('id');
 			let productName = $(this).data('name');
@@ -1195,7 +1364,7 @@
 			modal.show();
 		});
 
-				$(document).on('click', '#confirmQuantityBtn', function() {
+		$(document).on('click', '#confirmQuantityBtn', function () {
 			let quantity = parseInt($('#quantityInput').val());
 			if (isNaN(quantity) || quantity <= 0) {
 				alert("Số lượng phải là số và lớn hơn 0");
@@ -1257,8 +1426,8 @@
 		});
 
 
-		 // danh sach san pham hien thi tai modal va xu li su kien nut them san pham tai modal
-							let currentProductPage = 1;
+		// danh sach san pham hien thi tai modal va xu li su kien nut them san pham tai modal
+		let currentProductPage = 1;
 		const productPageSize = 5;
 
 		function loadDetailedProducts(page = currentProductPage) {
@@ -1273,32 +1442,32 @@
 						$.each(res.data, function (index, product) {
 							let imgUrl = product.imageUrl || "/img/default.jpg";
 							let rowHtml = `
-								<tr>
-									<td>${(page - 1) * productPageSize + index + 1}</td>
-									<td><img src="${imgUrl}" alt="${product.ten_SPCT}" width="50"></td>
-									<td>${product.ten_SPCT}</td>
-									<td>${parseFloat(product.price).toLocaleString()} VND</td>
-									<td>${product.dbQuantity}</td>
-									<td>${product.size}</td>
-									<td>${product.color}</td>
-									
-									<td>${product.cogiay}</td>
-									<td>${product.degiay}</td>
-									<td>${product.chatlieu}</td>
-									<td>
-										<button class="btn btn-success btn-sm add-product"
-												data-id="${product.id}"
-												data-name="${product.ten_SPCT}"
-												data-price="${product.price}"
-												data-size="${product.size}"
-												data-color="${product.color}">
+										<tr>
+											<td>${(page - 1) * productPageSize + index + 1}</td>
+											<td><img src="${imgUrl}" alt="${product.ten_SPCT}" width="50"></td>
+											<td>${product.ten_SPCT}</td>
+											<td>${parseFloat(product.price).toLocaleString()} VND</td>
+											<td>${product.dbQuantity}</td>
+											<td>${product.size}</td>
+											<td>${product.color}</td>
 
-												
-											Thêm
-										</button>
-									</td>
-								</tr>
-							`;
+											<td>${product.cogiay}</td>
+											<td>${product.degiay}</td>
+											<td>${product.chatlieu}</td>
+											<td>
+												<button class="btn btn-success btn-sm add-product"
+														data-id="${product.id}"
+														data-name="${product.ten_SPCT}"
+														data-price="${product.price}"
+														data-size="${product.size}"
+														data-color="${product.color}">
+
+
+													Thêm
+												</button>
+											</td>
+										</tr>
+									`;
 							tbody.append(rowHtml);
 						});
 						renderProductPagination(res.pagination);
@@ -1313,54 +1482,54 @@
 			});
 		}
 
-				function renderProductPagination(pagination) {
-		  let container = $('#productPaginationContainer');
-		  container.empty();
-		  if (!pagination) return;
+		function renderProductPagination(pagination) {
+			let container = $('#productPaginationContainer');
+			container.empty();
+			if (!pagination) return;
 
-		  // Nút First («)
-		  container.append(`<li class="page-item ${pagination.pageNumber === 1 ? 'disabled' : ''}">
-			<a class="page-link" href="#" data-page="1">&laquo;</a>
-		  </li>`);
+			// Nút First («)
+			container.append(`<li class="page-item ${pagination.pageNumber === 1 ? 'disabled' : ''}">
+					<a class="page-link" href="#" data-page="1">&laquo;</a>
+				  </li>`);
 
-		  // Nút Prev (‹)
-		  let prevPage = pagination.pageNumber > 1 ? pagination.pageNumber - 1 : 1;
-		  container.append(`<li class="page-item ${pagination.pageNumber === 1 ? 'disabled' : ''}">
-			<a class="page-link" href="#" data-page="${prevPage}">&lsaquo;</a>
-		  </li>`);
+			// Nút Prev (‹)
+			let prevPage = pagination.pageNumber > 1 ? pagination.pageNumber - 1 : 1;
+			container.append(`<li class="page-item ${pagination.pageNumber === 1 ? 'disabled' : ''}">
+					<a class="page-link" href="#" data-page="${prevPage}">&lsaquo;</a>
+				  </li>`);
 
-		  // Số trang
-		  for (let i = 1; i <= pagination.totalPages; i++) {
-			let activeClass = i === pagination.pageNumber ? "active" : "";
-			container.append(`<li class="page-item ${activeClass}">
-			  <a class="page-link" href="#" data-page="${i}">${i}</a>
-			</li>`);
-		  }
+			// Số trang
+			for (let i = 1; i <= pagination.totalPages; i++) {
+				let activeClass = i === pagination.pageNumber ? "active" : "";
+				container.append(`<li class="page-item ${activeClass}">
+					  <a class="page-link" href="#" data-page="${i}">${i}</a>
+					</li>`);
+			}
 
-		  // Nút Next (›)
-		  let nextPage = pagination.pageNumber < pagination.totalPages ? pagination.pageNumber + 1 : pagination.totalPages;
-		  container.append(`<li class="page-item ${pagination.pageNumber === pagination.totalPages ? 'disabled' : ''}">
-			<a class="page-link" href="#" data-page="${nextPage}">&rsaquo;</a>
-		  </li>`);
+			// Nút Next (›)
+			let nextPage = pagination.pageNumber < pagination.totalPages ? pagination.pageNumber + 1 : pagination.totalPages;
+			container.append(`<li class="page-item ${pagination.pageNumber === pagination.totalPages ? 'disabled' : ''}">
+					<a class="page-link" href="#" data-page="${nextPage}">&rsaquo;</a>
+				  </li>`);
 
-		  // Nút Last (»)
-		  container.append(`<li class="page-item ${pagination.pageNumber === pagination.totalPages ? 'disabled' : ''}">
-			<a class="page-link" href="#" data-page="${pagination.totalPages}">&raquo;</a>
-		  </li>`);
+			// Nút Last (»)
+			container.append(`<li class="page-item ${pagination.pageNumber === pagination.totalPages ? 'disabled' : ''}">
+					<a class="page-link" href="#" data-page="${pagination.totalPages}">&raquo;</a>
+				  </li>`);
 		}
-				//xư li su kien khi nhan icon phan trang sp
+		//xư li su kien khi nhan icon phan trang sp
 
-				$(document).on('click', '#productPaginationContainer .page-link', function(e) {
-		  e.preventDefault();
-		  let page = parseInt($(this).data('page'));
-		  if (page) {
-			currentProductPage = page;
-			loadDetailedProducts(page);
-		  }
+		$(document).on('click', '#productPaginationContainer .page-link', function (e) {
+			e.preventDefault();
+			let page = parseInt($(this).data('page'));
+			if (page) {
+				currentProductPage = page;
+				loadDetailedProducts(page);
+			}
 		});
-		
 
-		$(document).on('click', '.product-pagination-btn', function() {
+
+		$(document).on('click', '.product-pagination-btn', function () {
 			let page = parseInt($(this).data('page'));
 			if (page) {
 				currentProductPage = page;
@@ -1372,14 +1541,14 @@
 
 		//xu li su kien lay danh sach khach hang
 
-						// Các biến toàn cục cho phân trang khách hàng
+		// Các biến toàn cục cho phân trang khách hàng
 		let currentCustomerPage = 1;
 		const customerPageSize = 5;
 
-	
+
 		//tim kiem khach hang
 
-				function loadCustomers(page = currentCustomerPage, keyword = currentSearchKeyword) {
+		function loadCustomers(page = currentCustomerPage, keyword = currentSearchKeyword) {
 			$.ajax({
 				url: '/Admin/KhachHang/SearchCustomers',
 				type: 'GET',
@@ -1390,22 +1559,22 @@
 					if (res.success && res.data && res.data.length > 0) {
 						$.each(res.data, function (index, customer) {
 							tbody.append(`
-								<tr>
-									<td>${(page - 1) * customerPageSize + index + 1}</td>
-									<td>${customer.ho_ten}</td>
-									<td>${customer.phoneNumber}</td>
-									<td>${customer.email}</td>
-									<td>
-										<button class="btn btn-primary btn-sm choose-customer"
-												data-id="${customer.id}"
-												data-name="${customer.ho_ten}"
-												data-phone="${customer.phoneNumber}"
-												data-email="${customer.email}">
-											Chọn
-										</button>
-									</td>
-								</tr>
-							`);
+										<tr>
+											<td>${(page - 1) * customerPageSize + index + 1}</td>
+											<td>${customer.ho_ten}</td>
+											<td>${customer.phoneNumber}</td>
+											<td>${customer.email}</td>
+											<td>
+												<button class="btn btn-primary btn-sm choose-customer"
+														data-id="${customer.id}"
+														data-name="${customer.ho_ten}"
+														data-phone="${customer.phoneNumber}"
+														data-email="${customer.email}">
+													Chọn
+												</button>
+											</td>
+										</tr>
+									`);
 						});
 						renderCustomerPagination(res.pagination);
 					} else {
@@ -1421,44 +1590,44 @@
 		}
 
 		// Hàm render nút phân trang cho khách hàng
-				function renderCustomerPagination(pagination) {
-		  let container = $('#customerPaginationContainer');
-		  container.empty();
-		  if (!pagination) return;
+		function renderCustomerPagination(pagination) {
+			let container = $('#customerPaginationContainer');
+			container.empty();
+			if (!pagination) return;
 
-		  // Nút First («)
-		  container.append(`<li class="page-item ${pagination.pageNumber === 1 ? 'disabled' : ''}">
-			<a class="page-link" href="#" data-page="1">&laquo;</a>
-		  </li>`);
+			// Nút First («)
+			container.append(`<li class="page-item ${pagination.pageNumber === 1 ? 'disabled' : ''}">
+					<a class="page-link" href="#" data-page="1">&laquo;</a>
+				  </li>`);
 
-		  // Nút Prev (‹)
-		  let prevPage = pagination.pageNumber > 1 ? pagination.pageNumber - 1 : 1;
-		  container.append(`<li class="page-item ${pagination.pageNumber === 1 ? 'disabled' : ''}">
-			<a class="page-link" href="#" data-page="${prevPage}">&lsaquo;</a>
-		  </li>`);
+			// Nút Prev (‹)
+			let prevPage = pagination.pageNumber > 1 ? pagination.pageNumber - 1 : 1;
+			container.append(`<li class="page-item ${pagination.pageNumber === 1 ? 'disabled' : ''}">
+					<a class="page-link" href="#" data-page="${prevPage}">&lsaquo;</a>
+				  </li>`);
 
-		  // Số trang
-		  for (let i = 1; i <= pagination.totalPages; i++) {
-			let activeClass = i === pagination.pageNumber ? "active" : "";
-			container.append(`<li class="page-item ${activeClass}">
-			  <a class="page-link" href="#" data-page="${i}">${i}</a>
-			</li>`);
-		  }
+			// Số trang
+			for (let i = 1; i <= pagination.totalPages; i++) {
+				let activeClass = i === pagination.pageNumber ? "active" : "";
+				container.append(`<li class="page-item ${activeClass}">
+					  <a class="page-link" href="#" data-page="${i}">${i}</a>
+					</li>`);
+			}
 
-		  // Nút Next (›)
-		  let nextPage = pagination.pageNumber < pagination.totalPages ? pagination.pageNumber + 1 : pagination.totalPages;
-		  container.append(`<li class="page-item ${pagination.pageNumber === pagination.totalPages ? 'disabled' : ''}">
-			<a class="page-link" href="#" data-page="${nextPage}">&rsaquo;</a>
-		  </li>`);
+			// Nút Next (›)
+			let nextPage = pagination.pageNumber < pagination.totalPages ? pagination.pageNumber + 1 : pagination.totalPages;
+			container.append(`<li class="page-item ${pagination.pageNumber === pagination.totalPages ? 'disabled' : ''}">
+					<a class="page-link" href="#" data-page="${nextPage}">&rsaquo;</a>
+				  </li>`);
 
-		  // Nút Last (»)
-		  container.append(`<li class="page-item ${pagination.pageNumber === pagination.totalPages ? 'disabled' : ''}">
-			<a class="page-link" href="#" data-page="${pagination.totalPages}">&raquo;</a>
-		  </li>`);
+			// Nút Last (»)
+			container.append(`<li class="page-item ${pagination.pageNumber === pagination.totalPages ? 'disabled' : ''}">
+					<a class="page-link" href="#" data-page="${pagination.totalPages}">&raquo;</a>
+				  </li>`);
 		}
 
 		// Bắt sự kiện click trên các nút phân trang của khách hàng
-		$(document).on('click', '.customer-pagination-btn', function() {
+		$(document).on('click', '.customer-pagination-btn', function () {
 			let page = parseInt($(this).data('page'));
 			if (page) {
 				currentCustomerPage = page;
@@ -1466,37 +1635,38 @@
 			}
 		});
 		//xư li su kien khi nhan icon phan trang khach hang
-				$(document).on('click', '.page-item a', function(e) {
-		  e.preventDefault();
-		  let page = parseInt($(this).data('page'));
-		  if (page) {
-			currentCustomerPage = page;
-			loadCustomers(currentCustomerPage, currentSearchKeyword);
-		  }
+		$(document).on('click', '.page-item a', function (e) {
+			e.preventDefault();
+			let page = parseInt($(this).data('page'));
+			if (page) {
+				currentCustomerPage = page;
+				loadCustomers(currentCustomerPage, currentSearchKeyword);
+			}
 		});
 
 		// Sự kiện khi nhấn nút "Tài khoản"
-		$(document).on('click', '.selectCustomer', function(){
+		$(document).on('click', '.selectCustomer', function () {
+			currentInvoiceId = $(this).data('id');
 			// Khi nhấn "Tài khoản", load danh sách khách hàng ở trang đầu tiên
 			currentCustomerPage = 1;
-			  currentSearchKeyword = "";
-			loadCustomers(currentCustomerPage,currentSearchKeyword);
+			currentSearchKeyword = "";
+			loadCustomers(currentCustomerPage, currentSearchKeyword);
 			// Hiển thị modal khách hàng
 			let modal = new bootstrap.Modal(document.getElementById('customerModal'));
 			modal.show();
 		});
 
 		// goi ham xu li tim kiem khach hang
-				$(document).on('input', '#customerSearchInput', function() {
-					  currentSearchKeyword = $(this).val().trim();
+		$(document).on('input', '#customerSearchInput', function () {
+			currentSearchKeyword = $(this).val().trim();
 
 			currentCustomerPage = 1; // reset về trang 1
 			loadCustomers(currentCustomerPage, currentSearchKeyword);
 		});
-			 //them nhanh khach hang
-							$(document).on('submit', '#quickAddCustomerForm', function (e) {
-		
-								e.preventDefault();
+		//them nhanh khach hang
+		$(document).on('submit', '#quickAddCustomerForm', function (e) {
+
+			e.preventDefault();
 			let customerData = {
 				HoTen: $('#quickCustomerName').val().trim(),
 				PhoneNumber: $('#quickCustomerPhone').val().trim(),
@@ -1518,22 +1688,22 @@
 					if (res.success) {
 						alert("Thêm khách hàng thành công!");
 						let newRow = `
-							<tr>
-								<td>${$('#customerTable tbody tr').length + 1}</td>
-								<td>${res.data.ho_ten}</td>
-								<td>${res.data.phoneNumber}</td>
-								<td>${res.data.email}</td>
-								<td>
-									<button class="btn btn-outline-primary btn-sm choose-customer"
-											data-id="${res.data.id}"
-											data-name="${res.data.ho_ten}"
-											data-phone="${res.data.phoneNumber}"
-											data-email="${res.data.email}">
-										Chọn
-									</button>
-								</td>
-							</tr>
-						`;
+									<tr>
+										<td>${$('#customerTable tbody tr').length + 1}</td>
+										<td>${res.data.ho_ten}</td>
+										<td>${res.data.phoneNumber}</td>
+										<td>${res.data.email}</td>
+										<td>
+											<button class="btn btn-outline-primary btn-sm choose-customer"
+													data-id="${res.data.id}"
+													data-name="${res.data.ho_ten}"
+													data-phone="${res.data.phoneNumber}"
+													data-email="${res.data.email}">
+												Chọn
+											</button>
+										</td>
+									</tr>
+								`;
 						$('#customerTable tbody').append(newRow);
 						$('#quickAddCustomerForm')[0].reset();
 					} else {
@@ -1549,8 +1719,8 @@
 
 
 
-		//chọn khách hàng 
-			$(document).on('click', '.choose-customer', function () {
+		//chọn khách hàng
+		$(document).on('click', '.choose-customer', function () {
 			let customerId = $(this).data('id');
 			let name = $(this).data('name');
 			let phone = $(this).data('phone');
@@ -1585,6 +1755,10 @@
 				customerForm.find('.customerPhone').val(phone);
 				customerForm.find('.customerEmail').val(email);
 			}
+
+			// Xử lý nút openAddress
+			let addressBtn = container.find('.openAddress');
+			addressBtn.attr('data-id', customerId).show();
 
 			// Gửi request liên kết khách hàng với hóa đơn
 			let invoiceId = container.attr('data-db-invoice-id');
@@ -1622,7 +1796,7 @@
 		});
 
 		//API GetAvailableDiscounts để lấy danh sách voucher
-				let bestDiscountAmount = 0;
+		let bestDiscountAmount = 0;
 		// let bestVoucherCode = null; ban đầu là null
 		// 			 function autoSelectDiscountCode(invoiceDomId) {
 		// 	let container = $('#' + invoiceDomId);
@@ -1669,7 +1843,7 @@
 		// 				container.find('.discountAmount').val(maxDiscount);
 		// 				container.find('.finalTotal').val(orderTotal - maxDiscount);
 		// 				hien thi thong bao ma giam gia toot nhat
-		// 						container.find('#bestVoucherMessage').show();	
+		// 						container.find('#bestVoucherMessage').show();
 		// 					} else {
 		// 				Không tìm được voucher tốt nhất
 		// 				container.find('#bestVoucherMessage').hide();
@@ -1686,25 +1860,28 @@
 		// 	});
 		// }
 
-						function autoSelectDiscountCode(invoiceDomId) {
+		function autoSelectDiscountCode(invoiceDomId) {
 			let container = $('#' + invoiceDomId);
-			console.log('container:',container);
+			console.log('container:', container);
 			let orderTotal = parseFloat($('#totalPrice-' + invoiceDomId).text()) || 0;
-						console.log('orderTotal:',orderTotal);
+			console.log('orderTotal:', orderTotal);
 
 			let customerId = container.attr('data-customer-id') || null;
-						console.log('customerId:',customerId);
+			console.log('customerId:', customerId);
+
+
+			let fee = parseFloat(container.find('.fee').text()) || 0;
 
 			$.ajax({
 				url: '/Admin/PhieuGiamGia/GetAvailableDiscounts',
 				type: 'GET',
 				data: { customerId: customerId, orderTotal: orderTotal },
-				success: function(vouchers) {
+				success: function (vouchers) {
 					if (!vouchers || vouchers.length === 0) {
 						return;
 					}
 					let bestVoucher = null, maxDiscount = 0;
-					vouchers.forEach(function(voucher) {
+					vouchers.forEach(function (voucher) {
 						let discount = 0;
 						if (voucher.loai === 0) { // giảm theo VND
 							discount = voucher.gia_tri;
@@ -1720,36 +1897,36 @@
 						}
 					});
 					if (bestVoucher) {
-					maxDiscount=Math.floor(maxDiscount);
-					bestDiscountAmount=maxDiscount;
-					bestVoucherCode=bestVoucher.ma;
+						maxDiscount = Math.floor(maxDiscount);
+						bestDiscountAmount = maxDiscount;
+						bestVoucherCode = bestVoucher.ma;
 						container.find('.discountCodeInput').val(bestVoucher.ma);
 						debugger;
 						container.find('.discountAmount').val(maxDiscount);
 						debugger;
-						container.find('.finalTotal').val(orderTotal - maxDiscount);
+						container.find('.finalTotal').val(orderTotal - maxDiscount + fee);
 						debugger;
 						// Nếu có voucher tốt nhất, hiển thị toast confirm
 						Swal.fire({
-									icon: 'success',
-									title: 'Phiếu giảm giá tốt nhất đã được áp dụng!',
-									toast: true,
-									position: 'top-end',
-									showConfirmButton: false,
-									timer: 3000,
-									timerProgressBar: true
-							});
+							icon: 'success',
+							title: 'Phiếu giảm giá tốt nhất đã được áp dụng!',
+							toast: true,
+							position: 'top-end',
+							showConfirmButton: false,
+							timer: 3000,
+							timerProgressBar: true
+						});
 						// Bạn cũng có thể lưu lại thông tin voucher nếu cần dùng sau
 					}
 				},
-				error: function(err) {
+				error: function (err) {
 					console.error("Lỗi autoSelectDiscountCode:", err);
 				}
 			});
 		}
 
 
-				$(document).on('click', '.selectDiscount', function() {
+		$(document).on('click', '.selectDiscount', function () {
 			let invoiceDomId = $(this).data('id');
 			let container = $('#' + invoiceDomId);
 			let orderTotal = parseFloat($('#totalPrice-' + invoiceDomId).text()) || 0;
@@ -1759,45 +1936,45 @@
 				url: '/Admin/PhieuGiamGia/GetAvailableDiscounts',
 				type: 'GET',
 				data: { customerId: customerId, orderTotal: orderTotal },
-				success: function(vouchers) {
+				success: function (vouchers) {
 					if (!vouchers || vouchers.length === 0) {
 						alert("Không có phiếu giảm giá phù hợp.");
 						return;
 					}
 					// Tạo danh sách voucher hiển thị trong modal discountModal
 					let html = '';
-					vouchers.forEach(function(v) {
+					vouchers.forEach(function (v) {
 						html += `
-							<tr data-id="${v.id}">
-								<td>${v.ma}</td>
-								<td>${v.ten}</td>
-								<td>${v.loai === 1 ? 'Giảm %' : 'Giảm VND'}</td>
-								<td>${v.gia_tri}</td>
-								<td>
-									<button class="btn btn-sm btn-primary apply-discount"
-											data-id="${v.id}"
-											data-ma="${v.ma}"
-											data-loai="${v.loai}"
-											data-gia-tri="${v.gia_tri}"
-											data-max="${v.so_tien_giam_toi_da || 0}">
-										Áp dụng
-									</button>
-								</td>
-							</tr>
-						`;
+									<tr data-id="${v.id}">
+										<td>${v.ma}</td>
+										<td>${v.ten}</td>
+										<td>${v.loai === 1 ? 'Giảm %' : 'Giảm VND'}</td>
+										<td>${v.gia_tri}</td>
+										<td>
+											<button class="btn btn-sm btn-primary apply-discount"
+													data-id="${v.id}"
+													data-ma="${v.ma}"
+													data-loai="${v.loai}"
+													data-gia-tri="${v.gia_tri}"
+													data-max="${v.so_tien_giam_toi_da || 0}">
+												Áp dụng
+											</button>
+										</td>
+									</tr>
+								`;
 					});
 					$('#discountModal tbody').html(html);
 					let modal = new bootstrap.Modal(document.getElementById('discountModal'));
 					modal.show();
 				},
-				error: function(err) {
+				error: function (err) {
 					console.error("Lỗi khi lấy phiếu giảm giá:", err);
 					alert("Có lỗi xảy ra, vui lòng thử lại sau.");
 				}
 			});
 		});
 
-					$(document).on('click', '.apply-discount', function(){
+		$(document).on('click', '.apply-discount', function () {
 			// Lấy thông tin voucher từ nút "Áp dụng"
 			let voucherId = $(this).data('id');
 			let voucherCode = $(this).data('ma');
@@ -1805,11 +1982,18 @@
 			let giaTri = parseFloat($(this).data('gia-tri')) || 0;
 			let max = parseFloat($(this).data('max')) || 0;
 
+
 			if (!currentInvoiceId) {
 				alert("Không tìm thấy hóa đơn hiện hành.");
 				return;
 			}
 			let container = $('#' + currentInvoiceId);
+
+
+
+			let fee = parseFloat(container.find('.fee').text()) || 0;
+
+			console.log("da chay voi fee: " + fee);
 			let orderTotal = parseFloat($('#totalPrice-' + currentInvoiceId).text()) || 0;
 
 			let discount = 0;
@@ -1828,21 +2012,21 @@
 			container.find('.discountCodeInput').val(voucherCode);
 			container.find('.basePrice').val(orderTotal);
 			container.find('.discountAmount').val(discount);
-			container.find('.finalTotal').val(orderTotal - discount);
+			container.find('.finalTotal').val(orderTotal - discount + fee);
 
 			//kiem tra xem co ma gg nay co trung voi ma gg cua voucher code hay khong
-			if(Math.abs(discount - bestDiscountAmount) < 0.01){
-						Swal.fire({
-									icon: 'success',
-									title: 'Phiếu giảm giá tốt nhất đã được áp dụng!',
-									toast: true,
-									position: 'top-end',
-									showConfirmButton: false,
-									timer: 3000,
-									timerProgressBar: true
-							});
-			}else{
-						container.find('#bestVoucherMessage').hide();
+			if (Math.abs(discount - bestDiscountAmount) < 0.01) {
+				Swal.fire({
+					icon: 'success',
+					title: 'Phiếu giảm giá tốt nhất đã được áp dụng!',
+					toast: true,
+					position: 'top-end',
+					showConfirmButton: false,
+					timer: 3000,
+					timerProgressBar: true
+				});
+			} else {
+				container.find('#bestVoucherMessage').hide();
 			}
 
 			// Đóng modal voucher
@@ -1850,51 +2034,51 @@
 			if (modal) {
 				modal.hide();
 			}
-			console.log("Voucher applied:", { voucherId, voucherCode, discount, finalTotal: orderTotal - discount });
+			console.log("Voucher applied:", { voucherId, voucherCode, discount, finalTotal: orderTotal - discount + fee });
 		});
 
 		////////
 
-		   function loadPaymentMethods(){
-			  // Gọi API (nếu bạn có) hoặc load sẵn
-			  $.getJSON('/Admin/BHTQ/GetPaymentMethods', function(res){
-				  if (res.success) {
-					  let select = $('#paymentMethodSelect');
-					  select.empty();
-					  res.data.forEach(function(method){
-						  select.append(`<option value="${method.id}">${method.ten_phuong_thuc}</option>`);
-					  });
-				  } else {
-					  console.warn("Không load được phương thức thanh toán");
-				  }
-			  });
-		  }
-			  //nhan nut khach thanh toan , mo modal
-							$(document).on('click', '.openPayment', function(){
-		  currentInvoiceId = $(this).data('id');
-		  let invoiceDom = $('#' + currentInvoiceId);
-		  // Giả sử finalTotal được lưu trong input finalTotal trong container hóa đơn
-		  let invoiceTotal = parseFloat(invoiceDom.find('.finalTotal').val()) || 0;
+		function loadPaymentMethods() {
+			// Gọi API (nếu bạn có) hoặc load sẵn
+			$.getJSON('/Admin/BHTQ/GetPaymentMethods', function (res) {
+				if (res.success) {
+					let select = $('#paymentMethodSelect');
+					select.empty();
+					res.data.forEach(function (method) {
+						select.append(`<option value="${method.id}">${method.ten_phuong_thuc}</option>`);
+					});
+				} else {
+					console.warn("Không load được phương thức thanh toán");
+				}
+			});
+		}
+		//nhan nut khach thanh toan , mo modal
+		$(document).on('click', '.openPayment', function () {
+			currentInvoiceId = $(this).data('id');
+			let invoiceDom = $('#' + currentInvoiceId);
+			// Giả sử finalTotal được lưu trong input finalTotal trong container hóa đơn
+			let invoiceTotal = parseFloat(invoiceDom.find('.finalTotal').val()) || 0;
 
-		  // Reset form modal
-		  paymentRows = [];
-		  $('#paymentAmount').val(invoiceTotal);
-		  $('#paymentNote').val('');
-		  $('#paidAmount').text('0');
-		  $('#invoiceTotal').text(invoiceTotal.toLocaleString());
-		  $('#remaining').text(invoiceTotal.toLocaleString());
-		  $('#paymentDetailsTable tbody').empty();
+			// Reset form modal
+			paymentRows = [];
+			$('#paymentAmount').val(invoiceTotal);
+			$('#paymentNote').val('');
+			$('#paidAmount').text('0');
+			$('#invoiceTotal').text(invoiceTotal.toLocaleString());
+			$('#remaining').text(invoiceTotal.toLocaleString());
+			$('#paymentDetailsTable tbody').empty();
 
-		  // Load voucher (nếu có)
-		  // loadVouchers();
+			// Load voucher (nếu có)
+			// loadVouchers();
 
-		  // Mở modal
-		  let modal = new bootstrap.Modal(document.getElementById('paymentModal'));
-		  modal.show();
+			// Mở modal
+			let modal = new bootstrap.Modal(document.getElementById('paymentModal'));
+			modal.show();
 		});
-		
 
-							  // Nút "Thêm" => thêm dòng vào table
+
+		// Nút "Thêm" => thêm dòng vào table
 		// 		$('#addPaymentRowBtn').on('click', function(){
 		//   let amount = parseFloat($('#paymentAmount').val().replace(/\D/g,'')) || 0;
 		//   if (!amount || amount <= 0) {
@@ -1937,98 +2121,15 @@
 
 		// Nút "X" để xóa dòng
 		// 	   Xóa dòng thanh toán
-		// $(document).on('click', '.deletePaymentRow', function(){
-		//   let row = $(this).closest('tr');
-		//   let index = row.index();
-		//   row.remove();
-		//   paymentRows.splice(index, 1);
-		//   Cập nhật lại STT
-		//   $('#paymentDetailsTable tbody tr').each(function(i){
-		// 	$(this).find('td:first').text(i+1);
-		//   });
-		//   let totalPaid = paymentRows.reduce((sum, row) => sum + row.amount, 0);
-		//   let invoiceTotal = parseFloat($('#invoiceTotal').text().replace(/,/g, '')) || 0;
-		//   let remain = invoiceTotal - totalPaid;
-		//   if(remain < 0) remain = 0;
-		//   $('#paidAmount').text(totalPaid.toLocaleString());
-		//   $('#remaining').text(remain.toLocaleString());
-		// });
-
-				$('#addPaymentRowBtn').on('click', function(){
-					debugger;
-		  // Nếu là thanh toán đơn lẻ (TTM hoặc CK)
-		  if(currentMethod === 'TTM' || currentMethod === 'CK'){
-			  let amount = parseFloat($('#paymentAmount').val().replace(/\D/g,'')) || 0;
-			  if (!amount || amount <= 0) {
-				  alert("Vui lòng nhập số tiền > 0");
-				  return;
-			  }
-			  let methodText = (currentMethod === 'TTM') ? "Tiền mặt" : "Chuyển khoản";
-
-			  // Thêm dòng vào mảng paymentRows
-			  paymentRows.push({ amount: amount, method: currentMethod });
-
-			  // Thêm dòng vào table
-			  let rowIndex = $('#paymentDetailsTable tbody tr').length + 1;
-			  let newRow = `
-				<tr>
-				  <td>${rowIndex}</td>
-				  <td>${amount.toLocaleString()}</td>
-				  <td>${methodText}</td>
-				  <td><button class="btn btn-danger btn-sm deletePaymentRow">X</button></td>
-				</tr>
-			  `;
-			  $('#paymentDetailsTable tbody').append(newRow);
-		  }
-		  // Nếu là thanh toán "Cả 2"
-		  else if(currentMethod === 'all'){
-			  // Lấy số tiền từ 2 input riêng
-			  let cashAmount = parseFloat($('#cashAmount').val().replace(/\D/g,'')) || 0;
-					debugger;
-			  let bankAmount = parseFloat($('#bankAmount').val().replace(/\D/g,'')) || 0;
-				debugger;
-			  let totalSplit = cashAmount + bankAmount;
-				debugger;
-
-			  // So sánh với số tiền tổng (nếu cần)
-			  let invoiceTotal = parseFloat($('#paymentAmount').val().replace(/\D/g,'')) || 0;
-			  // let amount = parseFloat($('#paymentAmount').val().replace(/\D/g,'')) || 0;
-			  if(totalSplit !== invoiceTotal){
-				  alert("Tổng số tiền của Tiền mặt và Chuyển khoản phải bằng tổng số tiền hóa đơn (" + invoiceTotal.toLocaleString() + ")");
-				  return;
-			  }
-			  if(cashAmount <= 0 || bankAmount <= 0){
-				  alert("Vui lòng nhập số tiền cho cả 2 phương thức > 0");
-				  return;
-			  }
-
-			  // Thêm 2 dòng tương ứng
-			  paymentRows.push({ amount: cashAmount, method: 'TTM' });
-				debugger;
-			  paymentRows.push({ amount: bankAmount, method: 'CK' });
-				debugger;
-
-			  // Cập nhật table
-			  // Xóa các dòng cũ (nếu cần) hoặc thêm tiếp vào bảng
-			  let currentIndex = $('#paymentDetailsTable tbody tr').length;
-			  let newRows = `
-				<tr>
-				  <td>${currentIndex + 1}</td>
-				  <td>${cashAmount.toLocaleString()}</td>
-				  <td>Tiền mặt</td>
-				  <td><button class="btn btn-danger btn-sm deletePaymentRow">X</button></td>
-				</tr>
-				<tr>
-				  <td>${currentIndex + 2}</td>
-				  <td>${bankAmount.toLocaleString()}</td>
-				  <td>Chuyển khoản</td>
-				  <td><button class="btn btn-danger btn-sm deletePaymentRow">X</button></td>
-				</tr>
-			  `;
-			  $('#paymentDetailsTable tbody').append(newRows);
-		  }
-
-		  // Cập nhật tổng thanh toán
+		$(document).on('click', '.deletePaymentRow', function(){
+		  let row = $(this).closest('tr');
+		  let index = row.index();
+		  row.remove();
+		  paymentRows.splice(index, 1);
+		  // Cập nhật lại STT
+		  $('#paymentDetailsTable tbody tr').each(function(i){
+			$(this).find('td:first').text(i+1);
+		  });
 		  let totalPaid = paymentRows.reduce((sum, row) => sum + row.amount, 0);
 		  let invoiceTotal = parseFloat($('#invoiceTotal').text().replace(/,/g, '')) || 0;
 		  let remain = invoiceTotal - totalPaid;
@@ -2037,9 +2138,103 @@
 		  $('#remaining').text(remain.toLocaleString());
 		});
 
-						   // Nút "Xác nhận thanh toán" -> gửi toàn bộ dữ liệu thanh toán lên server
-					// Mảng paymentRows, currentInvoiceId, ... đã có sẵn
-								$(document).on('click', '#finalConfirmBtn', function() {
+		$('#addPaymentRowBtn').on('click', function () {
+			const container = $('#' + currentInvoiceId);
+			const invoiceTotal = parseFloat(container.find('.finalTotal').val().replace(/\D/g, '')) || 0;
+			let totalPaid = paymentRows.reduce((sum, row) => sum + row.amount, 0);
+
+			// Kiểm tra nếu tổng thanh toán đã đủ
+			if (totalPaid >= invoiceTotal) {
+				alert("Tổng số tiền thanh toán đã đủ hoặc vượt quá giá trị hóa đơn.");
+				return;
+			}
+
+			if (currentMethod === 'TTM' || currentMethod === 'CK') {
+				// Không cho phép thêm 2 lần cùng phương thức
+				if (paymentRows.some(r => r.method === currentMethod)) {
+					alert("Phương thức này đã được thêm.");
+					return;
+				}
+
+				let amount = parseFloat($('#paymentAmount').val().replace(/\D/g, '')) || 0;
+				if (!amount || amount <= 0) {
+					alert("Vui lòng nhập số tiền > 0");
+					return;
+				}
+
+				if (totalPaid + amount > invoiceTotal) {
+					alert("Tổng số tiền thanh toán vượt quá giá trị hóa đơn.");
+					return;
+				}
+
+				let methodText = (currentMethod === 'TTM') ? "Tiền mặt" : "Chuyển khoản";
+				paymentRows.push({ amount: amount, method: currentMethod });
+
+				let rowIndex = $('#paymentDetailsTable tbody tr').length + 1;
+				let newRow = `
+					<tr>
+					  <td>${rowIndex}</td>
+					  <td>${amount.toLocaleString()}</td>
+					  <td>${methodText}</td>
+					  <td><button class="btn btn-danger btn-sm deletePaymentRow">X</button></td>
+					</tr>
+				`;
+				$('#paymentDetailsTable tbody').append(newRow);
+			}
+
+			else if (currentMethod === 'all') {
+				// Đã có TTM hoặc CK rồi thì không cho thêm 'all'
+				if (paymentRows.some(r => r.method === 'TTM' || r.method === 'CK')) {
+					alert("Bạn đã thêm một trong hai phương thức, không thể dùng Cả hai.");
+					return;
+				}
+
+				let cashAmount = parseFloat($('#cashAmount').val().replace(/\D/g, '')) || 0;
+				let bankAmount = parseFloat($('#bankAmount').val().replace(/\D/g, '')) || 0;
+				let totalSplit = cashAmount + bankAmount;
+
+				if (cashAmount <= 0 || bankAmount <= 0) {
+					alert("Vui lòng nhập số tiền cho cả 2 phương thức > 0");
+					return;
+				}
+				if (totalSplit !== invoiceTotal) {
+					alert("Tổng tiền Tiền mặt và Chuyển khoản phải đúng bằng tổng tiền hóa đơn.");
+					return;
+				}
+
+				paymentRows.push({ amount: cashAmount, method: 'TTM' });
+				paymentRows.push({ amount: bankAmount, method: 'CK' });
+
+				let currentIndex = $('#paymentDetailsTable tbody tr').length;
+				let newRows = `
+					<tr>
+					  <td>${currentIndex + 1}</td>
+					  <td>${cashAmount.toLocaleString()}</td>
+					  <td>Tiền mặt</td>
+					  <td><button class="btn btn-danger btn-sm deletePaymentRow">X</button></td>
+					</tr>
+					<tr>
+					  <td>${currentIndex + 2}</td>
+					  <td>${bankAmount.toLocaleString()}</td>
+					  <td>Chuyển khoản</td>
+					  <td><button class="btn btn-danger btn-sm deletePaymentRow">X</button></td>
+					</tr>
+				`;
+				$('#paymentDetailsTable tbody').append(newRows);
+			}
+
+			// Cập nhật tổng
+			totalPaid = paymentRows.reduce((sum, row) => sum + row.amount, 0);
+			let remain = invoiceTotal - totalPaid;
+			if (remain < 0) remain = 0;
+			$('#paidAmount').text(totalPaid.toLocaleString());
+			$('#remaining').text(remain.toLocaleString());
+		});
+
+
+		// Nút "Xác nhận thanh toán" -> gửi toàn bộ dữ liệu thanh toán lên server
+		// Mảng paymentRows, currentInvoiceId, ... đã có sẵn
+		$(document).on('click', '#finalConfirmBtn', function () {
 			// Hiển thị hộp thoại xác nhận thanh toán
 			Swal.fire({
 				title: "Xác nhận thanh toán",
@@ -2054,7 +2249,55 @@
 				if (result.isConfirmed) {
 					// Sau khi người dùng xác nhận, tiếp tục xử lý thanh toán
 
+					const container = $('#' + currentInvoiceId);
+
+					// 🔹 Lấy thông tin địa chỉ
+					const tinh = container.find('.tinh option:selected').text();
+					const huyen = container.find('.huyen option:selected').text();
+					const xa = container.find('.xa option:selected').text();
+					const chiTiet = container.find('.DC_ChiTiet').val();  // class input địa chỉ chi tiết
+
+
+
+					// // Kiểm tra nếu không có sản phẩm nào
+					// const invoiceItems = container.find('.invoice-items tbody tr[data-id]');
+					// if (invoiceItems.length === 0) {
+					// 	Swal.fire({
+					// 		icon: 'warning',
+					// 		title: 'Không có sản phẩm nào trong hóa đơn!',
+					// 		text: 'Vui lòng thêm sản phẩm trước khi thanh toán.',
+					// 		toast: true,
+					// 		position: 'top-end',
+					// 		showConfirmButton: false,
+					// 		timer: 3000,
+					// 		timerProgressBar: true
+					// 	});
+					// 	return;
+					// }
+
+					let fee = parseFloat(container.find('.fee').text()) || 0;
+
+					const fullAddress = `${chiTiet}, ${xa}, ${huyen}, ${tinh}`;
+
+					let finalTotal = container.find('.finalTotal').val();
 					let paymentAmountStr = $('#paymentAmount').val(); // Lấy giá trị từ input
+
+					if (finalTotal != paymentAmountStr){
+						Swal.fire({
+							icon: 'error',
+							title: 'tổng tiền hóa đơn và số tiền thanh toán không khớp, hãy kiểm tra lại thanh toán',
+							toast: true,
+							position: 'top-end',
+							showConfirmButton: false,
+							timer: 3000,
+							timerProgressBar: true
+						});
+
+						const button = container.find('.openPayment');
+						button.trigger('click');
+
+						return;
+					}
 
 					// Kiểm tra nếu giá trị rỗng hoặc không hợp lệ
 					if (!paymentAmountStr || isNaN(paymentAmountStr.replace(/\D/g, ''))) {
@@ -2070,8 +2313,10 @@
 						return;
 					}
 
+
+					
 					// Chuyển đổi thành số
-					let finalTotal = parseFloat(paymentAmountStr.replace(/\D/g, '')) || 0;
+					
 					console.log("finalTotal sau khi chuyển đổi: ", finalTotal);
 
 					if (finalTotal <= 0) {
@@ -2082,46 +2327,48 @@
 					let requestData = {
 						InvoiceId: window.tempPaymentData.InvoiceId,
 						FinalTotal: finalTotal,
+						FullAddress: fullAddress,
 						VoucherCodeString: window.tempPaymentData.VoucherCodeString,
 						VoucherId: null,
+						ship: fee,
 						PaymentRows: window.tempPaymentData.PaymentRows
 					};
 
 					console.log("Request Data:", requestData);
-
+					debugger;
 					$.ajax({
 						url: '/Admin/BHTQ/FinalizePayment',
 						type: 'POST',
 						contentType: 'application/json;charset=utf-8',
 						data: JSON.stringify(requestData),
-								success: function(res) {
-			if (res.success) {
-				Swal.fire({
-					icon: 'success',
-					title: 'Thanh toán thành công!',
-					toast: true,
-					position: 'top-end',
-					showConfirmButton: false,
-					timer: 2000, // rút ngắn để reload nhanh hơn
-					timerProgressBar: true
-				}).then(() => {
-					window.tempPaymentData = null;
-					location.reload(); // 🚀 reload lại trang sau khi hiển thị thông báo
-				});
-			} else {
-				Swal.fire({
-					icon: 'error',
-					title: "Lỗi thanh toán",
-					text: res.message,
-					toast: true,
-					position: 'top-end',
-					showConfirmButton: false,
-					timer: 3000,
-					timerProgressBar: true
-				});
-			}
-		},
-						error: function(err) {
+						success: function (res) {
+							if (res.success) {
+								Swal.fire({
+									icon: 'success',
+									title: 'Thanh toán thành công!',
+									toast: true,
+									position: 'top-end',
+									showConfirmButton: false,
+									timer: 2000, // rút ngắn để reload nhanh hơn
+									timerProgressBar: true
+								}).then(() => {
+									window.tempPaymentData = null;
+									location.reload(); // 🚀 reload lại trang sau khi hiển thị thông báo
+								});
+							} else {
+								Swal.fire({
+									icon: 'error',
+									title: "Lỗi thanh toán",
+									text: res.message,
+									toast: true,
+									position: 'top-end',
+									showConfirmButton: false,
+									timer: 3000,
+									timerProgressBar: true
+								});
+							}
+						},
+						error: function (err) {
 							console.error("FinalizePayment error:", err);
 							Swal.fire({
 								icon: 'error',
@@ -2141,7 +2388,7 @@
 
 
 
-		//thêm phương thức thanh toán 
+		//thêm phương thức thanh toán
 		// $('#confirmPaymentBtn').on('click', function(){
 		// 	let amount = parseFloat($('#paymentAmount').val().replace(/\D/g,'')) || 0;
 		// 	let methodId = $('#paymentMethodSelect').val();
@@ -2189,26 +2436,38 @@
 		// });
 
 
-				$(document).on('click', '#confirmPaymentInModal', function () {
-		  let finalTotalStr = $('#finalTotal').val() || '0';
-		  let finalTotal = parseFloat(finalTotalStr.replace(/\D/g, '')) || 0;
+		$(document).on('click', '#confirmPaymentInModal', function () {
+			let finalTotalStr = $('#finalTotal').val() || '0';
+			let finalTotal = parseFloat(finalTotalStr.replace(/\D/g, '')) || 0;
 
-		  let voucherCode = $('#discountCodeInput').val() || '';
+			let voucherCode = $('#discountCodeInput').val() || '';
 
-		  window.tempPaymentData = {
-			InvoiceId: $('#invoiceContent .active').data('db-invoice-id'),
-			FinalTotal: finalTotal,
-			PaymentRows: paymentRows,
-			VoucherCodeString: voucherCode,
-			// Các dữ liệu khác nếu cần
-		  };
+			// 🔢 Tính lại tổng tiền đã thanh toán từ bảng
+			let totalPaid = 0;
+			$('#paymentDetailsTable tbody tr').each(function () {
+				const amountText = $(this).find('td:nth-child(2)').text().replace(/\D/g, '');
+				const amount = parseFloat(amountText) || 0;
+				totalPaid += amount;
+			});
+			$('#paymentAmount').val(totalPaid);
+			let tien = $('#paymentAmount').val()
+			console.log(totalPaid , tien);
 
-		  console.log("Temp Payment Data:", window.tempPaymentData);
 
-		  let modalInstance = bootstrap.Modal.getInstance(document.getElementById('paymentModal'));
-		  if (modalInstance) {
-			modalInstance.hide();
-		  }
+			window.tempPaymentData = {
+				InvoiceId: $('#invoiceContent .active').data('db-invoice-id'),
+				FinalTotal: finalTotal,
+				PaymentRows: paymentRows,
+				VoucherCodeString: voucherCode,
+				// Các dữ liệu khác nếu cần
+			};
+
+			console.log("Temp Payment Data:", window.tempPaymentData);
+
+			let modalInstance = bootstrap.Modal.getInstance(document.getElementById('paymentModal'));
+			if (modalInstance) {
+				modalInstance.hide();
+			}
 		});
 
 		////
@@ -2266,38 +2525,38 @@
 		// 	}
 		// }
 
-				let currentMethod = null;  // Lưu mã phương thức (TTM / CK / all)
-				let paymentRows = [];
-						$(document).on('click', '.payment-method', function(){
-		  currentMethod = $(this).data('method'); // "TTM", "CK", "all"
-		  if (currentMethod === 'TTM') {
-			  $('#selectedMethod').text('Tiền mặt');
-			  $('#splitPaymentContainer').hide();
-		  } else if (currentMethod === 'CK') {
-			  $('#selectedMethod').text('Chuyển khoản');
-			  $('#splitPaymentContainer').hide();
-		  } else if (currentMethod === 'all') {
-			  $('#selectedMethod').text('Cả 2');
-			  // Hiển thị nhóm input nhập số tiền riêng
-			  $('#splitPaymentContainer').show();
-		  }
+		let currentMethod = null;  // Lưu mã phương thức (TTM / CK / all)
+		let paymentRows = [];
+		$(document).on('click', '.payment-method', function () {
+			currentMethod = $(this).data('method'); // "TTM", "CK", "all"
+			if (currentMethod === 'TTM') {
+				$('#selectedMethod').text('Tiền mặt');
+				$('#splitPaymentContainer').hide();
+			} else if (currentMethod === 'CK') {
+				$('#selectedMethod').text('Chuyển khoản');
+				$('#splitPaymentContainer').hide();
+			} else if (currentMethod === 'all') {
+				$('#selectedMethod').text('Cả 2');
+				// Hiển thị nhóm input nhập số tiền riêng
+				$('#splitPaymentContainer').show();
+			}
 		});
 
-			// $(document).on('click', '.payment-method', function(){
-			//   Lấy mã từ data-method
-			//   currentMethod = $(this).data('method'); "TTM", "CK", "all"
+		// $(document).on('click', '.payment-method', function(){
+		//   Lấy mã từ data-method
+		//   currentMethod = $(this).data('method'); "TTM", "CK", "all"
 
-			//   Hiển thị text cho #selectedMethod
-			//   if (currentMethod === 'TTM') {
-			// 	  $('#selectedMethod').text('Tiền mặt');
-			//   } else if (currentMethod === 'CK') {
-			// 	  $('#selectedMethod').text('Chuyển khoản');
-			// 	  Nếu là chuyển khoản, gọi hàm xử lý thanh toán VNPay
-			// 	  processVNPayPayment();
-			//   } else if (currentMethod === 'all') {
-			// 	  $('#selectedMethod').text('Cả 2');
-			//   }
-			// });
+		//   Hiển thị text cho #selectedMethod
+		//   if (currentMethod === 'TTM') {
+		// 	  $('#selectedMethod').text('Tiền mặt');
+		//   } else if (currentMethod === 'CK') {
+		// 	  $('#selectedMethod').text('Chuyển khoản');
+		// 	  Nếu là chuyển khoản, gọi hàm xử lý thanh toán VNPay
+		// 	  processVNPayPayment();
+		//   } else if (currentMethod === 'all') {
+		// 	  $('#selectedMethod').text('Cả 2');
+		//   }
+		// });
 
 		// 			function processVNPayPayment(){
 		// 	Lấy thông tin tổng tiền đơn hàng từ giao diện (giả sử được lưu trong input finalTotal)
@@ -2331,38 +2590,55 @@
 		// 	});
 		// }
 
-		   // Gọi hàm khi trang tải
-	
+		// Gọi hàm khi trang tải
 
-		
-	
 
-			  function calculateFee() {
-			var provinceId = $("#tinh").val();
-			var districtId = $("#huyen").val();
-			var wardCode = $("#xa").val();
 
-			if (provinceId =="" && districtId == "" && wardCode == "") {
+
+
+		function calculateFee() {
+			console.log("da chay tinh phi");
+
+
+			let container = $('#' + currentInvoiceId);
+
+
+			var provinceCode = container.find('.tinh').val();
+			var districtId =   container.find('.huyen').val();
+			var wardCode =  container.find('.xa').val();
+
+			var form = container.find('.fee');
+
+
+			let subtotal = parseFloat($('#totalPrice-' + currentInvoiceId).text()) || 0;
+
+
+			let discount = parseFloat(container.find('.discountAmount').val()) || 0;
+			console.log(subtotal);
+
+
+
+			if (provinceCode == "" && districtId == "" && wardCode == "") {
 				alert("Vui lòng chọn đầy đủ địa chỉ.");
 				return;
 			}
 
-		   var requestData = {
-		from_district_id: 3440,
-		from_ward_code: "13009",
-		service_id: 53320,
-		service_type_id: null,
-		to_district_id: parseInt(districtId),
-		to_ward_code: wardCode,
-		height: 50,
-		length: 20,
-		weight: 200,
-		width: 20,
-		provinceId: provinceId,
-		subtotal: subtotal,
-		insurance_value: 10000,
-		cod_failed_amount: 2000,
-		coupon: null,
+			var requestData = {
+				from_district_id: 3440,
+				from_ward_code: "13009",
+				service_id: 53320,
+				service_type_id: null,
+				to_district_id: parseInt(districtId),
+				to_ward_code: wardCode,
+				height: 50,
+				length: 20,
+				weight: 200,
+				width: 20,
+				subtotal: subtotal,
+				provinceId: provinceCode,
+				insurance_value: 10000,
+				cod_failed_amount: 2000,
+				coupon: null,
 
 
 			};
@@ -2370,31 +2646,33 @@
 			console.log("Gửi dữ liệu:", requestData);
 
 			$.ajax({
-				url: '@Url.Action("GetShippingFee", "Cart")',
+				url: '/Admin/BHTQ/GetShippingFee1',
 				type: "POST",
 				contentType: "application/json; charset=utf-8",
 				data: JSON.stringify(requestData),
 				dataType: "json",
-				success: function(response) {
+				success: function (response) {
 
-					if(provinceId !=  201){
-
-						response.ship = 50000;
-					}
-					if(subtotal > 2000000)
-				   {
-					   response.ship = 0;
-				   }
-					 let total = response.ship + subtotal;
-					console.log("Nhận phản hồi:", response);
 					if (response.success) {
-						$("#fee").text(response.ship.toLocaleString() + " VNĐ");
-						$("#totalWithFee").text( total.toLocaleString() + " VNĐ");
+						const container = $('#' + currentInvoiceId);
+						const shippingFee = response.ship > 0 ? response.ship : 0;
+						container.find('.fee').text(shippingFee);
+						debugger;
+
+
+						debugger;
+
+						// Tính tổng tiền mới
+						const total = subtotal + shippingFee - discount;
+
+						container.find('.finalTotal').val(total);
+						debugger;
+
 					} else {
 						alert(response.message);
 					}
 				},
-				error: function(xhr) {
+				error: function (xhr) {
 					console.error("Lỗi chi tiết:", xhr.responseText);
 					alert("Có lỗi xảy ra khi tính phí vận chuyển.");
 				}
@@ -2405,71 +2683,208 @@
 
 		// Load danh sách tỉnh/huyện/xã
 
-				   function loadProvinces() {
+		function loadProvinces() {
+			let container = $('#' + currentInvoiceId);
+			let tinh = container.find('.tinh');
+			let huyen = container.find('.huyen');
+			let xa = container.find('.xa');
+
+			console.log("Container:", container.attr('id'));
+			console.log("Tỉnh select:", tinh.length, tinh);
+			console.log("Huyện select:", huyen.length, huyen);
+			console.log("Xã select:", xa.length, xa);
+
+
+			console.log("Đang load tỉnh cho " + currentInvoiceId);
+
 			$.ajax({
 				url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/province",
 				type: "GET",
 				headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
 				success: function (response) {
-					var provinces = response.data;
-					$("#tinh").empty().append('<option value="">Chọn Tỉnh/Thành phố</option>');
-					provinces.forEach(function (province) {
-						$("#tinh").append(`<option value="${province.ProvinceID}">${province.ProvinceName}</option>`);
+					tinh.empty().append('<option value="">Chọn Tỉnh/Thành phố</option>');
+					response.data.forEach(function (province) {
+						tinh.append(`<option value="${province.ProvinceID}">${province.ProvinceName}</option>`);
 					});
 				},
 				error: function () {
 					alert("Lỗi khi tải danh sách tỉnh/thành phố.");
 				}
 			});
+
+			// tỉnh thay đổi => load huyện
+			tinh.off('change').on('change', function () {
+				let provinceId = $(this).val();
+				if (!provinceId) return;
+
+				console.log("Đang load huyện cho " + currentInvoiceId);
+
+				$.ajax({
+					url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/district",
+					type: "GET",
+					headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
+					data: { "province_id": provinceId },
+					success: function (response) {
+						huyen.empty().append('<option value="">Chọn Quận/Huyện</option>');
+						response.data.forEach(function (district) {
+							huyen.append(`<option value="${district.DistrictID}">${district.DistrictName}</option>`);
+						});
+					},
+					error: function () {
+						alert("Lỗi khi tải danh sách quận/huyện.");
+					}
+				});
+			});
+
+			// huyện thay đổi => load xã
+			huyen.off('change').on('change', function () {
+				let districtId = $(this).val();
+				if (!districtId) return;
+
+				console.log("Đang load xã cho " + currentInvoiceId);
+
+				$.ajax({
+					url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/ward",
+					type: "GET",
+					headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
+					data: { "district_id": districtId },
+					success: function (response) {
+						xa.empty().append('<option value="">Chọn Xã/Phường</option>');
+						response.data.forEach(function (ward) {
+							xa.append(`<option value="${ward.WardCode}">${ward.WardName}</option>`);
+						});
+					},
+					error: function () {
+						alert("Lỗi khi tải danh sách xã/phường.");
+					}
+				});
+			});
 		}
 
 
-			  $("#tinh").change(function () {
-			var provinceId = $(this).val();
-			if (!provinceId) return;
 
+		$(document).on('click', '.openAddress', function () {
+			const customerId = $(this).data('id'); // giả định nút có data-id
+
+			console.log("đã chạy openAddress");
+			console.log(customerId);
+
+			currentInvoiceId = $(this).data('invoice');
+
+			let container = $('#' + currentInvoiceId);
+
+			var form = container.find('.AddressForm');
+			if (!form.is(':visible')) {
+				Swal.fire({
+					icon: 'warning',
+					title: 'Hãy chọn giao hàng trước khi chọn địa chỉ để thực hiện giao hàng!',
+					toast: true,
+					position: 'top-end',
+					showConfirmButton: false,
+					timer: 3000,
+					timerProgressBar: true
+				});
+				return;
+			}
+
+			if (!customerId) {
+				alert("Không tìm thấy ID khách hàng!");
+				return;
+			}
+			debugger;
 			$.ajax({
-				url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/district",
-				type: "GET",
-				headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
-				data: { "province_id": provinceId },
-				success: function (response) {
-					var districts = response.data;
-					$("#huyen").empty().append('<option value="">Chọn Quận/Huyện</option>');
-					districts.forEach(function (district) {
-						$("#huyen").append(`<option value="${district.DistrictID}">${district.DistrictName}</option>`);
+				url: `/Admin/Khachhang/GetAddressCustomer?customerId=${customerId}`,
+				type: 'GET',
+				success: function (res) {
+					const $tbody = $('#addressModal tbody');
+					$tbody.empty();
+
+					if (!res || res.length === 0 || res.success === false) {
+						$tbody.append(`<tr><td colspan="6">${res.message || "Không có địa chỉ nào!"}</td></tr>`);
+						return;
+					}
+
+					res.forEach((item, index) => {
+						$tbody.append(`
+									<tr>
+										<td>${index + 1}</td>
+										<td>${item.tinh}</td>
+										<td>${item.huyen}</td>
+										<td>${item.xa}</td>
+										<td>${item.chi_tiet}</td>
+										<td><button class="btn btn-sm btn-primary select-address"
+											data-tinh="${item.tinh}"
+											data-huyen="${item.huyen}"
+											data-xa="${item.xa}"
+											data-chitiet="${item.chi_tiet}">Chọn</button></td>
+									</tr>
+								`);
 					});
+
+					$('#addressModal').modal('show');
+					loadProvinces();
 				},
-				error: function () {
-					alert("Lỗi khi tải danh sách quận/huyện.");
+				error: function (err) {
+					alert("Lỗi khi lấy địa chỉ!");
 				}
 			});
 		});
-				$("#huyen").change(function () {
-			var districtId = $(this).val();
-			if (!districtId) return;
 
-			$.ajax({
-						url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?districtId",
-				type: "GET",
-				headers: { "Token": "be4fd050-0497-11f0-b971-3a146ce707b3" },
-				data: { "district_id": districtId },
-				success: function (response) {
-					var wards = response.data;
-					$("#xa").empty().append('<option value="">Chọn Xã/Phường</option>');
-					wards.forEach(function (ward) {
-						$("#xa").append(`<option value="${ward.WardCode}">${ward.WardName}</option>`);
-					});
-				},
-				error: function () {
-					alert("Lỗi khi tải danh sách xã/phường.");
+		$(document).on('click', '.select-address', function () {
+			const btn = $(this);
+			const cleanName = (str) => str.replace(/^Tỉnh\s+|^Thành phố\s+/i, "").trim();
+
+			const tenTinh = cleanName(btn.data('tinh'));
+			const tenHuyen = btn.data('huyen');
+			const tenXa = btn.data('xa');
+			const DC_ChiTiet = btn.data('chitiet');
+
+			// Xác định container tab đang mở
+			const container = $('#' + currentInvoiceId);
+			const tinhSelect = container.find('.tinh');
+			const huyenSelect = container.find('.huyen');
+			const xaSelect = container.find('.xa');
+			const chiTietSelect = container.find('.DC_ChiTiet');
+
+			var diaChi = container.find('.AddressForm');
+			diaChi.show();
+
+
+			console.log("Container:", container.attr('id'));
+			console.log("Tỉnh cần chọn:", tenTinh);
+			console.log("Huyện cần chọn:", tenHuyen);
+			console.log("Xã cần chọn:", tenXa);
+			console.log("DC_ChiTiet cần chọn:", DC_ChiTiet);
+
+			// Chọn tỉnh theo text
+			tinhSelect.find('option').each(function () {
+				if ($(this).text().trim() === tenTinh) {
+					tinhSelect.val($(this).val()).trigger('change');
+
+					setTimeout(() => {
+						huyenSelect.find('option').each(function () {
+							if ($(this).text().trim() === tenHuyen) {
+								huyenSelect.val($(this).val()).trigger('change');
+
+								setTimeout(() => {
+									xaSelect.find('option').each(function () {
+										if ($(this).text().trim() === tenXa) {
+											xaSelect.val($(this).val()).trigger('change');
+
+											setTimeout(() => {
+												chiTietSelect.val(DC_ChiTiet);
+											}, 5000);
+										}
+									});
+								}, 5000);
+							}
+						});
+					}, 5000);
 				}
 			});
 		});
 
 
-
-		
 	</script>
 
 

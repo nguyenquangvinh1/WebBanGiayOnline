@@ -116,19 +116,65 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
         public IActionResult RemoveBill(Guid id)
         {
-            var hoadon = _context.don_Chi_Tiets.FirstOrDefault(x => x.ID == id);
-            if (hoadon != null)
+            var hoadonChiTiet = _context.don_Chi_Tiets.FirstOrDefault(x => x.ID == id);
+            if (hoadonChiTiet == null)
+                return RedirectToAction("Index");
+
+            var hoaDon = _context.hoa_Dons.FirstOrDefault(h => h.ID == hoadonChiTiet.Hoa_DonID);
+
+        
+            if (hoaDon != null && (hoaDon.trang_thai == 2 ||hoaDon.trang_thai==1 || hoaDon.trang_thai == 3 || hoaDon.trang_thai == 4 || hoaDon.trang_thai == 5))
             {
-                Guid? billId = hoadon.Hoa_DonID; 
-                _context.don_Chi_Tiets.Remove(hoadon);
+                TempData["Error"] = "Không thể xóa sản phẩm vì hóa đơn đã xử lý.";
+                return RedirectToAction("Details", new { id = hoaDon.ID });
+            }
+
+       
+            var sanPhamId = hoadonChiTiet.San_Pham_Chi_TietID;
+            var soLuong = hoadonChiTiet.so_luong;
+            var soTien = hoadonChiTiet.thanh_tien;
+
+            _context.don_Chi_Tiets.Remove(hoadonChiTiet);
+
+            _context.SaveChanges();
+
+
+            if (hoaDon != null && soTien.HasValue)
+            {
+                hoaDon.tong_tien -= soTien.Value;
+                _context.hoa_Dons.Update(hoaDon);
+
+                _context.SaveChanges();
+            }
+
+        
+            var sanPhamChiTiet = _context.san_Pham_Chi_Tiets.FirstOrDefault(sp => sp.ID == sanPhamId);
+            if (sanPhamChiTiet != null)
+            {
+                sanPhamChiTiet.so_luong += soLuong;
+                _context.san_Pham_Chi_Tiets.Update(sanPhamChiTiet);
+
+                _context.SaveChanges();
+            }
+            var soLuongConLai = _context.don_Chi_Tiets.Count(x => x.Hoa_DonID == hoaDon.ID);
+            if (soLuongConLai == 0)
+            {
+                hoaDon.trang_thai = 4; 
+                _context.hoa_Dons.Update(hoaDon);
+
                 _context.SaveChanges();
 
-                if (billId != null)
-                    return RedirectToAction("Details", new { id = billId });
+
             }
+
+
+
+            if (hoaDon != null)
+                return RedirectToAction("Details", new { id = hoaDon.ID });
 
             return RedirectToAction("Index");
         }
+
 
 
         // GET: Admin/HoaDon/Details/5
@@ -151,7 +197,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
     new SelectListItem { Value = "1", Text = "Đã xác nhận" },
     new SelectListItem { Value = "2", Text = "Đang giao hàng" },
     new SelectListItem { Value = "3", Text = "Hoàn thành" },
-    new SelectListItem { Value = "4", Text = "Đã hủy" },
+    new SelectListItem { Value = "4", Text = "Đã hủy" },  
 
     
 };
@@ -170,45 +216,123 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
 
         [HttpPost]
-        public IActionResult UpdateQuantity(Guid id, int quantity)
+        public IActionResult UpdateQuantity(Guid id, int quantity, double newPrice)
         {
             var cart = _context.don_Chi_Tiets.FirstOrDefault(z => z.ID == id);
-
+            
             if (cart != null)
             {
-             
-                cart.so_luong = quantity;
-                cart.thanh_tien = cart.gia * quantity;
+                var hoaDon = _context.hoa_Dons.FirstOrDefault(h => h.ID == cart.Hoa_DonID);
 
-                _context.Update(cart);
-                _context.SaveChanges(); 
-                var hoaDon = _context.hoa_Dons.FirstOrDefault(h => h.MaHoaDon == cart.ma);
-
-                if (hoaDon != null)
+                if (hoaDon != null && (hoaDon.trang_thai == 2 || hoaDon.trang_thai == 3 || hoaDon.trang_thai == 4 || hoaDon.trang_thai == 5))
                 {
-                    
-                   
+                    return Json(new { success = false, message = "Trạng đơn hàng không cho phép bạn thay đổi số lượng !" });
+                }
+
+                var sanPham = _context.san_Pham_Chi_Tiets.FirstOrDefault(sp => sp.ID == cart.San_Pham_Chi_TietID);
+                if (sanPham == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy sản phẩm trong kho!" });
+                }
+
+                // Nếu giá mới khác giá cũ => tạo sản phẩm mới thay vì cập nhật dòng hiện tại
+                if (sanPham.gia != newPrice)
+                {
+                    // Kiểm tra số lượng đủ
+                    newPrice = sanPham.gia;
+                    int soLuongCu = cart.so_luong;
+                    int chenhlech = quantity - soLuongCu;
+
+                    // Trừ số lượng sản phẩm trong kho
+                    sanPham.so_luong -= quantity;
+                    _context.Update(sanPham);
+
+              
+                    // Tạo sản phẩm mới với giá mới
+                    var newCart = new Hoa_Don_Chi_Tiet()
+                    {
+                        ID = Guid.NewGuid(),
+                        Hoa_DonID = cart.Hoa_DonID,
+                        San_Pham_Chi_TietID = cart.San_Pham_Chi_TietID,
+                        so_luong = chenhlech,
+                        gia = newPrice,
+                        thanh_tien = chenhlech * newPrice,
+                        ma = cart.ma
+                    };
+
+                    _context.Add(newCart);
+                    _context.SaveChanges();
+
+                    // Cập nhật tổng tiền hóa đơn
                     var tongTienMoi = _context.don_Chi_Tiets
                                         .Where(z => z.ma == hoaDon.MaHoaDon)
                                         .Sum(z => z.gia * z.so_luong);
 
                     hoaDon.tong_tien = tongTienMoi;
                     _context.Update(hoaDon);
+                    _context.SaveChanges();
+
+                    return Json(new
+                    {
+                        success = true,
+                        newTotal = newCart.thanh_tien,
+                        totalCart = hoaDon.tong_tien
+                    });
                 }
-
-               
-                _context.SaveChanges(); 
-
-                return Json(new
+                else
                 {
-                    success = true,
-                    newTotal = cart.thanh_tien,
-                    totalCart = hoaDon?.tong_tien ?? cart.thanh_tien
-                });
+                    int soLuongCu = cart.so_luong;
+                    int chenhlech = quantity - soLuongCu;
+
+                    if (chenhlech > 0)
+                    {
+                        // Tăng số lượng => cần kiểm tra kho
+                        if (chenhlech > sanPham.so_luong)
+                        {
+                            return Json(new { success = false, message = "Số lượng sản phẩm không đủ trong kho!" });
+                        }
+                        sanPham.so_luong -= chenhlech;
+                    }
+                    else if (chenhlech < 0)
+                    {
+                        // Giảm số lượng => hoàn lại vào kho
+                        sanPham.so_luong += Math.Abs(chenhlech);
+                    }
+
+
+                    _context.Update(sanPham);
+
+                    cart.so_luong = quantity;
+                    cart.thanh_tien = cart.gia * quantity;
+
+                    _context.Update(cart);
+                    _context.SaveChanges();
+
+                    if (hoaDon != null)
+                    {
+                        var tongTienMoi = _context.don_Chi_Tiets
+                                            .Where(z => z.ma == hoaDon.MaHoaDon)
+                                            .Sum(z => z.gia * z.so_luong);
+
+                        hoaDon.tong_tien = tongTienMoi;
+                        _context.Update(hoaDon);
+                        _context.SaveChanges();
+                    }
+
+                    return Json(new
+                    {
+                        success = true,
+                        newTotal = cart.thanh_tien,
+                        totalCart = hoaDon?.tong_tien ?? cart.thanh_tien
+                    });
+                }
             }
 
             return Json(new { success = false, message = "Không tìm thấy sản phẩm trong giỏ hàng!" });
         }
+
+
+
         [HttpPost]
         public IActionResult CapNhatThongTin(Hoa_Don model)
         {
@@ -238,8 +362,11 @@ namespace WebBanGiay.Areas.Admin.Controllers
         [HttpPost]
         public JsonResult UpdateStatus(Guid? id, int newStatus)
         {
-            
             var hoaDon = _context.hoa_Dons.FirstOrDefault(h => h.ID == id);
+
+            var cart = _context.don_Chi_Tiets.FirstOrDefault(z => z.Hoa_DonID == hoaDon.ID);
+         
+            var sanPham = _context.san_Pham_Chi_Tiets.FirstOrDefault(sp => sp.ID == cart.San_Pham_Chi_TietID);
             if (hoaDon != null) 
             {
                 hoaDon.trang_thai = newStatus;
@@ -260,6 +387,23 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     thao_tac = "Chuyển trạng thái Hóa Đơn thành: " + tTHD.Name,
                     ghi_chu = "không"
                 };
+                if (newStatus == 1)
+                {
+                    if (sanPham != null && cart != null)
+                    {
+                        if (sanPham.so_luong >= cart.so_luong)
+                        {
+                            sanPham.so_luong -= cart.so_luong;
+                            _context.Update(sanPham);
+                        }
+                        else
+                        {
+                            return Json(new { success = false, message = "Số lượng sản phẩm không đủ trong kho!" });
+                        }
+                    }
+                }
+
+           
                 _context.tai_Khoan_Hoa_Dons.Add(link);
 
                 _context.SaveChanges();
@@ -547,34 +691,59 @@ namespace WebBanGiay.Areas.Admin.Controllers
         [HttpPost]
         public JsonResult HuyDonHang(Guid? id)
         {
-            var hoaDon = _context.hoa_Dons.FirstOrDefault(h => h.ID == id);
+            var hoaDon = _context.hoa_Dons
+                .Include(h => h.Hoa_Don_Chi_Tiets) 
+                .FirstOrDefault(h => h.ID == id);
+          
+
             if (hoaDon == null)
             {
                 return Json(new { success = false, message = "Không tìm thấy đơn hàng!" });
             }
 
-
-            if (hoaDon.trang_thai == 3 || hoaDon.trang_thai == 2) // Hoàn thành hoặc Đang giao hàng
+            if (hoaDon.trang_thai == 3 || hoaDon.trang_thai == 2 || hoaDon.trang_thai == 5)
             {
                 return Json(new { success = false, message = "Không thể hủy đơn hàng đã hoàn thành hoặc đang giao hàng!" });
             }
+
             if (hoaDon.trang_thai == 4)
             {
-
                 return Json(new { success = false, message = "Đơn hàng đã bị hủy, không thể thay đổi trạng thái!" });
             }
+
+            foreach (var ct in hoaDon.Hoa_Don_Chi_Tiets)
+            {
+                var sanPhamChiTiet = _context.san_Pham_Chi_Tiets.FirstOrDefault(sp => sp.ID == ct.San_Pham_Chi_TietID);
+                if (sanPhamChiTiet != null)
+                {
+                    sanPhamChiTiet.so_luong += ct.so_luong;
+                    _context.san_Pham_Chi_Tiets.Update(sanPhamChiTiet);
+                }
+            }
+            var giamgia = _context.phieu_Giam_Gias.FirstOrDefault(x => x.ID == hoaDon.Giam_GiaID);
+            if(giamgia != null)
+            {
+                giamgia.gia_tri_giam = 0;
+            }
+            if (hoaDon.Ship != null)
+            {
+                hoaDon.Ship = 0;
+            }
+
+            // Cập nhật trạng thái đơn hàng
             hoaDon.tong_tien = 0;
             hoaDon.trang_thai = 4;
-
-
+        
+            
 
             _context.hoa_Dons.Update(hoaDon);
             _context.SaveChanges();
-            Console.WriteLine($"Hủy đơn hàng: {hoaDon.ID} - Sau khi cập nhật: Tổng tiền = {hoaDon.tong_tien}");
 
+            Console.WriteLine($"Hủy đơn hàng: {hoaDon.ID} - Tổng tiền = {hoaDon.tong_tien}");
 
             return Json(new { success = true });
         }
+
 
 
         //[HttpPost]

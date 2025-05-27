@@ -256,25 +256,36 @@ namespace WebBanGiay.Controllers
             return RedirectToAction("Login");
         }
 
-        //public async Task<IActionResult> Logout()
-        //{
-        //    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        //    TempData["Message"] = "Đăng xuất thành công!";
-        //    return RedirectToAction("Login", "TaiKhoan");
-        //}
-            [HttpGet]
-            public async Task<IActionResult> Logout()
-            {
-                var role = User.FindFirst(ClaimTypes.Role)?.Value;
 
-                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+		//[HttpGet]
+		//public async Task<IActionResult> Logout()
+		//{
+		//    var role = User.FindFirst(ClaimTypes.Role)?.Value;
 
-                if (role == "Admin" || role == "Nhân Viên")
-                    return RedirectToAction("LoginAdmin", "Account", new { area = "Admin" });
+		//    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-                return RedirectToAction("Login", "TaiKhoan");
-            }
+		//    if (role == "Admin" || role == "Nhân Viên")
+		//        return RedirectToAction("LoginAdmin", "Account", new { area = "Admin" });
+
+		//    return RedirectToAction("Login", "TaiKhoan");
+		//}
+		[HttpGet]
+		public async Task<IActionResult> Logout()
+		{
+			var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
+			if (role == "Admin" || role == "Nhân Viên")
+			{
+				await HttpContext.SignOutAsync("AdminScheme");
+				return RedirectToAction("LoginAdmin", "Account", new { area = "Admin" });
+			}
+			else
+			{
+				await HttpContext.SignOutAsync("CustomerScheme");
+				return RedirectToAction("Login", "TaiKhoan");
+			}
+		}
 
 
-    }
+	}
 }

@@ -190,6 +190,39 @@ namespace WebBanGiay.Areas.Admin.Controllers
             string fromEmail = "trangthph44337@fpt.edu.vn";  // Thay bằng Gmail của bạn
             string fromPassword = "fdqe bzsy cscd kerv"; // Thay bằng App Password (16 ký tự)
 
+            string subject = "Tài khoản của bạn đã được tạo thành công";
+            string body = $@"
+            <p>Chào {username},</p>
+            <p>Tài khoản của bạn đã được tạo thành công.</p>
+            <p><b>Tên đăng nhập:</b> {username}</p>
+            <p><b>Mật khẩu:</b> {password}</p>";
+
+            using (MailMessage mail = new MailMessage())
+            {
+                mail.From = new MailAddress(fromEmail);
+                mail.To.Add(toEmail);
+                mail.Subject = subject;
+                mail.Body = body;
+                mail.IsBodyHtml = true;
+
+                using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                {
+                    smtp.UseDefaultCredentials = false; // Bắt buộc phải đặt false
+                    smtp.Credentials = new NetworkCredential(fromEmail, fromPassword);
+                    smtp.EnableSsl = true;
+                    smtp.Send(mail);
+                }
+            }
+        }
+
+
+        //------------------Gửi Mail------------------------//
+
+        private void SendEmail(string toEmail, string username, string password)
+        {
+            string fromEmail = "trangthph44337@fpt.edu.vn";  // Thay bằng Gmail của bạn
+            string fromPassword = "fdqe bzsy cscd kerv"; // Thay bằng App Password (16 ký tự)
+
             string subject = "Tài khoản nhân viên mới";
             string body = $@"
             <p>Chào {username},</p>
@@ -621,5 +654,32 @@ namespace WebBanGiay.Areas.Admin.Controllers
         {
             return _context.tai_Khoans.Any(e => e.ID == id);
         }
+
+        [HttpGet]
+        public IActionResult GetAddressCustomer(Guid? customerId)
+        {
+            if (customerId == null)
+            {
+				return Json(new { success = false, message = "chưa có ID khách hàng! " });
+			}
+            try
+            {
+				var query = _context.dia_Chis.Where(x => x.Tai_KhoanID == customerId)
+                    .Select(x => new
+				{
+					tinh = x.tinh,
+					huyen = x.huyen,
+					xa = x.xa,
+					chi_tiet = x.dia_chi_chi_tiet
+				}).ToList();
+                return Json(query);
+			}
+			catch (Exception ex)
+            {
+
+				return Json(new { success = false, message = "Lỗi địa chỉ: " + ex.Message });
+			}
+
+		}
     }
 }

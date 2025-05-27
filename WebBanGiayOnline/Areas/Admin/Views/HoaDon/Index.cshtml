@@ -271,18 +271,20 @@
                                         2 => "Đang giao hàng",
                                         3 => "Hoàn thành",
                                         4 => "Đã hủy",
-                                        -1 => "Chưa Thanh Toán",
-                                        -2 => "Đã Thanh Toán",
+                                5 => "Đã Thanh Toán",
+                                        6 => "Chưa Thanh Toán",
                                         _ => "Không xác định"
                                     };
                                 }
                                 @trangThaiText
                             </td>
-                        <td>@string.Format("{0:0,0} VND", item.tong_tien)</td>
+                        <td>@string.Format("{0:0,0} VND", item.tong_tien + item.Ship)</td>
                             <td>
                                 <div class="btn-group">
                                     <a asp-action="Details" asp-controller="HoaDon" asp-route-id="@item.ID" class="btn btn-info btn-sm">
-                                        <i class="fas fa-eye"></i>
+                                <i class="fas fa-eye text-warning"></i>
+
+
                                     </a>
                                    
                                 </div>

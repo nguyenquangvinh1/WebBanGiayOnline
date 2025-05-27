@@ -48,7 +48,11 @@
                 margin-right: 10px;
             }
 
-
+        .disabled-link {
+            pointer-events: none;
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
 
         .btn:hover {
             background-color: #0056b3;
@@ -215,6 +219,15 @@
             color: #FF0000; /* Chữ đỏ */
             background-color: #fff;
             border: 1px solid #FF0000; /* Viền đỏ (nếu muốn) */
+            border-radius: 20px;
+            padding: 4px 10px;
+            white-space: nowrap;
+        }
+
+        .trang-thai-chua-dien-ra {
+            color: #CC33CC; /* Chữ đỏ */
+            background-color: #fff;
+            border: 1px solid #CC33CC; /* Viền đỏ (nếu muốn) */
             border-radius: 20px;
             padding: 4px 10px;
             white-space: nowrap;
@@ -417,7 +430,7 @@
                                 @Html.DisplayFor(modelItem => item.so_luong)
                             </td>
 
-                            <td>@item.ngay_bat_dau.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>@item.ngay_bat_dau.GetValueOrDefault().ToString("yyyy-MM-dd HH:mm")</td>
 
                             <td>@item.ngay_ket_thuc.GetValueOrDefault().ToString("yyyy-MM-dd HH:mm")</td>
 
@@ -425,6 +438,10 @@
                                 @if (item.trang_thai == 1)
                                 {
                                     <span class="trang-thai-dang-dien-ra">Đang diễn ra</span>
+                                }
+                                else if (item.trang_thai == -1)
+                                {
+                                    <span class="trang-thai-chua-dien-ra">Chưa diễn ra</span>
                                 }
                                 else
                                 {
@@ -434,9 +451,13 @@
 
                             <td>
                                 <div class="btn-group btn-group-xs">
-                                    <a asp-area="Admin" asp-action="Edit" asp-route-id="@item.ID" class="btn btn-warning">
+                                    <a asp-area="Admin"
+                                       asp-action="Edit"
+                                       asp-route-id="@item.ID"
+                                       class="btn btn-warning @(item.trang_thai != -1 ? "disabled-link" : "")">
                                         <i class="fa fa-xs fa-pen"></i>
                                     </a>
+
 
                                 </div>
 

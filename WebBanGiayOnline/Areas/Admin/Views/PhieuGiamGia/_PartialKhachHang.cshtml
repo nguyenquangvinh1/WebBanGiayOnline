@@ -1,0 +1,47 @@
+﻿@model X.PagedList.IPagedList<ClssLib.Tai_Khoan>
+@using X.PagedList.Mvc.Core;
+@using X.PagedList;
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)" /></th>
+            <th>Tên</th>
+            <th>Số điện thoại</th>
+            <th>Email</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Count > 0)
+        {
+            foreach (var tai_khoan in Model)
+            {
+                <tr>
+                    <td><input type="checkbox" name="customerIds" value="@tai_khoan.ID" class="customer-checkbox" /></td>
+                    <td>@tai_khoan.ho_ten</td>
+                    <td>@tai_khoan.sdt</td>
+                    <td>@tai_khoan.email</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr><td colspan="4">Không có khách hàng nào.</td></tr>
+        }
+    </tbody>
+</table>
+
+@Html.PagedListPager(Model, page => Url.Action("Customer", new
+    {
+        page,
+        searchString = Context.Request.Query["searchString"]
+    }), new PagedListRenderOptions
+{
+    LiElementClasses = new[] { "page-item" },
+    PageClasses = new[] { "page-link" },
+    DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+    DisplayLinkToLastPage = PagedListDisplayMode.Always,
+    DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+    DisplayLinkToNextPage = PagedListDisplayMode.Always,
+    MaximumPageNumbersToDisplay = 5
+})

@@ -71,47 +71,47 @@ namespace WebBanGiay.Areas.Admin.Controllers
             var startOfWeek = today.AddDays(-(int)today.DayOfWeek + (today.DayOfWeek == DayOfWeek.Sunday ? -6 : 1));
             var endOfWeek = startOfWeek.AddDays(6);
             var homNay = _context.hoa_Dons
-                .Where(hd => hd.ngay_tao >= today && (hd.trang_thai == 3 || hd.trang_thai == 4))
+                .Where(hd => hd.ngay_tao >= today && (hd.trang_thai == 3 || hd.trang_thai == 4|| hd.trang_thai == 5))
                 .GroupBy(_ => 1)
                 .Select(x => new ThongKe()
                 {
                     TongTien = x.Sum(x => x.tong_tien),
-                    DonThanhCong = x.Count(x => x.trang_thai == 3),
+                    DonThanhCong = x.Count(x => x.trang_thai == 3 || x.trang_thai == 5),
                     DonHuy = x.Count(x => x.trang_thai == 4),
                 }).ToList();
 
 
 
             var tuanNay = _context.hoa_Dons
-                .Where(hd => hd.ngay_tao >= startOfWeek && hd.ngay_tao <= endOfWeek && (hd.trang_thai == 3 || hd.trang_thai == 4))
+                .Where(hd => hd.ngay_tao >= startOfWeek && hd.ngay_tao <= endOfWeek && (hd.trang_thai == 3 || hd.trang_thai == 4 || hd.trang_thai == 5))
                 .GroupBy(_ => 1)
                 .Select(x =>
                        new ThongKe()
                        {
                            TongTien = x.Where(x => x.trang_thai == 3).Sum(x => x.tong_tien),
-                           DonThanhCong = x.Count(x => x.trang_thai == 3),
+                           DonThanhCong = x.Count(x => x.trang_thai == 3 || x.trang_thai ==5),
                            DonHuy = x.Count(x => x.trang_thai == 4),
                        }).ToList();
 
             var thangNay = _context.hoa_Dons
-                .Where(hd => hd.ngay_tao.Month == today.Month && hd.ngay_tao.Year == today.Year && (hd.trang_thai == 3 || hd.trang_thai == 4))
+                .Where(hd => hd.ngay_tao.Month == today.Month && hd.ngay_tao.Year == today.Year && (hd.trang_thai == 3 || hd.trang_thai == 4 || hd.trang_thai == 5))
                 .GroupBy(_ => 1)
                 .Select(x =>
                        new ThongKe()
                        {
                            TongTien = x.Where(x => x.trang_thai == 3).Sum(x => x.tong_tien),
-                           DonThanhCong = x.Count(x => x.trang_thai == 3),
+                           DonThanhCong = x.Count(x => x.trang_thai == 3 || x.trang_thai == 5),
                            DonHuy = x.Count(x => x.trang_thai == 4),
                        }).ToList();
 
             var namNay = _context.hoa_Dons
-                .Where(hd => hd.ngay_tao.Year == today.Year && (hd.trang_thai == 3 || hd.trang_thai == 4))
+                .Where(hd => hd.ngay_tao.Year == today.Year && (hd.trang_thai == 3 || hd.trang_thai == 4 || hd.trang_thai == 5))
                 .GroupBy(_ => 1)
                 .Select(x =>
 new ThongKe()
 {
     TongTien = x.Where(x => x.trang_thai == 3).Sum(x => x.tong_tien),
-    DonThanhCong = x.Count(x => x.trang_thai == 3),
+    DonThanhCong = x.Count(x => x.trang_thai == 3 || x.trang_thai == 5),
     DonHuy = x.Count(x => x.trang_thai == 4),
 }).ToList();
 
@@ -163,7 +163,7 @@ new ThongKe()
         {
 
             var thongKe = _context.hoa_Dons
-                .Where(x => x.trang_thai == 3 || x.trang_thai == -2)
+                .Where(x => x.trang_thai == 3 || x.trang_thai == 5)
                .GroupBy(x => x.ngay_tao)
                
                 .Select(x => new
@@ -171,7 +171,7 @@ new ThongKe()
                     DoanhThu = x.Key,
                     TongTien =  x.Sum(x => x.tong_tien),
 
-                    DonThanhCong = x.Sum(x => x.trang_thai == 3 ? 1 : 0),
+                    DonThanhCong = x.Sum(x => x.trang_thai == 3 || x.trang_thai ==5 ? 1 : 0),
                     DonHuy = x.Sum(x => x.trang_thai == 4 ? 1 : 0),
                 }).ToList();
 
@@ -189,9 +189,9 @@ new ThongKe()
                 .Select(g => new
                 {
                     doanhThu = g.Key.ToString("yyyy-MM-dd"), // Chuyển DateTime thành string
-                    TongTien = g.Where(x => x.trang_thai == 3 || x.trang_thai == -2).Sum(x => x.tong_tien),
+                    TongTien = g.Where(x => x.trang_thai == 3 || x.trang_thai == 5).Sum(x => x.tong_tien),
 
-                    donThanhCong = g.Count(hd => hd.trang_thai == 3),
+                    donThanhCong = g.Count(hd => hd.trang_thai == 3 || hd.trang_thai ==5),
                     donHuy = g.Count(hd => hd.trang_thai == 4)
                 }).ToList();
 

@@ -31,6 +31,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 
         public async Task<IActionResult> Index()
         {
+            DateTime currentDate = DateTime.Now;
 
             var list = await _context.san_Phams
                 .AsNoTracking()
@@ -46,6 +47,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 .ToListAsync();
             foreach (var item in list)
             {
+                CheckStatusSP(item.ID, (int)item.trang_thai);
                 int tong = 0;
                 var spct = _context.san_Pham_Chi_Tiets.Where(x => x.San_PhamID == item.ID).ToList();
                 if (spct.Count != 0)
@@ -185,7 +187,8 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             var mauMoi = new Mau_Sac
             {
                 ID = Guid.NewGuid(),
-                ma_mau = maMau
+                ma_mau = maMau,
+                ngay_tao = DateTime.UtcNow
             };
 
             _context.mau_Sacs.Add(mauMoi);
@@ -204,7 +207,8 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             var KichCo = new Kich_Thuoc
             {
                 ID = Guid.NewGuid(),
-                ten_kich_thuoc = kichCo
+                ten_kich_thuoc = kichCo,
+                ngay_tao = DateTime.UtcNow
             };
 
             _context.kich_Thuocs.Add(KichCo);
@@ -232,7 +236,9 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             }
 
             // Thêm giá trị mới vào database
-            var newCoGiay = new Co_Giay { ten_loai_co_giay = tenCoGiay };
+            var newCoGiay = new Co_Giay { ten_loai_co_giay = tenCoGiay,
+                ngay_tao = DateTime.UtcNow
+            };
             _context.co_Giays.Add(newCoGiay);
             await _context.SaveChangesAsync();
 
@@ -255,7 +261,8 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             }
 
             // Thêm giá trị mới vào database
-            var newDeGiay = new De_Giay { ten_de_giay = tenDeGiay };
+            var newDeGiay = new De_Giay { ten_de_giay = tenDeGiay ,
+                ngay_tao = DateTime.UtcNow};
             _context.de_Giays.Add(newDeGiay);
             await _context.SaveChangesAsync();
 
@@ -278,7 +285,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             }
 
             // Thêm giá trị mới vào database
-            var newMuiGiay = new Mui_Giay { ten_mui_giay = tenMuiGiay };
+            var newMuiGiay = new Mui_Giay { ten_mui_giay = tenMuiGiay , ngay_tao = DateTime.UtcNow };
             _context.mui_Giays.Add(newMuiGiay);
             await _context.SaveChangesAsync();
 
@@ -301,7 +308,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             }
 
             // Thêm giá trị mới vào database
-            var newMauSac = new Mau_Sac { ma_mau = tenMauSac };
+            var newMauSac = new Mau_Sac { ma_mau = tenMauSac , ngay_tao = DateTime.UtcNow };
             _context.mau_Sacs.Add(newMauSac);
             await _context.SaveChangesAsync();
 
@@ -324,7 +331,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             }
 
             // Thêm giá trị mới vào database
-            var newKieuDang = new Kieu_Dang { ten_kieu_dang = tenKieuDang };
+            var newKieuDang = new Kieu_Dang { ten_kieu_dang = tenKieuDang , ngay_tao = DateTime.UtcNow };
             _context.kieu_Dangs.Add(newKieuDang);
             await _context.SaveChangesAsync();
 
@@ -347,7 +354,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             }
 
             // Thêm giá trị mới vào database
-            var newKichThuoc = new Kich_Thuoc { ten_kich_thuoc = tenKichThuoc };
+            var newKichThuoc = new Kich_Thuoc { ten_kich_thuoc = tenKichThuoc , ngay_tao = DateTime.UtcNow };
             _context.kich_Thuocs.Add(newKichThuoc);
             await _context.SaveChangesAsync();
 
@@ -370,7 +377,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             }
 
             // Thêm giá trị mới vào database
-            var newDanhMuc = new Danh_Muc { ten_danh_muc = tenDanhMuc };
+            var newDanhMuc = new Danh_Muc { ten_danh_muc = tenDanhMuc , ngay_tao = DateTime.UtcNow };
             _context.danh_Mucs.Add(newDanhMuc);
             await _context.SaveChangesAsync();
 
@@ -393,7 +400,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             }
 
             // Thêm giá trị mới vào database
-            var newChatLieu = new Chat_Lieu { ten_chat_lieu = tenChatLieu };
+            var newChatLieu = new Chat_Lieu { ten_chat_lieu = tenChatLieu , ngay_tao = DateTime.UtcNow };
             _context.chat_Lieus.Add(newChatLieu);
             await _context.SaveChangesAsync();
 
@@ -417,7 +424,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             }
 
             // Thêm giá trị mới vào database
-            var newLoaiGiay = new Loai_Giay { ten_loai_giay = tenLoaiGiay };
+            var newLoaiGiay = new Loai_Giay { ten_loai_giay = tenLoaiGiay , ngay_tao = DateTime.UtcNow  };
             _context.loai_Giays.Add(newLoaiGiay);
             await _context.SaveChangesAsync();
 
@@ -473,14 +480,31 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
                 .Where(x => x.San_PhamID == id)
                 .ToList();
 
-            bool allMatch = spctList.All(x => x.trang_thai == trang_thai);
+            foreach (var spct in spctList)
+            {
+                if (spct.so_luong == 0 && spct.trang_thai != 0)
+                {
+                    spct.trang_thai = 0;
+                    _context.san_Pham_Chi_Tiets.Update(spct);
+                }
+                
+            }
 
-            if (allMatch)
+            if (spctList.All(x => x.trang_thai == trang_thai))
             {
                 sp.trang_thai = trang_thai;
-                _context.SaveChanges();
+                _context.san_Phams.Update(sp);
             }
+            else if (spctList.All(x => x.trang_thai != trang_thai))
+            {
+                // ✅ Gán trạng thái theo item đầu tiên trong danh sách
+                sp.trang_thai = spctList.First().trang_thai;
+                _context.san_Phams.Update(sp);
+            }
+
+            _context.SaveChanges();
         }
+
 
         // GET: KieuDangController/Details/5
         public async Task<IActionResult> Details(Guid? id)
@@ -503,22 +527,23 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         // GET: KieuDangController/Create
         public IActionResult Create()
         {
-            var query = _context.san_Phams.AsQueryable();
+            var query = _context.san_Phams.ToList();
             var tenDaDangKy = new List<string>();
             foreach (var item in query)
             {
                 tenDaDangKy.Add(item.ten_san_pham);
             }
+
             ViewData["TenGiay"] = tenDaDangKy;
-            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu");
-            ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.ToList(), "ID", "ten_loai_co_giay");
-            ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.ToList(), "ID", "ten_danh_muc");
-            ViewData["De_GiayID"] = new SelectList(_context.de_Giays.ToList(), "ID", "ten_de_giay");
-            ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.ToList(), "ID", "ten_mui_giay");
-            ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.ToList(), "ID", "ten_kieu_dang");
-            ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.ToList(), "ID", "ten_loai_giay");
-            ViewData["Kich_ThuocID"] = new SelectList(_context.kich_Thuocs.ToList(), "ID", "ten_kich_thuoc");
-            ViewData["Mau_SacID"] = new SelectList(_context.mau_Sacs.ToList(), "ID", "ma_mau");
+            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_chat_lieu");
+            ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_loai_co_giay");
+            ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_danh_muc");
+            ViewData["De_GiayID"] = new SelectList(_context.de_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_de_giay");
+            ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_mui_giay");
+            ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_kieu_dang");
+            ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_loai_giay");
+            ViewData["Kich_ThuocID"] = new SelectList(_context.kich_Thuocs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_kich_thuoc");
+            ViewData["Mau_SacID"] = new SelectList(_context.mau_Sacs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ma_mau");
             return View();
         }
 
@@ -810,15 +835,15 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             }
             ViewData["TenGiay"] = tenDaDangKy;
 
-            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.ToList(), "ID", "ten_chat_lieu", san.Chat_LieuID);
-            ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.ToList(), "ID", "ten_loai_co_giay", san.Co_GiayID);
-            ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.ToList(), "ID", "ten_danh_muc", san.Danh_MucID);
-            ViewData["De_GiayID"] = new SelectList(_context.de_Giays.ToList(), "ID", "ten_de_giay", san.De_GiayID);
-            ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.ToList(), "ID", "ten_mui_giay", san.Mui_GiayID);
-            ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.ToList(), "ID", "ten_kieu_dang", san.Kieu_DangID);
-            ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.ToList(), "ID", "ten_loai_giay", san.Loai_GiayID);
-            ViewData["Kich_ThuocID"] = new SelectList(_context.kich_Thuocs.ToList(), "ID", "ten_kich_thuoc");
-            ViewData["Mau_SacID"] = new SelectList(_context.mau_Sacs.ToList(), "ID", "ma_mau");
+            ViewData["Chat_LieuID"] = new SelectList(_context.chat_Lieus.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_chat_lieu", san.Chat_LieuID);
+            ViewData["Co_GiayID"] = new SelectList(_context.co_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_loai_co_giay", san.Co_GiayID);
+            ViewData["Danh_MucID"] = new SelectList(_context.danh_Mucs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_danh_muc", san.Danh_MucID);
+            ViewData["De_GiayID"] = new SelectList(_context.de_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_de_giay", san.De_GiayID);
+            ViewData["Mui_GiayID"] = new SelectList(_context.mui_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_mui_giay", san.Mui_GiayID);
+            ViewData["Kieu_DangID"] = new SelectList(_context.kieu_Dangs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_kieu_dang", san.Kieu_DangID);
+            ViewData["Loai_GiayID"] = new SelectList(_context.loai_Giays.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_loai_giay", san.Loai_GiayID);
+            ViewData["Kich_ThuocID"] = new SelectList(_context.kich_Thuocs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ten_kich_thuoc");
+            ViewData["Mau_SacID"] = new SelectList(_context.mau_Sacs.OrderByDescending(x => x.ngay_tao).ToList(), "ID", "ma_mau");
             return View(san);
         }
 

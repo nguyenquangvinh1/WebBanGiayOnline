@@ -53,6 +53,34 @@
 			background-color: #f0f0f0;
 		}
 
+
+	.pagination-container {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-top: 20px;
+	}
+
+	.pagination-buttons .page-btn {
+		display: inline-block;
+		padding: 6px 12px;
+		margin: 0 2px;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+		text-decoration: none;
+		color: #333;
+	}
+
+		.pagination-buttons .page-btn:hover {
+			background-color: #f0f0f0;
+		}
+
+	.pagination-buttons .text-orange {
+		color: #ff7a00;
+	}
+
+
+
 </style>
 <div class="page-content-wrapper">
 	<div class="container-fluid">
@@ -142,7 +170,7 @@
 					@{
 						int currentPage = ViewBag.CurrentPage ?? 1;
 						int totalPages = ViewBag.TotalPages ?? 1;
-						int pageSize = ViewBag.PageSize ?? 3;
+						int pageSize = ViewBag.PageSize ?? 5;
 						int totalItems = ViewBag.TotalItems ?? 0;
 					}
 					<div class="pagination-container">
@@ -153,9 +181,23 @@
 						<div class="pagination-buttons">
 							<a class="page-btn" href="@Url.Action("Index", new { page = 1 })">&laquo;</a>
 							<a class="page-btn" href="@Url.Action("Index", new { page = currentPage > 1 ? currentPage - 1 : 1 })">&lsaquo;</a>
+
+							@for (int i = 1; i <= totalPages; i++)
+							{
+								if (i == currentPage)
+								{
+									<a class="page-btn fw-bold text-orange">@i</a>
+								}
+								else
+								{
+									<a class="page-btn" href="@Url.Action("Index", new { page = i })">@i</a>
+								}
+							}
+
 							<a class="page-btn" href="@Url.Action("Index", new { page = currentPage < totalPages ? currentPage + 1 : totalPages })">&rsaquo;</a>
 							<a class="page-btn" href="@Url.Action("Index", new { page = totalPages })">&raquo;</a>
 						</div>
+
 					</div>
 
 				</div>

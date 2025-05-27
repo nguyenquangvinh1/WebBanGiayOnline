@@ -1,6 +1,9 @@
 ﻿@model ClssLib.San_Pham
 
-
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
 
 <!-- Modal Hiển Thị Ảnh -->
 <div class="modal fade" id="productImageModal" tabindex="-1" aria-labelledby="productImageModalLabel" aria-hidden="true">
@@ -48,40 +51,43 @@
                     </button>
 
                     <div class="form-group">
-                        <label for="ten_san_pham" class="col-form-label">Tên Sản Phẩm</label>
-                        <select id="ten_san_pham" name="ten_san_pham" class="form-control select2">
-                            <option value="">-- Nhập hoặc chọn tên sản phẩm --</option>
+                        <label asp-for="ten_san_pham" class="col-form-label">Tên Sản Phẩm</label>
+                        <select asp-for="ten_san_pham" id="ten_san_pham" name="ten_san_pham" class="form-control select2">
+                            <option value="">-- Nhập tên sản phẩm --</option>
                             @foreach (var item in ViewBag.TenGiay as List<string>)
                             {
                                 <option value="@item">@item</option>
                             }
                         </select>
                         <span id="ten_san_pham_warning" class="text-danger" style="display: none;">⚠️ Tên sản phẩm đã tồn tại!</span>
+                        <span asp-validation-for="ten_san_pham" class="text-danger"></span>
                     </div>
 
 
                     <div class="form-group">
                         <label asp-for="Loai_GiayID" class="control-label"></label>
-                        <select id="Loai_GiayID" name="Loai_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddLoaiGiay">
+                        <select asp-for="Loai_GiayID" id="Loai_GiayID" name="Loai_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddLoaiGiay">
                             <option value="">-- Nhập hoặc chọn Loại Giày --</option>
                             @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Loai_GiayID)
                             {
                                 <option value="@item.Value">@item.Text</option>
                             }
                         </select>
+                        <span asp-validation-for="Loai_GiayID" class="text-danger"></span>
                     </div>
 
                     <div class="row">
                         <div class="col-sm-4">
                             <div class="form-group">
                                 <label asp-for="Chat_LieuID" class="control-label"></label>
-                                <select id="Chat_LieuID" name="Chat_LieuID" class="form-control select2" data-api="/Admin/SanPham/AddChatLieu">
+                                <select asp-for="Chat_LieuID" id="Chat_LieuID" name="Chat_LieuID" class="form-control select2" data-api="/Admin/SanPham/AddChatLieu">
                                     <option value="">-- Nhập hoặc chọn Chất Liệu --</option>
                                     @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Chat_LieuID)
                                     {
                                         <option value="@item.Value">@item.Text</option>
                                     }
                                 </select>
+                                <span asp-validation-for="Chat_LieuID" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-sm-4">
@@ -89,13 +95,14 @@
                             <div class="form-group">
                                 <label asp-for="Co_GiayID" class="control-label"></label>
 
-                                <select id="Co_GiayID" name="Co_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddCoGiay">
+                                <select asp-for="Co_GiayID" id="Co_GiayID" name="Co_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddCoGiay">
                                     <option value="">-- Nhập hoặc chọn Cổ Giày --</option>
                                     @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Co_GiayID)
                                     {
                                         <option value="@item.Value">@item.Text</option>
                                     }
                                 </select>
+                                <span asp-validation-for="Co_GiayID" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-sm-4">
@@ -104,13 +111,14 @@
                                 <label asp-for="Danh_MucID" class="control-label"></label>
 
 
-                                <select id="Danh_MucID" name="Danh_MucID" class="form-control select2" data-api="/Admin/SanPham/AddDanhMuc">
+                                <select asp-for="Danh_MucID" id="Danh_MucID" name="Danh_MucID" class="form-control select2" data-api="/Admin/SanPham/AddDanhMuc">
                                     <option value="">-- Nhập hoặc chọn Danh Mục --</option>
                                     @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Danh_MucID)
                                     {
                                         <option value="@item.Value">@item.Text</option>
                                     }
                                 </select>
+                                <span asp-validation-for="Danh_MucID" class="text-danger"></span>
                             </div>
                         </div>
 
@@ -120,13 +128,14 @@
                             <div class="form-group">
                                 <label asp-for="De_GiayID" class="control-label"></label>
 
-                                <select id="De_GiayID" name="De_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddDeGiay">
+                                <select asp-for="De_GiayID" id="De_GiayID" name="De_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddDeGiay">
                                     <option value="">-- Nhập hoặc chọn Đế Giày --</option>
                                     @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.De_GiayID)
                                     {
                                         <option value="@item.Value">@item.Text</option>
                                     }
                                 </select>
+                                <span asp-validation-for="De_GiayID" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-sm-4">
@@ -134,13 +143,14 @@
                             <div class="form-group">
                                 <label asp-for="Mui_GiayID" class="control-label"></label>
 
-                                <select id="Mui_GiayID" name="Mui_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddMuiGiay">
+                                <select asp-for="Mui_GiayID" id="Mui_GiayID" name="Mui_GiayID" class="form-control select2" data-api="/Admin/SanPham/AddMuiGiay">
                                     <option value="">-- Nhập hoặc chọn Mũi Giày --</option>
                                     @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Mui_GiayID)
                                     {
                                         <option value="@item.Value">@item.Text</option>
                                     }
                                 </select>
+                                <span asp-validation-for="Mui_GiayID" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-sm-4">
@@ -148,13 +158,15 @@
                             <div class="form-group">
                                 <label asp-for="Kieu_DangID" class="control-label"></label>
 
-                                <select id="Kieu_DangID" name="Kieu_DangID" class="form-control select2" data-api="/Admin/SanPham/AddKieuDang">
+                                <select asp-for="Kieu_DangID" id="Kieu_DangID" name="Kieu_DangID" class="form-control select2" data-api="/Admin/SanPham/AddKieuDang">
                                     <option value="">-- Nhập hoặc chọn Kiểu Dáng --</option>
                                     @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Kieu_DangID)
                                     {
                                         <option value="@item.Value">@item.Text</option>
                                     }
                                 </select>
+                                
+                                <span asp-validation-for="Kieu_DangID" class="text-danger"></span>
                             </div>
                         </div>
 
@@ -165,12 +177,12 @@
                         <textarea asp-for="mo_ta" class="form-control"></textarea>
                         <span asp-validation-for="mo_ta" class="text-danger"></span>
                     </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary" id="saveProduct">thêm</button>
-                        @* <input type="submit" value="Create" id="saveProduct" class="btn btn-primary" /> *@
-                    </div>
+                    
                 </form>
-
+                <div class="form-group">
+                    <button class="btn btn-primary" id="saveProduct">thêm</button>
+                    @* <input type="submit" value="Create" id="saveProduct" class="btn btn-primary" /> *@
+                </div>
             </div>
         </div>
 
@@ -327,6 +339,14 @@
         let selectedSizes = [];
         let uploadedImages = []; // Mảng lưu đường dẫn ảnh
 
+        var Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
+
 
         $(document).on("click", ".anh_form", function () {
 
@@ -347,33 +367,51 @@
             $('#newSize').focus();
         });
 
-        // Khi nhấn Enter để thêm kích cỡ mới
+        const kichThuocDaCo = @Html.Raw(Json.Serialize((IEnumerable<SelectListItem>)ViewData["Kich_ThuocID"]));
+
         $('#newSize').keypress(function (e) {
-            if (e.which == 13) { // Nhấn Enter
+            if (e.which == 13) {
+                e.preventDefault();
+
                 let newSize = $('#newSize').val().trim();
-                if (newSize !== "") {
-                    $.ajax({
-                        url: '/Admin/SanPham/ThemKichCo',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify(newSize),
-                        success: function (response) {
-                            // Thêm checkbox kích cỡ mới vào danh sách
-                            $('#sizeModalBody').append(`
-                                        <div class="form-check">
-                                            <input class="form-check-input size-checkbox" type="checkbox" value="${response}" checked> ${response}
-                                        </div>
-                                    `);
-                            $('#sizePickerContainer').hide(); // Ẩn ô nhập kích cỡ
-                            $('#newSize').val(''); // Xóa nội dung nhập
-                        },
-                        error: function () {
-                            alert("Có lỗi xảy ra khi thêm kích cỡ.");
-                        }
+                if (newSize === "") return;
+
+                // 🔍 Kiểm tra trùng từ danh sách lấy từ Razor
+                let isDuplicate = kichThuocDaCo.some(item => item.text.toLowerCase() === newSize.toLowerCase());
+
+                if (isDuplicate) {
+                    Toast.fire({
+                        icon: 'warning',
+                        title: '⚠️ Kích cỡ đã tồn tại trong danh sách!'
                     });
+                    return;
                 }
+
+                $.ajax({
+                    url: '/Admin/SanPham/ThemKichCo',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(newSize),
+                    success: function (response) {
+                        $('#sizeModalBody').append(`
+                        <div class="form-check">
+                            <input class="form-check-input size-checkbox" type="checkbox" value="${response}" checked> ${response}
+                        </div>
+                    `);
+                        $('#sizePickerContainer').hide();
+                        $('#newSize').val('');
+                    },
+                    error: function () {
+                        Toast.fire({
+                            icon: 'error',
+                            title: "Có lỗi xảy ra khi thêm kích cỡ."
+                        });
+                    }
+                });
             }
         });
+
+
 
 
         $('#showColorPicker').click(function () {
@@ -382,34 +420,53 @@
         });
 
         // Thêm màu mới khi nhấn Enter
+        const mauSacDaCo = @Html.Raw(Json.Serialize((IEnumerable<SelectListItem>)ViewData["Mau_SacID"]));
+
 
         // Khi người dùng nhấn phím Enter trong ô nhập màu
         $('#newColor').keypress(function (e) {
-            if (e.which == 13) { // Nhấn Enter
+            if (e.which === 13) {
+                e.preventDefault();
+                console.log(mauSacDaCo);
+
                 let newColor = $('#newColor').val().trim();
-                if (newColor !== "") {
-                    $.ajax({
-                        url: '/Admin/SanPham/ThemMau',
-                        type: 'POST',
-                        contentType: 'application/json', // Chuyển về JSON
-                        data: JSON.stringify(newColor), // Chuyển thành JSON
-                        success: function (response) {
-                            $('#colorModalBody').append(`
-                                 <div class="form-check d-flex align-items-center">
-                                                            <input class="form-check-input color-checkbox me-2" type="checkbox" value="${response}" checked> ${response}
-                                                </div>
-                                `);
-                            
-                            $('#colorPickerContainer').hide();
-                            $('#newColor').val('');
-                        },
-                        error: function () {
-                            alert("Có lỗi xảy ra khi thêm màu.");
-                        }
+                if (newColor === "") return;
+
+                // 🔍 Kiểm tra trùng lặp từ danh sách Razor
+                let isDuplicate = mauSacDaCo.some(item => item.text.toLowerCase() === newColor.toLowerCase());
+
+                if (isDuplicate) {
+                    Toast.fire({
+                        icon: 'warning',
+                        title: '⚠️ Màu sắc đã tồn tại trong danh sách!'
                     });
+                    return;
                 }
+
+                $.ajax({
+                    url: '/Admin/SanPham/ThemMau',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(newColor),
+                    success: function (response) {
+                        $('#colorModalBody').append(`
+                        <div class="form-check d-flex align-items-center">
+                            <input class="form-check-input color-checkbox me-2" type="checkbox" value="${response}" checked> ${response}
+                        </div>
+                    `);
+                        $('#colorPickerContainer').hide();
+                        $('#newColor').val('');
+                    },
+                    error: function () {
+                        Toast.fire({
+                            icon: 'error',
+                            title: "Có lỗi xảy ra khi thêm màu."
+                        });
+                    }
+                });
             }
         });
+
 
 
 
@@ -440,11 +497,17 @@
                                             `);
                         $("#productImages").val(JSON.stringify(uploadedImages)); // Lưu vào input ẩn
                     } else {
-                        alert("❌ Lỗi khi tải ảnh!");
+                        Toast.fire({
+                            icon: 'error',
+                            title: "❌ Lỗi khi tải ảnh!"
+                        });
                     }
                 },
                 error: function () {
-                    alert("⚠️ Có lỗi xảy ra khi tải ảnh!");
+                    Toast.fire({
+                        icon: 'error',
+                        title: "⚠️ Có lỗi xảy ra khi tải ảnh!"
+                    });
                 }
             });
         });
@@ -493,7 +556,10 @@
             });
 
             if (exceededLimit) {
-                alert("⚠️ Ảnh quá giới hạn! Chỉ có thể chọn tối đa 6 ảnh, các ảnh sau ảnh thứ 6 đã bị loại bỏ.");
+                Toast.fire({
+                    icon: 'error',
+                    title: "⚠️ Ảnh quá giới hạn! Chỉ có thể chọn tối đa 6 ảnh, các ảnh sau ảnh thứ 6 đã bị loại bỏ."
+                });
             }
 
 
@@ -555,32 +621,37 @@
         // Hàm khởi tạo Select2
         function khoiTaoSelect2() {
             $(".select2").each(function () {
-                let apiUrl = $(this).data("api"); // Lấy API từ data-attribute nếu có
+                let apiUrl = $(this).data("api");
 
                 $(this).select2({
-                    placeholder: "Nhập hoặc chọn một tùy chọn",
+                    placeholder: "Nhập hoặc chọn một tuỳ chọn",
                     allowClear: true,
                     tags: true,
-                    tokenSeparators: [','], // Giữ nguyên khoảng trắng trong giá trị nhập
+                    tokenSeparators: [','], // vẫn cho phép khoảng trắng
                     createTag: function (params) {
-                        let term = params.term.trim(); // Không xóa khoảng trắng giữa các từ
-                        if (term === "" || /^\s+$/.test(term)) return null; // Ngăn nhập toàn dấu cách
+                        let term = params.term.trim();
+                        if (term === "" || /^\s+$/.test(term)) return null;
 
+                        // Kiểm tra trùng option có sẵn
                         let exists = false;
                         $(this).find("option").each(function () {
-                            if ($(this).text().toLowerCase() === term.toLowerCase()) {
+                            if ($(this).text().trim().toLowerCase() === term.toLowerCase()) {
                                 exists = true;
                                 return false;
                             }
                         });
 
                         if (exists) {
+                            Toast.fire({
+                                icon: 'warning',
+                                title: '⚠️ Giá trị đã tồn tại trong danh sách!'
+                            });
                             return null;
                         }
 
                         return {
                             id: term,
-                            text: `Nhấn Enter để thêm mới \"${term}\"`,
+                            text: `Nhấn Enter để thêm mới "${term}"`,
                             newTag: true
                         };
                     }
@@ -589,28 +660,36 @@
                     let selectElement = $(this);
 
                     if (data.newTag) {
-                        let realValue = data.text.replace(/Nhấn Enter để thêm mới\s*\"(.+)\"$/, "$1");
+                        let realValue = data.text.replace(/Nhấn Enter để thêm mới\s*"(.+)"$/, "$1");
 
                         $.ajax({
                             url: apiUrl,
                             type: "POST",
                             contentType: "application/json",
-                            data: JSON.stringify(realValue), // Gửi JSON thay vì chuỗi thuần túy
+                            data: JSON.stringify(realValue),
                             success: function (response) {
                                 if (response.success) {
                                     let newOption = new Option(response.text, response.id, true, true);
                                     selectElement.append(newOption).trigger("change");
                                 } else {
-                                    alert("❌ Không thể thêm giá trị mới.");
+                                    Toast.fire({
+                                        icon: 'error',
+                                        title: "❌ Không thể thêm giá trị mới."
+                                    });
                                 }
                             },
                             error: function () {
-                                alert("⚠️ Lỗi khi gửi dữ liệu.");
+                                Toast.fire({
+                                    icon: 'error',
+                                    title: "⚠️ Lỗi khi gửi dữ liệu."
+                                });
                             }
                         });
                     }
                 });
             });
+        }
+
 
             $("#ten_san_pham").on("keypress", function (e) {
                 if (e.which === 32) {
@@ -628,14 +707,17 @@
 
                     if (kiemTraTrungLap(tenSanPham)) {
                         warningElement.show();
-                        alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
+                        Toast.fire({
+                            icon: 'error',
+                            title: "⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác."
+                        });
                         e.preventDefault();
                     } else {
                         warningElement.hide();
                     }
                 }
             });
-        }
+        
 
 
 
@@ -662,7 +744,10 @@
 
                 if (kiemTraTrungLap(tenSanPham)) {
                     warningElement.show();
-                    alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
+                    Toast.fire({
+                        icon: 'error',
+                        title: "⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác."
+                    });
                     e.preventDefault();
                 } else {
                     warningElement.hide();
@@ -844,21 +929,32 @@
             }
         }
 
-        $('#saveProduct').click(function (e) {
-
+        $('#saveProduct').off('click').on('click', function (e) {
             let sanPhamCTList = [];
-            let hasError = false; // Biến kiểm tra lỗi
+            let hasError = false;
+            let hasImage = false;
+            let tenSanPham = $("#ten_san_pham").val();
+            let danhSachTenGiay = @Html.Raw(Json.Serialize(ViewBag.TenGiay));
+            function kiemTraTrungLap(ten) {
+                return danhSachTenGiay.some(item => item.toLowerCase() === ten.trim().toLowerCase());
+            }
 
-            console.log("🔹 Đã chạy save");
+            if (kiemTraTrungLap(tenSanPham)) {
+                Toast.fire({
+                    icon: 'error',
+                    title: "⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác."
+                });
+                e.preventDefault();
+                return;
+            }
 
             $("[id^='table-']").each(function () {
                 let color = $(this).attr('id').replace('table-', '');
-                let table = $(this);
-                let rows = table.find("tbody tr");
+                let rows = $(this).find("tbody tr");
 
                 if (rows.length === 0) {
-                    console.warn(`⚠️ Không có hàng sản phẩm nào trong #table-${color}`);
-                    return; // Dừng gửi form nếu có lỗi
+                    console.warn(`⚠️ Không có sản phẩm trong bảng màu ${color}`);
+                    return;
                 }
 
                 rows.each(function () {
@@ -867,56 +963,67 @@
                     let price = parseInt($(this).find(".price").val()) || 0;
                     let imgUrl = $(this).find(".lst_img").val();
 
-                    if (quantity <= 0 || price <= 0) {
-                        hasError = true; // Đánh dấu có lỗi
-                        console.error(`❌ Lỗi: Màu: ${color}, Size: ${size}, SL: ${quantity}, Giá: ${price}`);
-                    } else {
-                        sanPhamCTList.push({
-                            Mau_Sac: color,
-                            Kich_Thuoc: size,
-                            so_luong: quantity,
-                            gia: price,
-                            imgUrl: imgUrl,
-                            trang_thai: 1,
-                            ngay_tao: new Date().toISOString()
-                        });
+                    const imgMissing = !imgUrl || imgUrl.trim() === "";
+                    const invalidData = quantity <= 0 || price <= 0;
+
+                    if (invalidData || imgMissing) {
+                        if (invalidData) {
+                            hasError = true;
+                            console.error(`❌ Lỗi dữ liệu: Màu: ${color}, Size: ${size}, SL: ${quantity}, Giá: ${price}`);
+                        }
+                        if (imgMissing) {
+                            hasImage = true;
+                            console.error(`❌ Lỗi thiếu ảnh: Màu: ${color}, Size: ${size}`);
+                        }
+                        return;
                     }
+
+                    sanPhamCTList.push({
+                        Mau_Sac: color,
+                        Kich_Thuoc: size,
+                        so_luong: quantity,
+                        gia: price,
+                        imgUrl: imgUrl,
+                        trang_thai: 1,
+                        ngay_tao: new Date().toISOString()
+                    });
                 });
             });
 
-            if (hasError) {
-                alert("⚠️ Vui lòng nhập số lượng và giá hợp lệ (> 0) cho tất cả sản phẩm.");
-                return; // Dừng gửi form nếu có lỗi
-            }
-            if (sanPhamCTList.length === 0) {
-                alert("⚠️ Bạn chưa chọn màu sắc và kích thước hợp lệ! Vui lòng kiểm tra lại.");
-                e.preventDefault(); // Ngăn không gửi form
+            // Xử lý lỗi
+            if (hasError || hasImage || sanPhamCTList.length === 0) {
+                e.preventDefault();
+
+                if (hasError) {
+                    Toast.fire({
+                        icon: 'error',
+                        title: "⚠️ Vui lòng nhập số lượng và giá hợp lệ (> 0) cho tất cả sản phẩm."
+                    });
+                }
+
+                if (hasImage) {
+                    Toast.fire({
+                        icon: 'error',
+                        title: "⚠️ Vui lòng thêm ảnh cho tất cả sản phẩm."
+                    });
+                }
+@* 
+                if (sanPhamCTList.length === 0) {
+                    Toast.fire({
+                        icon: 'error',
+                        title: "⚠️ Bạn chưa chọn màu sắc và kích thước hợp lệ!"
+                    });
+                } *@
                 return;
             }
 
-            // Chuyển dữ liệu thành JSON và gán vào input ẩn
             $('#lstSPCT').val(JSON.stringify(sanPhamCTList));
 
-
-
-            let danhSachTenGiay = @Html.Raw(Json.Serialize(ViewBag.TenGiay));
-            function kiemTraTrungLap(tenSanPham) {
-                return danhSachTenGiay.some(item => item.toLowerCase() === tenSanPham.trim().toLowerCase());
-            }
-
-            let tenSanPham = $("#ten_san_pham").val();
-            if (kiemTraTrungLap(tenSanPham)) {
-                alert("⚠️ Tên sản phẩm đã tồn tại! Vui lòng chọn tên khác.");
-                return;
-            }
-
-            debugger;
-            console.log("✅ Không có lỗi, gửi form...");
-            e.preventDefault();
             Swal.fire({
                 title: "Xác nhận",
                 text: "Bạn có chắc chắn muốn thêm sản phẩm này?",
                 icon: "warning",
+                showConfirmButton: true,
                 showCancelButton: true,
                 confirmButtonColor: "#3085d6",
                 cancelButtonColor: "#d33",
@@ -924,12 +1031,11 @@
                 cancelButtonText: "Hủy"
             }).then(function (result) {
                 if (result.isConfirmed) {
-
                     $('#formSanPham').submit();
-                    
                 }
             });
         });
+
         let currentTable = null;
 
         // Mở modal và xác định bảng cần cập nhật
@@ -945,7 +1051,10 @@
         $(document).off("click", "#quickEditForm").on("click", "#quickEditForm", function (e) {
 
             if (!currentTable) {
-                alert("⚠️ Không tìm thấy bảng sản phẩm!");
+                Toast.fire({
+                    icon: 'error',
+                    title: "⚠️ Không tìm thấy bảng sản phẩm!"
+                });
                 return;
             }
 
@@ -953,7 +1062,10 @@
             let price = $("#modalPrice").val();
 
             if (quantity === "" || price === "" || quantity < 0 || price < 0) {
-                alert("⚠️ Vui lòng nhập số lượng và giá hợp lệ!");
+                Toast.fire({
+                    icon: 'error',
+                    title: "⚠️ Vui lòng nhập số lượng và giá hợp lệ!"
+                });
                 return;
             }
 
