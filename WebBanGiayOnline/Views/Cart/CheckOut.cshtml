@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<WebBanGiay.Models.ViewModel.CartItem>
 @{
-    var pattern = @"^[^\s@]+@[^\s@]+\.[^\s@]+$";
+   var pattern = @"^[^\s@]+@[^\s@]+\.[^\s@]+$";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <!DOCTYPE html>
@@ -35,10 +35,22 @@
 
     <style>
         .container-fluid.page-header {
-        background-image: url(/coloshop-master/images/anhdep1.jpg); 
-        background-size: cover;
-        background-position: center;
+            background-image: url(/coloshop-master/images/anhdep1.jpg); 
+            background-size: cover;
+            background-position: center;
         }
+
+        .custom-btn {
+            width: auto;
+            padding: 8px 16px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+            .custom-btn:hover {
+                background-color: #28a745 !important; /* xanh lá cây Bootstrap */
+                color: white !important;
+                border-color: #28a745 !important;
+            }
     </style>
 </head>
 
@@ -148,7 +160,8 @@
             {
                 <div class="form-check my-3">
                     <button type="submit"
-                    class="btn border-secondary text-uppercase text-primary w-100 mt-2 openAddress" data-id="@User.FindFirst("userid")?.Value">
+                            class="btn border-secondary text-uppercase text-primary mt-2 custom-btn openAddress"
+                            data-id="@User.FindFirst("userid")?.Value">
                         <span>Địa chỉ khách hàng</span>
                     </button>
 
@@ -157,21 +170,21 @@
             <form asp-action="Checkout" asp-controller="Cart" >
                 <div class="row g-5">
                     <div class="col-md-12 col-lg-6 col-xl-7">
-
+                        
                         <div class="form-item delivery-info">
                             <label class="form-label my-2">Người nhận hàng<sup>*</sup></label>
                             <input type="text" name="TenKhachHang" class="form-control">
                             <span id="nameError" style="color: red; font-size: 14px;"></span>
+                           
 
-
-
+                            
                         </div>
                         <div class="form-item delivery-info">
                             <label class="form-label my-2">Email<sup>*</sup></label>
                             <input type="@pattern" name="Email" class="form-control">
-
+                          
                         </div>
-
+                     
 
                         <div class="form-item my-3" onchange="calculateFee()">
                             <div class="row">
@@ -206,31 +219,28 @@
                             <label class="form-label my-2">Điện thoại<sup>*</sup></label>
                             <input type="text" name="Sdt" class="form-control">
                             <span id="phoneError" style="color: red; font-size: 14px;"></span>
-
+                           
                         </div>
                         <div class="form-item mt-4">
                             <textarea name="GhiChu" class="form-control" spellcheck="false" cols="30" rows="11" placeholder="Ghi chú"></textarea>
                         </div>
 
-                      
-                            <input type="submit"
-                            name="payment"
-                            class="btn border-secondary text-uppercase text-primary w-100 mt-2"
-                            value="Thanh toán khi nhận hàng" />
-              
+                            <input type="submit" method="post"
+                                   name="payment"
+                                   class="btn border-secondary text-uppercase text-primary w-100 mt-2"
+                                   value="Thanh toán khi nhận hàng" />
 
-                    
                             <button type="submit"
-                                    class="btn border-secondary text-uppercase text-primary w-100 mt-2" asp-action="PayMent" asp-controller="Cart" method="post">
+                                    asp-action="PayMent" asp-controller="Cart" method="post"
+                                    class="btn border-secondary text-uppercase text-primary w-100 mt-2">
                                 Thanh Toán với VNPAY
                             </button>
-                  
 
                             <button type="submit"
-                                class="btn border-secondary text-uppercase text-primary w-100 mt-2" asp-action="PayMent" asp-controller="Cart" method="post">
+                                    asp-action="PaymentMoMo" asp-controller="Cart" method="post"
+                                    class="btn border-secondary text-uppercase text-primary w-100 mt-2">
                                 Thanh Toán với MoMo
                             </button>
-                   
                     </div>
 
                     <div class="col-md-12 col-lg-6 col-xl-5">
@@ -260,7 +270,7 @@
                                             <td class="py-5">@item.ThanhTien.ToString("#,##0 VNĐ")</td>
                                         </tr>
                                     }
-
+                                    
 
                                     <tr>
                                         <td colspan="4">Phí vận chuyển :</td>
@@ -270,12 +280,10 @@
                                         <td colspan="4">Tổng Tiền :</td>
                                         <td id="totalWithFee">
                                             @(Model.Sum(p => p.ThanhTienGG) > 0
-                                                    ? Model.Sum(p => p.ThanhTienGG).ToString("#,##0 VNĐ")
-                                                    : Model.Sum(p => p.ThanhTien).ToString("#,##0 VNĐ"))
+                                                ? Model.Sum(p => p.ThanhTienGG).ToString("#,##0 VNĐ")
+                                                : Model.Sum(p => p.ThanhTien).ToString("#,##0 VNĐ"))
                                         </td>
                                     </tr>
-
-
 
                                 </tbody>
                             </table>
@@ -288,7 +296,7 @@
 
     <!-- Checkout Page End -->
     <!-- Footer Start -->
-    <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
+     <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
 
         <div class="container py-5">
             <div class="pb-4 mb-4" style="border-bottom: 1px solid rgba(226, 175, 24, 0.5) ;">
@@ -320,7 +328,7 @@
                     <div class="footer-item">
                         <h4 class="text-light mb-3">Tại sao mọi người thích chúng tôi</h4>
                         <p class="mb-4">
-                            Adidas là thương hiêu giày đã có từ rất lâu từ thế kỉ trước
+                          Adidas là thương hiêu giày đã có từ rất lâu từ thế kỉ trước
                         </p>
                         <a href="" class="btn border-secondary py-2 px-4 rounded-pill text-primary">Tìm hiểu thêm </a>
                     </div>
@@ -330,30 +338,30 @@
                         <h4 class="text-light mb-3">Thông tin cửa hàng</h4>
                         <a class="btn-link" href="">Về chúng tôi </a>
                         <a class="btn-link" href="">Liên hệ chúng tôi</a>
-                        <a class="btn-link" href="">Chính sách bảo mật</a>
-                        <a class="btn-link" href="">Điều khoản & Điều kiện</a>
+                            <a class="btn-link" href="">Chính sách bảo mật</a>
+                            <a class="btn-link" href="">Điều khoản & Điều kiện</a>
 
-                        <a class="btn-link" href="">Câu hỏi thường gặp & Trợ giúp</a>
+                            <a class="btn-link" href="">Câu hỏi thường gặp & Trợ giúp</a>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <div class="d-flex flex-column text-start footer-item">
                         <h4 class="text-light mb-3">Tài khoản</h4>
-                        <a class="btn-link" href="">>Tài khoản cửa tôi</a>
+                            <a class="btn-link" href="">>Tài khoản cửa tôi</a>
                         <a class="btn-link" href="">Chi tiết cửa hàng</a>
                         <a class="btn-link" href="">giỏ cửa hàng</a>
-                        <a class="btn-link" href="">Danh sách mong muốn</a>
-                        <a class="btn-link" href="">Lịch sử đơn hàng</a>
-                        <a class="btn-link" href="">Đơn hàng quốc tế</a>
+                            <a class="btn-link" href="">Danh sách mong muốn</a>
+                            <a class="btn-link" href="">Lịch sử đơn hàng</a>
+                            <a class="btn-link" href="">Đơn hàng quốc tế</a>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <div class="footer-item">
                         <h4 class="text-light mb-3">Liên hệ</h4>
-                        <p>Địa chỉ:  Số 28 Trung Văn,Nam Từ Liêm ,Hà Nội</p>
-                        <p>Email:vinhnq041003@gmail.com</p>
+                            <p>Địa chỉ:  Số 28 Trung Văn,Nam Từ Liêm ,Hà Nội</p>
+                            <p>Email:vinhnq041003@gmail.com</p>
                         <p>Số điện thoại: 0865884051</p>
-
+             
                         <img src="~/img/payment.png" class="img-fluid" alt="">
                     </div>
                 </div>
@@ -419,7 +427,7 @@
     <script src="~/lib/waypoints/waypoints.min.js"></script>
     <script src="~/lib/lightbox/js/lightbox.min.js"></script>
     <script src="~/lib/owlcarousel/owl.carousel.min.js"></script>
-
+                 
     <!-- Template~/ Javascript -->
     <script src="~/js/main.js"></script>
 </body>
@@ -428,52 +436,59 @@
     <script>
 
 
-        document.addEventListener("DOMContentLoaded", function () {
-        let tenKhachHangInput = document.querySelector("input[name='TenKhachHang']");
-        if (tenKhachHangInput) {
-        tenKhachHangInput.addEventListener("blur", function () {
-        let errorSpan = document.getElementById("nameError");
-        if (this.value.trim() === "") {
-        errorSpan.textContent = "Tên không được để trống";
-        setTimeout(() => { this.focus(); }, 3);
-        }
-        else {
-        errorSpan.textContent = "";
-        }
-        });
-        }
+              document.addEventListener("DOMContentLoaded", function () {
+            let tenKhachHangInput = document.querySelector("input[name='TenKhachHang']");
+            if (tenKhachHangInput) {
+                tenKhachHangInput.addEventListener("blur", function () {
+                     let errorSpan = document.getElementById("nameError");
+                    if (this.value.trim() === "") {
+                        errorSpan.textContent = "Tên không được để trống";
+                        setTimeout(() => { this.focus(); }, 3);
+                    }
+                    else {
+                        errorSpan.textContent = "";
+                    }
+                });
+            }
 
-        let phoneInput = document.querySelector("input[name='Sdt']");
-        if (phoneInput) {
-        phoneInput.addEventListener("blur", function () {
-        let phonePattern = /^[0-9]{10,11}$/;
-        let errorSpan = document.getElementById("phoneError");
+            let phoneInput = document.querySelector("input[name='Sdt']");
+            if (phoneInput) {
+                phoneInput.addEventListener("blur", function () {
+                    let phonePattern = /^[0-9]{10,11}$/;
+                    let errorSpan = document.getElementById("phoneError");
 
-        if (!phonePattern.test(this.value.trim())) {
-        errorSpan.textContent = "Số điện thoại không hợp lệ! (10-11 số)";
-        } else {
-        errorSpan.textContent = "";
-        }
-        });
-        }
+                    if (!phonePattern.test(this.value.trim())) {
+                        errorSpan.textContent = "Số điện thoại không hợp lệ! (10-11 số)";
+                    } else {
+                        errorSpan.textContent = "";
+                    }
+                });
+            }
         });
 
 
         const stripPrefix = str => str?.replace(/^Tỉnh\s+|^Thành phố\s+/i, '').trim();
-
-
+        
+        
         // Gọi hàm khi trang tải
         $(document).ready(function () {
-            loadProvinces();
+
         @if (User.Identity.IsAuthenticated)
         {
 
             <text>
-                loadCustomerInfo('@User.FindFirst("userid")?.Value');
+
+                    loadProvinces();
+                    loadCustomerInfo('@User.FindFirst("userid")?.Value');
             </text>
         }
-      
-      
+        else
+        {
+
+            <text>
+                    loadProvinces();
+            </text>
+        }
         });
 
               function calculateFee() {
@@ -547,8 +562,8 @@
        
 
         //Load danh sách tỉnh/huyện/xã
-       
-                   function loadProvinces() {
+
+        function loadProvinces() {
             $.ajax({
                 url: "https://online-gateway.ghn.vn/shiip/public-api/master-data/province",
                 type: "GET",
@@ -702,7 +717,6 @@
                     const userDistrict = response.district;
                     const userWard = response.ward;
 
-                    loadProvinces();
                     setTimeout(() => {
                         // Chọn tỉnh
                         $('#tinh').find('option').each(function () {
@@ -720,13 +734,13 @@
                                                         $('#xa').val($(this).val()).trigger('change');
                                                     }
                                                 });
-                                            }, 500);
+                                            }, 1000);
                                         }
                                     });
-                                }, 500);
+                                }, 1000);
                             }
                         });
-                    }, 500);
+                    }, 1000);
                 },
                 error: function () {
                     Toast.fire({
@@ -828,13 +842,13 @@
 
                                             setTimeout(() => {
                                                 chiTietSelect.val(DC_ChiTiet);
-                                            }, 5000);
+                                            }, 500);
                                         }
                                     });
-                                }, 5000);
+                                }, 500);
                             }
                         });
-                    }, 5000);
+                    }, 500);
                 }
             });
         });
