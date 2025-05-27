@@ -117,7 +117,230 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    $(document).ready(function () {
+        // ========== Cập nhật thông tin khách hàng ==========
+        $("#updateCustomerBtn").on("click", function () {
+            Swal.fire({
+                title: "Xác nhận",
+                text: "Bạn có muốn sửa thông tin khách hàng này?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Có",
+                cancelButtonText: "Hủy"
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    const formData = {
+                        ID: $("#customerId").val(),
+                        ho_ten: $("#ho_ten").val(),
+                        email: $("#email").val(),
+                        sdt: $("#sdt").val(),
+                        cccd: $("#cccd").val(),
+                        ngay_sinh: $("#ngay_sinh").val()
+                    };
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/Admin/Khachhang/UpdateCustomer",
+                        data: formData,
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire("Thành công", "Đã cập nhật thông tin khách hàng!", "success");
+                            } else {
+                                Swal.fire("Lỗi", response.message, "error");
+                            }
+                        },
+                        error: function () {
+                            Swal.fire("Lỗi", "Có lỗi xảy ra khi cập nhật!", "error");
+                        }
+                    });
+                }
+            });
+        });
+
+        // ========== Load tỉnh / huyện / xã ==========
+        let cacheData = { provinces: [], districts: {}, wards: {} };
+
+        $.get("https://provinces.open-api.vn/api/p/", function (data) {
+            cacheData.provinces = data;
+            data.forEach(p => {
+                $("#tinh").append(`<option value="${p.code}" data-name="${p.name}">${p.name}</option>`);
+            });
+        });
+
+        $("#tinh").change(function () {
+            const provinceCode = $(this).val();
+            $("#huyen, #xa").empty().append('<option value="">Chọn</option>');
+
+            if (provinceCode) {
+                if (!cacheData.districts[provinceCode]) {
+                    $.get(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`, function (data) {
+                        cacheData.districts[provinceCode] = data.districts;
+                        data.districts.forEach(d => {
+                            $("#huyen").append(`<option value="${d.code}" data-name="${d.name}">${d.name}</option>`);
+                        });
+                    });
+                } else {
+                    cacheData.districts[provinceCode].forEach(d => {
+                        $("#huyen").append(`<option value="${d.code}" data-name="${d.name}">${d.name}</option>`);
+                    });
+                }
+            }
+        });
+
+        $("#huyen").change(function () {
+            const districtCode = $(this).val();
+            $("#xa").empty().append('<option value="">Chọn</option>');
+
+            if (districtCode) {
+                if (!cacheData.wards[districtCode]) {
+                    $.get(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`, function (data) {
+                        cacheData.wards[districtCode] = data.wards;
+                        data.wards.forEach(w => {
+                            $("#xa").append(`<option value="${w.code}" data-name="${w.name}">${w.name}</option>`);
+                        });
+                    });
+                } else {
+                    cacheData.wards[districtCode].forEach(w => {
+                        $("#xa").append(`<option value="${w.code}" data-name="${w.name}">${w.name}</option>`);
+                    });
+                }
+            }
+        });
+
+        // ========== Lưu địa chỉ ==========
+        $("#saveAddressBtn").click(function () {
+            const addressId = $("#addressId").val();
+            const addressDetail = $("#addressDetail").val();
+            const provinceCode = $("#tinh").val();
+            const districtCode = $("#huyen").val();
+            const wardCode = $("#xa").val();
+
+            const provinceName = $("#tinh option:selected").text();
+            const districtName = $("#huyen option:selected").text();
+            const wardName = $("#xa option:selected").text();
+
+            if (!addressDetail || !provinceCode || !districtCode || !wardCode) {
+                Swal.fire("Thiếu thông tin", "Vui lòng điền đầy đủ thông tin địa chỉ.", "warning");
+                return;
+            }
+
+            const taikhoanId = $("#taikhoanId").val();
+
+            const data = {
+                ID: addressId || null,
+                Tai_KhoanID: taikhoanId,
+                dia_chi_chi_tiet: addressDetail,
+                tinh: provinceName,
+                huyen: districtName,
+                xa: wardName,
+                loai_dia_chi: addressId ? 2 : 1
+            };
+
+            $.post("/Admin/Khachhang/SaveAddress", data, function (response) {
+                if (response.success) {
+                    const htmlRow = `
+    <tr id="addressRow_${response.id}">
+        <td class="address-detail">${addressDetail}</td>
+        <td class="address-province">${provinceName}</td>
+        <td class="address-district">${districtName}</td>
+        <td class="address-ward">${wardName}</td>
+        <td class="address-type">${response.loai_dia_chi === 1 ? "Mặc định" : "Phụ"}</td>
+        <td>
+            <button class="btn btn-secondary btn-edit" data-id="${response.id}" data-bs-toggle="modal" data-bs-target="#addressModal">Sửa</button>
+            <button class="btn btn-danger btn-delete" data-id="${response.id}">Xóa</button>
+            ${response.loai_dia_chi === 2 ? `<button class="btn btn-primary btn-set-default" data-id="${response.id}">Chọn mặc định</button>` : ''}
+        </td>
+    </tr>`;
+
+                    if (addressId) {
+                        $("#addressRow_" + addressId).replaceWith(htmlRow);
+                    } else {
+                        $("#addressList").append(htmlRow);
+                    }
+
+                    $('#addressModal').modal('hide');
+                } else {
+                    Swal.fire("Lỗi", response.message, "error");
+                }
+            });
+        });
+
+        // ========== Chọn địa chỉ mặc định ==========
+        $(document).on("click", ".btn-set-default", function () {
+            const addressId = $(this).data("id");
+
+            $.post("/Admin/Khachhang/SetDefaultAddress", { id: addressId }, function (response) {
+                if (response.success) {
+                    Swal.fire("Thành công", "Đã đặt địa chỉ mặc định.", "success");
+
+                    $(".address-type").text("Phụ");
+                    $(".btn-set-default").show();
+
+                    $("#addressRow_" + addressId + " .address-type").text("Mặc định");
+                    $("#addressRow_" + addressId + " .btn-set-default").hide();
+                } else {
+                    Swal.fire("Lỗi", response.message, "error");
+                }
+            });
+        });
+
+        // ========== Xóa địa chỉ ==========
+        $(document).on("click", ".btn-delete", function () {
+            const addressId = $(this).data("id");
+
+            Swal.fire({
+                title: "Xóa địa chỉ?",
+                text: "Bạn có chắc muốn xóa địa chỉ này?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#6c757d",
+                confirmButtonText: "Xóa",
+                cancelButtonText: "Hủy"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post("/Admin/Khachhang/DeleteAddress", { id: addressId }, function (response) {
+                        if (response.success) {
+                            $("#addressRow_" + addressId).remove();
+                            Swal.fire("Đã xóa", "Địa chỉ đã được xóa.", "success");
+                        } else {
+                            Swal.fire("Lỗi", response.message, "error");
+                        }
+                    });
+                }
+            });
+        });
+
+        // ========== Sửa địa chỉ ==========
+        $(document).on("click", ".btn-edit", function () {
+            const row = $("#addressRow_" + $(this).data("id"));
+            const id = $(this).data("id");
+
+            $("#addressId").val(id);
+            $("#addressDetail").val(row.find(".address-detail").text());
+
+            const province = row.find(".address-province").text();
+            const district = row.find(".address-district").text();
+            const ward = row.find(".address-ward").text();
+
+            $("#tinh").val($("#tinh option").filter((i, el) => $(el).text() === province).val()).trigger("change");
+
+            setTimeout(() => {
+                $("#huyen").val($("#huyen option").filter((i, el) => $(el).text() === district).val()).trigger("change");
+                setTimeout(() => {
+                    $("#xa").val($("#xa option").filter((i, el) => $(el).text() === ward).val());
+                }, 300);
+            }, 300);
+        });
+    });
+</script>
+
+
+@* <script>
     $(document).ready(function () {
         $("#updateCustomerBtn").on("submit", function (event) {
             event.preventDefault();
@@ -348,187 +571,7 @@
 
 
 
-    // $(document).ready(function () {
-    //     let cacheData = { provinces: [], districts: {}, wards: {} };
-
-    //     // Load danh sách tỉnh
-    //     $.get("https://provinces.open-api.vn/api/p/", function (data) {
-    //         cacheData.provinces = data;
-    //         data.forEach(p => {
-    //             $("#tinh").append(`<option value="${p.code}" data-name="${p.name}">${p.name}</option>`);
-    //         });
-    //     });
-
-    //     // Khi chọn tỉnh -> Load danh sách huyện
-    //     $("#tinh").change(function () {
-    //         let provinceCode = $(this).val();
-    //         $("#huyen, #xa").empty().append('<option value="">Chọn</option>');
-
-    //         if (provinceCode) {
-    //             if (!cacheData.districts[provinceCode]) {
-    //                 $.get(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`, function (data) {
-    //                     cacheData.districts[provinceCode] = data.districts;
-    //                     data.districts.forEach(d => {
-    //                         $("#huyen").append(`<option value="${d.code}" data-name="${d.name}">${d.name}</option>`);
-    //                     });
-    //                 });
-    //             } else {
-    //                 cacheData.districts[provinceCode].forEach(d => {
-    //                     $("#huyen").append(`<option value="${d.code}" data-name="${d.name}">${d.name}</option>`);
-    //                 });
-    //             }
-    //         }
-    //     });
-
-    //     // Khi chọn huyện -> Load danh sách xã
-    //     $("#huyen").change(function () {
-    //         let districtCode = $(this).val();
-    //         $("#xa").empty().append('<option value="">Chọn</option>');
-
-    //         if (districtCode) {
-    //             if (!cacheData.wards[districtCode]) {
-    //                 $.get(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`, function (data) {
-    //                     cacheData.wards[districtCode] = data.wards;
-    //                     data.wards.forEach(w => {
-    //                         $("#xa").append(`<option value="${w.code}" data-name="${w.name}">${w.name}</option>`);
-    //                     });
-    //                 });
-    //             } else {
-    //                 cacheData.wards[districtCode].forEach(w => {
-    //                     $("#xa").append(`<option value="${w.code}" data-name="${w.name}">${w.name}</option>`);
-    //                 });
-    //             }
-    //         }
-    //     });
-
-        // $("#addAddressBtn, .btn-edit").click(function () {
-        //     let addressId = $(this).data("id") || "";
-        //     $("#addressModal").modal("show");
-        //     $("#addressId").val(addressId);
-
-        //     if (addressId) {
-        //         let row = $("#addressRow_" + addressId);
-        //         $("#addressDetail").val(row.find(".address-detail").text());
-
-        //         // Lấy mã tỉnh, huyện, xã từ hàng được chọn
-        //         let provinceName = row.find(".address-province").text().trim();
-        //         let districtName = row.find(".address-district").text().trim();
-        //         let wardName = row.find(".address-ward").text().trim();
-
-        //         // Đặt giá trị cho tỉnh
-        //         $("#tinh option").each(function () {
-        //             if ($(this).text().trim() === provinceName) {
-        //                 $(this).prop("selected", true).change();
-        //             }
-        //         });
-
-        //         // Đợi danh sách huyện load xong rồi mới đặt giá trị
-        //         setTimeout(() => {
-        //             $("#huyen option").each(function () {
-        //                 if ($(this).text().trim() === districtName) {
-        //                     $(this).prop("selected", true).change();
-        //                 }
-        //             });
-        //         }, 200);
-
-        //         // Đợi danh sách xã load xong rồi mới đặt giá trị
-        //         setTimeout(() => {
-        //             $("#xa option").each(function () {
-        //                 if ($(this).text().trim() === wardName) {
-        //                     $(this).prop("selected", true);
-        //                 }
-        //             });
-        //         },300);
-        //     } else {
-        //         $("#addressDetail, #tinh, #huyen, #xa").val("");
-        //     }
-        // });
-
-
-
-        // // // **Sự kiện lưu địa chỉ vào CSDL**
-        // let addressId = null; // Biến lưu ID của địa chỉ khi sửa
-
-        // // Khi nhấn "Thêm mới", reset addressId để tránh cập nhật nhầm
-        // $("#btnAddNewAddress").click(function () {
-        //     addressId = null; // Reset ID để đảm bảo thêm mới
-        //     $("#addressDetail").val("");
-        //     $("#tinh").val("");
-        //     $("#huyen").val("");
-        //     $("#xa").val("");
-
-        //     $("#addressModal").modal("show");
-        // });
-
-        // // Khi nhấn "Sửa", lấy ID và điền vào modal
-        // $(document).on("click", ".btn-edit", function () {
-        //     addressId = $(this).data("id"); // Lấy ID địa chỉ
-        //     let row = $("#addressRow_" + addressId);
-
-        //     // Đổ dữ liệu vào modal
-        //     $("#addressDetail").val(row.find(".address-detail").text());
-        //     $("#tinh").val(row.find(".address-province").data("code"));
-        //     $("#huyen").val(row.find(".address-district").data("code"));
-        //     $("#xa").val(row.find(".address-ward").data("code"));
-
-        //     $("#addressModal").modal("show");
-        // });
-
-        // // Khi bấm lưu địa chỉ
-        // $("#saveAddressBtn").click(function () {
-        //     let address = {
-        //         Id: addressId, // Nếu đang sửa sẽ có ID, nếu thêm mới sẽ là null
-        //         dia_chi: $("#addressDetail").val(),
-        //         tinh: $("#tinh").find(":selected").data("name"),
-        //         huyen: $("#huyen").find(":selected").data("name"),
-        //         xa: $("#xa").find(":selected").data("name"),
-        //         Tai_KhoanID: $("#customerId").val()
-        //     };
-
-        //     // Nếu có ID thì gọi API cập nhật, nếu không thì gọi API thêm mới
-        //     let url = address.Id ? "/Admin/Khachhang/UpdateAddress" : "/Admin/Khachhang/AddAddress";
-
-        //     $.post(url, address, function (response) {
-        //         if (response.success) {
-        //             alert(address.Id ? "Cập nhật địa chỉ thành công!" : "Lưu địa chỉ thành công!");
-
-        //             if (!address.Id) { // Thêm mới
-        //                 let newRow = `
-        //             <tr id="addressRow_${response.newId}">
-        //                 <td class="address-detail">${address.dia_chi}</td>
-        //                 <td class="address-province" data-code="${$("#tinh").val()}">${address.tinh}</td>
-        //                 <td class="address-district" data-code="${$("#huyen").val()}">${address.huyen}</td>
-        //                 <td class="address-ward" data-code="${$("#xa").val()}">${address.xa}</td>
-        //                 <td>Phụ</td>
-        //                 <td>
-        //                     <button class="btn btn-secondary btn-edit" data-id="${response.newId}">Sửa</button>
-        //                     <button class="btn btn-danger btn-delete" data-id="${response.newId}">Xóa</button>
-        //                     <button class="btn btn-primary btn-set-default" data-id="${response.newId}">Chọn mặc định</button>
-        //                 </td>
-        //             </tr>`;
-        //                 $("#addressList").append(newRow);
-        //             } else { // Cập nhật
-        //                 let row = $("#addressRow_" + address.Id);
-        //                 row.find(".address-detail").text(address.dia_chi);
-        //                 row.find(".address-province").text(address.tinh).data("code", $("#tinh").val());
-        //                 row.find(".address-district").text(address.huyen).data("code", $("#huyen").val());
-        //                 row.find(".address-ward").text(address.xa).data("code", $("#xa").val());
-        //             }
-
-        //             $("#addressModal").modal("hide");
-
-        //             // Reset lại ID sau khi cập nhật xong
-        //             addressId = null;
-
-        //             setTimeout(() => {
-        //                 $(".modal-backdrop").remove();
-        //                 $("body").removeClass("modal-open").css({ "overflow": "auto", "padding-right": "0px" });
-        //             }, 500);
-        //         } else {
-        //             alert("Có lỗi xảy ra khi lưu địa chỉ!");
-        //         }
-        //     });
-        // });
+  
 
 
 
@@ -562,6 +605,6 @@
 
 
 
-</script>
+</script> *@
 
 

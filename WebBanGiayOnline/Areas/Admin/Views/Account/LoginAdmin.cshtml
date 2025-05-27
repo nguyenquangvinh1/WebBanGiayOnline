@@ -9,7 +9,18 @@
 
 <div class="d-flex justify-content-center align-items-center vh-100" style="background: url(/coloshop-master/images/anhdep1.jpg) center/cover no-repeat; filter: brightness(0.8);">
     <div class="p-5 shadow-lg rounded text-center" style="width: 450px; padding: 60px; background-color: #7cc500;">
-        <h3 class="fw-bold text-white">Sign In</h3>
+        <h3 class="fw-bold text-white">Đăng nhập</h3>
+        @* Hiển thị thông báo lỗi *@
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger mt-3 text-start">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <div>@error.ErrorMessage</div>
+                }
+            </div>
+        }
+
         <form asp-area="Admin" asp-controller="Account" asp-action="LoginAdmin" method="post">
             <div class="mb-4">
                 <input type="text" class="form-control form-control-lg" id="Username" name="Username" required placeholder="Tên đăng nhập" />

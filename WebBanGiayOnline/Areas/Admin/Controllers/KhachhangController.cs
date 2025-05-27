@@ -1,5 +1,6 @@
 ﻿using ClssLib;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,8 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 namespace WebBanGiay.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class KhachhangController : Controller
+	[Authorize(AuthenticationSchemes = "AdminScheme", Policy = "AdminOrEmployeePolicy")]
+	public class KhachhangController : Controller
     {
         //HttpClient _httpClient;
         private readonly AppDbContext _context;
@@ -100,11 +102,12 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
 
 
-        // POST: Admin/Customer/Create
         [HttpPost]
         public async Task<IActionResult> Create(CreateCustomerViewModel model)
         {
-            var khachHangrole= _context.vai_Tros.FirstOrDefault(x => x.ten_vai_tro== "Khách hàng");
+
+            var khachHangrole = _context.vai_Tros.FirstOrDefault(x => x.ten_vai_tro == "Khách hàng");
+
             if (_context.tai_Khoans.Any(n => n.email == model.Email && n.Vai_TroID == khachHangrole.ID))
             {
                 ModelState.AddModelError("email", "Email đã tồn tại!");
@@ -127,7 +130,10 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     return View(model);
                 }
 
-                string password = GenerateRandomPassword(); 
+
+                string password = GenerateRandomPassword(); // ✅ Tạo mật khẩu ngẫu nhiên
+
+
 
                 var taiKhoan = new Tai_Khoan
                 {
@@ -189,6 +195,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
             string fromEmail = "trangthph44337@fpt.edu.vn";  // Thay bằng Gmail của bạn
             string fromPassword = "fdqe bzsy cscd kerv"; // Thay bằng App Password (16 ký tự)
 
+
             string subject = "Tài khoản của bạn đã được tạo thành công";
             string body = $@"
             <p>Chào {username},</p>
@@ -222,9 +229,6 @@ namespace WebBanGiay.Areas.Admin.Controllers
             return new string(Enumerable.Repeat(validChars, length)
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
-
-
-       
 
         //----------------------------------------Edit----------------------------------//
 
@@ -418,7 +422,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                  .OrderByDescending(tk => tk.ngay_tao)
                  .ToList()
                  .Select(customer => new {
-                     id = customer.ID,                 // Sử dụng "id" (chữ thường)
+                     id = customer.ID,                
                      ho_ten = customer.ho_ten,
                      phoneNumber = customer.sdt,
                      email = customer.email,
@@ -618,7 +622,6 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
 
 
-        //------------------------------------------------------------------------------//
         private bool Exists(Guid id)
         {
             return _context.tai_Khoans.Any(e => e.ID == id);

@@ -7,11 +7,17 @@ using System.Security.Claims;
 using WebBanGiay.Data;
 using WebBanGiay.Areas.Admin.Models.ViewModel;
 using WebBanGiay.Models.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebBanGiay.Areas.Admin.Controllers
 {
-    [Area("Admin")]
-    public class AccountController : Controller
+	[AllowAnonymous]
+
+
+	[Area("Admin")]
+	[Authorize(AuthenticationSchemes = "AdminScheme", Policy = "AdminOrEmployeePolicy")]
+
+	public class AccountController : Controller
     {
         private readonly AppDbContext _context;
         public AccountController(AppDbContext context)
@@ -50,6 +56,8 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
             var diaChi = _context.dia_Chis.FirstOrDefault(dc => dc.Tai_KhoanID == user.ID);
 
+
+
             var claims = new List<Claim>
             {
                 new Claim("userid", user.ID.ToString()),
@@ -60,13 +68,19 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 new Claim("province", diaChi?.tinh ?? ""),
                 new Claim("district", diaChi?.huyen ?? ""),
                 new Claim("ward", diaChi?.xa ?? ""),
-                new Claim("address", diaChi?.dia_chi_chi_tiet ?? "")
+                new Claim("address", diaChi?.dia_chi_chi_tiet ?? ""),
             };
 
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+			//         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+			////await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+			//await HttpContext.SignInAsync("AdminScheme", new ClaimsPrincipal(claimsIdentity));
+			var claimsIdentity = new ClaimsIdentity(claims, "AdminScheme");
+			await HttpContext.SignInAsync("AdminScheme", new ClaimsPrincipal(claimsIdentity));
 
-            return RedirectToAction("Index", "Home", new { area = "Admin" });
+
+			//return RedirectToAction("Index", "Home"/*, new { area = "Admin" }*/);
+			return RedirectToAction("Index", "Home");
+
         }
     }
 }

@@ -26,12 +26,13 @@ using Microsoft.AspNetCore.Authorization;
 namespace WebBanGiay.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    //[Authorize(Policy = "EmployeePolicy")]
-    //[Authorize(Policy = "EmployeePolicy")]
+	//[Authorize(Policy = "EmployeePolicy")]
+	//[Authorize(Policy = "EmployeePolicy")]
+	[Authorize(AuthenticationSchemes = "AdminScheme", Policy = "AdminOrEmployeePolicy")]
 
-    //[Route("Admin/NhanVien")]
+	//[Route("Admin/NhanVien")]
 
-    public class NhanVienController : Controller
+	public class NhanVienController : Controller
     {
         private readonly AppDbContext _context;
 

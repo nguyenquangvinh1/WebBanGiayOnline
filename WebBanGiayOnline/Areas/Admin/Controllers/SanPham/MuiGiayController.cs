@@ -1,4 +1,5 @@
 ﻿using ClssLib;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebBanGiay.Data;
@@ -7,7 +8,9 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 {
 
     [Area("Admin")] /*sfsdfsd*/
-    public class MuiGiayController : Controller
+	[Authorize(AuthenticationSchemes = "AdminScheme", Policy = "AdminOrEmployeePolicy")]
+
+	public class MuiGiayController : Controller
     {
         private readonly AppDbContext _context;
 
