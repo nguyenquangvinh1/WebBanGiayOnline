@@ -161,42 +161,40 @@ namespace WebBanGiay.Controllers
                 var hanghoa = db.san_Pham_Chi_Tiets.SingleOrDefault(x => x.ID == id);
                 if (hanghoa == null)
                 {
-                    TempData["Message"] = $"Không tìm thấy {id}";
-                    return Redirect("/404");
+                    TempData["Message"] = $"Không ";
+                    return RedirectToAction("Details");
                 }
 
                 if (hanghoa.so_luong < quantity)
                 {
 
-                    TempData["Message"] = $"Không tìm thấy {id}";
-                    return RedirectToAction("Details");
+                    return Json(new { success = false, message = "Số lượng không đủ trong kho." });
                 }
-                hanghoa.so_luong -= quantity;
+                
+        
                 db.Update(hanghoa);
                 db.SaveChanges();
 
-        
-
-                    item = new CartItem
-                    {
-                        id = hanghoa.ID,
-                        TenHH = hanghoa.ten_SPCT,
-                        DonGia = db.san_Pham_Chi_Tiets.Find(id).gia,
-                        SoLuong = quantity,
-                        Hinh = hinh?.FirstOrDefault(x => x.San_Pham_Chi_TietID == id)?.Anh_San_Pham.anh_url ?? "Default_Image_URL"
-                    };
-                    Cart1.Add(item);
-                }
-                else
+                
+                item = new CartItem
                 {
-                    item.SoLuong += quantity;
-
-
-                }
-                HttpContext.Session.Set(MySetting.CART_KEY, Cart1);
-                return RedirectToAction("Index");
+                    id = hanghoa.ID,
+                    TenHH = hanghoa.ten_SPCT,
+                    DonGia = db.san_Pham_Chi_Tiets.Find(id).gia,
+                    SoLuong = quantity,
+                    Hinh = hinh?.FirstOrDefault(x => x.San_Pham_Chi_TietID == id)?.Anh_San_Pham.anh_url ?? "Default_Image_URL"
+                };
+                Cart1.Add(item);
             }
-           
+            else
+            {
+                item.SoLuong += quantity;
+
+
+            }
+            HttpContext.Session.Set(MySetting.CART_KEY, Cart1);
+            return Json(new { success = true });
+        }
 
         public IActionResult RemoveCart(Guid id)
         {
@@ -358,20 +356,9 @@ namespace WebBanGiay.Controllers
                                 .SingleOrDefault(X => X.ID == item.id);
                      
 
-                        if (spChiTiet != null && spChiTiet.so_luong >= item.SoLuong)
-                        {
-
-                            spChiTiet.so_luong -= item.SoLuong;
-                            db.Update(spChiTiet);
-                        }
-
-
-
-
+               
                         cthd.Add(new Hoa_Don_Chi_Tiet
                         {
-
-
                             ID = Guid.NewGuid(),
                             ma = newMa,
                             tensp = item.TenHH,
@@ -511,8 +498,8 @@ namespace WebBanGiay.Controllers
                     sdt_nguoi_nhan = model.Sdt ?? khach.sdt,
                     email_nguoi_nhan = model.Email ?? khach.email,
                     tong_tien = Cart.Sum(x => x.ThanhTienGG) == 0
-                     ? Cart.Sum(x => x.ThanhTien)
-                     : Cart.Sum(x => x.ThanhTienGG),
+                    ? Cart.Sum(x => x.ThanhTien)
+                    : Cart.Sum(x => x.ThanhTienGG),
                     ngay_tao = DateTime.Now,
                     Ship = shippingFee,
                     Giam_GiaID = discount == Guid.Empty ? null : (Guid?)discount,
@@ -521,7 +508,7 @@ namespace WebBanGiay.Controllers
                     ghi_chu = model.GhiChu ?? "Không có",
                 };
                 db.Add(hoadon);
-                db.SaveChanges();
+                    db.SaveChanges();
                 SendEmail(hoadon.email_nguoi_nhan, hoadon.trang_thai, hoadon.ten_nguoi_nhan, hoadon.MaHoaDon);
                 var lastHoaDon = db.hoa_Dons.FirstOrDefault(x => x.MaHoaDon == newMa);
                 db.Database.BeginTransaction();
@@ -553,8 +540,13 @@ namespace WebBanGiay.Controllers
                         {
                             spChiTiet.so_luong -= item.SoLuong;
                             db.Update(spChiTiet);
+                           
+                            
                         }
-
+                    if(spChiTiet.so_luong <= item.SoLuong)
+                        {
+                            return RedirectToAction("Index");
+                        }
                         cthd.Add(new Hoa_Don_Chi_Tiet
                         {
                             ID = Guid.NewGuid(),
