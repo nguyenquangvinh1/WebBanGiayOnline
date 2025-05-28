@@ -407,9 +407,14 @@ namespace WebBanGiay.Areas.Admin.Controllers
                             return Json(new { success = false, message = "Số lượng sản phẩm không đủ trong kho!" });
                         }
                     }
+                    
+                }
+                else if (newStatus == 3)
+                {
+
                 }
 
-           
+
                 _context.tai_Khoan_Hoa_Dons.Add(link);
 
                 _context.SaveChanges();
