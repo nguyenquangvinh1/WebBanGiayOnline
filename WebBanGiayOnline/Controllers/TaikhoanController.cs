@@ -260,58 +260,58 @@ namespace WebBanGiay.Controllers
         }
 
 
-		//[HttpGet]
-		//public async Task<IActionResult> Logout()
-		//{
-		//    var role = User.FindFirst(ClaimTypes.Role)?.Value;
+        //[HttpGet]
+        //public async Task<IActionResult> Logout()
+        //{
+        //    var role = User.FindFirst(ClaimTypes.Role)?.Value;
 
-		//    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        //    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-		//    if (role == "Admin" || role == "Nhân Viên")
-		//        return RedirectToAction("LoginAdmin", "Account", new { area = "Admin" });
+        //    if (role == "Admin" || role == "Nhân Viên")
+        //        return RedirectToAction("LoginAdmin", "Account", new { area = "Admin" });
 
-		//    return RedirectToAction("Login", "TaiKhoan");
-		//}
-		//[HttpGet]
-		//public async Task<IActionResult> Logout()
-		//{
-		//	var role = User.FindFirst(ClaimTypes.Role)?.Value;
+        //    return RedirectToAction("Login", "TaiKhoan");
+        //}
+        //[HttpGet]
+        //public async Task<IActionResult> Logout()
+        //{
+        //	var role = User.FindFirst(ClaimTypes.Role)?.Value;
 
-		//	if (role == "Admin" || role == "Nhân Viên")
-		//	{
-		//		await HttpContext.SignOutAsync("AdminScheme");
-		//		return RedirectToAction("LoginAdmin", "Account", new { area = "Admin" });
-		//	}
-		//	else
-		//	{
-		//		await HttpContext.SignOutAsync("CustomerScheme");
-		//		return RedirectToAction("Login", "TaiKhoan");
-		//	}
-		//}
-		[HttpGet]
-		public async Task<IActionResult> Logout()
-		{
-			// Đọc User từ scheme Admin
-			var adminResult = await HttpContext.AuthenticateAsync("AdminScheme");
-			var customerResult = await HttpContext.AuthenticateAsync("CustomerScheme");
+        //	if (role == "Admin" || role == "Nhân Viên")
+        //	{
+        //		await HttpContext.SignOutAsync("AdminScheme");
+        //		return RedirectToAction("LoginAdmin", "Account", new { area = "Admin" });
+        //	}
+        //	else
+        //	{
+        //		await HttpContext.SignOutAsync("CustomerScheme");
+        //		return RedirectToAction("Login", "TaiKhoan");
+        //	}
+        //}
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            // Kiểm tra người dùng hiện tại đang dùng scheme nào (ưu tiên Admin)
+            var adminResult = await HttpContext.AuthenticateAsync("AdminScheme");
+            if (adminResult.Succeeded && adminResult.Principal != null)
+            {
+                await HttpContext.SignOutAsync("AdminScheme");
+                return RedirectToAction("LoginAdmin", "Account", new { area = "Admin" });
+            }
 
-			var adminUser = adminResult?.Principal;
-			var customerUser = customerResult?.Principal;
+            var customerResult = await HttpContext.AuthenticateAsync("CustomerScheme");
+            if (customerResult.Succeeded && customerResult.Principal != null)
+            {
+                await HttpContext.SignOutAsync("CustomerScheme");
+                return RedirectToAction("Login", "TaiKhoan");
+            }
 
-			var role = adminUser?.FindFirst(ClaimTypes.Role)?.Value ?? customerUser?.FindFirst(ClaimTypes.Role)?.Value;
-
-			if (role == "Admin" || role == "Nhân Viên")
-			{
-				await HttpContext.SignOutAsync("AdminScheme");
-				return RedirectToAction("LoginAdmin", "Account", new { area = "Admin" });
-			}
-			else
-			{
-				await HttpContext.SignOutAsync("CustomerScheme");
-				return RedirectToAction("Login", "TaiKhoan");
-			}
-		}
+            // Nếu không có thông tin đăng nhập nào thì chuyển về trang chủ
+            return RedirectToAction("Index", "Home");
+        }
 
 
-	}
+
+
+    }
 }
