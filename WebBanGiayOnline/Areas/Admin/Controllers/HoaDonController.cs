@@ -21,8 +21,8 @@ using System.Net.Mail;
 using System.Net;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using WebBanGiay.Helpers;
-using WebBanGiay.Models;
 using System.Security.Claims;
+using WebBanGiay.Models;
 using Microsoft.AspNetCore.Authorization;
 
 

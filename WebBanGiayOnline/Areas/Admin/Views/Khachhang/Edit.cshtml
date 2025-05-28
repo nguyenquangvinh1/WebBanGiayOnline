@@ -120,6 +120,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function () {
+
         // ========== Cập nhật thông tin khách hàng ==========
         $("#updateCustomerBtn").on("click", function () {
             Swal.fire({
@@ -137,20 +138,22 @@
                         ID: $("#customerId").val(),
                         ho_ten: $("#ho_ten").val(),
                         email: $("#email").val(),
-                        sdt: $("#sdt").val(),
-                        cccd: $("#cccd").val(),
-                        ngay_sinh: $("#ngay_sinh").val()
+                        sdt: $("#sdt").val()
                     };
 
                     $.ajax({
                         type: "POST",
                         url: "/Admin/Khachhang/UpdateCustomer",
-                        data: formData,
+                        contentType: "application/json", // ✅ thêm dòng này
+                        data: JSON.stringify(formData),  // ✅ chuyển object sang JSON string
                         success: function (response) {
                             if (response.success) {
-                                Swal.fire("Thành công", "Đã cập nhật thông tin khách hàng!", "success");
+                                Swal.fire("Thành công", "Đã cập nhật thông tin khách hàng!", "success")
+                                    .then(() => {
+                                        window.location.href = "/Admin/Khachhang/Index";
+                                    });
                             } else {
-                                Swal.fire("Lỗi", response.message, "error");
+                                Swal.fire("Lỗi", "Cập nhật thất bại!", "error");
                             }
                         },
                         error: function () {
@@ -159,6 +162,7 @@
                     });
                 }
             });
+
         });
 
         // ========== Load tỉnh / huyện / xã ==========
