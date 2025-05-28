@@ -37,8 +37,8 @@ namespace WebBanGiay.Areas.Admin.Controllers
             new TTHD{ ID = 2, Name = "Đang giao hàng"},
             new TTHD{ ID = 3, Name = "Hoàn thành"},
             new TTHD{ ID = 4, Name = "Đã hủy"},
-            new TTHD{ ID = -1, Name = "Đã Thanh Toán"},
-            new TTHD{ ID = -2, Name = "Chưa Thanh Toán"}
+            new TTHD{ ID = 5, Name = "Đã Thanh Toán"},
+            new TTHD{ ID = 6, Name = "Chưa Thanh Toán"}
         };
 
         public HoaDonController(AppDbContext context)
@@ -102,8 +102,8 @@ namespace WebBanGiay.Areas.Admin.Controllers
         new SelectListItem { Value = "2", Text = "Đang giao hàng" },
         new SelectListItem { Value = "3", Text = "Hoàn thành" },
         new SelectListItem { Value = "4", Text = "Đã hủy" },
-        new SelectListItem { Value = "-1", Text = "Chưa thanh toán" },
-        new SelectListItem { Value = "-2", Text = "Đã thanh toán" },
+        new SelectListItem { Value = "6", Text = "Chưa thanh toán" },
+        new SelectListItem { Value = "5", Text = "Đã thanh toán" },
     }, "Value", "Text", Category.ToString());
 
 
