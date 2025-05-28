@@ -774,10 +774,10 @@ namespace WebBanGiay.Areas.Admin.Controllers
             try
             {
                 var ship = await _ghnService.CalculateFeeAsync(request);
-                ship = 50000;
-                if (request.provinceId == 201)
+                
+                if (request.provinceId != 201)
                 {
-                    ship = 0;
+                    ship = 50000;
                 }
                 if (request.subtotal > 2000000)
                 {
