@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -10,6 +11,9 @@ namespace ClssLib
     public class De_Giay
     {
         public Guid ID { get; set; }
+
+        [Display(Name = "Tên đế giày :")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Hãy nhập tên đế giày")]
         public string ten_de_giay { get; set; }
         public DateTime ngay_tao { get; set; }
         [JsonIgnore]
