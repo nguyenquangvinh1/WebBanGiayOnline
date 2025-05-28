@@ -21,7 +21,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
         }
         public async Task<IActionResult> Index()
         {
-            return View(await _context.danh_Mucs.ToListAsync());
+            return View(await _context.danh_Mucs.OrderByDescending(x => x.ngay_tao).ToListAsync());
         }
 
         // GET: KieuDangController/Details/5
@@ -56,6 +56,7 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
             if (ModelState.IsValid)
             {
                 danh_Muc.ID = Guid.NewGuid();
+                danh_Muc.ngay_tao = DateTime.Now;
                 _context.danh_Mucs.Add(danh_Muc);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
