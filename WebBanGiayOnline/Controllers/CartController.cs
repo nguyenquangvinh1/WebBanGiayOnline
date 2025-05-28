@@ -564,6 +564,7 @@ namespace WebBanGiay.Controllers
                         var spChiTiet = db.san_Pham_Chi_Tiets
                             .SingleOrDefault(X => X.ID == item.id);
                        
+                       
                 
                         cthd.Add(new Hoa_Don_Chi_Tiet
                         {
