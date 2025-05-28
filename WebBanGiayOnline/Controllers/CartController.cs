@@ -297,6 +297,7 @@ namespace WebBanGiay.Controllers
                     tong_tien = Cart.Sum(x => x.ThanhTienGG) == 0
                     ? Cart.Sum(x => x.ThanhTien)
                     : Cart.Sum(x => x.ThanhTienGG),
+                    thoi_gian_nhan_hang = DateTime.Now.AddDays(3),
                     ngay_tao = DateTime.Now,
                     Ship = shippingFee,
                     Giam_GiaID = discount == Guid.Empty ? null : (Guid?)discount,
@@ -508,6 +509,7 @@ namespace WebBanGiay.Controllers
                     ? Cart.Sum(x => x.ThanhTien)
                     : Cart.Sum(x => x.ThanhTienGG),
                     ngay_tao = DateTime.Now,
+                    thoi_gian_nhan_hang = DateTime.Now.AddDays(3),
                     Ship = shippingFee,
                     Giam_GiaID = discount == Guid.Empty ? null : (Guid?)discount,
                     trang_thai = 0,
@@ -563,6 +565,7 @@ namespace WebBanGiay.Controllers
                     {
                         var spChiTiet = db.san_Pham_Chi_Tiets
                             .SingleOrDefault(X => X.ID == item.id);
+                       
                        
                 
                         cthd.Add(new Hoa_Don_Chi_Tiet
