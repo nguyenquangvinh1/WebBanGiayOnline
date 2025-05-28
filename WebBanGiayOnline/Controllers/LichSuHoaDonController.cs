@@ -19,6 +19,7 @@ namespace WebBanGiay.Controllers
                 string userId = User.FindFirst("userid").Value;
                 Guid id =  Guid.Parse(userId) ;
                 var lichSu = _context.tai_Khoan_Hoa_Dons
+                .OrderByDescending(x => x.ngay_tao)
                     .Include(x => x.Hoa_Don)
                     .Where(x => x.Tai_KhoanID == id);
 
