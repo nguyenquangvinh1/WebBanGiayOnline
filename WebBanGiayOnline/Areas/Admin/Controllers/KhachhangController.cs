@@ -33,7 +33,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
         public IActionResult Index(int page = 1)
         {
-            int pageSize = 3;
+            int pageSize = 5;
 
             var query = _context.tai_Khoans
                 .Where(t => t.Vai_Tro.ten_vai_tro == "Khách hàng")
