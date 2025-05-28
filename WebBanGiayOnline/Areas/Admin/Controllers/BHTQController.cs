@@ -862,13 +862,17 @@ namespace WebBanGiay.Areas.Admin.Controllers
             invoice.Ship = model.ship;
 
             // 4. Đổi trạng thái hóa đơn thành 6 (Đã thanh toán)
-            invoice.trang_thai = 5;
             if (invoice.loai_hoa_don == 3)
             {
-
 				invoice.loai_hoa_don = 1;
 				invoice.trang_thai = 1;
-			}
+            }
+            else
+            {
+
+                invoice.trang_thai = 5;
+                invoice.dia_chi = "Tại quầy";
+            }
             _context.hoa_Dons.Update(invoice);
             _context.SaveChanges();
 

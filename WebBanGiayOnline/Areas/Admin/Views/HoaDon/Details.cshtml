@@ -490,9 +490,21 @@
                 : "0 VNĐ")
             </p>
             <p>
-                <strong>Mã giảm giá:</strong> @(Model.Giam_Gia != null
-                ? $"{Model.Giam_Gia.gia_tri_giam} %"
-                : "Không áp dụng")
+                <strong>Mã giảm giá:</strong> 
+                @if (Model.Giam_Gia != null)
+                {
+                    <span>
+                        @(Model.Giam_Gia.loai_phieu_giam_gia == 1
+                            ? $"{Model.Giam_Gia.gia_tri_giam} %"
+                            : $"{Model.Giam_Gia.gia_tri_giam} đ")
+                    </span>
+                }
+                else
+                {
+                    <span>
+                        Không áp dụng
+                    </span>
+                }
             </p>
         </div>
         <div class="col-md-6 text-right total-price" >

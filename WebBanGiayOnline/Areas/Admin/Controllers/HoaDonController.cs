@@ -56,6 +56,12 @@ namespace WebBanGiay.Areas.Admin.Controllers
             int pageSize = 10; // Số hóa đơn trên mỗi trang
 
             var hoaDons = _context.hoa_Dons.AsQueryable();
+            if (!fromDate.HasValue && !toDate.HasValue && string.IsNullOrEmpty(searchString) && !Category.HasValue)
+            {
+                DateTime today = DateTime.Today;
+                DateTime tomorrow = today.AddDays(1);
+                hoaDons = hoaDons.Where(h => h.ngay_tao >= today && h.ngay_tao < tomorrow);
+            }
             if (fromDate.HasValue)
             {
                 hoaDons = hoaDons.Where(h => h.ngay_tao >= fromDate.Value);

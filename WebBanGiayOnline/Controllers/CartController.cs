@@ -312,15 +312,15 @@ namespace WebBanGiay.Controllers
                 db.Database.BeginTransaction();
                 if (User.Identity != null && User.Identity.IsAuthenticated)
                 {
-                    string userId = User.FindFirst("userid").Value;
+                    //string userId =  User.FindFirst("userid").Value;
 
-                    Guid Id = Guid.Parse(userId);
+                    Guid Id = Guid.Parse(User.FindFirst("userid").Value);
 
                     var TK_HD = new Tai_Khoan_Hoa_Don
                     {
                         ID = Guid.NewGuid(),
-                        Ten = User.FindFirst("name").Value,
-                        vai_tro = User.FindFirst(ClaimTypes.Role)?.Value,
+                        Ten = model.TenKhachHang ?? khach.ho_ten,
+                        vai_tro = User.FindFirst(ClaimTypes.Role).Value,
                         thao_tac = "Mua Hàng Online",
                         ghi_chu = "Tạo tự động",
                         ngay_tao = DateTime.Now,
