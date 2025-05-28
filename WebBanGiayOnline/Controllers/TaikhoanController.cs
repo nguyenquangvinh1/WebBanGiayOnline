@@ -291,24 +291,11 @@ namespace WebBanGiay.Controllers
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
-            // Kiểm tra người dùng hiện tại đang dùng scheme nào (ưu tiên Admin)
-            var adminResult = await HttpContext.AuthenticateAsync("AdminScheme");
-            if (adminResult.Succeeded && adminResult.Principal != null)
-            {
-                await HttpContext.SignOutAsync("AdminScheme");
-                return RedirectToAction("LoginAdmin", "Account", new { area = "Admin" });
-            }
-
-            var customerResult = await HttpContext.AuthenticateAsync("CustomerScheme");
-            if (customerResult.Succeeded && customerResult.Principal != null)
-            {
-                await HttpContext.SignOutAsync("CustomerScheme");
-                return RedirectToAction("Login", "TaiKhoan");
-            }
-
-            // Nếu không có thông tin đăng nhập nào thì chuyển về trang chủ
-            return RedirectToAction("Index", "Home");
+            await HttpContext.SignOutAsync("CustomerScheme");
+            return RedirectToAction("Login", "TaiKhoan");
         }
+
+
 
 
 
