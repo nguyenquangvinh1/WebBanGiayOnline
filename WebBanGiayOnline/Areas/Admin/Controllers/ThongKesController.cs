@@ -61,6 +61,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                                          .Sum(hdct => hdct.so_luong)  // Trừ đi số lượng bán
                 })
                 .OrderByDescending(sp => sp.SoLuongTon)  // Sắp xếp theo số lượng tồn kho giảm dần
+                  .Take(10)
                 .ToList();
 
             // Kiểm tra dữ liệu và gán kết quả vào ViewBag
