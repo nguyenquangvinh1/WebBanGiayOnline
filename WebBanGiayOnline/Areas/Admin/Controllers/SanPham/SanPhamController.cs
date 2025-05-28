@@ -13,12 +13,14 @@ using DocumentFormat.OpenXml.InkML;
 using System.Linq;
 using System.Diagnostics;
 using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 {
 
     [Area("Admin")] /*sfsdfsd*/
-    public class SanPhamController : Controller
+	[Authorize(AuthenticationSchemes = "AdminScheme", Policy = "AdminOrEmployeePolicy")]
+	public class SanPhamController : Controller
     {
         private readonly AppDbContext _context;
 

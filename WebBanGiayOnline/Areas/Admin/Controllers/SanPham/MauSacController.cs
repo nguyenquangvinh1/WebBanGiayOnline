@@ -1,4 +1,5 @@
 ﻿using ClssLib;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +9,9 @@ namespace WebBanGiay.Areas.Admin.Controllers.SanPham
 {
 
     [Area("Admin")] /*123344*/
-    public class MauSacController : Controller
+	[Authorize(AuthenticationSchemes = "AdminScheme", Policy = "AdminOrEmployeePolicy")]
+
+	public class MauSacController : Controller
     {
         private readonly AppDbContext _context;
 

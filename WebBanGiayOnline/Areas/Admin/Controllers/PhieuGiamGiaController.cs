@@ -1,4 +1,5 @@
 ﻿using ClssLib;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -15,7 +16,8 @@ namespace WebBanGiay.Areas.Admin.Controllers
 {
 
     [Area("Admin")] /*sfsdfsd*/
-    public class PhieuGiamGiaController : Controller
+	[Authorize(AuthenticationSchemes = "AdminScheme", Policy = "AdminOrEmployeePolicy")]
+	public class PhieuGiamGiaController : Controller
     {
         // GET: CoGiayController
         private readonly AppDbContext _context;

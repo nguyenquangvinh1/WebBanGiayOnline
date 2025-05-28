@@ -23,12 +23,14 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using WebBanGiay.Helpers;
 using WebBanGiay.Models;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace WebBanGiay.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class HoaDonController : Controller
+	[Authorize(AuthenticationSchemes = "AdminScheme", Policy = "AdminOrEmployeePolicy")]
+	public class HoaDonController : Controller
     {
         private readonly AppDbContext _context;
         private readonly List<TTHD> tthd = new List<TTHD> { 
@@ -102,8 +104,8 @@ namespace WebBanGiay.Areas.Admin.Controllers
         new SelectListItem { Value = "2", Text = "Đang giao hàng" },
         new SelectListItem { Value = "3", Text = "Hoàn thành" },
         new SelectListItem { Value = "4", Text = "Đã hủy" },
-        new SelectListItem { Value = "6", Text = "Chưa thanh toán" },
-        new SelectListItem { Value = "5", Text = "Đã thanh toán" },
+        new SelectListItem { Value = "5", Text = "Chưa thanh toán" },
+        new SelectListItem { Value = "6", Text = "Đã thanh toán" },
     }, "Value", "Text", Category.ToString());
 
 
@@ -358,7 +360,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
 
         [HttpPost]
-        public JsonResult UpdateStatus(Guid? id, int newStatus)
+        public JsonResult UpdateStatus(Guid? id, int newStatus, string reason)
         {
             var hoaDon = _context.hoa_Dons.FirstOrDefault(h => h.ID == id);
 
@@ -383,7 +385,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
                     Ten = name,           // Gán tên NV
                     vai_tro = role, // Gán vai trò
                     thao_tac = "Chuyển trạng thái Hóa Đơn thành: " + tTHD.Name,
-                    ghi_chu = "không"
+                    ghi_chu = reason
                 };
                 if (newStatus == 1)
                 {
@@ -692,7 +694,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
             var hoaDon = _context.hoa_Dons
                 .Include(h => h.Hoa_Don_Chi_Tiets) 
                 .FirstOrDefault(h => h.ID == id);
-          
+        
 
             if (hoaDon == null)
             {
@@ -719,9 +721,13 @@ namespace WebBanGiay.Areas.Admin.Controllers
                 }
             }
             var giamgia = _context.phieu_Giam_Gias.FirstOrDefault(x => x.ID == hoaDon.Giam_GiaID);
-            if(giamgia != null)
+            foreach (var ct in hoaDon.Hoa_Don_Chi_Tiets)
             {
-                giamgia.gia_tri_giam = 0;
+                if (giamgia != null)
+                {
+                    giamgia.so_luong += ct.so_luong;
+                    giamgia.gia_tri_giam = 0;
+                }
             }
             if (hoaDon.Ship != null)
             {

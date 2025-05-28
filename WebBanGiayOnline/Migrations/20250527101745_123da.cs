@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WebBanGiay.Migrations
 {
     /// <inheritdoc />
-    public partial class datn : Migration
+    public partial class _123da : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,7 +18,8 @@ namespace WebBanGiay.Migrations
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ten_chat_lieu = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ten_chat_lieu = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ngay_tao = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -30,7 +31,8 @@ namespace WebBanGiay.Migrations
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ten_loai_co_giay = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ten_loai_co_giay = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ngay_tao = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -42,7 +44,8 @@ namespace WebBanGiay.Migrations
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ten_danh_muc = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ten_danh_muc = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ngay_tao = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -54,7 +57,8 @@ namespace WebBanGiay.Migrations
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ten_de_giay = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ten_de_giay = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ngay_tao = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -66,7 +70,8 @@ namespace WebBanGiay.Migrations
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ten_kich_thuoc = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ten_kich_thuoc = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ngay_tao = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -78,7 +83,8 @@ namespace WebBanGiay.Migrations
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ten_kieu_dang = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ten_kieu_dang = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ngay_tao = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -90,7 +96,8 @@ namespace WebBanGiay.Migrations
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ten_loai_giay = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ten_loai_giay = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ngay_tao = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -102,7 +109,8 @@ namespace WebBanGiay.Migrations
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ma_mau = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ma_mau = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ngay_tao = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -114,7 +122,8 @@ namespace WebBanGiay.Migrations
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ten_mui_giay = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ten_mui_giay = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ngay_tao = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -620,12 +629,12 @@ namespace WebBanGiay.Migrations
                 columns: new[] { "ID", "ma", "ten_phuong_thuc" },
                 values: new object[,]
                 {
-                    { new Guid("1b78693f-bc1f-4a4a-b1f8-51700e637c5b"), "CK", "Chuyển khoản" },
-                    { new Guid("34bcf697-08cc-4bcc-b533-543fa3129ef6"), "VNPAY", "Thanh toán VNPAY" },
-                    { new Guid("4d92623f-36d1-4022-a483-5b097a8f80b1"), "TTNH", "Thanh toán khi nhận hàng" },
-                    { new Guid("7d3b8f8c-c8b1-4493-95ad-2e7513fa7e3d"), "ALL", "Cả 2" },
-                    { new Guid("aac1bc23-ef9c-4049-b294-733cb577c6b4"), "TTM", "Tiền mặt" },
-                    { new Guid("f50a179b-5178-4904-a4cc-7b2991e072c4"), "MoMo", "Thanh toán MoMo" }
+                    { new Guid("225444de-a3c8-4cf7-ae55-8ca21faaad79"), "TTNH", "Thanh toán khi nhận hàng" },
+                    { new Guid("8d33c952-d19b-496c-b5e7-6a2d237f61b3"), "CK", "Chuyển khoản" },
+                    { new Guid("accdd736-f657-46a3-9c9d-35c954c41710"), "VNPAY", "Thanh toán VNPAY" },
+                    { new Guid("b2818100-e6a1-4129-a9b6-98d0e65ba3bf"), "TTM", "Tiền mặt" },
+                    { new Guid("bbc6bc6c-2226-4ec0-b522-84980c95bd34"), "ALL", "Cả 2" },
+                    { new Guid("f4670a29-9af1-49ce-b1f4-f9e65d5cdb29"), "MoMo", "Thanh toán MoMo" }
                 });
 
             migrationBuilder.InsertData(
@@ -633,15 +642,15 @@ namespace WebBanGiay.Migrations
                 columns: new[] { "ID", "ngay_sua", "ngay_tao", "ten_vai_tro", "trang_thai" },
                 values: new object[,]
                 {
-                    { new Guid("10f89178-6618-496b-bac5-8b6537c5d88f"), null, new DateTime(2025, 5, 21, 19, 38, 32, 991, DateTimeKind.Local).AddTicks(1705), "Admin", 1 },
-                    { new Guid("5abcfe9e-5e0b-4d45-bd82-b342b193c6b1"), null, new DateTime(2025, 5, 21, 19, 38, 32, 991, DateTimeKind.Local).AddTicks(1718), "Khách hàng", 1 },
-                    { new Guid("ec66e80c-e0eb-4755-992d-fbb280fca287"), null, new DateTime(2025, 5, 21, 19, 38, 32, 991, DateTimeKind.Local).AddTicks(1717), "Nhân Viên", 1 }
+                    { new Guid("6224bfb7-6e0b-4545-8d32-1dd583540879"), null, new DateTime(2025, 5, 27, 17, 17, 44, 23, DateTimeKind.Local).AddTicks(7899), "Admin", 1 },
+                    { new Guid("c912055d-ed3f-4d23-9348-15b062e0d6f5"), null, new DateTime(2025, 5, 27, 17, 17, 44, 23, DateTimeKind.Local).AddTicks(7922), "Nhân Viên", 1 },
+                    { new Guid("f4df6752-3dfa-4657-8e6a-39122095b00b"), null, new DateTime(2025, 5, 27, 17, 17, 44, 23, DateTimeKind.Local).AddTicks(7934), "Khách hàng", 1 }
                 });
 
             migrationBuilder.InsertData(
                 table: "tai_Khoans",
                 columns: new[] { "ID", "ResetToken", "TokenExpiry", "Vai_TroID", "cccd", "email", "gioi_tinh", "hinh_anh", "ho_ten", "ma", "ngay_sinh", "ngay_sua", "ngay_tao", "pass_word", "sdt", "trang_thai", "user_name" },
-                values: new object[] { new Guid("36a4e267-2233-4c94-8931-6a8c1d81ef64"), null, null, new Guid("10f89178-6618-496b-bac5-8b6537c5d88f"), "123456789012", "admin_tong@fpt.edu.vn", 1, "admin_tong.png", "Admin Tổng", "ADMIN01", new DateTime(1980, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, new DateTime(2025, 5, 21, 19, 38, 32, 991, DateTimeKind.Local).AddTicks(1846), "Admin123", "0123456789", 1, "admin_tong" });
+                values: new object[] { new Guid("17b1531b-3fea-44b5-8d10-3559d9bbafb5"), null, null, new Guid("6224bfb7-6e0b-4545-8d32-1dd583540879"), "123456789012", "admin_tong@fpt.edu.vn", 1, "admin_tong.png", "Admin Tổng", "ADMIN01", new DateTime(1980, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, new DateTime(2025, 5, 27, 17, 17, 44, 23, DateTimeKind.Local).AddTicks(8149), "Admin123", "0123456789", 1, "admin_tong" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_anh_San_Pham_San_Pham_Chi_Tiets_Anh_San_PhamID",

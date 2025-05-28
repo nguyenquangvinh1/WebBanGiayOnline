@@ -32,6 +32,7 @@ namespace WebBanGiay.Controllers
 
             var sanPham = _context.san_Phams
                 .Where(sp => sp.trang_thai == 1)
+                .OrderByDescending(x => x.ngay_sua)
                 .Where(sp => sp.San_Pham_Chi_Tiets.Any(ct => ct.so_luong > 0))
                 .AsQueryable();
 

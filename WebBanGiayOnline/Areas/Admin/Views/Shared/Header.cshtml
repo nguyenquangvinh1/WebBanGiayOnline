@@ -15,23 +15,22 @@
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-toggle="dropdown">
-                        <img src="~/images/nhanvien/0bd289c8-712d-42e4-95e7-82c882afd778_e42192b0682ede9d80d92260fb5e17cd (1).jpg" class="rounded-circle" width="30" height="30" alt="User Image">
-                        <span class="ml-2 text-white">@User.Identity.Name</span>
+                        <img src="~/images/nhanvien/a13c553c-33ba-4f9b-89cb-43a95f02805a_630aa8c6ef56404f93455b2889e963be.jpg" class="rounded-circle" width="30" height="30" alt="User Image">
+                        <span class="ml-2 text-dark">
+                            @User.Identity.Name
+                          
+                        </span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right mt-2" aria-labelledby="userDropdown">
                         @if (User.Identity.IsAuthenticated)
                         {
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" asp-area="Admin" asp-controller="Thongtintk" asp-action="Index">Thông tin tài khoản</a>
-
                             <a class="dropdown-item" asp-area="" asp-controller="TaiKhoan" asp-action="Logout">Đăng Xuất</a>
                         }
-
                     </div>
                 </li>
             </ul>
-
-
         </nav>
     </div>
 </div>

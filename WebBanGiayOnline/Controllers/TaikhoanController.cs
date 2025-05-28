@@ -14,13 +14,14 @@ using System.Net;
 using WebBanGiay.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using WebBanGiay.Models.ViewModel;
-using System.Text.RegularExpressions;
 
 
 namespace WebBanGiay.Controllers
 {
     [AllowAnonymous]
-    public class TaiKhoanController : Controller
+	[Authorize(AuthenticationSchemes = "CustomerScheme", Policy = "CustomerPolicy")]
+
+	public class TaiKhoanController : Controller
     {
         private readonly AppDbContext _context;
 
@@ -58,44 +59,29 @@ namespace WebBanGiay.Controllers
                 return View("Login", model);
             }
 
+            var diaChi = _context.dia_Chis.FirstOrDefault(dc => dc.Tai_KhoanID == user.ID);
 
-			// Lấy địa chỉ của người dùng (nếu có)
-			var diaChi = _context.dia_Chis.FirstOrDefault(dc => dc.Tai_KhoanID == user.ID);
+            var claims = new List<Claim>
+        {
+            new Claim("userid", user.ID.ToString()),
+            new Claim(ClaimTypes.Name, user.user_name),
+            new Claim(ClaimTypes.Role, user.Vai_Tro.ten_vai_tro),
+            new Claim(ClaimTypes.Email, user.email ?? ""),
+            new Claim("province", diaChi?.tinh ?? ""),
+            new Claim("district", diaChi?.huyen ?? ""),
+            new Claim("ward", diaChi?.xa ?? ""),
+            new Claim("address", diaChi?.dia_chi_chi_tiet ?? "")
+        };
 
-			string CleanLocationName(string input) =>
-			string.IsNullOrWhiteSpace(input) ? "" :
-			Regex.Replace(input, @"^(Tỉnh|Thành phố)\s+", "", RegexOptions.IgnoreCase).Trim();
-
-
-			var claims = new List<Claim>
-			{
-				new Claim("userid", user.ID.ToString()),
-				new Claim("name", user.ho_ten),
-				new Claim("email", user.email),
-				new Claim("SDT", user.sdt),
-				new Claim("ma", user.ma),
-				new Claim(ClaimTypes.Name, user.user_name),
-				new Claim(ClaimTypes.Role, user.Vai_Tro.ten_vai_tro),
-				new Claim(ClaimTypes.Email, user.email ?? ""),
-				new Claim("province", CleanLocationName(diaChi?.tinh)),
-				new Claim("district", diaChi?.huyen ?? ""),
-				new Claim("ward", diaChi?.xa ?? ""),
-				new Claim("address", diaChi?.dia_chi_chi_tiet ?? "")
-			};
-            Console.WriteLine(user.ID.ToString());
-            Console.WriteLine(user.ho_ten);
-            Console.WriteLine(user.email);
-            Console.WriteLine(user.sdt);
-            Console.WriteLine(user.ma);
-            Console.WriteLine(user.user_name);
-            Console.WriteLine(user.Vai_Tro.ten_vai_tro);
-            Console.WriteLine(CleanLocationName(diaChi?.tinh));
+			//         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+			////await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+			//await HttpContext.SignInAsync("CustomerScheme", new ClaimsPrincipal(claimsIdentity));
+			var claimsIdentity = new ClaimsIdentity(claims, "CustomerScheme");
+			await HttpContext.SignInAsync("CustomerScheme", new ClaimsPrincipal(claimsIdentity));
 
 
-			var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
-            return RedirectToAction("Index", "Home");
+			return RedirectToAction("Index", "Home");
         }
 
 
@@ -273,25 +259,59 @@ namespace WebBanGiay.Controllers
             return RedirectToAction("Login");
         }
 
-        //public async Task<IActionResult> Logout()
-        //{
-        //    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        //    TempData["Message"] = "Đăng xuất thành công!";
-        //    return RedirectToAction("Login", "TaiKhoan");
-        //}
-        [HttpGet]
-        public async Task<IActionResult> Logout()
-        {
-            var role = User.FindFirst(ClaimTypes.Role)?.Value;
 
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+		//[HttpGet]
+		//public async Task<IActionResult> Logout()
+		//{
+		//    var role = User.FindFirst(ClaimTypes.Role)?.Value;
 
-            if (role == "Admin" || role == "Nhân Viên")
-                return RedirectToAction("LoginAdmin", "Account", new { area = "Admin" });
+		//    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-            return RedirectToAction("Login", "TaiKhoan");
-        }
+		//    if (role == "Admin" || role == "Nhân Viên")
+		//        return RedirectToAction("LoginAdmin", "Account", new { area = "Admin" });
+
+		//    return RedirectToAction("Login", "TaiKhoan");
+		//}
+		//[HttpGet]
+		//public async Task<IActionResult> Logout()
+		//{
+		//	var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
+		//	if (role == "Admin" || role == "Nhân Viên")
+		//	{
+		//		await HttpContext.SignOutAsync("AdminScheme");
+		//		return RedirectToAction("LoginAdmin", "Account", new { area = "Admin" });
+		//	}
+		//	else
+		//	{
+		//		await HttpContext.SignOutAsync("CustomerScheme");
+		//		return RedirectToAction("Login", "TaiKhoan");
+		//	}
+		//}
+		[HttpGet]
+		public async Task<IActionResult> Logout()
+		{
+			// Đọc User từ scheme Admin
+			var adminResult = await HttpContext.AuthenticateAsync("AdminScheme");
+			var customerResult = await HttpContext.AuthenticateAsync("CustomerScheme");
+
+			var adminUser = adminResult?.Principal;
+			var customerUser = customerResult?.Principal;
+
+			var role = adminUser?.FindFirst(ClaimTypes.Role)?.Value ?? customerUser?.FindFirst(ClaimTypes.Role)?.Value;
+
+			if (role == "Admin" || role == "Nhân Viên")
+			{
+				await HttpContext.SignOutAsync("AdminScheme");
+				return RedirectToAction("LoginAdmin", "Account", new { area = "Admin" });
+			}
+			else
+			{
+				await HttpContext.SignOutAsync("CustomerScheme");
+				return RedirectToAction("Login", "TaiKhoan");
+			}
+		}
 
 
-    }
+	}
 }

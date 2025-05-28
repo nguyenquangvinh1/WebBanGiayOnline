@@ -37,7 +37,7 @@ namespace WebBanGiay.Data
                     email = "admin_tong@fpt.edu.vn", // Email
                     trang_thai = 1, // Trạng thái tài khoản
                     cccd = "123456789012", // Số CCCD
-                    hinh_anh = "admin_tong.png", // Ảnh đại diện
+                    hinh_anh = "default-avatar.jpg", // Ảnh đại diện
                     ngay_tao = DateTime.Now, // Ngày tạo tài khoản
                     Vai_TroID = adminRoleId.Value, // Vai trò Admin
                     ResetToken = null, // Token reset mật khẩu
