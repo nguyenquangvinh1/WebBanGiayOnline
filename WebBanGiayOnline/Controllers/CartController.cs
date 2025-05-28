@@ -319,7 +319,7 @@ namespace WebBanGiay.Controllers
                     var TK_HD = new Tai_Khoan_Hoa_Don
                     {
                         ID = Guid.NewGuid(),
-                        Ten = User.FindFirst("name").Value,
+                        Ten = model.TenKhachHang,
                         vai_tro = User.FindFirst(ClaimTypes.Role)?.Value,
                         thao_tac = "Mua Hàng Online",
                         ghi_chu = "Tạo tự động",
@@ -510,7 +510,7 @@ namespace WebBanGiay.Controllers
                     ngay_tao = DateTime.Now,
                     Ship = shippingFee,
                     Giam_GiaID = discount == Guid.Empty ? null : (Guid?)discount,
-                    trang_thai = 1,
+                    trang_thai = 0,
                     loai_hoa_don = 2,
                     ghi_chu = model.GhiChu ?? "Không có",
                 };
@@ -519,6 +519,26 @@ namespace WebBanGiay.Controllers
                 SendEmail(hoadon.email_nguoi_nhan, hoadon.trang_thai, hoadon.ten_nguoi_nhan, hoadon.MaHoaDon);
                 var lastHoaDon = db.hoa_Dons.FirstOrDefault(x => x.MaHoaDon == newMa);
                 db.Database.BeginTransaction();
+                if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    string userId = User.FindFirst("userid").Value;
+
+                    Guid Id = Guid.Parse(userId);
+
+                    var TK_HD = new Tai_Khoan_Hoa_Don
+                    {
+                        ID = Guid.NewGuid(),
+                        Ten = model.TenKhachHang,
+                        vai_tro = User.FindFirst(ClaimTypes.Role)?.Value,
+                        thao_tac = "Mua Hàng Online",
+                        ghi_chu = "Tạo tự động",
+                        ngay_tao = DateTime.Now,
+                        Tai_KhoanID = Id,
+                        Hoa_DonID = lastHoaDon.ID
+                    };
+                    db.tai_Khoan_Hoa_Dons.Add(TK_HD);
+                    db.SaveChanges();
+                }
 
                 var thanhtoan = new Thanh_Toan
                 {
@@ -543,17 +563,8 @@ namespace WebBanGiay.Controllers
                     {
                         var spChiTiet = db.san_Pham_Chi_Tiets
                             .SingleOrDefault(X => X.ID == item.id);
-                        if (spChiTiet != null && spChiTiet.so_luong >= item.SoLuong)
-                        {
-                            spChiTiet.so_luong -= item.SoLuong;
-                            db.Update(spChiTiet);
-                           
-                            
-                        }
-                    if(spChiTiet.so_luong < item.SoLuong)
-                        {
-                            return RedirectToAction("Index");
-                        }
+                       
+                
                         cthd.Add(new Hoa_Don_Chi_Tiet
                         {
                             ID = Guid.NewGuid(),

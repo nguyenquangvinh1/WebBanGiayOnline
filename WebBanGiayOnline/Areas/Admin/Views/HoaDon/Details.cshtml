@@ -253,7 +253,7 @@
                 <p><strong>SDT người nhận:</strong> @Model.sdt_nguoi_nhan</p>
                 <p><strong>Email người nhận:</strong> @Model.email_nguoi_nhan</p>
                 <p><strong>Địa chỉ người nhận:</strong> @Model.dia_chi</p>
-                @if (Model.trang_thai < 1 || Model.trang_thai == 5)
+                @if (Model.trang_thai < 1 )
                 {
                     <button class="btn btn-primary" onclick="toggleForm(true)">Sửa</button>
                 }
@@ -361,12 +361,12 @@
                                     {
                                         string phuongthuc = item1.Phuong_Thuc_Thanh_ToanID switch
                                         {
-                                            var id when id == Guid.Parse("D04A3590-610E-4686-9E6E-CF0C2770B148") => "Tiền mặt",
-                                            var id when id == Guid.Parse("32B17115-037E-4893-81FD-E9F5F07B18F6") => "Chuyển khoản",
-                                            var id when id == Guid.Parse("5B24F60D-3C23-467B-8F37-B186B30BC4F4") => "Cả 2",
-                                            var id when id == Guid.Parse("7A1828C2-E64C-4ECA-B632-D210C5352F33") => "Thanh toán khi nhận hàng",
-                                            var id when id == Guid.Parse("B34A2747-2008-4F5F-A2A3-7220F3A656F6") => "Thanh toán VnPay",
-                                            var id when id == Guid.Parse("C4D5897D-DC1C-4FA1-BE28-DDEAF5985F04") => "Thanh toán MoMo",
+                                            var id when id == Guid.Parse("b2818100-e6a1-4129-a9b6-98d0e65ba3bf") => "Tiền mặt",
+                                            var id when id == Guid.Parse("8d33c952-d19b-496c-b5e7-6a2d237f61b3") => "Chuyển khoản",
+                                            var id when id == Guid.Parse("bbc6bc6c-2226-4ec0-b522-84980c95bd34") => "Cả 2",
+                                            var id when id == Guid.Parse("225444de-a3c8-4cf7-ae55-8ca21faaad79") => "Thanh toán khi nhận hàng",
+                                            var id when id == Guid.Parse("accdd736-f657-46a3-9c9d-35c954c41710") => "Thanh toán VnPay",
+                                            var id when id == Guid.Parse("f4670a29-9af1-49ce-b1f4-f9e65d5cdb29") => "Thanh toán MoMo",
                                             _ => "Không xác định"
                                         };
                                             <div>@phuongthuc</div>
@@ -565,9 +565,12 @@
             } else if (currentStep === 3) {
                 nextBtn.style.display = "none";
                 prevBtn.style.display = "none";
+                huy.style.display = "none";
             } else if (currentStep === 2) {
                 prevBtn.style.display = "none";
                 nextBtn.style.display = "inline-block";
+                huy.style.display = "none";
+
             } else {
                 nextBtn.style.display = "inline-block";
                 prevBtn.style.display = "inline-block";
@@ -688,7 +691,7 @@
             var trangThai = parseInt($("#trangThaiDonHang").val());
 
             // Nếu là trạng thái không cho phép thay đổi
-            if (trangThai === 2 || trangThai === 3 || trangThai == 1) {
+            if (trangThai === 2 || trangThai === 3 || trangThai == 1 || trangThai == 5 ||trangThai ==4) {
                 $(".product-quantity").prop("readonly", true); // không cho chỉnh tay
                 $(".updateQuantity").prop("disabled", true);   // không cho bấm +/–
             }
