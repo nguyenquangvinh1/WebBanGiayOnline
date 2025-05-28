@@ -26,6 +26,7 @@ namespace WebBanGiay.Areas.Admin.Models.ViewModel
         [DataType(DataType.Date)]
         [CustomValidation(typeof(NhanVien_Model), "ValidateNgaySinh", ErrorMessage = "Nhân viên phải từ 18 tuổi trở lên")]
         public DateTime DateOfBirth { get; set; }
+
         [Required(ErrorMessage = "Số điện thoại không được để trống")]
         [RegularExpression("^0[0-9]{9}$", ErrorMessage = "Số điện thoại phải có 10 chữ số và bắt đầu bằng 0")]
         public string PhoneNumber { get; set; }
