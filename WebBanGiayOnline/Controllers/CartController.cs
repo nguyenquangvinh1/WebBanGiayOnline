@@ -602,15 +602,18 @@ namespace WebBanGiay.Controllers
         public async Task<IActionResult> PaymentMoMo(CheckoutVM model)
         {
             var hoadon1 = new Hoa_Don();
-            var totalAmount = Cart.Sum(p => p.DonGia * p.SoLuong);
 
+            var totalAmount = Cart.Sum(x => x.ThanhTienGG) == 0
+                ? Cart.Sum(x => x.ThanhTien)
+                : Cart.Sum(x => x.ThanhTienGG);
+            var shippingFee = HttpContext.Session.GetInt32("ShippingFee") ?? 0;
             var orderId = new Random().Next(1000, 100000).ToString();
             var description = $"{model.TenKhachHang} {model.Sdt}";
             var createdDate = DateTime.Now;
 
             var MomoModel = new MomoExecuteResponseModel
             {
-                Amount = totalAmount,
+                Amount = totalAmount + shippingFee,
               
                 Description = description,
                 FullName = model.TenKhachHang,
