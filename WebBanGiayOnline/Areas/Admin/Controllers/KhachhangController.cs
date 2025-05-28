@@ -33,7 +33,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
 
         public IActionResult Index(int page = 1)
         {
-            int pageSize = 3;
+            int pageSize = 5;
 
             var query = _context.tai_Khoans
                 .Where(t => t.Vai_Tro.ten_vai_tro == "Khách hàng")
@@ -116,7 +116,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
             {
                 ModelState.AddModelError("cccd", "Số CCCD đã tồn tại!");
             }
-            if (_context.tai_Khoans.Any(n => n.sdt == n.sdt && n.Vai_TroID == khachHangrole.ID))
+            if (_context.tai_Khoans.Any(n => n.sdt == model.PhoneNumber && n.Vai_TroID == khachHangrole.ID))
             {
                 ModelState.AddModelError("sdt", "Số điện thoại đã tồn tại!");
             }
