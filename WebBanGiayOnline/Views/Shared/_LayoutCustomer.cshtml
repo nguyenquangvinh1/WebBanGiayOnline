@@ -79,8 +79,10 @@
 							
 							<a href="https://localhost:7243" class="nav-item nav-link">Trang chủ</a>
 							<a asp-controller="San_Pham_Chi_Tiet" asp-action="Index" class="nav-item nav-link active">Cửa hàng</a>
-
-							<a asp-controller="LichSuHoaDon" asp-action="Index" class="nav-item nav-link">Tra cứu</a>
+							@if (User.Identity.IsAuthenticated)
+							{
+							<a asp-controller="LichSuHoaDon" asp-action="Index" class="nav-item nav-link">Tra cứu</a>}
+							
 
 						</div>
 						<div class="d-flex m-3 me-0">
