@@ -82,5 +82,11 @@ namespace WebBanGiay.Areas.Admin.Controllers
 			return RedirectToAction("Index", "Home");
 
         }
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync("AdminScheme");
+            return RedirectToAction("LoginAdmin", "Account", new { area = "Admin" });
+        }
     }
 }

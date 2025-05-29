@@ -35,7 +35,7 @@ namespace ClssLib
         [Display(Name = "Người đặt :")]
         public string ten_nguoi_nhan { get; set; }
         [Display(Name = "Ngày nhận hàng :")]
-        public DateTime thoi_gian_nhan_hang { get; set; }
+        public DateTime? thoi_gian_nhan_hang { get; set; }
         [Display(Name = "Ngày xuất hàng :")]
         public DateTime ngay_tao { get; set; }
         [Display(Name = "Ngày thay đổi :")]

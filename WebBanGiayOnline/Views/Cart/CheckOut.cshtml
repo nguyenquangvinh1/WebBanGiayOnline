@@ -91,11 +91,6 @@
                             <a asp-controller="LichSuHoaDon" asp-action="Index" class="nav-item nav-link">Tra cứu</a>
                         }
 
-
-<<<<<<< HEAD
-=======
-                       
->>>>>>> e7cf34e7a2892a8b1592aa176b2cb6c26c0ed4d0
                     </div>
                     <div class="d-flex m-3 me-0">
                         <button class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fas fa-search text-primary"></i></button>
@@ -219,9 +214,15 @@
                         </div>
                         <div class="form-item delivery-info">
                             <label class="form-label my-2">Địa chỉ chi tiết<sup>*</sup></label>
+                            <input type="text" name="ChiTiet" class="form-control">
+
+                        </div>
+                        <div class="form-item delivery-info" hidden>
+                            <label class="form-label my-2">Địa chỉ chi tiết<sup>*</sup></label>
                             <input type="text" name="fulldiachi" class="form-control">
 
                         </div>
+
 
                         <div class="form-item delivery-info">
                             <label class="form-label my-2">Điện thoại<sup>*</sup></label>
@@ -742,7 +743,7 @@
                     $('input[name="TenKhachHang"]').val(response.name);
                     $('input[name="Email"]').val(response.email);
                     $('input[name="Sdt"]').val(response.phone);
-                    $('input[name="fulldiachi"]').val(response.address);
+                    $('input[name="ChiTiet"]').val(response.address);
 
                     const cleanName = (str) => str.replace(/^Tỉnh\s+|^Thành phố\s+/i, "").trim();
                     const userProvince = cleanName(response.province);
@@ -764,15 +765,25 @@
                                                 $('#xa').find('option').each(function () {
                                                     if ($(this).text().trim() === userWard) {
                                                         $('#xa').val($(this).val()).trigger('change');
+                                                        setTimeout(() => {
+                                                            const tinh = $('#tinh').find('option:selected').text();
+                                                            const huyen = $('#huyen').find('option:selected').text();
+                                                            const xa = $('#xa').find('option:selected').text();
+                                                            const chiTiet = $('input[name="ChiTiet"]').val();
+
+
+                                                            const fullAddress = `${chiTiet}, ${xa}, ${huyen}, ${tinh}`;
+                                                            $('input[name="fulldiachi"]').val(fullAddress);
+                                                        }, 500);
                                                     }
                                                 });
-                                            }, 1000);
+                                            }, 500);
                                         }
                                     });
-                                }, 1000);
+                                }, 500);
                             }
                         });
-                    }, 1000);
+                    }, 500);
                 },
                 error: function () {
                     Toast.fire({
@@ -848,7 +859,7 @@
             const tinhSelect = $('#tinh');
             const huyenSelect = $('#huyen');
             const xaSelect = $("#xa");
-            const chiTietSelect = $('input[name="fulldiachi"]');
+            const chiTietSelect = $('input[name="ChiTiet"]');
 
 
 
@@ -871,7 +882,16 @@
                                     xaSelect.find('option').each(function () {
                                         if ($(this).text().trim() === tenXa) {
                                             xaSelect.val($(this).val()).trigger('change');
+                                            setTimeout(() => {
+                                                const tinh = $('#tinh').find('option:selected').text();
+                                                const huyen = $('#huyen').find('option:selected').text();
+                                                const xa = $('#xa').find('option:selected').text();
+                                                const chiTiet = $('input[name="ChiTiet"]').val();
 
+
+                                                const fullAddress = `${chiTiet}, ${xa}, ${huyen}, ${tinh}`;
+                                                $('input[name="fulldiachi"]').val(fullAddress);
+                                            }, 500);
                                             setTimeout(() => {
                                                 chiTietSelect.val(DC_ChiTiet);
                                             }, 500);

@@ -84,6 +84,32 @@ options.Events = new CookieAuthenticationEvents
 });
 
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminPolicy", policy =>
+    {
+        policy.AuthenticationSchemes.Add("AdminScheme");
+        policy.RequireRole("Admin");
+    });
+
+    options.AddPolicy("EmployeePolicy", policy =>
+    {
+        policy.AuthenticationSchemes.Add("AdminScheme");
+        policy.RequireRole("Nhân Viên");
+    });
+
+    options.AddPolicy("AdminOrEmployeePolicy", policy =>
+    {
+        policy.AuthenticationSchemes.Add("AdminScheme");
+        policy.RequireRole("Admin", "Nhân Viên");
+    });
+
+    options.AddPolicy("CustomerPolicy", policy =>
+    {
+        policy.AuthenticationSchemes.Add("CustomerScheme");
+        policy.RequireRole("Khách hàng");
+    });
+});
 
 
 
@@ -97,17 +123,17 @@ options.Events = new CookieAuthenticationEvents
 //    options.AccessDeniedPath = "/TaiKhoan/AccessDenied";
 //});
 
-builder.Services.AddAuthorization(options =>
-	{
-		options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
-		options.AddPolicy("EmployeePolicy", policy => policy.RequireRole("Nhân Viên"));
-		options.AddPolicy("CustomerPolicy", policy => policy.RequireRole("Khách hàng"));
-		options.AddPolicy("AdminOrEmployeePolicy", policy => policy.RequireRole("Admin", "Nhân Viên"));
-	});
+//builder.Services.AddAuthorization(options =>
+//	{
+//		options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
+//		options.AddPolicy("EmployeePolicy", policy => policy.RequireRole("Nhân Viên"));
+//		options.AddPolicy("CustomerPolicy", policy => policy.RequireRole("Khách hàng"));
+//		options.AddPolicy("AdminOrEmployeePolicy", policy => policy.RequireRole("Admin", "Nhân Viên"));
+//	});
 
 
-	// Đăng ký dbcontext
-	builder.Services.AddDbContext<AppDbContext>(options => {
+// Đăng ký dbcontext
+builder.Services.AddDbContext<AppDbContext>(options => {
 		options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 		options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 

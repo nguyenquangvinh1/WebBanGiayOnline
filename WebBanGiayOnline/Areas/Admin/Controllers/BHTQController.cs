@@ -866,6 +866,7 @@ namespace WebBanGiay.Areas.Admin.Controllers
             {
 				invoice.loai_hoa_don = 1;
 				invoice.trang_thai = 1;
+                invoice.thoi_gian_nhan_hang = DateTime.Now.AddDays(3);
             }
             else
             {
